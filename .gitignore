@@ -23,5 +23,31 @@ dist-ssr
 *.sln
 *.sw?
 
+# Secrets — never commit
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+service-role*.json
 tmp_script_*.js
+
+index1.html
+POSTS_REFINEMENT_PLAN.md
+prompt.md
+*s.md
+
+*.sql
+POSTS_REFINEMENT_PLAN.md
+.claude
+
+# powershells
+*.ps*
+
+*diff*.txt
+databasesecurityupdate.md
+*.md
+
+backend_api.php
+burrow-signup.html
+esamaj_frontend.html

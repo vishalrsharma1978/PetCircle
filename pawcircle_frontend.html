@@ -113,6 +113,51 @@
       gap: 0.35rem;
     }
 
+    @keyframes petCommunityStripScroll {
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+
+    .pet-community-strip {
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .pet-community-strip-track {
+      display: flex;
+      align-items: stretch;
+      gap: 0.5rem;
+      width: max-content;
+      animation: petCommunityStripScroll 24s linear infinite;
+      will-change: transform;
+    }
+
+    .pet-community-strip:hover .pet-community-strip-track {
+      animation-play-state: paused;
+    }
+
+    .pet-community-strip-item {
+      width: 168px;
+      flex: 0 0 auto;
+    }
+
+    @media (max-width: 640px) {
+      .pet-community-strip-item {
+        width: 142px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .pet-community-strip-track {
+        animation: none;
+      }
+    }
+
     /* Sidebar scrollbars - thin and unobtrusive so the sidebar can scroll
          independently from the main feed when its content overflows the viewport */
     .sidebar-scroll {
@@ -369,31 +414,31 @@
     }
 
     .faith-frame-bg-temple {
-      --faith-bg-src: url("img/bg_hindu.png");
+      --faith-bg-src: url("https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&q=80");
     }
 
     .faith-frame-bg-mosque {
-      --faith-bg-src: url("img/bg_muslim.png");
+      --faith-bg-src: url("https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&q=80");
     }
 
     .faith-frame-bg-church {
-      --faith-bg-src: url("img/bg_christian.png");
+      --faith-bg-src: url("https://images.unsplash.com/photo-1522926193341-e9ffd686c60f?w=400&q=80");
     }
 
     .faith-frame-bg-sikh {
-      --faith-bg-src: url("img/bg_sikh.png");
+      --faith-bg-src: url("https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=400&q=80");
     }
 
     .faith-frame-bg-buddhist {
-      --faith-bg-src: url("img/bg_buddhist.png");
+      --faith-bg-src: url("https://images.unsplash.com/photo-1552767059-ce182ead6c1b?w=400&q=80");
     }
 
     .faith-frame-bg-jain {
-      --faith-bg-src: url("img/bg_jain.png");
+      --faith-bg-src: url("https://images.unsplash.com/photo-1591839564896-ebe7a1b5ae88?w=400&q=80");
     }
 
     .faith-frame-bg-parsi {
-      --faith-bg-src: url("img/bg_parsi.png");
+      --faith-bg-src: url("https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=400&q=80");
     }
 
     /* Page starts invisible — revealed after session check to prevent login flash */
@@ -1023,10 +1068,13 @@
 
       <!-- Brand header -->
       <div class="flex items-center gap-3 mb-4 flex-shrink-0">
-        <div class="w-11 h-11 rounded-2xl bg-white/90 shadow border border-amber-200/60 flex items-center justify-center text-2xl leading-none flex-shrink-0">🐾</div>
+        <div class="w-11 h-11 rounded-2xl bg-sky-50 border border-amber-200/70 flex items-center justify-center relative shadow-sm flex-shrink-0">
+          <i data-lucide="paw-print" class="w-4.5 h-4.5 text-violet-900"></i>
+          <i data-lucide="paw-print" class="w-2.5 h-2.5 text-violet-700 absolute right-1.5 top-1.5"></i>
+        </div>
         <div>
           <div class="text-2xl font-bold tracking-tight text-gray-900 leading-tight" style="font-family: 'DM Serif Display'">PawCircle</div>
-          <div class="text-xs font-semibold text-amber-600 tracking-widest uppercase">Pet Community · All Families Welcome</div>
+          <div class="text-[11px] font-black text-amber-500 tracking-[0.2em] uppercase">Pet Community</div>
         </div>
         <span class="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200/80 flex-shrink-0">
           <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse inline-block"></span>
@@ -1034,32 +1082,11 @@
         </span>
       </div>
 
-      <!-- Static tagline -->
-      <div class="flex-shrink-0 mb-3">
-        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 border border-amber-200/60 shadow-sm text-xs font-semibold text-amber-700 w-fit">
-          <span id="public-entry-chip">Community Pulse · Live</span>
-          <span class="marquee-dots" aria-hidden="true"><span></span><span></span><span></span></span>
-        </div>
-        <h2 id="public-entry-title" class="mt-2 text-3xl sm:text-4xl font-bold text-gray-900 leading-tight" style="font-family: 'DM Serif Display'">
-          Every Pet Parent<br>Belongs Here
-        </h2>
-        <p id="public-entry-copy" class="mt-1.5 text-sm text-gray-600 max-w-lg">
-          From dogs to fish, cats to reptiles — PawCircle connects every kind of pet family with real communities, local events, and the people who just get it.
-        </p>
-      </div>
-
       <!-- Live rotating feed card — populated by initLoginFeed() -->
-      <div id="lp-feed-card" class="flex-shrink-0 rounded-2xl bg-white/85 border border-white/90 shadow-md p-4 mb-3 backdrop-blur-sm"></div>
+      <div id="lp-feed-card" class="flex-1 min-h-[420px] lg:min-h-[520px] rounded-2xl bg-white/85 border border-white/90 shadow-md p-5 mb-3 backdrop-blur-sm"></div>
 
       <!-- Activity ticker — populated by initLoginFeed() -->
       <div id="lp-activity-ticker" class="flex-shrink-0 flex items-center gap-2 flex-wrap mb-3"></div>
-
-      <!-- Mascot art -->
-      <div id="public-dog-mascot-art"
-        class="flex-1 min-h-[120px] rounded-[1.5rem] border border-white/60 shadow-lg shadow-black/10 overflow-hidden pet-soft-glow flex items-center justify-center p-3" style="background:#e8f6ff;">
-        <img src="img/dogs_hero.png" alt="Happy cartoon dogs — Corgi, Dalmatian, Golden Retriever, French Bulldog, Yorkie and Husky"
-          class="block max-w-full max-h-full w-auto h-auto rounded-xl" style="object-fit:contain;" />
-      </div>
 
       <!-- Hidden showcase kept in DOM for JS hydration but not displayed -->
       <div id="public-theme-showcase" class="hidden"></div>
@@ -1067,18 +1094,20 @@
 
     <!-- ── RIGHT: Login Form Pane ────────────────────────────────────────── -->
     <div class="w-full lg:flex-1 h-full flex flex-col items-center justify-center bg-white lg:border-l lg:border-gray-100 p-6 sm:p-8 overflow-hidden">
-      <div class="w-full max-w-xs">
+      <div class="w-full max-w-xs rounded-[1.75rem] border-2 border-brand-200/70 bg-white/92 p-5 sm:p-6 shadow-lg shadow-brand-200/30">
 
         <!-- Portal branding -->
         <div class="mb-5">
-          <div class="flex items-center gap-2 mb-3">
-            <div class="w-8 h-8 rounded-xl bg-brand-400/10 border border-brand-200/40 flex items-center justify-center">
-              <i data-lucide="paw-print" class="w-4 h-4 text-brand-400"></i>
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#ff7a66] to-[#ff5e77] flex items-center justify-center shadow-sm">
+              <i data-lucide="users" class="w-6 h-6 text-white"></i>
             </div>
-            <span class="text-xs font-bold text-brand-400 tracking-widest uppercase">PawCircle Portal</span>
+            <div class="leading-tight">
+              <div class="text-[2rem] font-bold text-slate-900" style="font-family: 'DM Serif Display'">PawCircle</div>
+            </div>
           </div>
           <h3 class="text-2xl font-bold text-gray-900" style="font-family: 'DM Serif Display'">Welcome back</h3>
-          <p class="mt-1 text-sm text-gray-500">Sign in to continue your pet-park journey.</p>
+          <p class="mt-1 text-sm text-gray-500">Let the tail-wagging fun begin!!</p>
         </div>
 
         <!-- Error banner -->
@@ -1188,55 +1217,58 @@
 
   <!-- ==================== SIGNUP ==================== -->
   <div id="view-signup"
-    class="view-section min-h-screen park-shell bg-gradient-to-br from-brand-100/25 via-sky-50 to-brand-300/15 flex-col justify-center py-12 sm:px-6 lg:px-8">
-    <div class="max-w-6xl mx-auto w-full park-grid">
-      <div class="park-hero-card rounded-[2rem] p-6 sm:p-8 lg:p-10">
-        <div class="park-title-chip">
-          <span>Choose Your Pet World</span>
-          <span class="marquee-dots" aria-hidden="true"><span></span><span></span><span></span></span>
-        </div>
-        <h2 class="mt-6 text-4xl sm:text-5xl font-bold text-gray-900 leading-tight" style="font-family: &quot;DM Serif Display&quot;">
-          Join the PawCircle Adventure
-        </h2>
-        <p id="signup-entry-copy" class="mt-4 text-sm sm:text-base text-gray-600 max-w-xl">
-          Pick your pet community and unlock a bright attraction-style experience. Dog lovers now enter a puppy-led meadow filled with sunny play energy.
-        </p>
-        <div id="signup-dog-mascot-art"
-          class="mt-8 min-h-[250px] rounded-[1.8rem] border border-white/60 shadow-lg shadow-black/10 bg-white/70 overflow-hidden pet-soft-glow"></div>
-        <div id="signup-theme-showcase" class="mt-6 grid grid-cols-2 gap-3"></div>
-      </div>
+    class="view-section h-screen bg-white flex-col justify-start sm:justify-center overflow-hidden py-3 sm:py-6 sm:px-6 lg:px-8">
+    <div class="max-w-md mx-auto w-full h-full flex flex-col justify-start sm:justify-center">
       <div
-        class="portal-form-card bg-white py-8 px-4 shadow-xl sm:rounded-[2rem] sm:px-10 border border-brand-200/30 relative overflow-hidden">
-        <div id="signup-watermark"></div>
+        class="portal-form-card rounded-[1.75rem] border-2 border-amber-200/70 bg-white/92 p-4 sm:p-6 shadow-lg shadow-amber-200/30 relative overflow-y-auto max-h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-7rem)]">
         <div class="relative z-10">
-          <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-900 flex items-center justify-center"
-              style="font-family: &quot;DM Serif Display&quot;">
-              <i data-lucide="sparkles" class="w-6 h-6 text-brand-400 mr-2"></i>
-              Join PawCircle Securely
-            </h2>
-            <p class="mt-2 text-sm text-gray-600">Create your pass and enter a mascot-led community world.</p>
+          <div class="text-center mb-4 sm:mb-6">
+            <div class="flex items-center justify-center gap-3 mb-2">
+              <div class="w-12 h-12 rounded-2xl bg-sky-50 border border-amber-200/70 flex items-center justify-center relative shadow-sm">
+                <i data-lucide="paw-print" class="w-5 h-5 text-violet-900"></i>
+                <i data-lucide="paw-print" class="w-3 h-3 text-violet-700 absolute right-1.5 top-1.5"></i>
+              </div>
+              <h2 class="text-3xl font-bold text-slate-900" style="font-family: &quot;DM Serif Display&quot;">
+                Join PawCircle Securely
+              </h2>
+            </div>
+            <p class="mt-1 text-sm text-slate-500">Create your account and join the pet community.</p>
           </div>
           <div id="signup-error"
-            class="hidden mb-4 bg-red-50 border-l-4 border-brand-400 p-3 rounded text-sm text-red-700"></div>
-          <form id="signup-step-1" class="space-y-5">
+            class="hidden mb-4 bg-red-50 border-l-4 border-brand-400 p-3 rounded-lg text-sm text-red-700"></div>
+          <form id="signup-step-1" class="space-y-3 sm:space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700">Full Name</label>
+              <label class="block text-sm font-medium text-slate-700">Pet Name</label>
               <input type="text" id="reg-name" required
-                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-brand-300 focus:border-brand-300 text-sm" />
+                class="mt-1 block w-full pl-4 pr-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm bg-gray-50/70"
+                placeholder="Enter pet name" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Pet Type</label>
+              <label class="block text-sm font-medium text-slate-700">Pet Parent Name</label>
+              <input type="text" id="reg-parent-name" required
+                class="mt-1 block w-full pl-4 pr-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm bg-gray-50/70"
+                placeholder="Enter pet parent name" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Sign Up With</label>
+              <select id="reg-contact-method" onchange="setSignupContactMode(this.value)"
+                class="mt-1 block w-full pl-4 pr-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 bg-gray-50/70 text-sm text-slate-700">
+                <option value="email">Email</option>
+                <option value="mobile">Mobile Phone</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Pet Type</label>
               <select id="reg-religion" required onchange="
-                    updateCommunityOptions('reg-religion', 'reg-community');
+                    updateBreedOptions('reg-religion', 'reg-breed');
+                  toggleCustomBreedInput();
                     document.getElementById('view-signup').className =
-                      'view-section active min-h-screen flex-col justify-center py-12 sm:px-6 lg:px-8 transition-colors duration-500 ' +
-                      getSignupBgClass(this.value);
+                      'view-section active h-screen bg-white flex-col justify-start sm:justify-center overflow-hidden py-3 sm:py-6 sm:px-6 lg:px-8 transition-colors duration-500';
                     updateSignupWatermark(this.value);
                     setPreferredEntryPetType(this.value);
                     hydrateEntryMascotArt(this.value);
                   "
-                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-brand-300 focus:border-brand-300 bg-white text-sm relative z-20">
+                class="mt-1 block w-full pl-4 pr-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 bg-gray-50/70 text-sm text-slate-700 relative z-20">
                 <option value="">Select Pet Type...</option>
                 <option>Dog</option>
                 <option>Cat</option>
@@ -1249,25 +1281,56 @@
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Community Focus</label>
-              <select id="reg-community" required
-                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-brand-300 focus:border-brand-300 bg-white text-sm">
-                <option value="">Select Community Focus...</option>
+              <label class="block text-sm font-medium text-slate-700">Breed</label>
+              <select id="reg-breed" required onchange="toggleCustomBreedInput()"
+                class="mt-1 block w-full pl-4 pr-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 bg-gray-50/70 text-sm text-slate-700">
+                <option value="">Select Breed...</option>
               </select>
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Email Address</label>
+            <div id="reg-custom-breed-wrap" class="hidden">
+              <label class="block text-sm font-medium text-slate-700">Add Breed</label>
+              <input type="text" id="reg-custom-breed"
+                class="mt-1 block w-full pl-4 pr-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm bg-gray-50/70"
+                placeholder="Enter breed name" />
+            </div>
+            <div id="reg-email-wrap">
+              <label class="block text-sm font-medium text-slate-700">Paw Parent Email</label>
               <input type="email" id="reg-email" required
-                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-brand-300 focus:border-brand-300 text-sm" />
+                class="mt-1 block w-full pl-4 pr-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm bg-gray-50/70" />
+            </div>
+            <div id="reg-phone-wrap" class="hidden">
+              <label class="block text-sm font-medium text-slate-700">Mobile Phone Number</label>
+              <div class="mt-1 flex items-center gap-2">
+                <input type="tel" id="reg-phone" inputmode="numeric" pattern="[0-9+\-\s()]{8,15}"
+                  class="block w-full pl-4 pr-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm bg-gray-50/70"
+                  placeholder="Enter mobile number" />
+                <button type="button" id="reg-send-otp-btn" onclick="sendSignupOtp()"
+                  class="shrink-0 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-900 bg-amber-400 hover:bg-amber-300 transition-colors">
+                  Send Code
+                </button>
+              </div>
+              <p id="reg-otp-status" class="mt-1 text-xs text-gray-500 hidden"></p>
+            </div>
+            <div id="reg-otp-wrap" class="hidden">
+              <label class="block text-sm font-medium text-slate-700">Verification Code</label>
+              <div class="mt-1 flex items-center gap-2">
+                <input type="text" id="reg-otp-code" inputmode="numeric" maxlength="6"
+                  class="block w-full pl-4 pr-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm bg-gray-50/70"
+                  placeholder="Enter 6-digit code" />
+                <button type="button" id="reg-verify-otp-btn" onclick="verifySignupOtp()"
+                  class="shrink-0 px-3 py-2.5 rounded-xl text-xs font-semibold text-white bg-violet-700 hover:bg-violet-600 transition-colors">
+                  Verify
+                </button>
+              </div>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Password</label>
+              <label class="block text-sm font-medium text-slate-700">Password</label>
               <input type="password" id="reg-password" required placeholder="Minimum 6 characters"
-                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-brand-300 focus:border-brand-300 text-sm" />
+                class="mt-1 block w-full pl-4 pr-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 text-sm bg-gray-50/70" />
             </div>
-            <div class="flex justify-end pt-4">
+            <div class="flex justify-end pt-2">
               <button type="submit" id="signup-submit-btn"
-                class="bg-brand-400 hover:bg-brand-300 text-white px-8 py-3 rounded-lg font-bold flex items-center shadow-md transition-colors w-full justify-center">
+                class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-slate-900 bg-amber-400 hover:bg-amber-300 transition-colors">
                 Complete Signup
                 <i data-lucide="check-circle-2" class="w-5 h-5 ml-2"></i>
               </button>
@@ -1275,9 +1338,9 @@
           </form>
         </div>
       </div>
-      <div class="mt-6 text-center lg:col-start-2">
+      <div class="mt-4 text-center pb-1">
         <button onclick="switchView('view-public-login')"
-          class="text-sm font-medium text-gray-600 hover:text-brand-400">
+          class="text-sm font-medium text-slate-500 hover:text-amber-500">
           Already have an account? Sign in.
         </button>
       </div>
@@ -1289,11 +1352,14 @@
     <!-- Top bar -->
     <div class="bg-white border-b border-gray-100 px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between shadow-sm gap-2">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 bg-gradient-to-br from-brand-400 to-brand-300 rounded-lg flex items-center justify-center shrink-0">
-          <i data-lucide="users" class="w-4 h-4 text-white"></i>
+        <div class="w-12 h-12 rounded-2xl bg-sky-50 border border-amber-200/70 flex items-center justify-center relative shadow-sm shrink-0">
+          <i data-lucide="paw-print" class="w-5 h-5 text-violet-900"></i>
+          <i data-lucide="paw-print" class="w-3 h-3 text-violet-700 absolute right-1.5 top-1.5"></i>
         </div>
-        <span class="font-bold text-gray-900 truncate"
-          style="font-family: &quot;DM Serif Display&quot;; font-size: 18px">PawCircle</span>
+        <div class="leading-tight min-w-0">
+          <div class="font-bold text-slate-900 truncate" style="font-family: &quot;DM Serif Display&quot;; font-size: 18px">PawCircle</div>
+          <div class="text-[11px] font-black tracking-[0.22em] text-amber-500 uppercase truncate">Pet Community</div>
+        </div>
       </div>
       <div class="flex items-center gap-2 sm:gap-3 overflow-hidden">
         <div class="flex items-center gap-2 truncate">
@@ -1313,9 +1379,9 @@
       <div id="dash-banner"
         class="bg-gradient-to-r from-brand-400 to-brand-300 rounded-2xl p-6 mb-6 text-white shadow-lg relative overflow-hidden transition-all duration-500 hover:shadow-xl hover:scale-[1.01]">
         <div id="dash-banner-symbol"
-          class="absolute right-6 top-1/2 -translate-y-1/2 text-8xl pointer-events-none transform flex items-center justify-center"
+          class="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-white/95 border border-white/90 shadow-lg pointer-events-none transform flex items-center justify-center overflow-hidden"
           style="line-height: 1"></div>
-        <div class="relative z-10">
+        <div class="relative z-10 pr-28 sm:pr-44">
           <p class="text-sm font-medium text-white/80 mb-1" id="dash-greeting-sub">
             Pet Community Portal
           </p>
@@ -1356,10 +1422,9 @@
 
             <!-- Branding and greeting text -->
             <div class="flex-1 min-w-0">
-              <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white leading-tight"
-                style="font-family: &quot;DM Serif Display&quot;">
-                PawCircle
-              </h1>
+              <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white leading-tight"
+                style="font-family: &quot;DM Serif Display&quot;">PawCircle</div>
+              <div class="text-[11px] sm:text-xs font-black tracking-[0.2em] uppercase text-amber-500 mt-0.5">Pet Community</div>
               <p class="text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300 mt-1"
                 id="social-header-greeting-native"></p>
               <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400" id="social-header-greeting-en"></p>
@@ -2138,6 +2203,17 @@
   <script>
     lucide.createIcons();
 
+    const PET_REAL_PHOTOS = {
+      Dog: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=1200&q=85&auto=format&fit=crop',
+      Cat: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=1200&q=85&auto=format&fit=crop',
+      Bird: 'https://images.unsplash.com/photo-1452570053594-1b985d6ea890?w=1200&q=85&auto=format&fit=crop',
+      Rabbit: 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=1200&q=85&auto=format&fit=crop',
+      Fish: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=1200&q=85&auto=format&fit=crop',
+      Reptile: 'https://images.unsplash.com/photo-1531386151447-fd76ad50012f?w=1200&q=85&auto=format&fit=crop',
+      "Small Pets": 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=1200&q=85&auto=format&fit=crop',
+      Other: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=1200&q=85&auto=format&fit=crop',
+    };
+
     // ── Login Page: Rotating Community Feed ──────────────────────────────
     function initLoginFeed() {
       var pane     = document.getElementById('lp-left-pane');
@@ -2148,6 +2224,7 @@
 
       var feeds = [
         {
+          petTheme: 'Dog',
           icon: '🐕', grad: 'linear-gradient(135deg,#fffbeb 0%,#fef9c3 60%,#f0fdf4 100%)',
           chipText: 'Dog Community · Active Now', chipCls: 'text-amber-700 border-amber-200',
           headline: 'Golden Hour Walk Guide for Summer 2026',
@@ -2162,6 +2239,7 @@
           online: 142,
         },
         {
+          petTheme: 'Cat',
           icon: '🐈', grad: 'linear-gradient(135deg,#fdf4ff 0%,#ede9fe 60%,#f0f9ff 100%)',
           chipText: 'Cat Community · Active Now', chipCls: 'text-purple-700 border-purple-200',
           headline: 'Keeping Indoor Cats Cool &amp; Stimulated',
@@ -2176,6 +2254,7 @@
           online: 89,
         },
         {
+          petTheme: 'Bird',
           icon: '🐦', grad: 'linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 60%,#ecfdf5 100%)',
           chipText: 'Bird Community · Active Now', chipCls: 'text-sky-700 border-sky-200',
           headline: 'Socialising Your Parrot: A Step-by-Step Guide',
@@ -2190,6 +2269,7 @@
           online: 34,
         },
         {
+          petTheme: 'Rabbit',
           icon: '🐇', grad: 'linear-gradient(135deg,#fff1f2 0%,#fce7f3 60%,#fff7ed 100%)',
           chipText: 'Rabbit Community · Active Now', chipCls: 'text-pink-700 border-pink-200',
           headline: 'Rabbit-Proofing Your Home: The Essential Checklist',
@@ -2204,6 +2284,7 @@
           online: 27,
         },
         {
+          petTheme: 'Fish',
           icon: '🐠', grad: 'linear-gradient(135deg,#ecfeff 0%,#cffafe 60%,#f0fdf4 100%)',
           chipText: 'Aquatics Community · Active Now', chipCls: 'text-cyan-700 border-cyan-200',
           headline: 'Summer Aquarium Care: Keeping Water Temperatures Safe',
@@ -2218,6 +2299,7 @@
           online: 18,
         },
         {
+          petTheme: 'Reptile',
           icon: '🦎', grad: 'linear-gradient(135deg,#f7fee7 0%,#ecfccb 60%,#fefce8 100%)',
           chipText: 'Reptile Community · Active Now', chipCls: 'text-lime-700 border-lime-200',
           headline: 'UVB Lighting &amp; Basking Zones: Getting It Right',
@@ -2242,7 +2324,7 @@
         if (onlineEl) onlineEl.textContent = (f.online + Math.floor(Math.random() * 14) - 7) + ' online';
 
         var tipsHtml = f.tips.map(function(t) {
-          return '<div class="rounded-xl border px-2 py-2 text-center ' + t.cls + '">' +
+          return '<div class="rounded-xl border px-2.5 py-2.5 text-center min-h-[92px] flex flex-col items-center justify-center ' + t.cls + '">' +
                  '<div class="text-base mb-0.5">' + t.icon + '<\/div>' +
                  '<div class="text-xs font-semibold leading-tight">' + t.label + '<br>' + t.sub + '<\/div><\/div>';
         }).join('');
@@ -2251,7 +2333,19 @@
           return '<span class="px-2 py-0.5 rounded-full bg-white border border-gray-200/70 text-xs font-medium text-gray-600">' + tag + '<\/span>';
         }).join('');
 
+        var galleryThemes = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Fish', 'Reptile']
+          .filter(function(themeName) { return themeName !== f.petTheme; });
+        var communityGalleryHtml = galleryThemes.concat(galleryThemes).map(function(themeName) {
+          var theme = getPetTheme(themeName);
+          var art = PET_REAL_PHOTOS[themeName] || getPetIllustrationDataUrl(theme, 'badge');
+          return '<div class="pet-community-strip-item rounded-xl border border-white/85 bg-white/76 p-2.5 shadow-sm">' +
+                   '<div class="h-28 rounded-lg" style="background-image:linear-gradient(135deg, color-mix(in srgb, ' + theme.accent + ' 18%, white), transparent 70%), url(\'' + art + '\');background-size:cover;background-position:center;"><\/div>' +
+                   '<div class="mt-1.5 text-[11px] font-bold text-gray-700 text-center leading-tight">' + theme.label + '<\/div>' +
+                 '<\/div>';
+        }).join('');
+
         card.innerHTML =
+          '<div class="h-full flex flex-col">' +
           '<div class="flex items-center justify-between mb-2">' +
             '<span class="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-0.5 rounded-full bg-white border uppercase tracking-wide ' + f.chipCls + '">' +
               f.icon + ' ' + f.chipText +
@@ -2259,9 +2353,16 @@
             '<span class="text-xs text-gray-400">5 min read<\/span>' +
           '<\/div>' +
           '<h3 class="text-base font-bold text-gray-800 leading-snug mb-1.5" style="font-family:&apos;DM Serif Display&apos;">' + f.headline + '<\/h3>' +
-          '<p class="text-xs text-gray-600 leading-relaxed mb-3">' + f.excerpt + '<\/p>' +
-          '<div class="grid grid-cols-3 gap-2 mb-3">' + tipsHtml + '<\/div>' +
-          '<div class="flex items-center gap-2 flex-wrap">' + tagsHtml + '<\/div>';
+          '<p class="text-sm text-gray-600 leading-relaxed mb-3">' + f.excerpt + '<\/p>' +
+          '<div class="grid grid-cols-3 gap-2.5 mb-3 auto-rows-fr">' + tipsHtml + '<\/div>' +
+          '<div class="mt-auto flex items-center gap-2 flex-wrap">' + tagsHtml + '<\/div>' +
+          '<div class="mt-3 pt-3 border-t border-white/80">' +
+            '<div class="text-[11px] font-black uppercase tracking-[0.16em] text-gray-500 mb-2">Explore Pet Communities<\/div>' +
+            '<div class="pet-community-strip">' +
+              '<div class="pet-community-strip-track">' + communityGalleryHtml + '<\/div>' +
+            '<\/div>' +
+          '<\/div>' +
+          '<\/div>';
 
         if (ticker) {
           ticker.innerHTML = f.activity.map(function(a) {
@@ -2324,9 +2425,96 @@
       Other: ["Mixed Pet Circle", "Neighborhood Pet Care", "Adoption Support"],
     };
 
+    const breedsByPetType = {
+      Dog: [
+        "Labrador Retriever", "Golden Retriever", "German Shepherd", "Beagle", "Pug", "Rottweiler",
+        "Siberian Husky", "Doberman Pinscher", "Boxer", "Dachshund", "Shih Tzu", "Pomeranian",
+        "Chihuahua", "Cocker Spaniel", "Great Dane", "Saint Bernard", "Border Collie", "Australian Shepherd",
+        "Belgian Malinois", "Basset Hound", "Maltese", "Lhasa Apso", "Poodle", "Toy Poodle",
+        "French Bulldog", "English Bulldog", "Boston Terrier", "Yorkshire Terrier", "Akita", "Samoyed",
+        "Pit Bull", "Indian Pariah Dog", "Rajapalayam", "Mudhol Hound", "Kombai", "Gaddi Kutta",
+        "Indie / Mixed", "Not Listed / Mixed",
+      ],
+      Cat: [
+        "Persian", "Siamese", "Maine Coon", "Ragdoll", "British Shorthair", "Bengal", "Sphynx",
+        "Abyssinian", "Russian Blue", "Scottish Fold", "American Shorthair", "Oriental Shorthair",
+        "Norwegian Forest", "Birman", "Turkish Angora", "Turkish Van", "Himalayan", "Burmese",
+        "Bombay", "Devon Rex", "Cornish Rex", "Manx", "Munchkin", "Domestic Shorthair",
+        "Domestic Longhair", "Indie / Mixed", "Not Listed / Mixed",
+      ],
+      Bird: [
+        "Budgerigar (Parakeet)", "Cockatiel", "Lovebird", "African Grey", "Canary", "Finch",
+        "Cockatoo", "Macaw", "Conure", "Quaker Parrot", "Eclectus", "Amazon Parrot",
+        "Indian Ringneck", "Lorikeet", "Budgie Mix", "Pigeon", "Dove", "Java Sparrow",
+        "Not Listed / Mixed",
+      ],
+      Rabbit: [
+        "Holland Lop", "Mini Lop", "Lionhead", "Netherland Dwarf", "Rex", "Mini Rex",
+        "Flemish Giant", "Dutch", "English Angora", "French Angora", "Californian", "New Zealand",
+        "Harlequin", "Himalayan Rabbit", "Polish", "Mixed Rabbit", "Not Listed / Mixed",
+      ],
+      Fish: [
+        "Goldfish", "Betta", "Guppy", "Molly", "Platy", "Swordtail", "Angelfish", "Discus",
+        "Neon Tetra", "Cardinal Tetra", "Corydoras", "Zebra Danio", "Koi", "Arowana",
+        "Flowerhorn", "Oscar", "Cichlid", "Pleco", "Barb", "Rasbora", "Not Listed / Mixed",
+      ],
+      Reptile: [
+        "Bearded Dragon", "Leopard Gecko", "Crested Gecko", "Corn Snake", "Ball Python", "King Snake",
+        "Boa Constrictor", "Green Iguana", "Blue Tongue Skink", "Monitor Lizard", "Chameleon",
+        "Russian Tortoise", "Sulcata Tortoise", "Red-Eared Slider", "Indian Star Tortoise",
+        "Not Listed / Mixed",
+      ],
+      "Small Pets": [
+        "Syrian Hamster", "Dwarf Hamster", "Roborovski Hamster", "Guinea Pig", "Abyssinian Guinea Pig",
+        "Peruvian Guinea Pig", "Ferret", "Chinchilla", "Gerbil", "Mouse", "Rat", "Hedgehog",
+        "Sugar Glider", "Not Listed / Mixed",
+      ],
+      Other: ["Not Listed / Mixed", "Unknown", "Other"],
+    };
+
+    const CUSTOM_BREEDS_KEY = "pawcircle_custom_breeds_by_pet_type";
+    const OTP_EXPIRY_MS = 5 * 60 * 1000;
+
+    const signupOtpState = {
+      phone: "",
+      code: "",
+      expiresAt: 0,
+      verifiedPhone: "",
+    };
+
+    function getCustomBreedsMap() {
+      try {
+        const raw = localStorage.getItem(CUSTOM_BREEDS_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        console.warn("Could not read custom breeds:", e);
+        return {};
+      }
+    }
+
+    function getCustomBreedsForPetType(petType) {
+      const map = getCustomBreedsMap();
+      const list = map[petType];
+      return Array.isArray(list) ? list : [];
+    }
+
+    function saveCustomBreedForPetType(petType, breedName) {
+      const cleanBreed = String(breedName || "").trim();
+      if (!petType || !cleanBreed) return;
+      const map = getCustomBreedsMap();
+      const existing = Array.isArray(map[petType]) ? map[petType] : [];
+      const exists = existing.some((item) => item.trim().toLowerCase() === cleanBreed.toLowerCase());
+      if (!exists) {
+        existing.push(cleanBreed);
+        map[petType] = existing;
+        localStorage.setItem(CUSTOM_BREEDS_KEY, JSON.stringify(map));
+      }
+    }
+
     function updateCommunityOptions(religionSelectId, communitySelectId) {
       const religion = document.getElementById(religionSelectId).value;
       const communitySelect = document.getElementById(communitySelectId);
+      if (!communitySelect) return;
       communitySelect.innerHTML =
         '<option value="">Select Community Focus...</option>';
       if (religion && communitiesByReligion[religion]) {
@@ -2337,6 +2525,147 @@
           communitySelect.appendChild(opt);
         });
       }
+    }
+
+    function updateBreedOptions(religionSelectId, breedSelectId) {
+      const religion = document.getElementById(religionSelectId)?.value;
+      const breedSelect = document.getElementById(breedSelectId);
+      if (!breedSelect) return;
+      breedSelect.innerHTML = '<option value="">Select Breed...</option>';
+      if (religion && breedsByPetType[religion]) {
+        const baseBreeds = breedsByPetType[religion] || [];
+        const customBreeds = getCustomBreedsForPetType(religion);
+        const allBreeds = [];
+        const seen = new Set();
+
+        baseBreeds.concat(customBreeds).forEach((breed) => {
+          const key = String(breed || "").trim().toLowerCase();
+          if (!key || seen.has(key)) return;
+          seen.add(key);
+          allBreeds.push(String(breed).trim());
+        });
+
+        allBreeds.forEach((breed) => {
+          const opt = document.createElement("option");
+          opt.value = breed;
+          opt.textContent = breed;
+          breedSelect.appendChild(opt);
+        });
+      }
+    }
+
+    function toggleCustomBreedInput() {
+      const breedSelect = document.getElementById("reg-breed");
+      const wrapper = document.getElementById("reg-custom-breed-wrap");
+      const input = document.getElementById("reg-custom-breed");
+      if (!breedSelect || !wrapper || !input) return;
+      const show = breedSelect.value === "Not Listed / Mixed";
+      wrapper.classList.toggle("hidden", !show);
+      input.required = show;
+      if (!show) input.value = "";
+    }
+
+    function normalizePhone(input) {
+      return String(input || "").replace(/[^0-9+]/g, "");
+    }
+
+    function setOtpStatus(message, tone = "muted") {
+      const el = document.getElementById("reg-otp-status");
+      if (!el) return;
+      el.classList.remove("hidden", "text-gray-500", "text-green-600", "text-red-600", "text-amber-600");
+      el.classList.add(
+        tone === "success" ? "text-green-600" :
+        tone === "error" ? "text-red-600" :
+        tone === "warning" ? "text-amber-600" : "text-gray-500",
+      );
+      el.textContent = message;
+    }
+
+    function resetSignupOtpState() {
+      signupOtpState.phone = "";
+      signupOtpState.code = "";
+      signupOtpState.expiresAt = 0;
+      signupOtpState.verifiedPhone = "";
+      const otpCode = document.getElementById("reg-otp-code");
+      if (otpCode) otpCode.value = "";
+      const otpWrap = document.getElementById("reg-otp-wrap");
+      if (otpWrap) otpWrap.classList.add("hidden");
+      const otpStatus = document.getElementById("reg-otp-status");
+      if (otpStatus) {
+        otpStatus.classList.add("hidden");
+        otpStatus.textContent = "";
+      }
+    }
+
+    function setSignupContactMode(mode = "email") {
+      const emailWrap = document.getElementById("reg-email-wrap");
+      const emailInput = document.getElementById("reg-email");
+      const phoneWrap = document.getElementById("reg-phone-wrap");
+      const phoneInput = document.getElementById("reg-phone");
+      const useMobile = mode === "mobile";
+
+      if (emailWrap) emailWrap.classList.toggle("hidden", useMobile);
+      if (emailInput) {
+        emailInput.required = !useMobile;
+        if (useMobile) emailInput.value = "";
+      }
+
+      if (phoneWrap) phoneWrap.classList.toggle("hidden", !useMobile);
+      if (phoneInput) {
+        phoneInput.required = useMobile;
+        if (!useMobile) phoneInput.value = "";
+      }
+
+      if (!useMobile) {
+        resetSignupOtpState();
+      }
+    }
+
+    function sendSignupOtp() {
+      const mode = document.getElementById("reg-contact-method")?.value || "email";
+      if (mode !== "mobile") return;
+      const rawPhone = document.getElementById("reg-phone")?.value || "";
+      const phone = normalizePhone(rawPhone);
+      if (phone.length < 8) {
+        setOtpStatus("Please enter a valid mobile number first.", "error");
+        return;
+      }
+
+      const code = String(Math.floor(100000 + Math.random() * 900000));
+      signupOtpState.phone = phone;
+      signupOtpState.code = code;
+      signupOtpState.expiresAt = Date.now() + OTP_EXPIRY_MS;
+      signupOtpState.verifiedPhone = "";
+
+      const otpWrap = document.getElementById("reg-otp-wrap");
+      if (otpWrap) otpWrap.classList.remove("hidden");
+      setOtpStatus(`Verification code sent. Demo code: ${code}`, "warning");
+    }
+
+    function verifySignupOtp() {
+      const rawPhone = document.getElementById("reg-phone")?.value || "";
+      const phone = normalizePhone(rawPhone);
+      const entered = (document.getElementById("reg-otp-code")?.value || "").trim();
+
+      if (!signupOtpState.code || !signupOtpState.phone) {
+        setOtpStatus("Please send a verification code first.", "error");
+        return;
+      }
+      if (Date.now() > signupOtpState.expiresAt) {
+        setOtpStatus("Verification code expired. Please request a new code.", "error");
+        return;
+      }
+      if (phone !== signupOtpState.phone) {
+        setOtpStatus("Phone number changed. Please resend code.", "error");
+        return;
+      }
+      if (entered !== signupOtpState.code) {
+        setOtpStatus("Invalid verification code.", "error");
+        return;
+      }
+
+      signupOtpState.verifiedPhone = phone;
+      setOtpStatus("Phone number verified successfully.", "success");
     }
 
     function switchView(viewId) {
@@ -2363,6 +2692,12 @@
     const DEMO_ADMIN = { email: "admin@pawcircle.com", password: "admin123" };
     if (!localStorage.getItem("esamaj_db"))
       localStorage.setItem("esamaj_db", JSON.stringify([]));
+
+    setSignupContactMode("email");
+    document.getElementById("reg-phone")?.addEventListener("input", function () {
+      signupOtpState.verifiedPhone = "";
+      setOtpStatus("Mobile changed. Please resend and verify code.", "muted");
+    });
 
     // ── Public Login ──────────────────────────────────────────────────────
     document
@@ -2607,19 +2942,51 @@
       .addEventListener("submit", async function (e) {
         e.preventDefault();
         const name = document.getElementById("reg-name").value.trim();
+        const parentName = document.getElementById("reg-parent-name").value.trim();
+        const contactMethod = document.getElementById("reg-contact-method")?.value || "email";
         const email = document.getElementById("reg-email").value.trim();
+        const phone = normalizePhone(document.getElementById("reg-phone")?.value || "");
         const password = document.getElementById("reg-password").value;
         const religion =
           document.getElementById("reg-religion").value || "Dog";
-        const community = document.getElementById("reg-community").value;
+        const selectedBreed = document.getElementById("reg-breed")?.value || "Unknown";
+        const customBreed = document.getElementById("reg-custom-breed")?.value.trim() || "";
+        const breed = selectedBreed === "Not Listed / Mixed" ? customBreed : selectedBreed;
+        const identityEmail = contactMethod === "mobile"
+          ? `mobile.${phone}@pawcircle.local`
+          : email;
+        const community =
+          communitiesByReligion[religion]?.[0] || "General Pet Circle";
 
-        if (!name || !email || !password) {
+        if (!name || !parentName || !password || !breed) {
           showError("signup", "Please fill in all fields.");
           return;
+        }
+        if (contactMethod === "email" && !email) {
+          showError("signup", "Please enter email address.");
+          return;
+        }
+        if (contactMethod === "mobile") {
+          if (phone.length < 8) {
+            showError("signup", "Please enter a valid mobile number.");
+            return;
+          }
+          if (signupOtpState.verifiedPhone !== phone) {
+            showError("signup", "Please verify your mobile number using the code.");
+            return;
+          }
         }
         if (password.length < 6) {
           showError("signup", "Password must be at least 6 characters.");
           return;
+        }
+        if (selectedBreed === "Not Listed / Mixed" && !customBreed) {
+          showError("signup", "Please enter the breed name.");
+          return;
+        }
+
+        if (selectedBreed === "Not Listed / Mixed") {
+          saveCustomBreedForPetType(religion, customBreed);
         }
 
         const btn = document.getElementById("signup-submit-btn");
@@ -2636,9 +3003,13 @@
             body: JSON.stringify({
               action: "signup",
               name,
-              email,
+              parentName,
+              email: identityEmail,
+              phone,
+              contactMethod,
               password,
               religion,
+              breed,
               community,
             }),
           });
@@ -2647,6 +3018,9 @@
             populateMemberDashboard(data.user);
             switchView("view-member-dashboard");
             document.getElementById("signup-step-1").reset();
+            toggleCustomBreedInput();
+            setSignupContactMode("email");
+            updateBreedOptions("reg-religion", "reg-breed");
           } else {
             showError(
               "signup",
@@ -2657,8 +3031,16 @@
           // Backend unreachable — fall back to localStorage
           console.warn("Backend unreachable, saving to local DB.");
           const db = JSON.parse(localStorage.getItem("esamaj_db") || "[]");
-          if (db.find((u) => u.email === email)) {
-            showError("signup", "An account with this email already exists.");
+          const exists = contactMethod === "mobile"
+            ? db.find((u) => normalizePhone(u.phone || "") === phone)
+            : db.find((u) => u.email === identityEmail);
+          if (exists) {
+            showError(
+              "signup",
+              contactMethod === "mobile"
+                ? "An account with this mobile number already exists."
+                : "An account with this email already exists.",
+            );
             btn.innerHTML = orig;
             btn.disabled = false;
             lucide.createIcons();
@@ -2666,9 +3048,13 @@
           }
           const newUser = {
             name,
-            email,
+            parentName,
+            email: identityEmail,
+            phone,
+            contactMethod,
             password,
             religion,
+            breed,
             community,
             membership_applied: false,
             role: "member",
@@ -2678,6 +3064,9 @@
           populateMemberDashboard(newUser);
           switchView("view-member-dashboard");
           document.getElementById("signup-step-1").reset();
+          toggleCustomBreedInput();
+          setSignupContactMode("email");
+          updateBreedOptions("reg-religion", "reg-breed");
         } finally {
           btn.innerHTML = orig;
           btn.disabled = false;
@@ -3240,15 +3629,8 @@
     const updateSignupWatermark = (religion) => {
       const container = document.getElementById("signup-watermark");
       if (!container) return;
-      const theme = getPetTheme(religion);
-      const bgUrl = getPetIllustrationDataUrl(theme, "watermark");
-      const darkColorClass = getDarkColorClass(religion);
-
-      container.innerHTML = `
-                <div class="absolute inset-0 pointer-events-none opacity-30 mix-blend-multiply z-0" style="isolation: isolate;">
-                    <div class="w-full h-full ${darkColorClass}"></div>
-                    <div class="absolute inset-0 mix-blend-screen" style="background-image: url('${bgUrl}'); background-position: center; background-size: cover; background-repeat: no-repeat;"></div>
-                </div>`;
+      // Keep signup palette consistent with signin by disabling theme tint overlays.
+      container.innerHTML = "";
     };
 
     const ENTRY_PET_TYPE_KEY = "pawcircle_entry_pet_type";
@@ -3296,7 +3678,7 @@
           title: `Step Into ${featureTheme.landName}`,
           copy: "The dog community opens with your Golden Labrador mascot, warm meadow colors, and a sunny park-day atmosphere across the experience.",
           badge: "Featured puppy-led park theme",
-          signup: "Pick your pet community and unlock a bright attraction-style experience. Dog lovers now enter a puppy-led meadow filled with sunny play energy.",
+          signup: "Pick your pet community and unlock a bright attraction-style experience.",
         },
         cat: {
           chip: "Cat Community Feature",
@@ -4836,10 +5218,12 @@
         : '<i data-lucide="user" class="w-4 h-4 text-brand-300"></i>';
 
       const bannerSymbol = document.getElementById("dash-banner-symbol");
-      if (bannerSymbol)
+      if (bannerSymbol) {
+        const bannerPhoto = PET_REAL_PHOTOS[theme.label] || PET_REAL_PHOTOS.Other;
         bannerSymbol.innerHTML = user.religion
-          ? getCircledLogo(theme.emoji, user.religion)
+          ? `<img src="${bannerPhoto}" alt="${theme.label} pet" class="w-full h-full object-cover" onerror="this.remove()" />`
           : "";
+      }
 
       const dashboardBg = document.getElementById("view-member-dashboard");
       const dashBanner = document.getElementById("dash-banner");
@@ -5089,9 +5473,56 @@
       el.innerHTML = `<span class="${className}" aria-hidden="true">${glyph}</span>`;
     }
 
+    function setPetImageBadge(target, imageUrl, alt = "Pet", expression = "🐾") {
+      const el = typeof target === "string" ? document.querySelector(target) : target;
+      if (!el || !imageUrl) return;
+      el.innerHTML = `
+        <span class="relative inline-flex items-center justify-center w-12 h-12">
+          <img src="${imageUrl}" alt="${alt}" class="w-12 h-12 rounded-full object-cover border border-white/90 shadow-md" />
+          <span class="absolute -right-2 -bottom-2 w-7 h-7 rounded-full bg-white text-[17px] leading-none flex items-center justify-center border-2 border-amber-300 shadow-lg" title="${alt} mood">${expression}</span>
+        </span>`;
+    }
+
+    function getCommunityExpressionsByTab(user, theme) {
+      const liveCommunity = (
+        document.getElementById("s2-community")?.value ||
+        user?.socialProfile?.community ||
+        user?.community ||
+        ""
+      ).toLowerCase();
+
+      const byPet = {
+        dog: { feed: "🐶", friends: "🦴", connections: "🐾", groups: "🏕️", live: "🎾", events: "🎉", guides: "🩺", match: "💞", memorial: "🌈" },
+        cat: { feed: "😺", friends: "🧶", connections: "🐾", groups: "🏠", live: "😻", events: "🎊", guides: "🐟", match: "💞", memorial: "🌈" },
+        bird: { feed: "🦜", friends: "🪶", connections: "🔎", groups: "🌿", live: "🎥", events: "🎉", guides: "🧠", match: "💞", memorial: "🌈" },
+        rabbit: { feed: "🐰", friends: "🥕", connections: "🔎", groups: "🌱", live: "🎥", events: "🎉", guides: "🥬", match: "💞", memorial: "🌈" },
+        fish: { feed: "🐠", friends: "🫧", connections: "🔎", groups: "🌊", live: "🎥", events: "🎉", guides: "🧪", match: "💞", memorial: "🌈" },
+        reptile: { feed: "🦎", friends: "☀️", connections: "🔎", groups: "🏜️", live: "🎥", events: "🎉", guides: "🧠", match: "💞", memorial: "🌈" },
+        "small pets": { feed: "🐹", friends: "🌰", connections: "🔎", groups: "🏡", live: "🎥", events: "🎉", guides: "🧠", match: "💞", memorial: "🌈" },
+        other: { feed: "🐾", friends: "🤝", connections: "🔎", groups: "🌟", live: "🎥", events: "🎉", guides: "🧠", match: "💞", memorial: "🌈" },
+      };
+
+      const base = byPet[theme.key] || byPet.other;
+
+      if (/rescue|adopt|foster/.test(liveCommunity)) {
+        return { ...base, feed: "🫶", friends: "🤗", events: "🐾", match: "💓" };
+      }
+      if (/senior|care|wellness|vet|health/.test(liveCommunity)) {
+        return { ...base, feed: "🩺", guides: "📘", events: "🧘", match: "💞" };
+      }
+      if (/club|play|park|meet|circle|community/.test(liveCommunity)) {
+        return { ...base, feed: "😄", friends: "🤝", groups: "🎊", live: "🎥" };
+      }
+
+      return base;
+    }
+
     function applyPetVisualTheme(user = currentUserObj) {
       const theme = getPetTheme(user);
       const labels = applyPetNavigationLabels(user);
+
+      const selectedPetPhoto = PET_REAL_PHOTOS[theme.label] || PET_REAL_PHOTOS.Other;
+      const expressionByTab = getCommunityExpressionsByTab(user, theme);
 
       const decorativeTargets = [
         ["#tab-btn-feed div", theme.sectionEmoji.feed],
@@ -5109,6 +5540,17 @@
         setPetGlyph(selector, glyph);
       });
 
+      // Replace left sidebar tab icons with real pet image badges.
+      setPetImageBadge("#tab-btn-feed div", selectedPetPhoto, "PawdCast", expressionByTab.feed);
+      setPetImageBadge("#tab-btn-friends div", selectedPetPhoto, "PawPals", expressionByTab.friends);
+      setPetImageBadge("#tab-btn-connections div", selectedPetPhoto, "Sniff Spots", expressionByTab.connections);
+      setPetImageBadge("#tab-btn-groups div", selectedPetPhoto, "Pack Pods", expressionByTab.groups);
+      setPetImageBadge("#tab-btn-live-events div", selectedPetPhoto, "PawStream", expressionByTab.live);
+      setPetImageBadge("#tab-btn-events div", selectedPetPhoto, "Tail Trails", expressionByTab.events);
+      setPetImageBadge("#tab-btn-festivals div", selectedPetPhoto, "PawCare", expressionByTab.guides);
+      setPetImageBadge("#tab-btn-matchmaking div", selectedPetPhoto, "Heart Tails", expressionByTab.match);
+      setPetImageBadge("#tab-btn-obituaries div", selectedPetPhoto, "Rainbow Tails", expressionByTab.memorial);
+
       setPetGlyph("#social-tab-friends .text-center i[data-lucide]", theme.sectionEmoji.friends, "text-4xl leading-none");
       setPetGlyph("#social-tab-groups .text-center i[data-lucide]", theme.sectionEmoji.groups, "text-4xl leading-none");
       setPetGlyph("#social-tab-festivals .text-center i[data-lucide]", theme.sectionEmoji.guides, "text-4xl leading-none");
@@ -5117,7 +5559,8 @@
 
       const coverPattern = document.getElementById("cover-photo-pattern");
       if (coverPattern) {
-        coverPattern.style.backgroundImage = `linear-gradient(135deg, color-mix(in srgb, ${theme.accent} 22%, transparent), transparent 60%), url('${getPetIllustrationDataUrl(theme, "hero")}'), repeating-linear-gradient(135deg, transparent, transparent 30px, rgba(255,255,255,0.08) 30px, rgba(255,255,255,0.08) 60px)`;
+        const coverHero = PET_REAL_PHOTOS[theme.label] || PET_REAL_PHOTOS.Other;
+        coverPattern.style.backgroundImage = `linear-gradient(135deg, color-mix(in srgb, ${theme.accent} 18%, transparent), transparent 62%), url('${coverHero}'), repeating-linear-gradient(135deg, transparent, transparent 30px, rgba(255,255,255,0.08) 30px, rgba(255,255,255,0.08) 60px)`;
       }
 
       const feedComposerCard = document.getElementById("feed-composer-card");
@@ -5202,7 +5645,7 @@
       const shapeClass = getFaithFrameClass(religion);
       const theme = getPetTheme({ ...currentUserObj, religion });
       const accentColor = getFaithAccentColor(religion);
-      const bgSrc = getPetIllustrationDataUrl(theme, "badge");
+      const bgSrc = PET_REAL_PHOTOS[theme.label] || PET_REAL_PHOTOS.Other;
 
       if (nameEl) nameEl.innerText = name || "User Name";
       if (frame) {
@@ -5239,13 +5682,21 @@
         }
         if (letter) letter.classList.add("hidden");
       } else {
-        if (img) {
-          img.src = "";
-          img.classList.add("hidden");
-        }
-        if (letter) {
-          letter.innerText = theme.emoji || initial;
-          letter.classList.remove("hidden");
+        if (bgSrc) {
+          if (img) {
+            img.src = bgSrc;
+            img.classList.remove("hidden");
+          }
+          if (letter) letter.classList.add("hidden");
+        } else {
+          if (img) {
+            img.src = "";
+            img.classList.add("hidden");
+          }
+          if (letter) {
+            letter.innerText = theme.emoji || initial;
+            letter.classList.remove("hidden");
+          }
         }
       }
       lucide.createIcons();
@@ -5403,6 +5854,7 @@
       const modalText = document.getElementById("profile-modal-avatar-text");
       const avatarInitial = getSocialAvatar(name);
       const theme = getPetTheme(currentUserObj);
+      const fallbackPhoto = PET_REAL_PHOTOS[theme.label] || PET_REAL_PHOTOS.Other;
 
       if (url) {
         const imageHtml = `<img src="${url}" alt="${avatarInitial}" class="w-full h-full object-cover rounded-full">`;
@@ -5418,23 +5870,18 @@
         }
         if (modalText) modalText.classList.add("hidden");
       } else {
+        const imageHtml = `<img src="${fallbackPhoto}" alt="${theme.label} pet" class="w-full h-full object-cover rounded-full">`;
         if (sidebarAvatarImg) {
-          sidebarAvatarImg.src = "";
-          sidebarAvatarImg.classList.add("hidden");
+          sidebarAvatarImg.src = fallbackPhoto;
+          sidebarAvatarImg.classList.remove("hidden");
         }
-        if (sidebarAvatarLetter) {
-          sidebarAvatarLetter.innerText = theme.emoji || avatarInitial;
-          sidebarAvatarLetter.classList.remove("hidden");
-        }
-        if (feedAvatar) feedAvatar.innerHTML = `<span class="text-lg pet-floaty">${theme.sectionEmoji.feed}</span>`;
+        if (sidebarAvatarLetter) sidebarAvatarLetter.classList.add("hidden");
+        if (feedAvatar) feedAvatar.innerHTML = imageHtml;
         if (modalImg) {
-          modalImg.src = "";
-          modalImg.classList.add("hidden");
+          modalImg.src = fallbackPhoto;
+          modalImg.classList.remove("hidden");
         }
-        if (modalText) {
-          modalText.innerText = theme.emoji || avatarInitial;
-          modalText.classList.remove("hidden");
-        }
+        if (modalText) modalText.classList.add("hidden");
       }
       // Keep cover header avatar in sync
       const religion =
@@ -5488,10 +5935,10 @@
 
       if (headerLogoEl) {
         const accent = getFaithAccentColor(currentUserObj.religion);
-        const bgImg = getPetIllustrationDataUrl(theme, "badge");
+        const bgImg = PET_REAL_PHOTOS[theme.label] || PET_REAL_PHOTOS.Other;
         const placeholderHtml = bgImg ? `
             <div class="flex items-center justify-center w-full h-full rounded-full overflow-hidden bg-white">
-              <img src="${bgImg}" class="w-full h-full object-cover" alt="${theme.label} illustration" />
+              <img src="${bgImg}" class="w-full h-full object-cover" alt="${theme.label} pet" />
             </div>
           ` : `
             <div class="flex items-center justify-center w-full h-full rounded-full bg-white text-3xl font-black uppercase" style="color:${accent};">
@@ -7416,6 +7863,7 @@
 
       const theme = getPetTheme(currentUserObj);
       const communityLabel = currentUserObj?.community || communityName || "your area";
+      const selectedPetFrameImage = PET_REAL_PHOTOS[theme.label] || PET_REAL_PHOTOS.Other;
 
       const titleEl = document.getElementById("trending-title");
       const subtitleEl = document.getElementById("trending-subtitle");
@@ -7457,7 +7905,7 @@
 
       const adCardsHtml = adCards.map((card, index) => `
         <div class="book-item pet-card-lively rounded-2xl border border-dashed border-brand-200 dark:border-brand-900/50 bg-white/90 dark:bg-gray-900/80 overflow-hidden shadow-sm">
-          <div class="h-28 relative overflow-hidden" style="background-image: linear-gradient(135deg, color-mix(in srgb, ${theme.accent} 22%, white), transparent 70%), url('${getPetIllustrationDataUrl(theme, index === 0 ? "cover" : "badge")}'); background-size: cover; background-position: center;">
+          <div class="h-28 relative overflow-hidden" style="background-image: linear-gradient(135deg, color-mix(in srgb, ${theme.accent} 22%, white), transparent 70%), url('${selectedPetFrameImage}'); background-size: cover; background-position: center;">
             <div class="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent"></div>
             <div class="absolute top-3 left-3 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-gray-800 shadow-sm">
               <span>${card.emoji}</span>

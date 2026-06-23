@@ -107,6 +107,23 @@
       transform: translateY(-4px) scale(1.01);
     }
 
+    .dark #social-tab-feed {
+      position: relative;
+      border: 1px solid rgba(71, 85, 105, 0.38);
+      border-radius: 1rem;
+      padding: 0.9rem;
+      background:
+        radial-gradient(120% 140% at 16% 10%, rgba(59, 130, 246, 0.18), transparent 60%),
+        radial-gradient(100% 100% at 88% 88%, rgba(148, 163, 184, 0.14), transparent 64%),
+        linear-gradient(160deg, rgba(2, 6, 23, 0.92), rgba(15, 23, 42, 0.9));
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    }
+
+    .dark #social-tab-feed > * {
+      position: relative;
+      z-index: 1;
+    }
+
     .pet-tab-badge {
       display: inline-flex;
       align-items: center;
@@ -1804,7 +1821,7 @@
             </div>
             <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-50 dark:border-gray-800 px-2">
               <div class="flex items-center gap-4">
-                <button
+                <button type="button" onclick="openFeedMediaPicker()"
                   class="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
                   <i data-lucide="image" class="w-4 h-4 text-green-500"></i>
                   Photo/Video
@@ -1822,6 +1839,23 @@
                 style="background: var(--faith-accent, #f59e0b)">
                 Post
               </button>
+            </div>
+            <input type="file" id="feed-media-input" class="hidden" accept="image/*,video/*"
+              onchange="handleFeedMediaSelection(this)" />
+            <div id="feed-media-preview"
+              class="hidden mt-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/70 p-3">
+              <div class="flex items-center justify-between gap-3 mb-2">
+                <div class="text-xs text-gray-600 dark:text-gray-300 truncate">
+                  <span id="feed-media-kind" class="font-bold">Media</span>
+                  <span id="feed-media-name" class="ml-1"></span>
+                </div>
+                <button type="button" onclick="clearFeedMediaSelection()"
+                  class="no-faith-hover text-xs px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
+                  Remove
+                </button>
+              </div>
+              <img id="feed-media-preview-img" src="" alt="Selected media" class="hidden w-full max-h-64 object-cover rounded-lg" />
+              <video id="feed-media-preview-video" controls class="hidden w-full max-h-64 rounded-lg bg-black"></video>
             </div>
           </div>
 
@@ -5158,8 +5192,387 @@
 
     let currentUserObj = {};
     let feedPosts = [];
+    let selectedFeedMediaFile = null;
+    let selectedFeedMediaPreviewUrl = "";
     let currentMiniCalendarDate = new Date();
+    const FEED_REACTION_STORAGE_PREFIX = "esamaj_feed_reactions_";
+    const FEED_HIDDEN_POSTS_PREFIX = "esamaj_hidden_posts_";
+    let reactionSyncMode = "unknown";
+    let reactionSyncNoticeShown = false;
+    let postMenuListenerBound = false;
+    let reactionAudioCtx = null;
+    const FEED_REACTIONS = [
+      { key: "bone", label: "Dog Bone" },
+      { key: "bark", label: "Angry Bark" },
+      { key: "heart", label: "Dog Heart" },
+      { key: "bite", label: "Dog Bite" },
+    ];
+
+    function getReactionIconHtml(reactionKey) {
+      const expressionByReaction = {
+        bone: "🦴",
+        bark: "💢",
+        heart: "❤️",
+        bite: "😬",
+      };
+      const reactionPhotoByKey = {
+        bone: "https://placedog.net/80/80?id=41",
+        bark: "https://placedog.net/80/80?id=96",
+        heart: "https://placedog.net/80/80?id=109",
+        bite: "https://placedog.net/80/80?id=154",
+      };
+      const badge = expressionByReaction[reactionKey] || "🐾";
+      const photo = reactionPhotoByKey[reactionKey] || getPrimaryLandingPetImage(currentUserObj) || PET_REAL_PHOTOS.Dog || PET_REAL_PHOTOS.Other;
+
+      return `<span class="relative inline-flex items-center justify-center w-5 h-5">
+                <img src="${photo}" alt="dog" class="w-5 h-5 rounded-full object-cover border border-white/80 shadow-sm" loading="lazy" decoding="async" />
+                <span class="absolute -right-1 -bottom-1 w-3.5 h-3.5 rounded-full bg-white text-[9px] leading-none flex items-center justify-center border border-amber-300">${badge}</span>
+              </span>`;
+    }
+
+    function getReactionAudioContext() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return null;
+        if (!reactionAudioCtx) reactionAudioCtx = new AudioCtx();
+        return reactionAudioCtx;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function playReactionSound(reactionKey) {
+      const ctx = getReactionAudioContext();
+      if (!ctx) return;
+
+      const now = ctx.currentTime;
+      const master = ctx.createGain();
+      master.connect(ctx.destination);
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
+
+      const beep = (freq, start, duration, type = "sine", gainVal = 0.08) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now + start);
+        gain.gain.setValueAtTime(0.0001, now + start);
+        gain.gain.exponentialRampToValueAtTime(gainVal, now + start + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + start + duration);
+        osc.connect(gain);
+        gain.connect(master);
+        osc.start(now + start);
+        osc.stop(now + start + duration + 0.03);
+      };
+
+      const noise = (start, duration, gainVal = 0.04) => {
+        const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * duration), ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < data.length; i += 1) {
+          data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+        }
+        const src = ctx.createBufferSource();
+        const filter = ctx.createBiquadFilter();
+        filter.type = "bandpass";
+        filter.frequency.setValueAtTime(1100, now + start);
+        filter.Q.value = 1.2;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.0001, now + start);
+        gain.gain.exponentialRampToValueAtTime(gainVal, now + start + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + start + duration);
+        src.buffer = buffer;
+        src.connect(filter);
+        filter.connect(gain);
+        gain.connect(master);
+        src.start(now + start);
+        src.stop(now + start + duration + 0.02);
+      };
+
+      if (reactionKey === "bone") {
+        beep(420, 0, 0.12, "triangle", 0.06);
+        beep(520, 0.1, 0.14, "triangle", 0.06);
+      } else if (reactionKey === "heart") {
+        beep(360, 0, 0.1, "sine", 0.07);
+        beep(310, 0.12, 0.16, "sine", 0.08);
+      } else if (reactionKey === "bite") {
+        noise(0, 0.09, 0.05);
+        beep(220, 0.08, 0.14, "square", 0.06);
+      } else {
+        noise(0, 0.08, 0.05);
+        beep(280, 0.05, 0.16, "sawtooth", 0.06);
+      }
+    }
+
+    function getFeedReactionStorageKey() {
+      const email = (currentUserObj?.email || "guest").toLowerCase().trim();
+      return `${FEED_REACTION_STORAGE_PREFIX}${email}`;
+    }
+
+    function getLocalFeedReactions() {
+      try {
+        const raw = localStorage.getItem(getFeedReactionStorageKey()) || "{}";
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch (_) {
+        return {};
+      }
+    }
+
+    function saveLocalFeedReactions(map) {
+      try {
+        localStorage.setItem(getFeedReactionStorageKey(), JSON.stringify(map || {}));
+      } catch (_) { }
+    }
+
+    function setLocalFeedReaction(postId, reactionKey) {
+      const map = getLocalFeedReactions();
+      if (reactionKey) {
+        map[String(postId)] = reactionKey;
+      } else {
+        delete map[String(postId)];
+      }
+      saveLocalFeedReactions(map);
+    }
+
+    function mergeFeedReactionState(postId, reactionCounts = {}, selectedFromServer = null) {
+      const counts = { ...reactionCounts };
+      FEED_REACTIONS.forEach(({ key }) => {
+        counts[key] = Number(counts[key] || 0);
+      });
+
+      let selectedReaction = selectedFromServer || null;
+      const localReaction = getLocalFeedReactions()[String(postId)] || null;
+
+      if (localReaction && localReaction !== selectedReaction) {
+        if (selectedReaction && counts[selectedReaction] > 0) {
+          counts[selectedReaction] -= 1;
+        }
+        counts[localReaction] = Number(counts[localReaction] || 0) + 1;
+        selectedReaction = localReaction;
+      }
+
+      return {
+        reactionCounts: counts,
+        selectedReaction,
+      };
+    }
+
+    function getPostReactionTotal(post) {
+      if (!post?.reactionCounts) return 0;
+      return FEED_REACTIONS.reduce((sum, reaction) => {
+        return sum + Number(post.reactionCounts?.[reaction.key] || 0);
+      }, 0);
+    }
+
+    function getPostOwnerProfilePhoto(post) {
+      if (post?.profilePhoto) return post.profilePhoto;
+
+      const currentUserName = String(currentUserObj?.socialProfile?.name || currentUserObj?.name || "").trim().toLowerCase();
+      const postAuthor = String(post?.author || "").trim().toLowerCase();
+      const currentUserId = String(currentUserObj?.id || "").trim();
+      const postUserId = String(post?.user_id || "").trim();
+
+      const isCurrentUserPost = (currentUserId && postUserId && currentUserId === postUserId)
+        || (currentUserName && postAuthor && currentUserName === postAuthor);
+
+      if (isCurrentUserPost) {
+        return (
+          currentUserObj?.profile_photo_url
+          || currentUserObj?.socialProfile?.profile_photo_url
+          || getPrimaryLandingPetImage(currentUserObj)
+          || null
+        );
+      }
+
+      return null;
+    }
+
+    function getHiddenPostsStorageKey() {
+      const email = (currentUserObj?.email || "guest").toLowerCase().trim();
+      return `${FEED_HIDDEN_POSTS_PREFIX}${email}`;
+    }
+
+    function getHiddenPostsMap() {
+      try {
+        const raw = localStorage.getItem(getHiddenPostsStorageKey()) || "{}";
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch (_) {
+        return {};
+      }
+    }
+
+    function saveHiddenPostsMap(map) {
+      try {
+        localStorage.setItem(getHiddenPostsStorageKey(), JSON.stringify(map || {}));
+      } catch (_) { }
+    }
+
+    function isPostHidden(postId) {
+      return Boolean(getHiddenPostsMap()[String(postId)]);
+    }
+
+    function setPostHidden(postId, hidden = true) {
+      const map = getHiddenPostsMap();
+      if (hidden) map[String(postId)] = true;
+      else delete map[String(postId)];
+      saveHiddenPostsMap(map);
+    }
+
+    function isOwnPost(post) {
+      if (!post) return false;
+      const currentUserId = String(currentUserObj?.id || "").trim();
+      const postUserId = String(post.user_id || "").trim();
+      if (currentUserId && postUserId) {
+        return currentUserId === postUserId;
+      }
+      const currentName = String(currentUserObj?.socialProfile?.name || currentUserObj?.name || "").trim().toLowerCase();
+      const postAuthor = String(post.author || "").trim().toLowerCase();
+      return Boolean(currentName && postAuthor && currentName === postAuthor);
+    }
+
+    function closeAllPostMenus() {
+      document.querySelectorAll("[data-post-menu]").forEach((menu) => {
+        menu.classList.add("hidden");
+      });
+      document.querySelectorAll("[data-post-share-menu]").forEach((menu) => {
+        menu.classList.add("hidden");
+      });
+    }
+
+    function ensurePostMenuDismissListener() {
+      if (postMenuListenerBound) return;
+      document.addEventListener("click", (evt) => {
+        const target = evt.target;
+        if (
+          target?.closest?.("[data-post-menu]")
+          || target?.closest?.("[data-post-menu-trigger]")
+          || target?.closest?.("[data-post-share-menu]")
+          || target?.closest?.("[data-post-share-trigger]")
+        ) {
+          return;
+        }
+        closeAllPostMenus();
+      });
+      postMenuListenerBound = true;
+    }
+
+    function getPostById(postId) {
+      return feedPosts.find((p) => String(p.id) === String(postId));
+    }
+
+    function getPostSharePayload(postId) {
+      const post = getPostById(postId);
+      const text = post?.content ? String(post.content).trim() : "Check out this PawdCast post";
+      const shortText = text.length > 140 ? `${text.slice(0, 137)}...` : text;
+      const url = `${window.location.origin}${window.location.pathname}#pawdcast-${encodeURIComponent(String(postId))}`;
+      const title = `${post?.author || "PawCircle"} on PawdCast`;
+      return { post, title, text: shortText, url };
+    }
+
+    function toggleShareMenu(postId, event) {
+      if (event?.stopPropagation) event.stopPropagation();
+      const menu = document.getElementById(`post-share-menu-${postId}`);
+      if (!menu) return;
+      const isOpen = !menu.classList.contains("hidden");
+      closeAllPostMenus();
+      if (!isOpen) menu.classList.remove("hidden");
+    }
+
+    function copyPostLink(postId) {
+      const payload = getPostSharePayload(postId);
+      const write = navigator?.clipboard?.writeText
+        ? navigator.clipboard.writeText(payload.url)
+        : Promise.reject(new Error("Clipboard API unavailable"));
+
+      write
+        .then(() => showToast("Post link copied."))
+        .catch(() => {
+          const ok = window.prompt("Copy post link:", payload.url);
+          if (ok !== null) showToast("Post link ready to copy.");
+        });
+
+      closeAllPostMenus();
+    }
+
+    async function sharePostNative(postId) {
+      const payload = getPostSharePayload(postId);
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: payload.title, text: payload.text, url: payload.url });
+        } catch (_) { }
+      } else {
+        copyPostLink(postId);
+        return;
+      }
+      closeAllPostMenus();
+    }
+
+    function sharePostTo(postId, platform) {
+      const payload = getPostSharePayload(postId);
+      const encodedUrl = encodeURIComponent(payload.url);
+      const encodedText = encodeURIComponent(payload.text);
+
+      const map = {
+        whatsapp: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+        x: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
+        linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+      };
+
+      const shareUrl = map[platform];
+      if (!shareUrl) return;
+
+      window.open(shareUrl, "_blank", "noopener,noreferrer,width=640,height=720");
+      closeAllPostMenus();
+    }
+
+    async function syncPostReactionSilently(postId, reaction) {
+      if (reactionSyncMode === "disabled") return null;
+
+      try {
+        const response = await fetch("pawcircle_api.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "toggle_post_reaction",
+            user_id: currentUserObj.id,
+            post_id: postId,
+            reaction: reaction || null,
+          }),
+        });
+
+        const text = await response.text();
+        const jsonStart = text.indexOf("{");
+        if (jsonStart === -1) {
+          reactionSyncMode = "disabled";
+          return null;
+        }
+
+        const data = JSON.parse(text.slice(jsonStart));
+        if (data.status !== "success") {
+          reactionSyncMode = "disabled";
+          return null;
+        }
+
+        reactionSyncMode = "available";
+        return data;
+      } catch (_) {
+        reactionSyncMode = "disabled";
+        return null;
+      }
+    }
     function populateMemberDashboard(user) {
+      const db = JSON.parse(localStorage.getItem("esamaj_db") || "[]");
+      const persistedUser = db.find((u) => u.email === user.email) || {};
+      user = {
+        ...persistedUser,
+        ...user,
+        profile_photo_url: user.profile_photo_url || persistedUser.profile_photo_url || "",
+        cover_photo_url: user.cover_photo_url || persistedUser.cover_photo_url || "",
+      };
+
       currentUserEmail = user.email;
       currentUserObj = user;
       setPreferredEntryPetType(user.religion || user.pet_type || "Dog");
@@ -5219,7 +5632,7 @@
 
       const bannerSymbol = document.getElementById("dash-banner-symbol");
       if (bannerSymbol) {
-        const bannerPhoto = PET_REAL_PHOTOS[theme.label] || PET_REAL_PHOTOS.Other;
+        const bannerPhoto = getPrimaryLandingPetImage(user);
         bannerSymbol.innerHTML = user.religion
           ? `<img src="${bannerPhoto}" alt="${theme.label} pet" class="w-full h-full object-cover" onerror="this.remove()" />`
           : "";
@@ -5483,6 +5896,15 @@
         </span>`;
     }
 
+    function getPrimaryLandingPetImage(user = currentUserObj) {
+      const theme = getPetTheme(user);
+      return (
+        user?.profile_photo_url ||
+        PET_REAL_PHOTOS[theme.label] ||
+        PET_REAL_PHOTOS.Other
+      );
+    }
+
     function getCommunityExpressionsByTab(user, theme) {
       const liveCommunity = (
         document.getElementById("s2-community")?.value ||
@@ -5521,7 +5943,7 @@
       const theme = getPetTheme(user);
       const labels = applyPetNavigationLabels(user);
 
-      const selectedPetPhoto = PET_REAL_PHOTOS[theme.label] || PET_REAL_PHOTOS.Other;
+      const selectedPetPhoto = getPrimaryLandingPetImage(user);
       const expressionByTab = getCommunityExpressionsByTab(user, theme);
 
       const decorativeTargets = [
@@ -5559,13 +5981,21 @@
 
       const coverPattern = document.getElementById("cover-photo-pattern");
       if (coverPattern) {
-        const coverHero = PET_REAL_PHOTOS[theme.label] || PET_REAL_PHOTOS.Other;
-        coverPattern.style.backgroundImage = `linear-gradient(135deg, color-mix(in srgb, ${theme.accent} 18%, transparent), transparent 62%), url('${coverHero}'), repeating-linear-gradient(135deg, transparent, transparent 30px, rgba(255,255,255,0.08) 30px, rgba(255,255,255,0.08) 60px)`;
+        const coverHero = getPrimaryLandingPetImage(user);
+        const isDarkMode = document.documentElement.classList.contains("dark");
+        coverPattern.style.backgroundImage = isDarkMode
+          ? `linear-gradient(165deg, rgba(2,6,23,0.72), rgba(15,23,42,0.58)), linear-gradient(135deg, color-mix(in srgb, ${theme.accent} 22%, transparent), transparent 64%), url('${coverHero}'), repeating-linear-gradient(135deg, transparent, transparent 30px, rgba(255,255,255,0.07) 30px, rgba(255,255,255,0.07) 60px)`
+          : `linear-gradient(135deg, color-mix(in srgb, ${theme.accent} 18%, transparent), transparent 62%), url('${coverHero}'), repeating-linear-gradient(135deg, transparent, transparent 30px, rgba(255,255,255,0.08) 30px, rgba(255,255,255,0.08) 60px)`;
+        coverPattern.style.backgroundBlendMode = isDarkMode ? "normal, normal, multiply, normal" : "normal";
       }
 
       const feedComposerCard = document.getElementById("feed-composer-card");
       if (feedComposerCard) {
-        feedComposerCard.style.backgroundImage = `linear-gradient(135deg, color-mix(in srgb, ${theme.accent} 8%, white), transparent 70%)`;
+        const isDarkMode = document.documentElement.classList.contains("dark");
+        feedComposerCard.style.backgroundImage = isDarkMode
+          ? `linear-gradient(155deg, rgba(3,7,18,0.9), rgba(15,23,42,0.86)), linear-gradient(135deg, color-mix(in srgb, ${theme.accent} 22%, #0b1220), transparent 72%)`
+          : `linear-gradient(135deg, color-mix(in srgb, ${theme.accent} 8%, white), transparent 70%)`;
+        feedComposerCard.style.backgroundBlendMode = isDarkMode ? "normal, screen" : "normal";
       }
 
       const composerSticker = document.getElementById("feed-composer-sticker");
@@ -5935,7 +6365,7 @@
 
       if (headerLogoEl) {
         const accent = getFaithAccentColor(currentUserObj.religion);
-        const bgImg = PET_REAL_PHOTOS[theme.label] || PET_REAL_PHOTOS.Other;
+        const bgImg = getPrimaryLandingPetImage(currentUserObj);
         const placeholderHtml = bgImg ? `
             <div class="flex items-center justify-center w-full h-full rounded-full overflow-hidden bg-white">
               <img src="${bgImg}" class="w-full h-full object-cover" alt="${theme.label} pet" />
@@ -6589,6 +7019,12 @@
     function normalizePostFromApi(p) {
       const profile = p.profiles || {};
       const author = p.author || profile.full_name || profile.name || "Member";
+      const rawCounts = p.reaction_counts || p.reactions || {};
+      const mergedReactionState = mergeFeedReactionState(
+        p.id,
+        rawCounts,
+        p.selected_reaction || p.selectedReaction || null,
+      );
 
       return {
         id: p.id,
@@ -6608,6 +7044,8 @@
         avatarClass:
           "bg-brand-100 text-brand-900 dark:bg-brand-900/50 dark:text-brand-100",
         profilePhoto: p.profile_photo_url || profile.profile_photo_url || null,
+        reactionCounts: mergedReactionState.reactionCounts,
+        selectedReaction: mergedReactionState.selectedReaction,
       };
     }
 
@@ -6615,13 +7053,15 @@
       const feedContainer = document.getElementById("social-feed-posts");
       if (!feedContainer) return;
       const theme = getPetTheme(currentUserObj);
+      ensurePostMenuDismissListener();
 
       feedContainer.innerHTML = "";
       const chunkSize = 5;
       let index = 0;
+      const visiblePosts = feedPosts.filter((p) => !isPostHidden(p.id));
 
       function renderChunk() {
-        const chunk = feedPosts.slice(index, index + chunkSize);
+        const chunk = visiblePosts.slice(index, index + chunkSize);
         if (!chunk.length) {
           lucide.createIcons();
           return;
@@ -6633,8 +7073,27 @@
           const btnClass = post.isLiked ? "text-brand-500" : "";
           const postId = String(post.id);
 
-          const avatarHtml = post.profilePhoto
-            ? `<img src="${escapeHtml(post.profilePhoto)}" loading="lazy" decoding="async" class="w-10 h-10 rounded-full object-cover" alt="">`
+          if (!post.reactionCounts) {
+            post.reactionCounts = {};
+          }
+          FEED_REACTIONS.forEach(({ key }) => {
+            if (typeof post.reactionCounts[key] !== "number") {
+              post.reactionCounts[key] = Number(post.reactionCounts[key] || 0);
+            }
+          });
+
+          const persistedReaction = getLocalFeedReactions()[postId] || null;
+          if (persistedReaction && post.selectedReaction !== persistedReaction) {
+            if (post.selectedReaction && post.reactionCounts[post.selectedReaction] > 0) {
+              post.reactionCounts[post.selectedReaction] -= 1;
+            }
+            post.reactionCounts[persistedReaction] = Number(post.reactionCounts[persistedReaction] || 0) + 1;
+            post.selectedReaction = persistedReaction;
+          }
+
+          const ownerPhoto = getPostOwnerProfilePhoto(post);
+          const avatarHtml = ownerPhoto
+            ? `<img src="${escapeHtml(ownerPhoto)}" loading="lazy" decoding="async" class="w-10 h-10 rounded-full object-cover" alt="">`
             : `<div class="w-10 h-10 ${post.avatarClass} rounded-full flex items-center justify-center font-bold text-lg">${theme.emoji}</div>`;
 
           const mediaHtml = post.media_url
@@ -6644,6 +7103,26 @@
               : `<img src="${escapeHtml(post.media_url)}" loading="lazy" decoding="async" class="w-full max-h-[520px] object-cover" alt="Post media">`}
               </div>`
             : "";
+
+          const reactionButtonsHtml = FEED_REACTIONS.map((reaction) => {
+            const isActive = post.selectedReaction === reaction.key;
+            const count = Number(post.reactionCounts?.[reaction.key] || 0);
+            const activeClass = isActive
+              ? "bg-amber-100/90 dark:bg-amber-900/40 border-amber-300 dark:border-amber-600 text-amber-800 dark:text-amber-200"
+              : "bg-white/80 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300";
+            return `<button type="button" onclick="togglePostReaction('${postId}', '${reaction.key}')" class="no-faith-hover inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full border text-xs font-semibold transition-colors hover:border-brand-300 hover:text-brand-600 ${activeClass}" title="${reaction.label}">
+                      <span class="text-sm leading-none w-5 inline-flex items-center justify-center">${getReactionIconHtml(reaction.key)}</span>
+                      <span>${count}</span>
+                    </button>`;
+          }).join("");
+
+          const overallFooterCount = Number(post.likes || 0) + getPostReactionTotal(post);
+
+               const ownPost = isOwnPost(post);
+               const menuButtonsHtml = ownPost
+                ? `<button type="button" onclick="editPost('${postId}')" class="no-faith-hover w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">Edit post</button>
+                  <button type="button" onclick="deletePost('${postId}')" class="no-faith-hover w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 border-t border-gray-100 dark:border-gray-700">Delete post</button>`
+                : `<button type="button" onclick="hidePost('${postId}')" class="no-faith-hover w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">Hide post</button>`;
 
         let commentsHtml = "";
         if (post.commentsLoaded) {
@@ -6679,19 +7158,37 @@
                                 <div class="text-xs text-gray-500 dark:text-gray-400">${escapeHtml(post.time)}</div>
                             </div>
                         </div>
-                        <button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+                        <div class="relative">
+                          <button type="button" data-post-menu-trigger onclick="togglePostMenu('${postId}', event)" class="no-faith-hover text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-md"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+                          <div id="post-menu-${postId}" data-post-menu class="hidden absolute right-0 top-8 z-20 w-40 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden">
+                            ${menuButtonsHtml}
+                          </div>
+                        </div>
                     </div>
                     <div class="p-4">
                         <p class="text-sm text-gray-800 dark:text-gray-300 whitespace-pre-wrap">${escapeHtml(post.content)}</p>
                         ${mediaHtml}
                         ${post.specialBlock || ""}
+                        <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-wrap gap-2">
+                          ${reactionButtonsHtml}
+                        </div>
                     </div>
                     <div class="px-4 py-3 border-t border-gray-50 dark:border-gray-800 flex items-center justify-between text-gray-500 dark:text-gray-400 text-sm">
                         <button onclick="toggleLike('${postId}')" class="flex items-center gap-2 hover:text-brand-500 transition-colors ${btnClass}">
-                            <i data-lucide="heart" class="w-4 h-4 ${heartClass}"></i> <span id="like-count-${postId}">${post.likes}</span>
+                        <i data-lucide="heart" class="w-4 h-4 ${heartClass}"></i> <span id="like-count-${postId}">${overallFooterCount}</span>
                         </button>
                         <button onclick="toggleComments('${postId}')" class="flex items-center gap-2 hover:text-brand-500 transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i> <span id="comment-count-${postId}">${post.comments}</span> Comments</button>
-                        <button onclick="showToast('Shared successfully!')" class="flex items-center gap-2 hover:text-brand-500 transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i> Share</button>
+                        <div class="relative">
+                          <button type="button" data-post-share-trigger onclick="toggleShareMenu('${postId}', event)" class="no-faith-hover flex items-center gap-2 hover:text-brand-500 transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i> Share</button>
+                          <div id="post-share-menu-${postId}" data-post-share-menu class="hidden absolute right-0 bottom-8 z-20 w-52 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden text-sm">
+                            <button type="button" onclick="sharePostTo('${postId}', 'whatsapp')" class="no-faith-hover w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">Share on WhatsApp</button>
+                            <button type="button" onclick="sharePostTo('${postId}', 'facebook')" class="no-faith-hover w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 border-t border-gray-100 dark:border-gray-700">Share on Facebook</button>
+                            <button type="button" onclick="sharePostTo('${postId}', 'x')" class="no-faith-hover w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 border-t border-gray-100 dark:border-gray-700">Share on X</button>
+                            <button type="button" onclick="sharePostTo('${postId}', 'linkedin')" class="no-faith-hover w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 border-t border-gray-100 dark:border-gray-700">Share on LinkedIn</button>
+                            <button type="button" onclick="sharePostNative('${postId}')" class="no-faith-hover w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 border-t border-gray-100 dark:border-gray-700">More options...</button>
+                            <button type="button" onclick="copyPostLink('${postId}')" class="no-faith-hover w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 border-t border-gray-100 dark:border-gray-700">Copy post link</button>
+                          </div>
+                        </div>
                     </div>
                     <div id="comment-box-${postId}" class="hidden px-4 pb-4 pt-2 border-t border-gray-50 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
                         <div id="comments-list-${postId}" class="mb-3">${commentsHtml}</div>
@@ -6778,6 +7275,153 @@
       }
     }
 
+    async function togglePostReaction(postId, reactionKey) {
+      const post = feedPosts.find((p) => String(p.id) === String(postId));
+      if (!post) return;
+
+      playReactionSound(reactionKey);
+
+      if (!post.reactionCounts) post.reactionCounts = {};
+      FEED_REACTIONS.forEach(({ key }) => {
+        if (typeof post.reactionCounts[key] !== "number") {
+          post.reactionCounts[key] = Number(post.reactionCounts[key] || 0);
+        }
+      });
+
+      const previous = post.selectedReaction;
+      if (previous === reactionKey) {
+        post.reactionCounts[reactionKey] = Math.max(0, Number(post.reactionCounts[reactionKey] || 0) - 1);
+        post.selectedReaction = null;
+      } else {
+        if (previous) {
+          post.reactionCounts[previous] = Math.max(0, Number(post.reactionCounts[previous] || 0) - 1);
+        }
+        post.reactionCounts[reactionKey] = Number(post.reactionCounts[reactionKey] || 0) + 1;
+        post.selectedReaction = reactionKey;
+      }
+
+      setLocalFeedReaction(postId, post.selectedReaction);
+      renderFeed();
+
+      if (!currentUserObj?.id || String(postId).startsWith("local_")) {
+        return;
+      }
+
+      try {
+        const data = await syncPostReactionSilently(postId, post.selectedReaction || null);
+        if (!data) {
+          if (!reactionSyncNoticeShown && reactionSyncMode === "disabled") {
+            reactionSyncNoticeShown = true;
+            showToast("Reaction saved locally. Sync will resume when backend is available.");
+          }
+          return;
+        }
+
+        const serverMerged = mergeFeedReactionState(
+          postId,
+          data.reaction_counts || post.reactionCounts,
+          data.selected_reaction ?? post.selectedReaction,
+        );
+        post.reactionCounts = serverMerged.reactionCounts;
+        post.selectedReaction = serverMerged.selectedReaction;
+        setLocalFeedReaction(postId, post.selectedReaction);
+        renderFeed();
+      } catch (err) {
+        // Keep local persisted reaction even when backend sync is unavailable.
+        if (!reactionSyncNoticeShown) {
+          reactionSyncNoticeShown = true;
+          showToast("Reaction saved locally. Sync will resume when backend is available.");
+        }
+      }
+    }
+
+    function togglePostMenu(postId, event) {
+      if (event?.stopPropagation) event.stopPropagation();
+      const menu = document.getElementById(`post-menu-${postId}`);
+      if (!menu) return;
+      const isOpen = !menu.classList.contains("hidden");
+      closeAllPostMenus();
+      if (!isOpen) menu.classList.remove("hidden");
+    }
+
+    function hidePost(postId) {
+      setPostHidden(postId, true);
+      closeAllPostMenus();
+      renderFeed();
+      showToast("Post hidden from your PawdCast.");
+    }
+
+    async function editPost(postId) {
+      const post = feedPosts.find((p) => String(p.id) === String(postId));
+      if (!post || !isOwnPost(post)) return;
+
+      const updated = window.prompt("Edit your post", post.content || "");
+      if (updated === null) return;
+
+      const nextContent = updated.trim();
+      if (!nextContent) {
+        alert("Post content cannot be empty.");
+        return;
+      }
+
+      const oldContent = post.content;
+      post.content = nextContent;
+      closeAllPostMenus();
+      renderFeed();
+
+      if (!currentUserObj?.id || String(postId).startsWith("local_")) {
+        return;
+      }
+
+      try {
+        const data = await api("edit_post", {
+          user_id: currentUserObj.id,
+          post_id: postId,
+          content: nextContent,
+        });
+
+        if (data.status !== "success") {
+          throw new Error(data.message || "Could not update post.");
+        }
+      } catch (err) {
+        post.content = oldContent;
+        renderFeed();
+        console.warn("Edit sync fallback:", err?.message || err);
+        showToast("Post edited locally. Backend sync unavailable.");
+      }
+    }
+
+    async function deletePost(postId) {
+      const post = feedPosts.find((p) => String(p.id) === String(postId));
+      if (!post || !isOwnPost(post)) return;
+      if (!window.confirm("Delete this post?")) return;
+
+      const previous = [...feedPosts];
+      feedPosts = feedPosts.filter((p) => String(p.id) !== String(postId));
+      closeAllPostMenus();
+      renderFeed();
+
+      if (!currentUserObj?.id || String(postId).startsWith("local_")) {
+        return;
+      }
+
+      try {
+        const data = await api("delete_post", {
+          user_id: currentUserObj.id,
+          post_id: postId,
+        });
+
+        if (data.status !== "success") {
+          throw new Error(data.message || "Could not delete post.");
+        }
+      } catch (err) {
+        feedPosts = previous;
+        renderFeed();
+        console.warn("Delete sync fallback:", err?.message || err);
+        showToast("Could not delete post from server.");
+      }
+    }
+
     async function submitComment(postId) {
       const input = document.getElementById(`comment-input-${postId}`);
       if (!input) return;
@@ -6817,14 +7461,21 @@
     async function submitPost() {
       const input = document.getElementById("feed-post-input");
       const content = input.value.trim();
-      if (!content) return;
+      const mediaFile = selectedFeedMediaFile;
+      if (!content && !mediaFile) return;
+
+      const postType = mediaFile && String(mediaFile.type || "").startsWith("video") ? "video" : (mediaFile ? "image" : "text");
+      const fallbackContent = postType === "video" ? "Shared a video update." : "Shared a photo update.";
+      const finalContent = content || (mediaFile ? fallbackContent : "");
 
       const optimisticPost = {
         id: `local_${Date.now()}`,
         author: currentUserObj.socialProfile?.name || currentUserObj.name || "You",
         initials: getSocialAvatar(currentUserObj.socialProfile?.name || currentUserObj.name || "Y"),
         time: "Posting...",
-        content,
+        content: finalContent,
+        media_url: mediaFile ? selectedFeedMediaPreviewUrl : null,
+        post_type: postType,
         specialBlock: "",
         likes: 0,
         comments: 0,
@@ -6833,18 +7484,37 @@
         commentsLoaded: false,
         avatarClass:
           "bg-brand-100 text-brand-900 dark:bg-brand-900/50 dark:text-brand-100",
-        profilePhoto: currentUserObj.profile_photo_url || null,
+        profilePhoto: currentUserObj.profile_photo_url || currentUserObj?.socialProfile?.profile_photo_url || getPrimaryLandingPetImage(currentUserObj) || null,
+        reactionCounts: FEED_REACTIONS.reduce((acc, r) => {
+          acc[r.key] = 0;
+          return acc;
+        }, {}),
+        selectedReaction: null,
       };
 
       feedPosts.unshift(optimisticPost);
       input.value = "";
+      clearFeedMediaSelection();
       renderFeed();
 
       try {
+        let mediaUrl = null;
+        if (mediaFile) {
+          mediaUrl = await uploadPhotoToSupabase(mediaFile, {
+            bucket: postType === "video" ? "feed-videos" : "feed-photos",
+            prefix: "feed",
+            userId: currentUserObj.id,
+          });
+          if (!mediaUrl) {
+            throw new Error("Could not upload selected media.");
+          }
+        }
+
         const data = await api("create_post", {
           user_id: currentUserObj.id,
-          content,
-          post_type: "text",
+          content: finalContent,
+          post_type: mediaUrl ? postType : "text",
+          media_url: mediaUrl,
           community: currentUserObj.community || null,
           religion: currentUserObj.religion || null,
         });
@@ -6864,6 +7534,92 @@
         console.error(err);
         alert(err.message || "Could not create post.");
       }
+    }
+
+    function openFeedMediaPicker() {
+      const picker = document.getElementById("feed-media-input");
+      if (picker) picker.click();
+    }
+
+    function clearFeedMediaSelection() {
+      const picker = document.getElementById("feed-media-input");
+      const previewBox = document.getElementById("feed-media-preview");
+      const previewImg = document.getElementById("feed-media-preview-img");
+      const previewVideo = document.getElementById("feed-media-preview-video");
+      const mediaName = document.getElementById("feed-media-name");
+      const mediaKind = document.getElementById("feed-media-kind");
+
+      if (picker) picker.value = "";
+      if (previewBox) previewBox.classList.add("hidden");
+
+      if (previewImg) {
+        previewImg.src = "";
+        previewImg.classList.add("hidden");
+      }
+
+      if (previewVideo) {
+        previewVideo.src = "";
+        previewVideo.classList.add("hidden");
+      }
+
+      if (mediaName) mediaName.textContent = "";
+      if (mediaKind) mediaKind.textContent = "Media";
+
+      if (selectedFeedMediaPreviewUrl) {
+        URL.revokeObjectURL(selectedFeedMediaPreviewUrl);
+      }
+      selectedFeedMediaPreviewUrl = "";
+      selectedFeedMediaFile = null;
+    }
+
+    function handleFeedMediaSelection(input) {
+      const file = input?.files?.[0];
+      if (!file) {
+        clearFeedMediaSelection();
+        return;
+      }
+
+      const isImage = String(file.type || "").startsWith("image/");
+      const isVideo = String(file.type || "").startsWith("video/");
+      if (!isImage && !isVideo) {
+        alert("Please select an image or video file.");
+        clearFeedMediaSelection();
+        return;
+      }
+
+      const maxBytes = 50 * 1024 * 1024;
+      if (file.size > maxBytes) {
+        alert("Selected file is too large. Please choose a file under 50 MB.");
+        clearFeedMediaSelection();
+        return;
+      }
+
+      const previewBox = document.getElementById("feed-media-preview");
+      const previewImg = document.getElementById("feed-media-preview-img");
+      const previewVideo = document.getElementById("feed-media-preview-video");
+      const mediaName = document.getElementById("feed-media-name");
+      const mediaKind = document.getElementById("feed-media-kind");
+
+      selectedFeedMediaFile = file;
+      if (selectedFeedMediaPreviewUrl) {
+        URL.revokeObjectURL(selectedFeedMediaPreviewUrl);
+      }
+      selectedFeedMediaPreviewUrl = URL.createObjectURL(file);
+
+      if (mediaName) mediaName.textContent = file.name;
+      if (mediaKind) mediaKind.textContent = isVideo ? "Video" : "Photo";
+
+      if (previewImg) {
+        previewImg.classList.toggle("hidden", !isImage);
+        previewImg.src = isImage ? selectedFeedMediaPreviewUrl : "";
+      }
+
+      if (previewVideo) {
+        previewVideo.classList.toggle("hidden", !isVideo);
+        previewVideo.src = isVideo ? selectedFeedMediaPreviewUrl : "";
+      }
+
+      if (previewBox) previewBox.classList.remove("hidden");
     }
 
 
@@ -7863,7 +8619,7 @@
 
       const theme = getPetTheme(currentUserObj);
       const communityLabel = currentUserObj?.community || communityName || "your area";
-      const selectedPetFrameImage = PET_REAL_PHOTOS[theme.label] || PET_REAL_PHOTOS.Other;
+      const selectedPetFrameImage = getPrimaryLandingPetImage(currentUserObj);
 
       const titleEl = document.getElementById("trending-title");
       const subtitleEl = document.getElementById("trending-subtitle");
@@ -10363,6 +11119,9 @@
         icon.setAttribute("data-lucide", "sun");
       } else {
         icon.setAttribute("data-lucide", "moon");
+      }
+      if (currentUserObj && currentUserObj.email) {
+        applyPetVisualTheme(currentUserObj);
       }
       lucide.createIcons();
     }

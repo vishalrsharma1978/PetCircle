@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
     attach('btn-back-signup', 'click', prevSignupStep);
 
     // Form Submissions
-    attach('public-login-form', 'submit', handlePublicLogin);
-    attach('admin-login-form', 'submit', handleAdminLogin);
+    // attach('public-login-form', 'submit', handlePublicLogin);
+    // attach('admin-login-form', 'submit', handleAdminLogin);
     // attach('signup-step-1', 'submit', handleSignupSubmit);
     // attach('signup-step-2', 'submit', handleSignupSubmit);
 

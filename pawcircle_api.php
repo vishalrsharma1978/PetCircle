@@ -2980,9 +2980,12 @@ function finalizeSignup($payload, $plainPassword = '')
             return;
         }
 
+        $session = createUserSession($userId, 'member');
+
         echo json_encode([
             "status"  => "success",
             "message" => "Account created successfully.",
+            "session" => $session,
             "user"    => [
                 "id"          => $userId,
                 "pet_name"    => $petName,

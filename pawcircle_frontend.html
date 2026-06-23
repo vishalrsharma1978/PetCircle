@@ -7088,48 +7088,44 @@
   <script>
     lucide.createIcons();
 
-    const communitiesByReligion = {
-      Hindu: [
-        "Brahmin",
-        "Rajput",
-        "Kayastha",
-        "Baniya",
-        "Reddy",
-        "Mudaliar",
-        "Nair",
-        "Patel",
-        "Agarwal",
-        "Khatri",
-        "Yadav",
-        "Maratha",
-        "Caste No Bar",
+    const breedsByPetType = {
+      Dog: [
+        "Labrador Retriever", "Golden Retriever", "German Shepherd", "Poodle", 
+        "Bulldog", "Beagle", "Rottweiler", "Dachshund", "Corgi", "Husky", 
+        "Pug", "Shih Tzu", "Boxer", "Chihuahua", "Mixed Breed", "other"
       ],
-      Muslim: ["Sunni", "Shia", "Pathan", "Syed", "Sheikh", "Caste No Bar"],
-      Sikh: ["Jat", "Khatri", "Arora", "Ramgharia", "Saini", "Caste No Bar"],
-      Christian: [
-        "Syrian Christian",
-        "Catholic",
-        "Protestant",
-        "Born Again",
-        "Caste No Bar",
+      Cat: [
+        "Persian", "Maine Coon", "Siamese", "Ragdoll", "Bengal", "Sphynx", 
+        "British Shorthair", "Abyssinian", "Scottish Fold", "Mixed Breed", "other"
       ],
-      Jain: ["Digambar", "Shwetambar", "Baniya", "Caste No Bar"],
-      Buddhist: ["Navayana", "Theravada", "Mahayana", "Caste No Bar"],
-      Parsi: ["Irani", "Parsi", "Caste No Bar"],
-      Other: ["Caste No Bar"],
+      Bird: [
+        "Parrot", "Canary", "Finch", "Cockatiel", "Lovebird", "Macaw", "Mixed Breed", "other"
+      ],
+      Rabbit: [
+        "Holland Lop", "Netherland Dwarf", "Lionhead", "Flemish Giant", "Mini Rex", "Mixed Breed", "other"
+      ],
+      Fish: [
+        "Betta", "Goldfish", "Guppy", "Tetra", "Cichlid", "Koi", "other"
+      ],
+      Reptile: [
+        "Bearded Dragon", "Gecko", "Snake", "Turtle", "Iguana", "other"
+      ],
+      "Small Pets": [
+        "Hamster", "Guinea Pig", "Mouse", "Rat", "Gerbil", "Chinchilla", "Ferret", "other"
+      ],
+      Other: ["other"],
     };
 
-    function updateCommunityOptions(religionSelectId, communitySelectId) {
-      const religion = document.getElementById(religionSelectId).value;
-      const communitySelect = document.getElementById(communitySelectId);
-      communitySelect.innerHTML =
-        '<option value="">Select Pet Community...</option>';
-      if (religion && communitiesByReligion[religion]) {
-        communitiesByReligion[religion].forEach((c) => {
+    function updateBreedOptions(typeSelectId, breedSelectId) {
+      const type = document.getElementById(typeSelectId).value;
+      const breedSelect = document.getElementById(breedSelectId);
+      breedSelect.innerHTML = '<option value="">Select Breed...</option>';
+      if (type && breedsByPetType[type]) {
+        breedsByPetType[type].forEach((b) => {
           const opt = document.createElement("option");
-          opt.value = c;
-          opt.textContent = c;
-          communitySelect.appendChild(opt);
+          opt.value = b;
+          opt.textContent = b === "other" ? "Other..." : b;
+          breedSelect.appendChild(opt);
         });
       }
     }

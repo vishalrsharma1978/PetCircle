@@ -895,14 +895,14 @@ function fetchAppUserWithProfileById($userId)
 
     $res = supabaseRequest('GET', '/rest/v1/users', [
         'id' => 'eq.' . strtolower($userId),
-        'select' => 'id,email,role,is_verified,verified_at,last_login_at,last_active_at,deactivated_at,auth_user_id,profiles(full_name,community,religion,primary_interests,skills,age_group,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,occupation,bio,current_city,privacy_settings)',
+        'select' => 'id,email,role,is_verified,verified_at,last_login_at,last_active_at,deactivated_at,auth_user_id,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city,privacy_settings)',
         'limit' => '1',
     ]);
 
     if (($res['code'] ?? 500) >= 400) {
         $res = supabaseRequest('GET', '/rest/v1/users', [
             'id' => 'eq.' . strtolower($userId),
-            'select' => 'id,email,role,last_login_at,last_active_at,deactivated_at,auth_user_id,profiles(full_name,community,religion,primary_interests,skills,age_group,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,occupation,bio,current_city)',
+            'select' => 'id,email,role,last_login_at,last_active_at,deactivated_at,auth_user_id,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city)',
             'limit' => '1',
         ]);
     }
@@ -918,14 +918,14 @@ function fetchAppUserWithProfileByAuthUserId($authUserId)
 
     $res = supabaseRequest('GET', '/rest/v1/users', [
         'auth_user_id' => 'eq.' . strtolower($authUserId),
-        'select' => 'id,email,role,is_verified,verified_at,last_login_at,last_active_at,deactivated_at,auth_user_id,profiles(full_name,community,religion,primary_interests,skills,age_group,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,occupation,bio,current_city,privacy_settings)',
+        'select' => 'id,email,role,is_verified,verified_at,last_login_at,last_active_at,deactivated_at,auth_user_id,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city,privacy_settings)',
         'limit' => '1',
     ]);
 
     if (($res['code'] ?? 500) >= 400) {
         $res = supabaseRequest('GET', '/rest/v1/users', [
             'auth_user_id' => 'eq.' . strtolower($authUserId),
-            'select' => 'id,email,role,last_login_at,last_active_at,deactivated_at,auth_user_id,profiles(full_name,community,religion,primary_interests,skills,age_group,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,occupation,bio,current_city)',
+            'select' => 'id,email,role,last_login_at,last_active_at,deactivated_at,auth_user_id,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city)',
             'limit' => '1',
         ]);
     }
@@ -3018,7 +3018,7 @@ function handleTestUserLogin($shortcut)
     $email = $test['email'];
     $res = supabaseRequest('GET', '/rest/v1/users', [
         'email' => 'eq.' . $email,
-        'select' => 'id,email,role,is_verified,verified_at,profiles(full_name,community,religion,primary_interests,skills,age_group,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,occupation,bio,current_city,privacy_settings)',
+        'select' => 'id,email,role,is_verified,verified_at,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city,privacy_settings)',
         'limit' => '1',
     ]);
 
@@ -3057,7 +3057,7 @@ function handleTestUserLogin($shortcut)
 
         $res = supabaseRequest('GET', '/rest/v1/users', [
             'id' => 'eq.' . $userId,
-            'select' => 'id,email,role,is_verified,verified_at,profiles(full_name,community,religion,primary_interests,skills,age_group,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,occupation,bio,current_city,privacy_settings)',
+            'select' => 'id,email,role,is_verified,verified_at,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city,privacy_settings)',
             'limit' => '1',
         ]);
     }
@@ -3103,7 +3103,7 @@ function handleLogin($data, $expectedRole)
 
     $res = supabaseRequest('GET', '/rest/v1/users', [
         'email' => 'eq.' . $email,
-        'select' => 'id,email,role,is_verified,verified_at,password_hash,profiles(full_name,community,religion,primary_interests,skills,age_group,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,occupation,bio,current_city,privacy_settings)',
+        'select' => 'id,email,role,is_verified,verified_at,password_hash,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city,privacy_settings)',
         'limit' => '1',
     ]);
 
@@ -3114,7 +3114,7 @@ function handleLogin($data, $expectedRole)
     if (($res['code'] ?? 500) >= 400) {
         $res = supabaseRequest('GET', '/rest/v1/users', [
             'email' => 'eq.' . $email,
-            'select' => 'id,email,role,password_hash,profiles(full_name,community,religion,primary_interests,skills,age_group,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,occupation,bio,current_city)',
+            'select' => 'id,email,role,password_hash,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city)',
             'limit' => '1',
         ]);
     }
@@ -3256,39 +3256,39 @@ function buildUserPayload($user, $loginAt = null)
     $systemTags = adminCapabilityTags($adminCaps);
     $displayTags = profileDisplayTags($customTags, $systemTags);
     $interests = implode(', ', $customTags);
-    $skills = (isset($profile['skills']) && is_array($profile['skills']))
-        ? implode(', ', $profile['skills']) : '';
 
     return [
         "id" => $user['id'],
-        "name" => $profile['full_name'] ?? ($user['email'] ?? 'Member'),
+        "name" => $profile['pet_name'] ?? ($user['email'] ?? 'Member'),
+        "pet_name" => $profile['pet_name'] ?? '',
+        "parent_name" => $profile['parent_name'] ?? '',
         "email" => $user['email'] ?? '',
         "role" => $user['role'] ?? 'member',
-        "community" => $profile['community'] ?? 'Not Specified',
-        "religion" => $profile['religion'] ?? '',
+        "pet_type" => $profile['pet_type'] ?? 'Dog',
+        "breed" => $profile['breed'] ?? '',
+        "community" => $profile['breed'] ?? '',
+        "religion" => $profile['pet_type'] ?? '',
         "membership_applied" => $profile['membership_applied'] ?? false,
         "membership_status" => $profile['status'] ?? 'none',
         "profile_photo_url" => $profile['profile_photo_url'] ?? null,
         "cover_photo_url" => $profile['cover_photo_url'] ?? null,
         "mobile_number" => $profile['mobile_number'] ?? null,
         "gender" => $profile['gender'] ?? null,
-        "occupation" => $profile['occupation'] ?? null,
         "bio" => $profile['bio'] ?? '',
         "current_city" => $profile['current_city'] ?? null,
         "last_login_at" => $loginAt ?? ($user['last_login_at'] ?? null),
         "last_active_at" => $user['last_active_at'] ?? null,
-        "age_group" => profileAgeGroup($profile),
         "primary_interests" => $customTags,
         "custom_tags" => $customTags,
         "system_tags" => $systemTags,
         "tags" => $displayTags,
         "socialProfile" => [
-            "name" => $profile['full_name'] ?? ($user['email'] ?? 'Member'),
-            "community" => $profile['community'] ?? 'Not Specified',
-            "religion" => $profile['religion'] ?? '',
-            "age" => profileAgeGroup($profile),
+            "name" => $profile['pet_name'] ?? ($user['email'] ?? 'Member'),
+            "pet_name" => $profile['pet_name'] ?? '',
+            "parent_name" => $profile['parent_name'] ?? '',
+            "pet_type" => $profile['pet_type'] ?? '',
+            "breed" => $profile['breed'] ?? '',
             "gender" => $profile['gender'] ?? null,
-            "occupation" => $profile['occupation'] ?? '',
             "bio" => $profile['bio'] ?? '',
             "currentCity" => $profile['current_city'] ?? null,
             "contactNo" => $profile['mobile_number'] ?? null,
@@ -3300,8 +3300,6 @@ function buildUserPayload($user, $loginAt = null)
         ],
         "personalization" => [
             "interests" => $interests,
-            "skills" => $skills,
-            "ageGroup" => profileAgeGroup($profile),
             "tags" => $customTags,
         ],
         "admin_capabilities" => $adminCaps,
@@ -3310,12 +3308,14 @@ function buildUserPayload($user, $loginAt = null)
     ];
 }
 
+
+
 function handleSessionMe($data)
 {
     $userId = requireUuid($data['auth_user_id'] ?? '', 'user_id');
     $res = supabaseRequest('GET', '/rest/v1/users', [
         'id' => 'eq.' . $userId,
-        'select' => 'id,email,role,is_verified,verified_at,last_login_at,last_active_at,profiles(full_name,community,religion,primary_interests,skills,age_group,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,occupation,bio,current_city,privacy_settings)',
+        'select' => 'id,email,role,is_verified,verified_at,last_login_at,last_active_at,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city,privacy_settings)',
         'limit' => '1',
     ]);
 
@@ -3324,7 +3324,7 @@ function handleSessionMe($data)
     if (($res['code'] ?? 500) >= 400) {
         $res = supabaseRequest('GET', '/rest/v1/users', [
             'id' => 'eq.' . $userId,
-            'select' => 'id,email,role,last_login_at,last_active_at,profiles(full_name,community,religion,primary_interests,skills,age_group,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,occupation,bio,current_city)',
+            'select' => 'id,email,role,last_login_at,last_active_at,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city)',
             'limit' => '1',
         ]);
     }

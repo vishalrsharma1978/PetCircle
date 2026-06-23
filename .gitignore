@@ -51,3 +51,12 @@ databasesecurityupdate.md
 backend_api.php
 burrow-signup.html
 esamaj_frontend.html
+
+# python scripts
+*.py
+
+# Database
+*.sql
+
+# other
+*.md

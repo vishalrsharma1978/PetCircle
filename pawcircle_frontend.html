@@ -7130,6 +7130,15 @@
       }
     }
 
+    function toggleCustomBreedInput() {
+      const breedSelect = document.getElementById("reg-breed");
+      const customWrap = document.getElementById("reg-custom-breed-wrap");
+      if (breedSelect && customWrap) {
+        customWrap.style.display = breedSelect.value === "other" ? "block" : "none";
+      }
+    }
+
+
     function setAdminThemeState(isAdminView) {
       const root = document.documentElement;
       const body = document.body;

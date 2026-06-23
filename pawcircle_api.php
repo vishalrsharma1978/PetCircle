@@ -2932,54 +2932,39 @@ function finalizeSignup($payload, $plainPassword = '')
             return;
         }
 
-        // Check for duplicate email or phone if provided
-        if (!empty($email)) {
-            $checkRes = supabaseRequest('GET', '/rest/v1/users', ['email' => 'eq.' . $email, 'select' => 'id']);
-            if (!empty($checkRes['data'])) {
+        // Create Supabase Auth identity
+        $metadata = [
+            'pet_name' => $petName,
+            'parent_name' => $parentName,
+            'pet_type' => $petType,
+            'breed' => $breed,
+            'source' => 'pawcircle_signup'
+        ];
+        if (!empty($phone)) $metadata['mobile_number'] = $phone;
+
+        $authCreate = createSupabaseAuthUserForSignup($email, $password, $metadata);
+        if (empty($authCreate['ok'])) {
+            $msg = $authCreate['message'] ?? 'Could not create secure account.';
+            if (($authCreate['code'] ?? 0) === 409 || stripos($msg, 'already') !== false || stripos($msg, 'registered') !== false) {
                 http_response_code(409);
                 echo json_encode(["status" => "error", "message" => "An account with this email already exists."]);
                 return;
             }
-        }
-
-        // Insert user
-        $passwordHash = password_hash($password, PASSWORD_BCRYPT);
-        $userPayload = [
-            'password_hash' => $passwordHash,
-            'role'          => 'member',
-        ];
-        if (!empty($email)) $userPayload['email'] = $email;
-        if (!empty($phone)) $userPayload['mobile_number'] = $phone;
-        
-        $userRes = supabaseRequest('POST', '/rest/v1/users', [], $userPayload, ['Prefer: return=representation']);
-
-        if ($userRes['code'] >= 400 || empty($userRes['data'])) {
             http_response_code(500);
-            $errDetail = is_array($userRes['data']) ? ($userRes['data']['message'] ?? json_encode($userRes['data'])) : 'No response from Supabase';
-            echo json_encode(["status" => "error", "message" => "Failed to create user account: " . $errDetail . " (HTTP " . $userRes['code'] . ")"]);
+            echo json_encode(["status" => "error", "message" => $msg]);
             return;
         }
 
-        $userId = $userRes['data'][0]['id'];
+        $authUser = $authCreate['user'];
+        $appUser = linkOrCreateAppUserForSupabaseAuth($authUser, $metadata);
 
-        // Insert profile
-        $profileRes = supabaseRequest('POST', '/rest/v1/profiles', [], [
-            'user_id'           => $userId,
-            'pet_name'          => $petName,
-            'parent_name'       => $parentName,
-            'pet_type'          => $petType,
-            'breed'             => $breed,
-            'mobile_number'     => $phone,
-        ], ['Prefer: return=representation']);
-
-        if ($profileRes['code'] >= 400) {
-            // Roll back user row if profile insert fails
-            supabaseRequest('DELETE', '/rest/v1/users', ['id' => 'eq.' . $userId]);
+        if (!$appUser || empty($appUser['id'])) {
             http_response_code(500);
-            echo json_encode(["status" => "error", "message" => "Failed to save profile. Please try again."]);
+            echo json_encode(["status" => "error", "message" => "Failed to link app user. Please try again."]);
             return;
         }
 
+        $userId = $appUser['id'];
         $session = createUserSession($userId, 'member');
 
         echo json_encode([
@@ -2997,8 +2982,6 @@ function finalizeSignup($payload, $plainPassword = '')
             ],
         ]);
     }
-
-
 // ---------------------------------------------------------------------------
 // MEMBER LOGIN
 // ---------------------------------------------------------------------------

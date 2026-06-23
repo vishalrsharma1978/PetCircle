@@ -7313,6 +7313,7 @@
         .addEventListener("submit", async function (e) {
           e.preventDefault();
           const petName = document.getElementById("reg-name") ? document.getElementById("reg-name").value.trim() : "";
+          const parentName = document.getElementById("reg-parent-name") ? document.getElementById("reg-parent-name").value.trim() : "";
           const email = document.getElementById("reg-email") ? document.getElementById("reg-email").value.trim() : "";
           const password = document.getElementById("reg-password") ? document.getElementById("reg-password").value : "";
           const petType = document.getElementById("reg-religion") ? document.getElementById("reg-religion").value : "Dog";
@@ -7323,7 +7324,7 @@
             if (customBreed) breed = customBreed.value.trim();
           }
 
-          if (!petName || !email || !password) {
+          if (!petName || !parentName || !email || !password) {
             showError("signup", "Please fill in all fields.");
             return;
           }
@@ -7347,6 +7348,7 @@
               body: JSON.stringify({
                 action: "signup",
                 pet_name: petName,
+                parent_name: parentName,
                 email: email,
                 password: password,
                 pet_type: petType,

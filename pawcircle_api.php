@@ -2966,6 +2966,7 @@ function finalizeSignup($payload, $plainPassword = '')
         $profileRes = supabaseRequest('POST', '/rest/v1/profiles', [], [
             'user_id'           => $userId,
             'pet_name'          => $petName,
+            'parent_name'       => $parentName,
             'pet_type'          => $petType,
             'breed'             => $breed,
             'mobile_number'     => $phone,
@@ -2983,12 +2984,13 @@ function finalizeSignup($payload, $plainPassword = '')
             "status"  => "success",
             "message" => "Account created successfully.",
             "user"    => [
-                "id"        => $userId,
-                "pet_name"  => $petName,
-                "email"     => $email,
-                "role"      => "member",
-                "pet_type"  => $petType,
-                "breed"     => $breed
+                "id"          => $userId,
+                "pet_name"    => $petName,
+                "parent_name" => $parentName,
+                "email"       => $email,
+                "role"        => "member",
+                "pet_type"    => $petType,
+                "breed"       => $breed
             ],
         ]);
     }

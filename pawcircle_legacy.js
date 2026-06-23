@@ -28,8 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Form Submissions
     attach('public-login-form', 'submit', handlePublicLogin);
     attach('admin-login-form', 'submit', handleAdminLogin);
-    attach('signup-step-1', 'submit', handleSignupSubmit);
-    attach('signup-step-2', 'submit', handleSignupSubmit);
+    // attach('signup-step-1', 'submit', handleSignupSubmit);
+    // attach('signup-step-2', 'submit', handleSignupSubmit);
 
     // Initialize Local Database Mock (only used if pawcircle_api.php cannot be reached)
     const DEMO_ADMIN = { email: 'admin@esamaj.com', password: 'admin123', role: 'admin' };

@@ -2982,14 +2982,14 @@ function finalizeSignup($payload, $plainPassword = '')
         echo json_encode([
             "status"  => "success",
             "message" => "Account created successfully.",
-            "user"    => appendPetAliases([
+            "user"    => [
                 "id"        => $userId,
                 "pet_name"  => $petName,
                 "email"     => $email,
                 "role"      => "member",
                 "pet_type"  => $petType,
                 "breed"     => $breed
-            ]),
+            ],
         ]);
     }
 

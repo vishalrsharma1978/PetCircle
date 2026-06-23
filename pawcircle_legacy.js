@@ -181,22 +181,41 @@ async function handleSignupSubmit(e) {
     e.preventDefault();
     const btn = document.getElementById('signup-submit-btn');
 
-    const name = document.getElementById('reg-name').value.trim();
-    const email = document.getElementById('reg-email').value.trim();
-    const password = document.getElementById('reg-password').value;
-    const religion = document.getElementById('reg-religion').value;
-    const community = document.getElementById('reg-community').value;
-    const interests = document.getElementById('reg-interests').value.trim();
-    const skills = document.getElementById('reg-skills').value.trim();
-    const age = document.getElementById('reg-age').value;
+    const petName = document.getElementById('reg-name') ? document.getElementById('reg-name').value.trim() : '';
+    const parentName = document.getElementById('reg-parent-name') ? document.getElementById('reg-parent-name').value.trim() : '';
+    const email = document.getElementById('reg-email') ? document.getElementById('reg-email').value.trim() : '';
+    const password = document.getElementById('reg-password') ? document.getElementById('reg-password').value : '';
+    
+    // Fallback if the user chooses mobile
+    const method = document.getElementById('reg-contact-method') ? document.getElementById('reg-contact-method').value : 'email';
+    const phone = document.getElementById('reg-phone') ? document.getElementById('reg-phone').value.trim() : '';
+    
+    // Pet details
+    const petType = document.getElementById('reg-religion') ? document.getElementById('reg-religion').value : 'Dog';
+    let breed = document.getElementById('reg-breed') ? document.getElementById('reg-breed').value : '';
+    if (breed === 'other') {
+        const custom = document.getElementById('reg-custom-breed');
+        if (custom) breed = custom.value.trim();
+    }
+
+    if (!petName || !parentName || (!email && !phone) || !password) {
+        showError('signup', 'Please fill in all required fields.');
+        return;
+    }
 
     btn.disabled = true;
-    btn.innerHTML = "Creating encrypted account... <i data-lucide='loader' class='w-5 h-5 ml-2 animate-spin'></i>";
-    lucide.createIcons();
+    btn.innerHTML = "Creating account... <i data-lucide='loader' class='w-5 h-5 ml-2 animate-spin'></i>";
+    if (window.lucide) lucide.createIcons();
 
     const payload = {
         action: 'signup',
-        name, email, password, religion, community, interests, skills, age
+        pet_name: petName,
+        parent_name: parentName,
+        email: email,
+        mobile_number: phone,
+        password: password,
+        pet_type: petType,
+        breed: breed
     };
 
     try {
@@ -209,37 +228,27 @@ async function handleSignupSubmit(e) {
         const data = await response.json();
 
         if (data.status === 'success') {
-            populateMemberDashboard(data.user);
+            if (typeof populateMemberDashboard === 'function') populateMemberDashboard(data.user);
             switchView('view-member-dashboard');
-            resetSignupForms();
+            if (typeof resetSignupForms === 'function') resetSignupForms();
         } else {
             showError('signup', data.message);
         }
     } catch (err) {
-        console.warn("Backend API not reachable. Creating user inside local simulated DB.");
-        const db = JSON.parse(localStorage.getItem('esamaj_mock_db'));
-
-        if (db.find(u => u.email === email)) {
-            showError('signup', 'Email already exists inside Local simulated database.');
-            btn.innerHTML = "Complete Signup <i data-lucide='check-circle-2' class='w-5 h-5 ml-2'></i>";
-            lucide.createIcons();
-            btn.disabled = false;
-            return;
-        }
-
-        const newUser = { name, email, password, religion, community, interests, skills, age };
-        db.push(newUser);
-        localStorage.setItem('esamaj_mock_db', JSON.stringify(db));
-
-        populateMemberDashboard(newUser);
-        switchView('view-member-dashboard');
-        resetSignupForms();
+        console.error("Signup error:", err);
+        showError('signup', 'An unexpected error occurred. Please try again.');
     } finally {
-        btn.innerHTML = "Complete Signup <i data-lucide='check-circle-2' class='w-5 h-5 ml-2'></i>";
-        lucide.createIcons();
         btn.disabled = false;
+        btn.innerHTML = `
+            <span id="submitLabel">Complete Signup</span>
+            <svg id="submitIcon" viewBox="0 0 24 24" style="stroke: #FFF8EC;">
+              <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
+        `;
     }
 }
+
 
 function populateMemberDashboard(user) {
     document.getElementById('dash-name').innerText = user.name ?? '';

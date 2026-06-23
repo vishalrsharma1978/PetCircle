@@ -2905,6 +2905,94 @@ function finalizeSignup($payload, $plainPassword = '')
         }
     }
 }
+    function handleSignup($data) {
+        if (empty($data['pet_name']) || (empty($data['email']) && empty($data['mobile_number'])) || empty($data['password'])) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "Pet name, email/phone, and password are required."]);
+            return;
+        }
+
+        $petName   = htmlspecialchars(strip_tags($data['pet_name']));
+        $email     = filter_var($data['email'] ?? '', FILTER_SANITIZE_EMAIL);
+        $phone     = htmlspecialchars(strip_tags($data['mobile_number'] ?? ''));
+        $password  = $data['password'];
+        $petType   = htmlspecialchars(strip_tags($data['pet_type'] ?? 'Dog'));
+        $breed     = htmlspecialchars(strip_tags($data['breed'] ?? ''));
+        $parentName= htmlspecialchars(strip_tags($data['parent_name'] ?? ''));
+
+        if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "Invalid email format."]);
+            return;
+        }
+
+        if (strlen($password) < 6) {
+            http_response_code(400);
+            echo json_encode(["status" => "error", "message" => "Password must be at least 6 characters."]);
+            return;
+        }
+
+        // Check for duplicate email or phone if provided
+        if (!empty($email)) {
+            $checkRes = supabaseRequest('GET', '/rest/v1/users', ['email' => 'eq.' . $email, 'select' => 'id']);
+            if (!empty($checkRes['data'])) {
+                http_response_code(409);
+                echo json_encode(["status" => "error", "message" => "An account with this email already exists."]);
+                return;
+            }
+        }
+
+        // Insert user
+        $passwordHash = password_hash($password, PASSWORD_BCRYPT);
+        $userPayload = [
+            'password_hash' => $passwordHash,
+            'role'          => 'member',
+        ];
+        if (!empty($email)) $userPayload['email'] = $email;
+        if (!empty($phone)) $userPayload['mobile_number'] = $phone;
+        
+        $userRes = supabaseRequest('POST', '/rest/v1/users', [], $userPayload, ['Prefer: return=representation']);
+
+        if ($userRes['code'] >= 400 || empty($userRes['data'])) {
+            http_response_code(500);
+            $errDetail = is_array($userRes['data']) ? ($userRes['data']['message'] ?? json_encode($userRes['data'])) : 'No response from Supabase';
+            echo json_encode(["status" => "error", "message" => "Failed to create user account: " . $errDetail . " (HTTP " . $userRes['code'] . ")"]);
+            return;
+        }
+
+        $userId = $userRes['data'][0]['id'];
+
+        // Insert profile
+        $profileRes = supabaseRequest('POST', '/rest/v1/profiles', [], [
+            'user_id'           => $userId,
+            'pet_name'          => $petName,
+            'pet_type'          => $petType,
+            'breed'             => $breed,
+            'mobile_number'     => $phone,
+        ], ['Prefer: return=representation']);
+
+        if ($profileRes['code'] >= 400) {
+            // Roll back user row if profile insert fails
+            supabaseRequest('DELETE', '/rest/v1/users', ['id' => 'eq.' . $userId]);
+            http_response_code(500);
+            echo json_encode(["status" => "error", "message" => "Failed to save profile. Please try again."]);
+            return;
+        }
+
+        echo json_encode([
+            "status"  => "success",
+            "message" => "Account created successfully.",
+            "user"    => appendPetAliases([
+                "id"        => $userId,
+                "pet_name"  => $petName,
+                "email"     => $email,
+                "role"      => "member",
+                "pet_type"  => $petType,
+                "breed"     => $breed
+            ]),
+        ]);
+    }
+
 
 // ---------------------------------------------------------------------------
 // MEMBER LOGIN

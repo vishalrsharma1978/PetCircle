@@ -62,3 +62,6 @@ esamaj_frontend.html
 *.md
 *.png
 *.txt
+
+# Temporary merge resolution files
+_merge_temp/

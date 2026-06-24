@@ -324,389 +324,6 @@
     };
   </script>
   <style>
-  <style>
-    #view-admin-dashboard,
-    #admin-loading-overlay,
-    #admin-password-modal,
-    .admin-popups {
-      --admin-color-500: var(--brand-500, #f97316);
-      --admin-color-5-percent: color-mix(in srgb, var(--brand-500, #f97316) 5%, transparent);
-      --admin-color-50: var(--brand-50, #fff5f5);
-      --admin-color-100: var(--brand-100, #ffd45a);
-      --admin-color-200: var(--brand-200, #ffa95a);
-      --admin-color-300: var(--brand-300, #ff8b5a);
-      --admin-color-400: var(--brand-400, #ff5a5a);
-      --admin-color-900: var(--brand-900, #730e0e);
-    }
-
-    #view-admin-dashboard .border-orange-500\/20,
-    #admin-password-modal .border-orange-500\/30,
-    #admin-loading-overlay .border-orange-500\/30 {
-      border-color: color-mix(in srgb, var(--admin-color-500) 25%, transparent) !important;
-    }
-
-    #view-admin-dashboard .bg-orange-500,
-    #admin-password-modal .bg-orange-500 {
-      background-color: var(--admin-color-500) !important;
-    }
-
-    #view-admin-dashboard .hover\:bg-orange-600:hover,
-    #admin-password-modal .hover\:bg-orange-600:hover {
-      background-color: var(--admin-color-900) !important;
-    }
-
-    #view-admin-dashboard .text-orange-300,
-    #admin-loading-overlay .text-orange-300 {
-      color: var(--admin-color-300) !important;
-    }
-
-    #view-admin-dashboard .text-orange-700 {
-      color: var(--admin-color-900) !important;
-    }
-
-    #view-admin-dashboard .bg-orange-500\/15,
-    #admin-loading-overlay .bg-orange-500\/15 {
-      background-color: color-mix(in srgb, var(--admin-color-500) 15%, transparent) !important;
-    }
-
-    #view-admin-dashboard .bg-orange-500\/10 {
-      background-color: color-mix(in srgb, var(--admin-color-500) 10%, transparent) !important;
-    }
-
-    #view-admin-dashboard .border-t-orange-500,
-    #admin-loading-overlay .border-t-orange-500 {
-      border-top-color: var(--admin-color-500) !important;
-    }
-
-    #view-admin-dashboard .text-orange-300\/80 {
-      color: color-mix(in srgb, var(--admin-color-300) 80%, transparent) !important;
-    }
-
-    #view-admin-dashboard .hover\:bg-orange-50:hover {
-      background-color: color-mix(in srgb, var(--admin-color-500) 8%, transparent) !important;
-    }
-
-    #view-admin-dashboard .hover\:bg-orange-950\/20:hover {
-      background-color: color-mix(in srgb, var(--admin-color-500) 15%, transparent) !important;
-    }
-
-    #view-admin-dashboard .focus\:border-orange-400:focus,
-    #admin-password-modal .focus\:border-orange-400:focus {
-      border-color: var(--admin-color-500) !important;
-    }
-
-    #view-admin-dashboard .focus\:ring-orange-400\/20:focus,
-    #admin-password-modal .focus\:ring-orange-400\/20:focus {
-      box-shadow: 0 0 0 4px color-mix(in srgb, var(--admin-color-500) 20%, transparent) !important;
-    }
-
-    #view-admin-dashboard .admin-nav-btn.is-active {
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.18), rgba(59, 130, 246, 0.10)) !important;
-      border-color: rgba(167, 139, 250, 0.28) !important;
-      box-shadow: 0 12px 28px rgba(30, 41, 59, 0.24) !important;
-    }
-
-    #view-admin-dashboard .border-brand-500 {
-      border-color: var(--admin-color-500) !important;
-    }
-
-    #view-admin-dashboard .bg-brand-500 {
-      background-color: var(--admin-color-500) !important;
-    }
-
-    #view-admin-dashboard .text-brand-500 {
-      color: var(--admin-color-500) !important;
-    }
-
-    /* Theme-tinted border outlines matching active color scheme */
-    #view-admin-dashboard .border-white\/12 {
-      border-color: color-mix(in srgb, var(--admin-color-500) 18%, transparent) !important;
-    }
-
-    #view-admin-dashboard .border-white\/10 {
-      border-color: color-mix(in srgb, var(--admin-color-500) 14%, transparent) !important;
-    }
-
-    #view-admin-dashboard .border-white\/8 {
-      border-color: color-mix(in srgb, var(--admin-color-500) 10%, transparent) !important;
-    }
-
-    #view-admin-dashboard .border-gray-150,
-    #view-admin-dashboard .dark\:border-gray-800 {
-      border-color: color-mix(in srgb, var(--admin-color-500) 14%, transparent) !important;
-    }
-
-    #view-admin-dashboard .border-gray-200,
-    #view-admin-dashboard .dark\:border-gray-700 {
-      border-color: color-mix(in srgb, var(--admin-color-500) 25%, transparent) !important;
-    }
-
-    #view-admin-dashboard .hover\:bg-white\/5:hover {
-      background-color: color-mix(in srgb, var(--admin-color-500) 8%, transparent) !important;
-    }
-
-    /* Fix Tailwind color opacity variables mapping bugs in dark mode */
-    html.dark .dark\:border-brand-900\/60 {
-      border-color: color-mix(in srgb, var(--brand-900, #7a2222) 60%, transparent) !important;
-    }
-
-    html.dark .dark\:border-brand-900\/50 {
-      border-color: color-mix(in srgb, var(--brand-900, #7a2222) 50%, transparent) !important;
-    }
-
-    html.dark .dark\:border-brand-900\/40 {
-      border-color: color-mix(in srgb, var(--brand-900, #7a2222) 40%, transparent) !important;
-    }
-
-    html.dark .dark\:border-brand-900\/30 {
-      border-color: color-mix(in srgb, var(--brand-900, #7a2222) 30%, transparent) !important;
-    }
-
-    html.dark .dark\:border-brand-800 {
-      border-color: color-mix(in srgb, var(--brand-900, #7a2222) 60%, transparent) !important;
-    }
-
-    html.dark .dark\:hover\:border-brand-700:hover {
-      border-color: var(--brand-500, #e04848) !important;
-    }
-
-    html.dark .dark\:bg-brand-900\/50 {
-      background-color: color-mix(in srgb, var(--brand-900, #7a2222) 50%, transparent) !important;
-    }
-
-    html.dark .dark\:bg-brand-900\/40 {
-      background-color: color-mix(in srgb, var(--brand-900, #7a2222) 40%, transparent) !important;
-    }
-
-    html.dark .dark\:bg-brand-900\/30 {
-      background-color: color-mix(in srgb, var(--brand-900, #7a2222) 30%, transparent) !important;
-    }
-
-    html.dark .dark\:bg-brand-950\/30 {
-      background-color: color-mix(in srgb, var(--brand-900, #7a2222) 20%, transparent) !important;
-    }
-
-    html.dark .dark\:bg-brand-950\/50 {
-      background-color: color-mix(in srgb, var(--brand-900, #7a2222) 35%, transparent) !important;
-    }
-
-    /* cobe globe labels styling */
-    .dc-label {
-      pointer-events: none;
-      user-select: none;
-    }
-
-    #admin-loading-globe,
-    #admin-servers-globe {
-      filter: brightness(1.16) saturate(0.82) contrast(1.04);
-    }
-
-    #admin-loading-globe-wrapper,
-    #admin-servers-globe-wrapper {
-      isolation: isolate;
-    }
-
-    #admin-loading-globe,
-    #admin-servers-globe {
-      position: relative;
-      z-index: 2;
-    }
-
-    #admin-loading-globe-labels,
-    #admin-servers-globe-labels {
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-    }
-
-    /* --- FIGMA DESIGN SYSTEM OVERRIDES --- */
-    body {
-      font-family: 'Inter', sans-serif !important;
-    }
-
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    .heading-font {
-      font-family: 'Poppins', sans-serif !important;
-    }
-
-    h1 {
-      font-size: 24px !important;
-    }
-
-    h2 {
-      font-size: 20px !important;
-    }
-
-    /* Buttons */
-    button,
-    .btn {
-      border-radius: 8px !important;
-    }
-
-    button.rounded-full,
-    .rounded-full {
-      border-radius: 50px !important;
-    }
-
-    /* Cards */
-    .bg-white.shadow,
-    .bg-white.shadow-sm,
-    .bg-white.shadow-md,
-    .bg-white.shadow-xl,
-    .bg-gray-800 {
-      border-radius: 12px !important;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
-      border: 1px solid #e5e7eb !important;
-    }
-
-    .dark .bg-gray-800 {
-      border: 1px solid #374151 !important;
-    }
-
-    /* ------------------------------------- */
-
-    body {
-      font-family: "DM Sans", sans-serif;
-    }
-
-    @keyframes petFloat {
-      0%, 100% {
-        transform: translateY(0) rotate(0deg);
-      }
-
-      50% {
-        transform: translateY(-6px) rotate(1.2deg);
-      }
-    }
-
-    @keyframes petGlow {
-      0%, 100% {
-        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
-      }
-
-      50% {
-        box-shadow: 0 16px 36px color-mix(in srgb, var(--faith-accent, #e04848) 22%, transparent);
-      }
-    }
-
-    @keyframes petPan {
-      0% {
-        background-position: 50% 45%;
-      }
-
-      100% {
-        background-position: 50% 58%;
-      }
-    }
-
-    @keyframes petAppear {
-      0% {
-        opacity: 0;
-        transform: translateY(10px) scale(0.98);
-      }
-
-      100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    .pet-floaty {
-      animation: petFloat 4.8s ease-in-out infinite;
-      transform-origin: center;
-    }
-
-    .pet-soft-glow {
-      animation: petGlow 4.2s ease-in-out infinite;
-    }
-
-    .pet-pan-bg {
-      animation: petPan 18s ease-in-out infinite alternate;
-      background-size: cover;
-    }
-
-    .pet-card-lively {
-      animation: petAppear 0.45s ease-out both;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
-
-    .pet-card-lively:hover {
-      transform: translateY(-4px) scale(1.01);
-    }
-
-    .dark #social-tab-feed {
-      position: relative;
-      border: 1px solid rgba(71, 85, 105, 0.38);
-      border-radius: 1rem;
-      padding: 0.9rem;
-      background:
-        radial-gradient(120% 140% at 16% 10%, rgba(59, 130, 246, 0.18), transparent 60%),
-        radial-gradient(100% 100% at 88% 88%, rgba(148, 163, 184, 0.14), transparent 64%),
-        linear-gradient(160deg, rgba(2, 6, 23, 0.92), rgba(15, 23, 42, 0.9));
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
-    }
-
-    .dark #social-tab-feed > * {
-      position: relative;
-      z-index: 1;
-    }
-
-    .pet-tab-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-    }
-
-    @keyframes petCommunityStripScroll {
-      0% {
-        transform: translateX(0);
-      }
-
-      100% {
-        transform: translateX(-50%);
-      }
-    }
-
-    .pet-community-strip {
-      overflow: hidden;
-      width: 100%;
-    }
-
-    .pet-community-strip-track {
-      display: flex;
-      align-items: stretch;
-      gap: 0.5rem;
-      width: max-content;
-      animation: petCommunityStripScroll 24s linear infinite;
-      will-change: transform;
-    }
-
-    .pet-community-strip:hover .pet-community-strip-track {
-      animation-play-state: paused;
-    }
-
-    .pet-community-strip-item {
-      width: 168px;
-      flex: 0 0 auto;
-    }
-
-    @media (max-width: 640px) {
-      .pet-community-strip-item {
-        width: 142px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .pet-community-strip-track {
-        animation: none;
-      }
-    }
-
     /* --- DYNAMIC ADMIN RELIGION THEME OVERRIDES --- */
     #view-admin-dashboard,
     #admin-loading-overlay,
@@ -1619,7 +1236,7 @@
       --faith-bg-src: url("img/bg_parsi.png");
     }
 
-    /* Page starts invisible ΓÇö revealed after session check to prevent login flash */
+    /* Page starts invisible — revealed after session check to prevent login flash */
     body {
       visibility: hidden;
     }
@@ -3611,7 +3228,7 @@
       display: none;
     }
 
-    /* ===== Pravachan Hub: hero banner ===== */
+    /* ===== PawCircle: hero banner ===== */
     .ch-hero {
       position: relative;
       overflow: hidden;
@@ -6148,7 +5765,7 @@
   <div id="view-public-login"
     class="view-section active h-screen overflow-hidden flex-col lg:flex-row items-stretch">
 
-    <!-- ΓöÇΓöÇ LEFT: Pet Pet Pet Pet Community Pulse Pane ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ -->
+    <!-- ── LEFT: Pet Pet Pet Pet Community Pulse Pane ───────────────────────────────────── -->
     <div id="lp-left-pane" class="w-full lg:flex-[1.35] h-full flex flex-col p-6 sm:p-8 lg:p-10 overflow-y-auto sidebar-scroll" style="background:linear-gradient(135deg,#fffbeb 0%,#f0fdf4 55%,#ecfeff 100%);transition:background 0.8s ease">
 
       <!-- Brand header -->
@@ -6163,21 +5780,21 @@
         </div>
         <span class="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200/80 flex-shrink-0">
           <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse inline-block"></span>
-          <span id="lp-online-count">ΓÇö online</span>
+          <span id="lp-online-count">— online</span>
         </span>
       </div>
 
-      <!-- Live rotating feed card ΓÇö populated by initLoginFeed() -->
+      <!-- Live rotating feed card — populated by initLoginFeed() -->
       <div id="lp-feed-card" class="flex-1 min-h-[420px] lg:min-h-[520px] rounded-2xl bg-white/85 border border-white/90 shadow-md p-5 mb-3 backdrop-blur-sm"></div>
 
-      <!-- Activity ticker ΓÇö populated by initLoginFeed() -->
+      <!-- Activity ticker — populated by initLoginFeed() -->
       <div id="lp-activity-ticker" class="flex-shrink-0 flex items-center gap-2 flex-wrap mb-3"></div>
 
       <!-- Hidden showcase kept in DOM for JS hydration but not displayed -->
       <div id="public-theme-showcase" class="hidden"></div>
     </div>
 
-    <!-- ΓöÇΓöÇ RIGHT: Login Form Pane ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ -->
+    <!-- ── RIGHT: Login Form Pane ────────────────────────────────────────── -->
     <div class="w-full lg:flex-1 h-full flex flex-col items-center justify-center bg-white lg:border-l lg:border-gray-100 p-6 sm:p-8 overflow-hidden">
       <div class="w-full max-w-xs rounded-[1.75rem] border-2 border-brand-200/70 bg-white/92 p-5 sm:p-6 shadow-lg shadow-brand-200/30">
 
@@ -6216,7 +5833,7 @@
               <i data-lucide="lock" class="icon h-4 w-4"></i>
               <input type="password" id="public-password" required
                 class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-300 text-sm bg-gray-50/70"
-                placeholder="ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇó" />
+                placeholder="••••••••" />
             </div>
           </div>
           <button type="submit" id="public-submit-btn"
@@ -6689,8 +6306,8 @@
 
       <!-- Daily Mantra / Quote -->
       <div class="mantra-card" id="dash-mantra-card">
-        <span class="mantra-icon" id="dash-mantra-icon">≡ƒòë∩╕Å</span>
-        <p class="mantra-quote" id="dash-mantra-text">Loading today's inspirationΓÇª</p>
+        <span class="mantra-icon" id="dash-mantra-icon">🕉️</span>
+        <p class="mantra-quote" id="dash-mantra-text">Loading today's inspiration…</p>
         <p class="mantra-source" id="dash-mantra-source"></p>
       </div>
 
@@ -7021,7 +6638,7 @@
             class="social-tab-item px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
             Groups
           </button>
-          <!-- Posts tab removed from navbar ΓÇö your posts are shown when you open your own profile. -->
+          <!-- Posts tab removed from navbar — your posts are shown when you open your own profile. -->
           <button data-tab="my-posts" onclick="switchSocialTab('my-posts')"
             class="social-tab-item hidden px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
             Posts
@@ -7060,10 +6677,10 @@
             class="social-tab-item hidden px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
             Obituaries
           </button>
-          <!-- Pravachan Hub hidden for now (code retained). -->
+          <!-- PawCircle hidden for now (code retained). -->
           <button onclick="switchView('view-content-hub')"
             class="social-tab-item hidden px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
-            Pravachan Hub
+            PawCircle
           </button>
 
           <div id="social-tab-indicator"
@@ -7171,16 +6788,16 @@
               Obituaries
             </button>
 
-            <!-- ΓöÇΓöÇ New feature shortcuts ΓöÇΓöÇ -->
+            <!-- ── New feature shortcuts ── -->
             <div class="hidden pt-4 pb-1 px-1 text-xs font-black uppercase tracking-wider text-gray-400">Explore</div>
 
-            <!-- Pravachan Hub hidden for now (code retained). -->
+            <!-- PawCircle hidden for now (code retained). -->
             <button onclick="switchView('view-content-hub')"
               class="social-tab-btn no-faith-hover hidden w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
               <div class="bg-red-50 dark:bg-red-900/30 text-red-500 p-1.5 rounded-lg">
                 <i data-lucide="tv-2" class="w-5 h-5"></i>
               </div>
-              Pravachan Hub
+              PawCircle
             </button>
           </div>
 
@@ -7352,23 +6969,6 @@
                 style="background: var(--faith-accent, #f59e0b)">
                 Post
               </button>
-            </div>
-            <input type="file" id="feed-media-input" class="hidden" accept="image/*,video/*"
-              onchange="handleFeedMediaSelection(this)" />
-            <div id="feed-media-preview"
-              class="hidden mt-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/70 p-3">
-              <div class="flex items-center justify-between gap-3 mb-2">
-                <div class="text-xs text-gray-600 dark:text-gray-300 truncate">
-                  <span id="feed-media-kind" class="font-bold">Media</span>
-                  <span id="feed-media-name" class="ml-1"></span>
-                </div>
-                <button type="button" onclick="clearFeedMediaSelection()"
-                  class="no-faith-hover text-xs px-2.5 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
-                  Remove
-                </button>
-              </div>
-              <img id="feed-media-preview-img" src="" alt="Selected media" class="hidden w-full max-h-64 object-cover rounded-lg" />
-              <video id="feed-media-preview-video" controls class="hidden w-full max-h-64 rounded-lg bg-black"></video>
             </div>
           </div>
 
@@ -8182,12 +7782,14 @@
     }
 
     function switchView(viewId) {
-      // Stop the PawStream live stream when navigating away so audio doesn't linger.
+      // Stop the PawCircle live stream when navigating away so audio doesn't linger.
       if (viewId !== "view-content-hub") {
         const yt = document.getElementById("ch-yt-player");
         if (yt && yt.src) yt.src = "";
         const chVid = document.getElementById("ch-video-player");
         if (chVid) { try { chVid.pause(); } catch (e) { } }
+        const chAud = document.getElementById("ch-audio-player");
+        if (chAud) { try { chAud.pause(); } catch (e) { } }
       }
       document
         .querySelectorAll(".view-section")
@@ -8248,6 +7850,7 @@
             playPortalTransition(() => {
               populateMemberDashboard(demoUser);
               initializeSocialFeed();
+              switchView("view-member-dashboard");
               showToast("Offline demo mode. Backend calls are disabled.", "info");
               btn.classList.remove("!bg-green-500", "!border-green-500");
               btn.disabled = false;
@@ -8266,6 +7869,7 @@
               playPortalTransition(() => {
                 populateMemberDashboard(authData.user);
                 initializeSocialFeed();
+              switchView("view-member-dashboard");
                 btn.classList.remove("!bg-green-500", "!border-green-500");
                 btn.disabled = false;
                 btn.innerText = "Sign in";
@@ -8295,6 +7899,7 @@
               // Always land on the feed; the profile form is only opened on demand
               // (via the bell notification or the dashboard's "Apply" prompt).
               initializeSocialFeed();
+              switchView("view-member-dashboard");
               btn.classList.remove("!bg-green-500", "!border-green-500");
               btn.disabled = false;
               btn.innerText = "Sign in";
@@ -10580,11 +10185,6 @@
 
     let currentUserObj = {};
     let feedPosts = [];
-                <button type="button" onclick="openPostMediaPicker()"
-        return null;
-      }
-    }
-
     let activeFeedFilter = "All Posts";
     let postsLoading = true;
     let postsLoadFailed = false;
@@ -10838,124 +10438,10 @@
         return user;
       } catch (e) {
         console.warn("Could not read stored session:", e);
-
-    let selectedFeedMediaFile = null;
-    let selectedFeedMediaPreviewUrl = "";
-    let currentMiniCalendarDate = new Date();
-    const FEED_REACTION_STORAGE_PREFIX = "esamaj_feed_reactions_";
-    const FEED_HIDDEN_POSTS_PREFIX = "esamaj_hidden_posts_";
-    let reactionSyncMode = "unknown";
-    let reactionSyncNoticeShown = false;
-    let postMenuListenerBound = false;
-    let reactionAudioCtx = null;
-    const FEED_REACTIONS = [
-      { key: "bone", label: "Dog Bone" },
-      { key: "bark", label: "Angry Bark" },
-      { key: "heart", label: "Dog Heart" },
-      { key: "bite", label: "Dog Bite" },
-    ];
-
-    function getReactionIconHtml(reactionKey) {
-      const expressionByReaction = {
-        bone: "🦴",
-        bark: "💢",
-        heart: "❤️",
-        bite: "😬",
-      };
-      const reactionPhotoByKey = {
-        bone: "https://placedog.net/80/80?id=41",
-        bark: "https://placedog.net/80/80?id=96",
-        heart: "https://placedog.net/80/80?id=109",
-        bite: "https://placedog.net/80/80?id=154",
-      };
-      const badge = expressionByReaction[reactionKey] || "🐾";
-      const photo = reactionPhotoByKey[reactionKey] || getPrimaryLandingPetImage(currentUserObj) || PET_REAL_PHOTOS.Dog || PET_REAL_PHOTOS.Other;
-
-      return `<span class="relative inline-flex items-center justify-center w-5 h-5">
-                <img src="${photo}" alt="dog" class="w-5 h-5 rounded-full object-cover border border-white/80 shadow-sm" loading="lazy" decoding="async" />
-                <span class="absolute -right-1 -bottom-1 w-3.5 h-3.5 rounded-full bg-white text-[9px] leading-none flex items-center justify-center border border-amber-300">${badge}</span>
-              </span>`;
+        return null;
+      }
     }
 
-    function getReactionAudioContext() {
-      try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return null;
-        if (!reactionAudioCtx) reactionAudioCtx = new AudioCtx();
-        return reactionAudioCtx;
-      } catch (_) {
-      currentUserEmail = user.email;
-      currentUserObj = user;
-      updateAdminModeControls();
-      syncUserAgeGroup(currentUserObj);
-      applyDarkModePreference(getSavedDarkModePreference(user));
-      updateOfflineDemoBadge();
-      friendsLoading = true;
-      globalFriends = [];
-      globalFriendRequests = [];
-      updateFriendCountDisplays();
-      if (!isOfflineDemoUser(user) && typeof loadPackDataFromDatabase === "function") {
-        loadPackDataFromDatabase();
-      }
-      if (!isOfflineDemoUser(user) && typeof loadNotifications === "function") {
-        loadNotifications();
-      }
-      if (!isOfflineDemoUser(user) && typeof startNotificationPolling === "function") {
-        startNotificationPolling();
-      }
-      updatePostAudienceHint();
-      const suvicharBtn = document.getElementById("send-suvichar-btn");
-      if (suvicharBtn) {
-        suvicharBtn.classList.toggle("hidden", String(user.religion || "").toLowerCase() !== "hindu");
-      }
-      if (!isOfflineDemoUser(user)) {
-        persistCurrentSession(user);
-        setupActivityTracking();
-        trackUserActivity("dashboard_open", { force: true });
-      }
-      // Ensure cover photo in DOM matches the signed-in user (avoid showing previous user's cover)
-      try {
-        applyCoverPhoto(user.cover_photo_url || null);
-      } catch (err) {
-        console.warn("Could not set cover photo for user:", err);
-      }
-      currentStep = 1;
-      selectedGender = "";
-      selectedInterests = [];
-      skillTags = [];
-      consentChecks = { terms: false, privacy: false, accuracy: false };
-
-      const dashName = document.getElementById("dash-name");
-      if (dashName) dashName.innerText = user.name || "Member";
-      const dashNameTopbar = document.getElementById("dash-name-topbar");
-      if (dashNameTopbar) dashNameTopbar.innerText = user.name || "Member";
-
-      const greetings = {
-        Hindu: "नमस्ते",
-        Muslim: "السَّلَامُ عَلَيْكُمْ",
-        Sikh: "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ",
-        Christian: "God bless you",
-        Buddhist: "May you find peace",
-        Jain: "Jai Jinendra",
-        Parsi: "Ushta Te",
-      };
-      const greetingEn = {
-        Hindu: "Welcome",
-        Muslim: "Peace be upon you",
-        Sikh: "Truth is eternal",
-        Christian: "Grace be with you",
-        Buddhist: "Peace be with you",
-        Jain: "Victory to the Jinas",
-        Parsi: "Happiness to you",
-      };
-
-      document.getElementById("dash-greeting").innerText =
-        greetings[user.religion] || "Welcome";
-      const enGreetingEl = document.getElementById("dash-greeting-en");
-      if (enGreetingEl)
-        enGreetingEl.innerText = greetingEn[user.religion] || "Welcome";
-
-      const topLogo = document.getElementById("dash-logo-topbar");
     function readStoredSession() {
       const activeIds = [
         readStorageValue(sessionStorage, PAWCIRCLE_ACTIVE_SESSION_ID_KEY),
@@ -11124,338 +10610,83 @@
       if (option) selectEl.value = option.value;
     }
 
-    function playReactionSound(reactionKey) {
-      const ctx = getReactionAudioContext();
-      if (!ctx) return;
+    function populateMemberDashboard(user, opts = {}) {
+      currentUserEmail = user.email;
+      currentUserObj = user;
+      updateAdminModeControls();
+      syncUserAgeGroup(currentUserObj);
+      applyDarkModePreference(getSavedDarkModePreference(user));
+      updateOfflineDemoBadge();
+      friendsLoading = true;
+      globalFriends = [];
+      globalFriendRequests = [];
+      updateFriendCountDisplays();
+      if (!isOfflineDemoUser(user) && typeof loadPackDataFromDatabase === "function") {
+        loadPackDataFromDatabase();
+      }
+      if (!isOfflineDemoUser(user) && typeof loadNotifications === "function") {
+        loadNotifications();
+      }
+      if (!isOfflineDemoUser(user) && typeof startNotificationPolling === "function") {
+        startNotificationPolling();
+      }
+      updatePostAudienceHint();
+      const suvicharBtn = document.getElementById("send-suvichar-btn");
+      if (suvicharBtn) {
+        suvicharBtn.classList.toggle("hidden", String(user.religion || "").toLowerCase() !== "hindu");
+      }
+      if (!isOfflineDemoUser(user)) {
+        persistCurrentSession(user);
+        setupActivityTracking();
+        trackUserActivity("dashboard_open", { force: true });
+      }
+      // Ensure cover photo in DOM matches the signed-in user (avoid showing previous user's cover)
+      try {
+        applyCoverPhoto(user.cover_photo_url || null);
+      } catch (err) {
+        console.warn("Could not set cover photo for user:", err);
+      }
+      currentStep = 1;
+      selectedGender = "";
+      selectedInterests = [];
+      skillTags = [];
+      consentChecks = { terms: false, privacy: false, accuracy: false };
 
-      const now = ctx.currentTime;
-      const master = ctx.createGain();
-      master.connect(ctx.destination);
-      master.gain.setValueAtTime(0.0001, now);
-      master.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
-      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
+      const dashName = document.getElementById("dash-name");
+      if (dashName) dashName.innerText = user.name || "Member";
+      const dashNameTopbar = document.getElementById("dash-name-topbar");
+      if (dashNameTopbar) dashNameTopbar.innerText = user.name || "Member";
 
-      const beep = (freq, start, duration, type = "sine", gainVal = 0.08) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, now + start);
-        gain.gain.setValueAtTime(0.0001, now + start);
-        gain.gain.exponentialRampToValueAtTime(gainVal, now + start + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + start + duration);
-        osc.connect(gain);
-        gain.connect(master);
-        osc.start(now + start);
-        osc.stop(now + start + duration + 0.03);
+      const greetings = {
+        Hindu: "नमस्ते",
+        Muslim: "السَّلَامُ عَلَيْكُمْ",
+        Sikh: "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ",
+        Christian: "God bless you",
+        Buddhist: "May you find peace",
+        Jain: "Jai Jinendra",
+        Parsi: "Ushta Te",
+      };
+      const greetingEn = {
+        Hindu: "Welcome",
+        Muslim: "Peace be upon you",
+        Sikh: "Truth is eternal",
+        Christian: "Grace be with you",
+        Buddhist: "Peace be with you",
+        Jain: "Victory to the Jinas",
+        Parsi: "Happiness to you",
       };
 
-      const noise = (start, duration, gainVal = 0.04) => {
-        const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * duration), ctx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < data.length; i += 1) {
-          data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
-        }
-        const src = ctx.createBufferSource();
-        const filter = ctx.createBiquadFilter();
-        filter.type = "bandpass";
-        filter.frequency.setValueAtTime(1100, now + start);
-        filter.Q.value = 1.2;
-        const gain = ctx.createGain();
-        gain.gain.setValueAtTime(0.0001, now + start);
-        gain.gain.exponentialRampToValueAtTime(gainVal, now + start + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + start + duration);
-        src.buffer = buffer;
-        src.connect(filter);
-        filter.connect(gain);
-        gain.connect(master);
-        src.start(now + start);
-        src.stop(now + start + duration + 0.02);
-      };
+      document.getElementById("dash-greeting").innerText =
+        greetings[user.religion] || "Welcome";
+      const enGreetingEl = document.getElementById("dash-greeting-en");
+      if (enGreetingEl)
+        enGreetingEl.innerText = greetingEn[user.religion] || "Welcome";
 
-      if (reactionKey === "bone") {
-        beep(420, 0, 0.12, "triangle", 0.06);
-        beep(520, 0.1, 0.14, "triangle", 0.06);
-      } else if (reactionKey === "heart") {
-        beep(360, 0, 0.1, "sine", 0.07);
-        beep(310, 0.12, 0.16, "sine", 0.08);
-      } else if (reactionKey === "bite") {
-        noise(0, 0.09, 0.05);
-        beep(220, 0.08, 0.14, "square", 0.06);
-      } else {
-        noise(0, 0.08, 0.05);
-        beep(280, 0.05, 0.16, "sawtooth", 0.06);
-      }
-    }
-
-    function getFeedReactionStorageKey() {
-      const email = (currentUserObj?.email || "guest").toLowerCase().trim();
-      return `${FEED_REACTION_STORAGE_PREFIX}${email}`;
-    }
-
-    function getLocalFeedReactions() {
-      try {
-        const raw = localStorage.getItem(getFeedReactionStorageKey()) || "{}";
-        const parsed = JSON.parse(raw);
-        return parsed && typeof parsed === "object" ? parsed : {};
-      } catch (_) {
-        return {};
-      }
-    }
-
-    function saveLocalFeedReactions(map) {
-      try {
-        localStorage.setItem(getFeedReactionStorageKey(), JSON.stringify(map || {}));
-      } catch (_) { }
-    }
-
-    function setLocalFeedReaction(postId, reactionKey) {
-      const map = getLocalFeedReactions();
-      if (reactionKey) {
-        map[String(postId)] = reactionKey;
-      } else {
-        delete map[String(postId)];
-      }
-      saveLocalFeedReactions(map);
-    }
-
-    function mergeFeedReactionState(postId, reactionCounts = {}, selectedFromServer = null) {
-      const counts = { ...reactionCounts };
-      FEED_REACTIONS.forEach(({ key }) => {
-        counts[key] = Number(counts[key] || 0);
-      });
-
-      let selectedReaction = selectedFromServer || null;
-      const localReaction = getLocalFeedReactions()[String(postId)] || null;
-
-      if (localReaction && localReaction !== selectedReaction) {
-        if (selectedReaction && counts[selectedReaction] > 0) {
-          counts[selectedReaction] -= 1;
-        }
-        counts[localReaction] = Number(counts[localReaction] || 0) + 1;
-        selectedReaction = localReaction;
-      }
-
-      return {
-        reactionCounts: counts,
-        selectedReaction,
-      };
-    }
-
-    function getPostReactionTotal(post) {
-      if (!post?.reactionCounts) return 0;
-      return FEED_REACTIONS.reduce((sum, reaction) => {
-        return sum + Number(post.reactionCounts?.[reaction.key] || 0);
-      }, 0);
-    }
-
-    function getPostOwnerProfilePhoto(post) {
-      if (post?.profilePhoto) return post.profilePhoto;
-
-      const currentUserName = String(currentUserObj?.socialProfile?.name || currentUserObj?.name || "").trim().toLowerCase();
-      const postAuthor = String(post?.author || "").trim().toLowerCase();
-      const currentUserId = String(currentUserObj?.id || "").trim();
-      const postUserId = String(post?.user_id || "").trim();
-
-      const isCurrentUserPost = (currentUserId && postUserId && currentUserId === postUserId)
-        || (currentUserName && postAuthor && currentUserName === postAuthor);
-
-      if (isCurrentUserPost) {
-        return (
-          currentUserObj?.profile_photo_url
-          || currentUserObj?.socialProfile?.profile_photo_url
-          || getPrimaryLandingPetImage(currentUserObj)
-          || null
-        );
-      }
-
-      return null;
-    }
-
-    function getHiddenPostsStorageKey() {
-      const email = (currentUserObj?.email || "guest").toLowerCase().trim();
-      return `${FEED_HIDDEN_POSTS_PREFIX}${email}`;
-    }
-
-    function getHiddenPostsMap() {
-      try {
-        const raw = localStorage.getItem(getHiddenPostsStorageKey()) || "{}";
-        const parsed = JSON.parse(raw);
-        return parsed && typeof parsed === "object" ? parsed : {};
-      } catch (_) {
-        return {};
-      }
-    }
-
-    function saveHiddenPostsMap(map) {
-      try {
-        localStorage.setItem(getHiddenPostsStorageKey(), JSON.stringify(map || {}));
-      } catch (_) { }
-    }
-
-    function isPostHidden(postId) {
-      return Boolean(getHiddenPostsMap()[String(postId)]);
-    }
-
-    function setPostHidden(postId, hidden = true) {
-      const map = getHiddenPostsMap();
-      if (hidden) map[String(postId)] = true;
-      else delete map[String(postId)];
-      saveHiddenPostsMap(map);
-    }
-
-    function isOwnPost(post) {
-      if (!post) return false;
-      const currentUserId = String(currentUserObj?.id || "").trim();
-      const postUserId = String(post.user_id || "").trim();
-      if (currentUserId && postUserId) {
-        return currentUserId === postUserId;
-      }
-      const currentName = String(currentUserObj?.socialProfile?.name || currentUserObj?.name || "").trim().toLowerCase();
-      const postAuthor = String(post.author || "").trim().toLowerCase();
-      return Boolean(currentName && postAuthor && currentName === postAuthor);
-    }
-
-    function closeAllPostMenus() {
-      document.querySelectorAll("[data-post-menu]").forEach((menu) => {
-        menu.classList.add("hidden");
-      });
-      document.querySelectorAll("[data-post-share-menu]").forEach((menu) => {
-        menu.classList.add("hidden");
-      });
-    }
-
-    function ensurePostMenuDismissListener() {
-      if (postMenuListenerBound) return;
-      document.addEventListener("click", (evt) => {
-        const target = evt.target;
-        if (
-          target?.closest?.("[data-post-menu]")
-          || target?.closest?.("[data-post-menu-trigger]")
-          || target?.closest?.("[data-post-share-menu]")
-          || target?.closest?.("[data-post-share-trigger]")
-        ) {
-          return;
-        }
-        closeAllPostMenus();
-      });
-      postMenuListenerBound = true;
-    }
-
-    function getPostById(postId) {
-      return feedPosts.find((p) => String(p.id) === String(postId));
-    }
-
-    function getPostSharePayload(postId) {
-      const post = getPostById(postId);
-      const text = post?.content ? String(post.content).trim() : "Check out this PawdCast post";
-      const shortText = text.length > 140 ? `${text.slice(0, 137)}...` : text;
-      const url = `${window.location.origin}${window.location.pathname}#pawdcast-${encodeURIComponent(String(postId))}`;
-      const title = `${post?.author || "PawCircle"} on PawdCast`;
-      return { post, title, text: shortText, url };
-    }
-
-    function toggleShareMenu(postId, event) {
-      if (event?.stopPropagation) event.stopPropagation();
-      const menu = document.getElementById(`post-share-menu-${postId}`);
-      if (!menu) return;
-      const isOpen = !menu.classList.contains("hidden");
-      closeAllPostMenus();
-      if (!isOpen) menu.classList.remove("hidden");
-    }
-
-    function copyPostLink(postId) {
-      const payload = getPostSharePayload(postId);
-      const write = navigator?.clipboard?.writeText
-        ? navigator.clipboard.writeText(payload.url)
-        : Promise.reject(new Error("Clipboard API unavailable"));
-
-      write
-        .then(() => showToast("Post link copied."))
-        .catch(() => {
-          const ok = window.prompt("Copy post link:", payload.url);
-          if (ok !== null) showToast("Post link ready to copy.");
-        });
-
-      closeAllPostMenus();
-    }
-
-    async function sharePostNative(postId) {
-      const payload = getPostSharePayload(postId);
-      if (navigator.share) {
-        try {
-          await navigator.share({ title: payload.title, text: payload.text, url: payload.url });
-        } catch (_) { }
-      } else {
-        copyPostLink(postId);
-        return;
-      }
-      closeAllPostMenus();
-    }
-
-    function sharePostTo(postId, platform) {
-      const payload = getPostSharePayload(postId);
-      const encodedUrl = encodeURIComponent(payload.url);
-      const encodedText = encodeURIComponent(payload.text);
-
-      const map = {
-        whatsapp: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
-        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-        x: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
-        linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
-      };
-
-      const shareUrl = map[platform];
-      if (!shareUrl) return;
-
-      window.open(shareUrl, "_blank", "noopener,noreferrer,width=640,height=720");
-      closeAllPostMenus();
-    }
-
-    async function syncPostReactionSilently(postId, reaction) {
-      if (reactionSyncMode === "disabled") return null;
-
-      try {
-        const response = await fetch("pawcircle_api.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            action: "toggle_post_reaction",
-            user_id: currentUserObj.id,
-            post_id: postId,
-            reaction: reaction || null,
-          }),
-        });
-
-        const text = await response.text();
-        const jsonStart = text.indexOf("{");
-        if (jsonStart === -1) {
-          reactionSyncMode = "disabled";
-          return null;
-        }
-
-        const data = JSON.parse(text.slice(jsonStart));
-        if (data.status !== "success") {
-          reactionSyncMode = "disabled";
-          return null;
-        }
-
-        reactionSyncMode = "available";
-        return data;
-      } catch (_) {
-        reactionSyncMode = "disabled";
-        return null;
-      }
-    }
-    function populateMemberDashboard(user) {
-      const db = JSON.parse(localStorage.getItem("esamaj_db") || "[]");
-      const persistedUser = db.find((u) => u.email === user.email) || {};
-      user = {
-        ...persistedUser,
-        ...user,
-        profile_photo_url: user.profile_photo_url || persistedUser.profile_photo_url || "",
-        cover_photo_url: user.cover_photo_url || persistedUser.cover_photo_url || "",
-      };
-
+      const topLogo = document.getElementById("dash-logo-topbar");
+      if (topLogo) {
+        topLogo.innerHTML = user.religion
+          ? getCircledLogo(logos[user.religion], user.religion)
+          : '<i data-lucide="user" class="w-4 h-4 text-brand-300"></i>';
       }
 
       const bannerSymbol = document.getElementById("dash-banner-symbol");
@@ -11513,16 +10744,9 @@
         renderMembershipPlaceholder();
       }
 
-      topLogo.innerHTML = user.religion
-        ? getCircledLogo(theme.emoji, user.religion)
-        : '<i data-lucide="user" class="w-4 h-4 text-brand-300"></i>';
-
-      const bannerSymbol = document.getElementById("dash-banner-symbol");
-      if (bannerSymbol) {
-        const bannerPhoto = getPrimaryLandingPetImage(user);
-        bannerSymbol.innerHTML = user.religion
-          ? `<img src="${bannerPhoto}" alt="${theme.label} pet" class="w-full h-full object-cover" onerror="this.remove()" />`
-          : "";
+      /* ── New feature hooks ── */
+      if (typeof renderDailyMantra === 'function') renderDailyMantra(user.religion || 'Hindu');
+      if (typeof applyTrustBadge === 'function') applyTrustBadge(!!user.is_verified);
     }
 
     function getSocialAvatar(name) {
@@ -12086,300 +11310,26 @@ function initializeSocialFeed() {
 
       if (headerLogoEl) {
         const accent = getFaithAccentColor(currentUserObj.religion);
-      /* ── New feature hooks ── */
-      if (typeof renderDailyMantra === 'function') renderDailyMantra(user.religion || 'Hindu');
-      if (typeof applyTrustBadge === 'function') applyTrustBadge(!!user.is_verified);
-
-      return { plural: "PetPals", singular: "PetPal" };
-    }
-
-    function applyCompanionLabels(user = currentUserObj) {
-      const labels = getCompanionLabelSet(user);
-      const coverLabel = document.getElementById("cover-profile-friends-label");
-      const topTabLabel = document.getElementById("social-tab-friends-label");
-      const sidebarLabel = document.getElementById("sidebar-tab-friends-label");
-
-      if (coverLabel) coverLabel.innerText = labels.plural;
-      if (topTabLabel) topTabLabel.innerText = labels.plural;
-      if (sidebarLabel) sidebarLabel.innerText = labels.plural;
-
-      return labels;
-    }
-
-    function getPetNavigationLabels(user = currentUserObj) {
-      const theme = getPetTheme(user);
-      const pals = getCompanionLabelSet(user).plural;
-      const map = {
-        dog: {
-          feed: "PawdCast",
-          friends: pals,
-          connections: "Sniff Spots",
-          groups: "Pack Pods",
-          live: "PawStream",
-          events: "Tail Trails",
-          guides: "PawCare",
-          match: "Heart Tails",
-          memorial: "Rainbow Tails",
-        },
-        cat: {
-          feed: "PurrCast",
-          friends: pals,
-          connections: "Whisker Map",
-          groups: "Clowder Clubs",
-          live: "PurrStream",
-          events: "CatNaps & Meetups",
-          guides: "WhiskerCare",
-          match: "PurrMatch",
-          memorial: "Rainbow Whiskers",
-        },
-        bird: {
-          feed: "WingCast",
-          friends: pals,
-          connections: "Perch Map",
-          groups: "Flock Pods",
-          live: "SkyStream",
-          events: "WingDates",
-          guides: "FeatherCare",
-          match: "Nest Match",
-          memorial: "Rainbow Wings",
-        },
-        rabbit: {
-          feed: "HopCast",
-          friends: pals,
-          connections: "Burrow Map",
-          groups: "Warren Pods",
-          live: "HopStream",
-          events: "Bunny Bounds",
-          guides: "BunnyCare",
-          match: "Bond Buns",
-          memorial: "Rainbow Hops",
-        },
-        fish: {
-          feed: "FinCast",
-          friends: pals,
-          connections: "Reef Map",
-          groups: "School Pods",
-          live: "ReefStream",
-          events: "Current Circles",
-          guides: "AquaCare",
-          match: "Bubble Match",
-          memorial: "Rainbow Reef",
-        },
-        reptile: {
-          feed: "ScaleCast",
-          friends: pals,
-          connections: "Habitat Map",
-          groups: "Terrarium Pods",
-          live: "BaskStream",
-          events: "Sun Meets",
-          guides: "ScaleCare",
-          match: "Clutch Match",
-          memorial: "Rainbow Scales",
-        },
-        horse: {
-          feed: "PonyCast",
-          friends: pals,
-          connections: "Trail Map",
-          groups: "Stable Circles",
-          live: "HoofStream",
-          events: "Gallop Gatherings",
-          guides: "HoofCare",
-          match: "Bridle Match",
-          memorial: "Rainbow Mane",
-        },
-        "small-pets": {
-          feed: "NibbleCast",
-          friends: pals,
-          connections: "Cozy Map",
-          groups: "Pocket Pods",
-          live: "NestStream",
-          events: "Tiny Trails",
-          guides: "NestCare",
-          match: "Cuddle Match",
-          memorial: "Rainbow Burrows",
-        },
-        other: {
-          feed: "PetCast",
-          friends: pals,
-          connections: "Pet Map",
-          groups: "Pet Pods",
-          live: "PetStream",
-          events: "Pet Meetups",
-          guides: "Pet Care",
-          match: "Pet Match",
-          memorial: "Rainbow Tails",
-        },
-      };
-
-      return map[theme.key] || map.other;
-    }
-
-    function applyPetNavigationLabels(user = currentUserObj) {
-      const labels = getPetNavigationLabels(user);
-      const updates = {
-        "social-tab-feed-label": labels.feed,
-        "sidebar-tab-feed-label": labels.feed,
-        "social-tab-friends-label": labels.friends,
-        "sidebar-tab-friends-label": labels.friends,
-        "social-tab-connections-label": labels.connections,
-        "sidebar-tab-connections-label": labels.connections,
-        "social-tab-groups-label": labels.groups,
-        "sidebar-tab-groups-label": labels.groups,
-        "social-tab-live-label": labels.live,
-        "sidebar-tab-live-label": labels.live,
-        "social-tab-events-label": labels.events,
-        "sidebar-tab-events-label": labels.events,
-        "social-tab-guides-label": labels.guides,
-        "sidebar-tab-guides-label": labels.guides,
-        "social-tab-match-label": labels.match,
-        "sidebar-tab-match-label": labels.match,
-        "social-tab-memorial-label": labels.memorial,
-        "sidebar-tab-memorial-label": labels.memorial,
-      };
-
-      Object.entries(updates).forEach(([id, text]) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = text;
-      });
-
-      const feedInput = document.getElementById("feed-post-input");
-      if (feedInput) feedInput.placeholder = `Share a ${labels.feed} update with your pet community...`;
-
-      const searchInput = document.getElementById("social-search-input");
-      if (searchInput) searchInput.placeholder = `Search ${labels.feed}...`;
-
-      const highlightLabel = document.getElementById("sidebar-highlight-label");
-      if (highlightLabel) highlightLabel.textContent = `${labels.feed} Spotlight`;
-
-      return labels;
-    }
-
-    function setPetGlyph(target, glyph, className = "text-xl leading-none") {
-      const el = typeof target === "string" ? document.querySelector(target) : target;
-      if (!el) return;
-      el.innerHTML = `<span class="${className}" aria-hidden="true">${glyph}</span>`;
-    }
-
-    function setPetImageBadge(target, imageUrl, alt = "Pet", expression = "🐾") {
-      const el = typeof target === "string" ? document.querySelector(target) : target;
-      if (!el || !imageUrl) return;
-      el.innerHTML = `
-        <span class="relative inline-flex items-center justify-center w-12 h-12">
-          <img src="${imageUrl}" alt="${alt}" class="w-12 h-12 rounded-full object-cover border border-white/90 shadow-md" />
-          <span class="absolute -right-2 -bottom-2 w-7 h-7 rounded-full bg-white text-[17px] leading-none flex items-center justify-center border-2 border-amber-300 shadow-lg" title="${alt} mood">${expression}</span>
-        </span>`;
-    }
-
-    function getPrimaryLandingPetImage(user = currentUserObj) {
-      const theme = getPetTheme(user);
-      return (
-        user?.profile_photo_url ||
-        PET_REAL_PHOTOS[theme.label] ||
-        PET_REAL_PHOTOS.Other
-      );
-    }
-
-    function getCommunityExpressionsByTab(user, theme) {
-      const liveCommunity = (
-        document.getElementById("s2-community")?.value ||
-        user?.socialProfile?.community ||
-        user?.community ||
-        ""
-      ).toLowerCase();
-
-      const byPet = {
-        dog: { feed: "🐶", friends: "🦴", connections: "🐾", groups: "🏕️", live: "🎾", events: "🎉", guides: "🩺", match: "💞", memorial: "🌈" },
-        cat: { feed: "😺", friends: "🧶", connections: "🐾", groups: "🏠", live: "😻", events: "🎊", guides: "🐟", match: "💞", memorial: "🌈" },
-        bird: { feed: "🦜", friends: "🪶", connections: "🔎", groups: "🌿", live: "🎥", events: "🎉", guides: "🧠", match: "💞", memorial: "🌈" },
-        rabbit: { feed: "🐰", friends: "🥕", connections: "🔎", groups: "🌱", live: "🎥", events: "🎉", guides: "🥬", match: "💞", memorial: "🌈" },
-        fish: { feed: "🐠", friends: "🫧", connections: "🔎", groups: "🌊", live: "🎥", events: "🎉", guides: "🧪", match: "💞", memorial: "🌈" },
-        reptile: { feed: "🦎", friends: "☀️", connections: "🔎", groups: "🏜️", live: "🎥", events: "🎉", guides: "🧠", match: "💞", memorial: "🌈" },
-        "small pets": { feed: "🐹", friends: "🌰", connections: "🔎", groups: "🏡", live: "🎥", events: "🎉", guides: "🧠", match: "💞", memorial: "🌈" },
-        other: { feed: "🐾", friends: "🤝", connections: "🔎", groups: "🌟", live: "🎥", events: "🎉", guides: "🧠", match: "💞", memorial: "🌈" },
-      };
-
-      const base = byPet[theme.key] || byPet.other;
-
-      if (/rescue|adopt|foster/.test(liveCommunity)) {
-        return { ...base, feed: "🫶", friends: "🤗", events: "🐾", match: "💓" };
-      }
-      if (/senior|care|wellness|vet|health/.test(liveCommunity)) {
-        return { ...base, feed: "🩺", guides: "📘", events: "🧘", match: "💞" };
-      }
-      if (/club|play|park|meet|circle|community/.test(liveCommunity)) {
-        return { ...base, feed: "😄", friends: "🤝", groups: "🎊", live: "🎥" };
-      }
-
-      return base;
-    }
-
-    function applyPetVisualTheme(user = currentUserObj) {
-      const theme = getPetTheme(user);
-      const labels = applyPetNavigationLabels(user);
-
-      const selectedPetPhoto = getPrimaryLandingPetImage(user);
-      const expressionByTab = getCommunityExpressionsByTab(user, theme);
-
-      const decorativeTargets = [
-        ["#tab-btn-feed div", theme.sectionEmoji.feed],
-        ["#tab-btn-friends div", theme.sectionEmoji.friends],
-        ["#tab-btn-connections div", theme.sectionEmoji.connections],
-        ["#tab-btn-groups div", theme.sectionEmoji.groups],
-        ["#tab-btn-live-events div", theme.sectionEmoji.live],
-        ["#tab-btn-events div", theme.sectionEmoji.events],
-        ["#tab-btn-festivals div", theme.sectionEmoji.guides],
-        ["#tab-btn-matchmaking div", theme.sectionEmoji.match],
-        ["#tab-btn-obituaries div", theme.sectionEmoji.memorial],
-      ];
-
-      decorativeTargets.forEach(([selector, glyph]) => {
-        setPetGlyph(selector, glyph);
-      });
-
-      // Replace left sidebar tab icons with real pet image badges.
-      setPetImageBadge("#tab-btn-feed div", selectedPetPhoto, "PawdCast", expressionByTab.feed);
-      setPetImageBadge("#tab-btn-friends div", selectedPetPhoto, "PawPals", expressionByTab.friends);
-      setPetImageBadge("#tab-btn-connections div", selectedPetPhoto, "Sniff Spots", expressionByTab.connections);
-      setPetImageBadge("#tab-btn-groups div", selectedPetPhoto, "Pack Pods", expressionByTab.groups);
-      setPetImageBadge("#tab-btn-live-events div", selectedPetPhoto, "PawStream", expressionByTab.live);
-      setPetImageBadge("#tab-btn-events div", selectedPetPhoto, "Tail Trails", expressionByTab.events);
-      setPetImageBadge("#tab-btn-festivals div", selectedPetPhoto, "PawCare", expressionByTab.guides);
-      setPetImageBadge("#tab-btn-matchmaking div", selectedPetPhoto, "Heart Tails", expressionByTab.match);
-      setPetImageBadge("#tab-btn-obituaries div", selectedPetPhoto, "Rainbow Tails", expressionByTab.memorial);
-
-      setPetGlyph("#social-tab-friends .text-center i[data-lucide]", theme.sectionEmoji.friends, "text-4xl leading-none");
-      setPetGlyph("#social-tab-groups .text-center i[data-lucide]", theme.sectionEmoji.groups, "text-4xl leading-none");
-      setPetGlyph("#social-tab-festivals .text-center i[data-lucide]", theme.sectionEmoji.guides, "text-4xl leading-none");
-      setPetGlyph("#social-tab-matchmaking .text-center i[data-lucide]", theme.sectionEmoji.match, "text-4xl leading-none");
-      setPetGlyph("#sidebar-highlight-icon", theme.sectionEmoji.feed, "text-4xl leading-none drop-shadow");
-
-      const coverPattern = document.getElementById("cover-photo-pattern");
-      if (coverPattern) {
-        const coverHero = getPrimaryLandingPetImage(user);
-        const isDarkMode = document.documentElement.classList.contains("dark");
-        coverPattern.style.backgroundImage = isDarkMode
-          ? `linear-gradient(165deg, rgba(2,6,23,0.72), rgba(15,23,42,0.58)), linear-gradient(135deg, color-mix(in srgb, ${theme.accent} 22%, transparent), transparent 64%), url('${coverHero}'), repeating-linear-gradient(135deg, transparent, transparent 30px, rgba(255,255,255,0.07) 30px, rgba(255,255,255,0.07) 60px)`
-          : `linear-gradient(135deg, color-mix(in srgb, ${theme.accent} 18%, transparent), transparent 62%), url('${coverHero}'), repeating-linear-gradient(135deg, transparent, transparent 30px, rgba(255,255,255,0.08) 30px, rgba(255,255,255,0.08) 60px)`;
-        coverPattern.style.backgroundBlendMode = isDarkMode ? "normal, normal, multiply, normal" : "normal";
-      }
-
-      const feedComposerCard = document.getElementById("feed-composer-card");
-      if (feedComposerCard) {
-        const isDarkMode = document.documentElement.classList.contains("dark");
-        feedComposerCard.style.backgroundImage = isDarkMode
-          ? `linear-gradient(155deg, rgba(3,7,18,0.9), rgba(15,23,42,0.86)), linear-gradient(135deg, color-mix(in srgb, ${theme.accent} 22%, #0b1220), transparent 72%)`
-          : `linear-gradient(135deg, color-mix(in srgb, ${theme.accent} 8%, white), transparent 70%)`;
-        feedComposerCard.style.backgroundBlendMode = isDarkMode ? "normal, screen" : "normal";
-      }
-
-      const composerSticker = document.getElementById("feed-composer-sticker");
-      if (composerSticker) {
-        composerSticker.textContent = theme.sectionEmoji.feed;
-        composerSticker.title = labels.feed;
-      }
-
-      const headerFrame = document.getElementById("social-header-logo-frame");
-      if (headerFrame) headerFrame.classList.add("pet-floaty");
+        const darkMap = {
+          Hindu: "#9a3412",
+          Muslim: "#065f46",
+          Sikh: "#1e3a8a",
+          Christian: "#4c1d95",
+          Buddhist: "#92400e",
+          Jain: "#7f1d1d",
+          Parsi: "#7f1d1d",
+        };
+        const darkColor = darkMap[currentUserObj.religion] || accent;
+        const bgMap = {
+          Hindu: "img/bg_hindu.png",
+          Muslim: "img/bg_muslim.png",
+          Sikh: "img/bg_sikh.png",
+          Christian: "img/bg_christian.png",
+          Buddhist: "img/bg_buddhist.png",
+          Jain: "img/bg_jain.png",
+          Parsi: "img/bg_parsi.png",
+        };
+        const bgImg = bgMap[currentUserObj.religion];
         const placeholderHtml = bgImg ? `
             <div class="flex items-center justify-center w-full h-full rounded-full overflow-hidden bg-white">
               <img src="${bgImg}" class="w-full h-full object-cover" alt="Religion Logo" />
@@ -14497,7 +13447,28 @@ function initializeSocialFeed() {
     function normalizePostFromApi(p) {
       const profile = p.profiles || {};
       const author = p.author || profile.full_name || profile.name || "Member";
-        const bgImg = getPrimaryLandingPetImage(currentUserObj);
+      const normalizeHashtags = (raw) => {
+        if (Array.isArray(raw)) {
+          return raw
+            .map((tag) => String(tag || "").trim())
+            .filter(Boolean)
+            .map((tag) => tag.startsWith("#") ? tag : `#${tag}`);
+        }
+        if (typeof raw === "string") {
+          return raw
+            .split(/[\s,]+/)
+            .map((tag) => tag.trim())
+            .filter(Boolean)
+            .map((tag) => tag.startsWith("#") ? tag : `#${tag}`);
+        }
+        return [];
+      };
+      const audience =
+        p.community
+          ? `Pet Community: ${p.community}`
+          : p.religion
+            ? `Religion: ${p.religion}`
+            : "Global";
 
       return {
         id: p.id,
@@ -14540,35 +13511,10 @@ function initializeSocialFeed() {
         avatarClass:
           "bg-brand-100 text-brand-900 dark:bg-brand-900/50 dark:text-brand-100",
         profilePhoto: p.profile_photo_url || profile.profile_photo_url || null,
-      const normalizeHashtags = (raw) => {
-        if (Array.isArray(raw)) {
-          return raw
-            .map((tag) => String(tag || "").trim())
-            .filter(Boolean)
-            .map((tag) => tag.startsWith("#") ? tag : `#${tag}`);
-        }
-        if (typeof raw === "string") {
-          return raw
-            .split(/[\s,]+/)
-            .map((tag) => tag.trim())
-            .filter(Boolean)
-            .map((tag) => tag.startsWith("#") ? tag : `#${tag}`);
-        }
-        return [];
-      };
-      const audience =
-        p.community
-          ? `Pet Community: ${p.community}`
-          : p.religion
-            ? `Religion: ${p.religion}`
-            : "Global";
-
-      const rawCounts = p.reaction_counts || p.reactions || {};
-      const mergedReactionState = mergeFeedReactionState(
-        p.id,
-        rawCounts,
-        p.selected_reaction || p.selectedReaction || null,
-      );
+        admin_capabilities: profile.admin_capabilities || p.admin_capabilities || [],
+        custom_tags: profile.custom_tags || profile.primary_interests || p.custom_tags || [],
+        system_tags: profile.system_tags || p.system_tags || [],
+        tags: profile.tags || p.tags || [],
       };
     }
 
@@ -15089,10 +14035,10 @@ function initializeSocialFeed() {
 
     // Custom samaj reactions shown beside the heart count.
     const POST_REACTIONS = {
-      "Liked": { icon: "thumbs-up", color: "#e04848", label: "Like" },
-      "Loved": { icon: "heart", color: "#ef4444", label: "Love" },
-      "Ashirwad given": { icon: "sun", color: "#f97316", label: "Ashirwad" },
-      "Supported": { icon: "handshake", color: "#3b82f6", label: "Support" },
+      "bone": { icon: "bone", color: "#e04848", label: "Dog Bone" },
+      "heart": { icon: "heart", color: "#ef4444", label: "Dog Heart" },
+      "bark": { icon: "flame", color: "#f97316", label: "Angry Bark" },
+      "bite": { icon: "alert-triangle", color: "#3b82f6", label: "Dog Bite" },
     };
 
     function renderReactionBadgeHtml(post) {
@@ -15139,13 +14085,48 @@ function initializeSocialFeed() {
     function renderFeed() {
       const feedContainer = document.getElementById("social-feed-posts");
       if (!feedContainer) return;
-        admin_capabilities: profile.admin_capabilities || p.admin_capabilities || [],
-        custom_tags: profile.custom_tags || profile.primary_interests || p.custom_tags || [],
-        system_tags: profile.system_tags || p.system_tags || [],
-        tags: profile.tags || p.tags || [],
-,
-        reactionCounts: mergedReactionState.reactionCounts,
-        selectedReaction: mergedReactionState.selectedReaction,
+
+      feedContainer.innerHTML = "";
+
+      if (postsLoading) {
+        feedContainer.innerHTML = Array.from({ length: 3 }).map(() => `
+          <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden mb-4 animate-pulse">
+            <div class="p-4 border-b border-gray-50 dark:border-gray-800 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 w-36 rounded bg-gray-200 dark:bg-gray-800"></div>
+                <div class="h-3 w-24 rounded bg-gray-100 dark:bg-gray-800"></div>
+              </div>
+            </div>
+            <div class="p-4 space-y-3">
+              <div class="h-4 w-full rounded bg-gray-100 dark:bg-gray-800"></div>
+              <div class="h-4 w-5/6 rounded bg-gray-100 dark:bg-gray-800"></div>
+              <div class="h-32 rounded-xl bg-gray-100 dark:bg-gray-800"></div>
+            </div>
+          </div>
+        `).join("");
+        return;
+      }
+
+      if (postsLoadFailed) {
+        feedContainer.innerHTML = `
+          <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-red-100 dark:border-red-900/40 p-6 text-center">
+            <div class="w-12 h-12 rounded-full bg-red-50 dark:bg-red-950/40 text-red-500 flex items-center justify-center mx-auto mb-3">
+              <i data-lucide="alert-circle" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-bold text-gray-800 dark:text-gray-100">Could not load posts</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Please refresh or try again later.</p>
+          </div>`;
+        lucide.createIcons();
+        return;
+      }
+
+      const chunkSize = 5;
+      let index = 0;
+
+      function renderChunk() {
+        const displayPosts = postsForDisplay(feedPosts);
+        const chunk = displayPosts.slice(index, index + chunkSize);
         if (!chunk.length) {
           lucide.createIcons();
           return;
@@ -15174,8 +14155,11 @@ function initializeSocialFeed() {
                 </div>
               </div>`;
 
-      const theme = getPetTheme(currentUserObj);
-      ensurePostMenuDismissListener();
+          const safeAuthor = escapeHtml(post.author).replace(/'/g, "\\'");
+          const safeProfilePhoto = post.profilePhoto ? escapeHtml(post.profilePhoto).replace(/'/g, "\\'") : '';
+          const avatarHtml = post.profilePhoto
+            ? `<img src="${escapeHtml(post.profilePhoto)}" onclick="openUserProfile('${safeAuthor}', 'Pet Community Member', '${String(post.user_id || '').replace(/'/g, "\\'")}', '${safeProfilePhoto}')" loading="lazy" decoding="async" class="w-10 h-10 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-[#f97316] transition-all" alt="">`
+            : `<div onclick="openUserProfile('${safeAuthor}', 'Pet Community Member', '${String(post.user_id || '').replace(/'/g, "\\'")}')" class="w-10 h-10 ${post.avatarClass} rounded-full flex items-center justify-center font-bold cursor-pointer hover:ring-2 hover:ring-[#f97316] transition-all">${post.initials}</div>`;
 
           const postTagPills = renderProfileTagPills(post, { limit: 3, compact: true, wrapperClass: "mt-1" });
           const titleHtml = post.title
@@ -15197,8 +14181,35 @@ function initializeSocialFeed() {
             ? `<div class="mt-3 inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-blue-200"><i data-lucide="calendar-days" class="h-3.5 w-3.5"></i>${escapeHtml(linkedEventTitle)}</div>`
             : "";
 
-        const displayPosts = postsForDisplay(feedPosts);
-        const chunk = displayPosts.slice(index, index + chunkSize);
+          const commentsHtml = renderPostCommentsHtml(post);
+          const actionsHtml = post.isSystemWelcome
+            ? `<div class="px-4 py-3 border-t border-gray-50 dark:border-gray-800 text-xs text-gray-500 dark:text-gray-400">Create your first post to start the conversation.</div>`
+            : `<div class="px-4 py-3 border-t border-gray-50 dark:border-gray-800 flex items-center justify-between text-gray-500 dark:text-gray-400 text-sm">
+                        <div class="relative group">
+                            <button id="like-btn-${postId}" onclick="toggleLike('${postId}')" aria-pressed="${post.isLiked ? "true" : "false"}" class="flex items-center gap-2 hover:text-brand-500 transition-colors ${btnClass}">
+                                <i data-lucide="heart" class="w-4 h-4 ${heartClass}"></i> <span id="like-count-${postId}">${post.likes}</span><span id="reaction-badge-${postId}" class="inline-flex items-center">${renderReactionBadgeHtml(post)}</span>
+                            </button>
+                            <!-- Custom Samaj Reactions Hover Menu -->
+                            <!-- pb-2 (instead of mb-2) keeps a hoverable bridge over the gap so the menu stays clickable -->
+                            <div class="absolute bottom-full left-0 pb-2 hidden group-hover:block z-20">
+                              <div class="flex items-center gap-1 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-xl rounded-full p-1.5 w-max transform transition-all opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0">
+                                <button onclick="event.stopPropagation(); reactToPost('${postId}', 'bone')" style="--no-faith-hover-bg: rgba(156,163,175,0.18); --no-faith-hover-color:#e04848; --no-faith-hover-border:transparent;" class="no-faith-hover w-8 h-8 rounded-full flex items-center justify-center text-brand-500 transition-transform hover:scale-110" title="Dog Bone"><i data-lucide="bone" class="w-4 h-4"></i></button>
+                                <button onclick="event.stopPropagation(); reactToPost('${postId}', 'heart')" style="--no-faith-hover-bg: rgba(156,163,175,0.18); --no-faith-hover-color:#ef4444; --no-faith-hover-border:transparent;" class="no-faith-hover w-8 h-8 rounded-full flex items-center justify-center text-red-500 transition-transform hover:scale-110" title="Dog Heart"><i data-lucide="heart" class="w-4 h-4 fill-current"></i></button>
+                                <button onclick="event.stopPropagation(); reactToPost('${postId}', 'bark')" style="--no-faith-hover-bg: rgba(156,163,175,0.18); --no-faith-hover-color:#f97316; --no-faith-hover-border:transparent;" class="no-faith-hover w-8 h-8 rounded-full flex items-center justify-center text-orange-500 transition-transform hover:scale-110" title="Angry Bark"><i data-lucide="flame" class="w-4 h-4"></i></button>
+                                <button onclick="event.stopPropagation(); reactToPost('${postId}', 'bite')" style="--no-faith-hover-bg: rgba(156,163,175,0.18); --no-faith-hover-color:#3b82f6; --no-faith-hover-border:transparent;" class="no-faith-hover w-8 h-8 rounded-full flex items-center justify-center text-blue-500 transition-transform hover:scale-110" title="Dog Bite"><i data-lucide="alert-triangle" class="w-4 h-4"></i></button>
+                              </div>
+                            </div>
+                        </div>
+                        <button onclick="toggleComments('${postId}')" class="flex items-center gap-2 hover:text-brand-500 transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i> <span id="comment-count-${postId}">${post.comments}</span> Comments</button>
+                        <button onclick="sharePostNative('${postId}')" class="flex items-center gap-2 hover:text-brand-500 transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i> Share</button>
+                    </div>
+                    <div id="comment-box-${postId}" class="hidden px-4 pb-4 pt-2 border-t border-gray-50 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 rounded-b-2xl">
+                        <div id="comments-list-${postId}" class="mb-3">${commentsHtml}</div>
+                        <div class="flex gap-2">
+                            <input type="text" id="comment-input-${postId}" onkeydown="handleCommentKeydown(event, '${postId}')" placeholder="Write a comment..." class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500">
+                            <button onclick="submitComment('${postId}')" class="text-white bg-brand-500 hover:bg-brand-600 rounded-full p-2 w-9 h-9 flex items-center justify-center transition-colors"><i data-lucide="send" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>`;
 
           const postHtml = `
                 <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 mb-4">
@@ -15215,27 +14226,7 @@ function initializeSocialFeed() {
                                 <div class="text-xs text-gray-500 dark:text-gray-400">${escapeHtml(post.time)}${post.updatedTime ? ` &middot; Last updated ${escapeHtml(post.updatedTime)}` : ""}${post.audience ? ` &middot; ${escapeHtml(post.audience)}` : ""}</div>
                             </div>
                         </div>
-          if (!post.reactionCounts) { post.reactionCounts = {}; }
-          FEED_REACTIONS.forEach(({ key }) => {
-            if (typeof post.reactionCounts[key] !== "number") {
-              post.reactionCounts[key] = Number(post.reactionCounts[key] || 0);
-            }
-          });
-          const persistedReaction = getLocalFeedReactions()[postId] || null;
-          if (persistedReaction && post.selectedReaction !== persistedReaction) {
-            if (post.selectedReaction && post.reactionCounts[post.selectedReaction] > 0) {
-              post.reactionCounts[post.selectedReaction] -= 1;
-            }
-            post.reactionCounts[persistedReaction] = Number(post.reactionCounts[persistedReaction] || 0) + 1;
-            post.selectedReaction = persistedReaction;
-          }
-
-          const safeAuthor = escapeHtml(post.author).replace(/'/g, "\\'");
-          const ownerPhoto = getPostOwnerProfilePhoto(post) || post.profilePhoto;
-          const safeProfilePhoto = ownerPhoto ? escapeHtml(ownerPhoto).replace(/'/g, "\\'") : '';
-          const avatarHtml = ownerPhoto
-            ? `<img src="${escapeHtml(ownerPhoto)}" onclick="openUserProfile('${safeAuthor}', 'Pet Community Member', '${String(post.user_id || '').replace(/'/g, "\\'")}', '${safeProfilePhoto}')" loading="lazy" decoding="async" class="w-10 h-10 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-[#f97316] transition-all" alt="">`
-            : `<div onclick="openUserProfile('${safeAuthor}', 'Pet Community Member', '${String(post.user_id || '').replace(/'/g, "\\'")}')" class="w-10 h-10 ${post.avatarClass} rounded-full flex items-center justify-center font-bold cursor-pointer hover:ring-2 hover:ring-[#f97316] transition-all text-lg">${typeof theme !== 'undefined' && theme.emoji ? theme.emoji : post.initials}</div>`;
+                        ${moreHtml}
                     </div>
                     <div class="p-4">
                         ${titleHtml}
@@ -15244,69 +14235,8 @@ function initializeSocialFeed() {
                         ${hashtagsHtml}
                         ${linkedEventHtml}
                         ${post.specialBlock || ""}
-                        <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-wrap gap-2">
-                          ${reactionButtonsHtml}
-                        </div>
                     </div>
-          const reactionButtonsHtml = FEED_REACTIONS.map((reaction) => {
-            const isActive = post.selectedReaction === reaction.key;
-            const count = Number(post.reactionCounts?.[reaction.key] || 0);
-            const activeClass = isActive
-              ? "bg-amber-100/90 dark:bg-amber-900/40 border-amber-300 dark:border-amber-600 text-amber-800 dark:text-amber-200"
-              : "bg-white/80 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300";
-            return `<button type="button" onclick="togglePostReaction('${postId}', '${reaction.key}')" class="no-faith-hover inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full border text-xs font-semibold transition-colors hover:border-brand-300 hover:text-brand-600 ${activeClass}" title="${reaction.label}">
-                      <span class="text-sm leading-none w-5 inline-flex items-center justify-center">${getReactionIconHtml(reaction.key)}</span>
-                      <span>${count}</span>
-                    </button>`;
-          }).join("");
-
-          const overallFooterCount = Number(post.likes || 0) + getPostReactionTotal(post);
-
-          const ownPost = isOwnPost(post);
-          const menuButtonsHtml = ownPost
-            ? `<button type="button" onclick="editPost('${postId}')" class="no-faith-hover w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">Edit post</button>
-               <button type="button" onclick="deletePost('${postId}')" class="no-faith-hover w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 border-t border-gray-100 dark:border-gray-700">Delete post</button>`
-            : `<button type="button" onclick="hidePost('${postId}')" class="no-faith-hover w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">Hide post</button>`;
-
-          const commentsHtml = renderPostCommentsHtml(post);
-          const actionsHtml = post.isSystemWelcome
-            ? `<div class="px-4 py-3 border-t border-gray-50 dark:border-gray-800 text-xs text-gray-500 dark:text-gray-400">Create your first post to start the conversation.</div>`
-            : `<div class="px-4 py-3 border-t border-gray-50 dark:border-gray-800 flex items-center justify-between text-gray-500 dark:text-gray-400 text-sm">
-                        <div class="relative group flex items-center gap-2">
-                            <button id="like-btn-${postId}" onclick="toggleLike('${postId}')" aria-pressed="${post.isLiked ? "true" : "false"}" class="flex items-center gap-2 hover:text-brand-500 transition-colors ${btnClass}">
-                                <i data-lucide="heart" class="w-4 h-4 ${heartClass}"></i> <span id="like-count-${postId}">${overallFooterCount}</span><span id="reaction-badge-${postId}" class="inline-flex items-center">${renderReactionBadgeHtml(post)}</span>
-                            </button>
-                            <!-- Custom Samaj Reactions Hover Menu -->
-                            <div class="absolute bottom-full left-0 pb-2 hidden group-hover:block z-20">
-                              <div class="flex items-center gap-1 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-xl rounded-full p-1.5 w-max transform transition-all opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0">
-                                <button onclick="event.stopPropagation(); reactToPost('${postId}', 'Liked')" style="--no-faith-hover-bg: rgba(156,163,175,0.18); --no-faith-hover-color:#e04848; --no-faith-hover-border:transparent;" class="no-faith-hover w-8 h-8 rounded-full flex items-center justify-center text-brand-500 transition-transform hover:scale-110" title="Like"><i data-lucide="thumbs-up" class="w-4 h-4"></i></button>
-                                <button onclick="event.stopPropagation(); reactToPost('${postId}', 'Loved')" style="--no-faith-hover-bg: rgba(156,163,175,0.18); --no-faith-hover-color:#ef4444; --no-faith-hover-border:transparent;" class="no-faith-hover w-8 h-8 rounded-full flex items-center justify-center text-red-500 transition-transform hover:scale-110" title="Love"><i data-lucide="heart" class="w-4 h-4 fill-current"></i></button>
-                                <button onclick="event.stopPropagation(); reactToPost('${postId}', 'Ashirwad given')" style="--no-faith-hover-bg: rgba(156,163,175,0.18); --no-faith-hover-color:#f97316; --no-faith-hover-border:transparent;" class="no-faith-hover w-8 h-8 rounded-full flex items-center justify-center text-orange-500 transition-transform hover:scale-110" title="Ashirwad (Blessings)"><i data-lucide="sun" class="w-4 h-4"></i></button>
-                                <button onclick="event.stopPropagation(); reactToPost('${postId}', 'Supported')" style="--no-faith-hover-bg: rgba(156,163,175,0.18); --no-faith-hover-color:#3b82f6; --no-faith-hover-border:transparent;" class="no-faith-hover w-8 h-8 rounded-full flex items-center justify-center text-blue-500 transition-transform hover:scale-110" title="Support/Proud"><i data-lucide="handshake" class="w-4 h-4"></i></button>
-                              </div>
-                            </div>
-                            <div class="ml-2 flex items-center gap-1">${reactionButtonsHtml}</div>
-                        </div>
-                        <button onclick="toggleComments('${postId}')" class="flex items-center gap-2 hover:text-brand-500 transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i> <span id="comment-count-${postId}">${post.comments}</span> Comments</button>
-                        <div class="relative">
-                          <button type="button" data-post-share-trigger onclick="toggleShareMenu('${postId}', event)" class="no-faith-hover flex items-center gap-2 hover:text-brand-500 transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i> Share</button>
-                          <div id="post-share-menu-${postId}" data-post-share-menu class="hidden absolute right-0 bottom-8 z-20 w-52 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden text-sm">
-                            <button type="button" onclick="sharePostTo('${postId}', 'whatsapp')" class="no-faith-hover w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">Share on WhatsApp</button>
-                            <button type="button" onclick="sharePostTo('${postId}', 'facebook')" class="no-faith-hover w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 border-t border-gray-100 dark:border-gray-700">Share on Facebook</button>
-                            <button type="button" onclick="sharePostTo('${postId}', 'x')" class="no-faith-hover w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 border-t border-gray-100 dark:border-gray-700">Share on X</button>
-                            <button type="button" onclick="sharePostTo('${postId}', 'linkedin')" class="no-faith-hover w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 border-t border-gray-100 dark:border-gray-700">Share on LinkedIn</button>
-                            <button type="button" onclick="sharePostNative('${postId}')" class="no-faith-hover w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 border-t border-gray-100 dark:border-gray-700">More options...</button>
-                            <button type="button" onclick="copyPostLink('${postId}')" class="no-faith-hover w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 border-t border-gray-100 dark:border-gray-700">Copy post link</button>
-                          </div>
-                        </div>
-                    </div>
-                    <div id="comment-box-${postId}" class="hidden px-4 pb-4 pt-2 border-t border-gray-50 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 rounded-b-2xl">
-                        <div id="comments-list-${postId}" class="mb-3">${commentsHtml}</div>
-                        <div class="flex gap-2">
-                            <input type="text" id="comment-input-${postId}" onkeydown="handleCommentKeydown(event, '${postId}')" placeholder="Write a comment..." class="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500">
-                            <button onclick="submitComment('${postId}')" class="text-white bg-brand-500 hover:bg-brand-600 rounded-full p-2 w-9 h-9 flex items-center justify-center transition-colors"><i data-lucide="send" class="w-4 h-4"></i></button>
-                        </div>
-                    </div>`;
+                    ${actionsHtml}
                 </div>`;
           const tempDiv = document.createElement('div');
           tempDiv.innerHTML = postHtml;
@@ -15366,6 +14296,7 @@ function initializeSocialFeed() {
     function reactToPost(postId, label) {
       const post = feedPosts.find((p) => String(p.id) === String(postId));
       if (!post) return;
+      playReactionSound(label);
       post.reaction = label;
       if (!post.isLiked) {
         toggleLike(postId); // sets isLiked + refreshes the badge via updatePostLikeDom
@@ -15414,16 +14345,349 @@ function initializeSocialFeed() {
       }
     }
 
-                        <div class="relative">
-                          <button type="button" data-post-menu-trigger onclick="togglePostMenu('${postId}', event)" class="no-faith-hover text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-md"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
-                          <div id="post-menu-${postId}" data-post-menu class="hidden absolute right-0 top-8 z-20 w-40 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden">
-                            ${typeof menuButtonsHtml !== 'undefined' ? menuButtonsHtml : ''}
-                          </div>
-                        </div>      }
+    // ── Post "more" menu: edit / archive / delete ────────────────────
+    function closePostMenus() {
+      document.querySelectorAll(".post-menu").forEach((m) => m.classList.add("hidden"));
+    }
+
+    function togglePostMenu(postId, event) {
+      if (event) event.stopPropagation();
+      const menu = document.getElementById(`post-menu-${postId}`);
+      if (!menu) return;
+      const willOpen = menu.classList.contains("hidden");
+      closePostMenus();
+      if (willOpen) {
+        menu.classList.remove("hidden");
+        if (typeof lucide !== "undefined") lucide.createIcons();
+      }
+    }
+
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".post-menu")) closePostMenus();
+      if (!e.target.closest(".comment-menu") && !e.target.closest('[onclick^="toggleCommentMenu"]')) {
+        document.querySelectorAll(".comment-menu").forEach((m) => m.classList.add("hidden"));
+      }
+    });
+
+    function isLocalPostId(postId) {
+      const id = String(postId);
+      return id.startsWith("suvichar_") || id.startsWith("system");
+    }
+
+    let editingPostId = null;
+
+    function editPost(postId) {
+      closePostMenus();
+      const post = feedPosts.find((p) => String(p.id) === String(postId));
+      if (!post) return;
+      editingPostId = postId;
+      const ta = document.getElementById("edit-post-textarea");
+      if (ta) ta.value = post.content || "";
+
+      renderEditPostMediaPreview(post);
+      setHashtagChips("edit-post-hashtags-chips", post.hashtags || []);
+      const hashtagsInput = document.getElementById("edit-post-hashtags");
+      if (hashtagsInput) hashtagsInput.value = "";
+
+      refreshPostEventOptions("edit-post-event-options");
+      const eventsInput = document.getElementById("edit-post-events");
+      const eventIdInput = document.getElementById("edit-post-event-id");
+      const currentEvent = post.linkedEvent || (post.linkedEvents?.[0] ? { id: post.linkedEvents[0], title: post.linkedEvents[0] } : null);
+      if (eventsInput) {
+        const choice = currentEvent && getPostEventChoices().find((event) => String(event.id) === String(currentEvent.id) || event.title === currentEvent.title);
+        eventsInput.value = choice ? (choice.date ? `${choice.title} - ${choice.date}` : choice.title) : (currentEvent?.title || "");
+      }
+      if (eventIdInput) eventIdInput.value = currentEvent?.id || "";
+
+      const archivedCheckbox = document.getElementById("edit-post-archived");
+      if (archivedCheckbox) {
+        archivedCheckbox.checked = !!post.isArchived;
+      }
+
+      const modal = document.getElementById("edit-post-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      if (typeof lucide !== "undefined") lucide.createIcons();
+      if (ta) ta.focus();
+    }
+
+    function closeEditPostModal() {
+      const modal = document.getElementById("edit-post-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      editingPostId = null;
+    }
+
+    async function saveEditedPost() {
+      const ta = document.getElementById("edit-post-textarea");
+      const content = (ta?.value || "").trim();
+      if (!content) {
+        showToast("Post content cannot be empty.");
+        return;
+      }
+      const post = feedPosts.find((p) => String(p.id) === String(editingPostId));
+      if (!post) return;
+
+      const hashtags = collectPostHashtags("edit-post-hashtags", "edit-post-hashtags-chips");
+      const linkedEvent = getSelectedPostEvent("edit-post-events", "edit-post-event-id");
+      if (document.getElementById("edit-post-events")?.value?.trim() && !linkedEvent) return;
+      const mediaUrlsInput = document.getElementById("edit-post-media-urls");
+      let mediaUrls = [];
+      try { mediaUrls = JSON.parse(mediaUrlsInput?.value || "[]"); } catch (e) { mediaUrls = []; }
+
+      const local = isLocalPostId(post.id);
+      post.content = content;
+      post.description = content;
+      post.hashtags = hashtags;
+      post.media_urls = mediaUrls;
+      post.media_url = mediaUrls[0] || null;
+      post.post_type = mediaUrls.some(isPostMediaVideo) ? "video" : mediaUrls.length ? "image" : "text";
+      post.linkedEvent = linkedEvent ? { id: linkedEvent.id, title: linkedEvent.title } : null;
+      post.linkedEvents = linkedEvent ? [linkedEvent.title] : [];
+      post.updated_at = new Date().toISOString();
+      post.updatedTime = getPostUpdatedTime(post.created_at, post.updated_at);
+      renderFeed();
+      closeEditPostModal();
+      if (!local && currentUserObj?.id) {
+        try {
+          const data = await api("update_post", {
+            user_id: currentUserObj.id,
+            post_id: post.id,
+            content,
+            description: content,
+            hashtags,
+            media_url: post.media_url,
+            media_urls: mediaUrls,
+            post_type: post.post_type,
+            linked_event_id: linkedEvent?.id || null,
+            linked_event_title: linkedEvent?.title || null,
+          });
+          if (data.status !== "success") throw new Error(data.message || "Could not update post.");
+          if (data.post) {
+            const updatedPost = normalizePostFromApi(data.post);
+            Object.assign(post, updatedPost, {
+              content: updatedPost.content || content,
+              description: updatedPost.description || content,
+              hashtags: updatedPost.hashtags?.length ? updatedPost.hashtags : hashtags,
+              media_url: updatedPost.media_url || mediaUrls[0] || null,
+              media_urls: updatedPost.media_urls?.length ? updatedPost.media_urls : mediaUrls,
+              linkedEvent: updatedPost.linkedEvent || (linkedEvent ? { id: linkedEvent.id, title: linkedEvent.title } : null),
+              linkedEvents: updatedPost.linkedEvents?.length ? updatedPost.linkedEvents : (linkedEvent ? [linkedEvent.title] : []),
+            });
+            renderFeed();
+          }
+          showToast("Post updated.");
+        } catch (err) {
+          console.error(err);
+          showToast(err.message || "Could not update post.");
+        }
+      } else {
+        showToast("Post updated.");
+      }
     }
 
     async function deletePost(postId) {
-                    ${actionsHtml}      }
+      closePostMenus();
+      const post = feedPosts.find((p) => String(p.id) === String(postId));
+      if (!post) return;
+      if (!(await showConfirm("Delete post?", "This cannot be undone.", { confirmText: "Delete", danger: true }))) return;
+      const local = isLocalPostId(post.id);
+      feedPosts = feedPosts.filter((p) => String(p.id) !== String(postId));
+      renderFeed();
+      if (!local && currentUserObj?.id) {
+        try {
+          const data = await api("delete_post", {
+            user_id: currentUserObj.id,
+            post_id: postId,
+          });
+          if (data.status !== "success") throw new Error(data.message || "Could not delete post.");
+          showToast("Post deleted.");
+        } catch (err) {
+          console.error(err);
+          showToast(err.message || "Could not delete post.");
+        }
+      } else {
+        showToast("Post deleted.");
+      }
+    }
+
+    function getArchivedPostIds() {
+      const key = "pawcircle_archived_posts_" + (currentUserObj?.email || "guest");
+      return JSON.parse(localStorage.getItem(key) || "[]");
+    }
+
+    function saveArchivedPostIds(ids) {
+      const key = "pawcircle_archived_posts_" + (currentUserObj?.email || "guest");
+      localStorage.setItem(key, JSON.stringify(ids));
+    }
+
+    function archivePost(postId) {
+      closePostMenus();
+      const ids = getArchivedPostIds();
+      if (!ids.includes(String(postId))) ids.push(String(postId));
+      saveArchivedPostIds(ids);
+      renderFeed();
+      showToast("Post archived and hidden from your feed.");
+    }
+
+    function unarchivePost(postId) {
+      let ids = getArchivedPostIds();
+      ids = ids.filter((id) => String(id) !== String(postId));
+      saveArchivedPostIds(ids);
+      renderFeed();
+      // Re-render the archived panel if we are currently viewing it
+      if (typeof renderAccountSettings === 'function' && accountSettingsState.activeSection === 'archived') {
+        renderAccountSettings();
+      }
+      showToast('Post restored to your feed.');
+    }
+
+    function renderSettingsArchivedPanelHtml() {
+      const archivedIds = getArchivedPostIds();
+      const allPosts = typeof feedPosts !== 'undefined' ? feedPosts : [];
+      const archivedPosts = archivedIds
+        .map((id) => allPosts.find((p) => String(p.id) === String(id)))
+        .filter(Boolean);
+
+      let cardsHtml = '';
+      if (archivedPosts.length === 0 && archivedIds.length === 0) {
+        cardsHtml = `
+          <div class="flex flex-col items-center justify-center py-16 text-center">
+            <div class="w-16 h-16 bg-amber-50 dark:bg-amber-900/20 rounded-2xl flex items-center justify-center mb-4">
+              <i data-lucide="archive-x" class="w-8 h-8 text-amber-400"></i>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">No archived posts</p>
+            <p class="text-gray-400 dark:text-gray-500 text-xs mt-1">Posts you archive from your feed will appear here.</p>
+          </div>`;
+      } else if (archivedPosts.length === 0 && archivedIds.length > 0) {
+        // IDs exist but posts are not loaded yet (e.g. feed hasn't loaded)
+        cardsHtml = `
+          <div class="flex flex-col items-center justify-center py-16 text-center">
+            <div class="w-16 h-16 bg-amber-50 dark:bg-amber-900/20 rounded-2xl flex items-center justify-center mb-4">
+              <i data-lucide="archive" class="w-8 h-8 text-amber-400"></i>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">${archivedIds.length} archived post${archivedIds.length > 1 ? 's' : ''}</p>
+            <p class="text-gray-400 dark:text-gray-500 text-xs mt-1">Visit the feed first to load post details, then return here to view them.</p>
+          </div>`;
+      } else {
+        archivedPosts.forEach((post) => {
+          const author = typeof escapeHtml === 'function' ? escapeHtml(post.author || 'Unknown') : (post.author || 'Unknown');
+          const initials = (post.author || 'U').charAt(0).toUpperCase();
+          const snippet = (post.content || '').replace(/<[^>]*>/g, '').slice(0, 120);
+          const safeSnippet = typeof escapeHtml === 'function' ? escapeHtml(snippet) : snippet;
+          const timeStr = post.created_at ? formatDateTime(post.created_at) : (post.time || '');
+          cardsHtml += `
+            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-200 flex items-center justify-center font-bold text-sm flex-shrink-0">${initials}</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-sm text-gray-800 dark:text-gray-200">${author}</span>
+                  <span class="text-xs text-gray-400">${timeStr}</span>
+                </div>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">${safeSnippet}${snippet.length >= 120 ? '…' : ''}</p>
+              </div>
+              <button onclick="unarchivePost('${String(post.id).replace(/'/g, "\\\'")}')" class="no-faith-hover px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 text-xs font-bold border border-amber-200 dark:border-amber-800 flex items-center gap-1 flex-shrink-0 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors" style="--no-faith-hover-bg: #fef3c7; --no-faith-hover-color: #b45309; --no-faith-hover-border: #fbbf24;"><i data-lucide="archive-restore" class="w-3.5 h-3.5"></i> Unarchive</button>
+            </div>`;
+        });
+      }
+
+      return `
+        <div class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
+          <div class="flex items-center justify-between gap-3 mb-6">
+            <div>
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white">Archived posts</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Posts you\'ve hidden from your feed. Unarchive to restore them.</p>
+            </div>
+            <i data-lucide="archive" class="w-5 h-5 text-amber-500"></i>
+          </div>
+          <div class="space-y-3">
+            ${cardsHtml}
+          </div>
+        </div>`;
+    }
+
+    function renderShareFriendsList() {
+      const list = document.getElementById("share-friends-list");
+      if (!list) return;
+      const friends =
+        typeof globalFriends !== "undefined" && Array.isArray(globalFriends)
+          ? globalFriends
+          : [];
+      if (!friends.length) {
+        list.innerHTML = `<p class="text-sm text-gray-500 dark:text-gray-400 text-center py-6">No friends yet. Add friends to share posts with them in chat.</p>`;
+        return;
+      }
+      list.innerHTML = friends
+        .map((f) => {
+          const fid = f.id || f.user_id;
+          const name = f.name || "Member";
+          const initials = f.initials || getSocialAvatar(name);
+          return `
+          <div class="flex items-center justify-between gap-3 px-1 py-2">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-9 h-9 rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/50 dark:text-brand-200 flex items-center justify-center font-bold text-sm flex-shrink-0">${initials}</div>
+              <span class="font-semibold text-sm text-gray-800 dark:text-gray-200 truncate">${escapeHtml(name)}</span>
+            </div>
+            <button onclick="shareToFriend('${String(fid).replace(/'/g, "\\'")}', '${String(name).replace(/'/g, "\\'")}')" style="--no-faith-hover-bg: var(--brand-500,#e04848); --no-faith-hover-color:#fff; --no-faith-hover-border:var(--brand-500,#e04848);" class="no-faith-hover px-3 py-1.5 rounded-lg bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-300 text-xs font-bold flex items-center gap-1 flex-shrink-0"><i data-lucide="send" class="w-3.5 h-3.5"></i> Send</button>
+          </div>`;
+        })
+        .join("");
+      if (typeof lucide !== "undefined") lucide.createIcons();
+    }
+
+    async function shareToFriend(friendId, friendName) {
+      let link = "";
+      let text = "";
+      if (shareModalItemType === "event") {
+        link = buildEventShareUrl(shareModalItemId);
+        const evts = JSON.parse(localStorage.getItem("pawcircle_calendar_events") || "[]");
+        const event = evts.find((e) => String(e.id) === String(shareModalItemId) || String(e.db_id) === String(shareModalItemId));
+        const title = event?.title || "Pet Community event";
+        const subtitle = event?.date ? ` on ${event.date}` : "";
+        text = `📌 Shared an event: ${title}${subtitle} ${link}`;
+      } else {
+        link = getPostShareLink(shareModalItemId);
+        const post = feedPosts.find((p) => String(p.id) === String(shareModalItemId));
+        const snippet = post && post.content ? `"${post.content.slice(0, 80)}${post.content.length > 80 ? "…" : ""}" ` : "";
+        text = `📌 Shared a post${post ? ` by ${post.author}` : ""}: ${snippet}${link}`;
+      }
+      closeShareModal();
+      if (!currentUserObj?.id) {
+        showToast("Sign in to share via chat.");
+        return;
+      }
+      try {
+        const data = await api("send_direct_message", {
+          user_id: currentUserObj.id,
+          friend_id: friendId,
+          content: text,
+        });
+        if (data.status !== "success") throw new Error(data.message || "Could not share.");
+        if (typeof getDirectChat === "function" && typeof findFriendById === "function") {
+          const friend = findFriendById(friendId);
+          if (friend) {
+            const chat = getDirectChat(friendId);
+            chat.messages.push({
+              client_id: createLocalMessageId(),
+              sender: currentUserObj.socialProfile?.name || currentUserObj.name || "You",
+              sender_id: currentUserObj.id,
+              recipient_id: friendId,
+              text,
+              media: null,
+              created_at: new Date().toISOString(),
+              status: "sent",
+            });
+            chat.messages = dedupeDirectMessages(chat.messages);
+            if (typeof refreshOpenFriendChatIfNeeded === "function") {
+              refreshOpenFriendChatIfNeeded(friendId, friend);
+            }
+          }
+        }
+        showToast(`Shared with ${friendName}!`);
+      } catch (err) {
+        console.error(err);
+        showToast(err.message || `Could not share with ${friendName}.`);
+      }
     }
 
     async function submitComment(postId) {
@@ -15880,436 +15144,6 @@ function initializeSocialFeed() {
       const input = document.getElementById("feed-post-input");
       const title = titleInput?.value?.trim() || "";
       const content = input.value.trim();
-    function closePostMenus() {
-      document.querySelectorAll(".post-menu").forEach((m) => m.classList.add("hidden"));
-      closeAllPostMenus();
-    }
-
-    function togglePostMenu(postId, event) {
-      if (event?.stopPropagation) event.stopPropagation();
-      const menu = document.getElementById(`post-menu-${postId}`);
-      if (!menu) return;
-      const isOpen = !menu.classList.contains("hidden");
-      closePostMenus();
-      if (!isOpen) {
-        menu.classList.remove("hidden");
-        if (typeof lucide !== "undefined") lucide.createIcons();
-      }
-    }
-
-    document.addEventListener("click", (e) => {
-      if (!e.target.closest(".post-menu") && !e.target.closest("[data-post-menu]") && !e.target.closest("[data-post-menu-trigger]")) closePostMenus();
-      if (!e.target.closest(".comment-menu") && !e.target.closest('[onclick^="toggleCommentMenu"]')) {
-        document.querySelectorAll(".comment-menu").forEach((m) => m.classList.add("hidden"));
-      }
-    });
-
-    function isLocalPostId(postId) {
-      const id = String(postId);
-      return id.startsWith("suvichar_") || id.startsWith("system") || id.startsWith("local_");
-    }
-
-    let editingPostId = null;
-
-
-
-    function editPost(postId) {
-      closePostMenus();
-      const post = feedPosts.find((p) => String(p.id) === String(postId));
-      if (!post) return;
-      editingPostId = postId;
-      const ta = document.getElementById("edit-post-textarea");
-      if (ta) ta.value = post.content || "";
-
-      renderEditPostMediaPreview(post);
-      setHashtagChips("edit-post-hashtags-chips", post.hashtags || []);
-      const hashtagsInput = document.getElementById("edit-post-hashtags");
-      if (hashtagsInput) hashtagsInput.value = "";
-
-      refreshPostEventOptions("edit-post-event-options");
-      const eventsInput = document.getElementById("edit-post-events");
-      const eventIdInput = document.getElementById("edit-post-event-id");
-      const currentEvent = post.linkedEvent || (post.linkedEvents?.[0] ? { id: post.linkedEvents[0], title: post.linkedEvents[0] } : null);
-      if (eventsInput) {
-        const choice = currentEvent && getPostEventChoices().find((event) => String(event.id) === String(currentEvent.id) || event.title === currentEvent.title);
-        eventsInput.value = choice ? (choice.date ? `${choice.title} - ${choice.date}` : choice.title) : (currentEvent?.title || "");
-      }
-      if (eventIdInput) eventIdInput.value = currentEvent?.id || "";
-
-      const archivedCheckbox = document.getElementById("edit-post-archived");
-      if (archivedCheckbox) {
-        archivedCheckbox.checked = !!post.isArchived;
-      }
-
-      const modal = document.getElementById("edit-post-modal");
-      modal.classList.remove("hidden");
-      modal.classList.add("flex");
-      if (typeof lucide !== "undefined") lucide.createIcons();
-      if (ta) ta.focus();
-    }
-
-    function closeEditPostModal() {
-      const modal = document.getElementById("edit-post-modal");
-      modal.classList.add("hidden");
-      modal.classList.remove("flex");
-      editingPostId = null;
-    }
-
-    async function saveEditedPost() {
-      const ta = document.getElementById("edit-post-textarea");
-      const content = (ta?.value || "").trim();
-      if (!content) {
-        showToast("Post content cannot be empty.");
-        return;
-      }
-      const post = feedPosts.find((p) => String(p.id) === String(editingPostId));
-      if (!post) return;
-
-      const hashtags = collectPostHashtags("edit-post-hashtags", "edit-post-hashtags-chips");
-      const linkedEvent = getSelectedPostEvent("edit-post-events", "edit-post-event-id");
-      if (document.getElementById("edit-post-events")?.value?.trim() && !linkedEvent) return;
-      const mediaUrlsInput = document.getElementById("edit-post-media-urls");
-      let mediaUrls = [];
-      try { mediaUrls = JSON.parse(mediaUrlsInput?.value || "[]"); } catch (e) { mediaUrls = []; }
-
-      const local = isLocalPostId(post.id);
-      post.content = content;
-      post.description = content;
-      post.hashtags = hashtags;
-      post.media_urls = mediaUrls;
-      post.media_url = mediaUrls[0] || null;
-      post.post_type = mediaUrls.some(isPostMediaVideo) ? "video" : mediaUrls.length ? "image" : "text";
-      post.linkedEvent = linkedEvent ? { id: linkedEvent.id, title: linkedEvent.title } : null;
-      post.linkedEvents = linkedEvent ? [linkedEvent.title] : [];
-      post.updated_at = new Date().toISOString();
-      post.updatedTime = getPostUpdatedTime(post.created_at, post.updated_at);
-      renderFeed();
-      closeEditPostModal();
-      if (!local && currentUserObj?.id) {
-        try {
-          const data = await api("update_post", {
-            user_id: currentUserObj.id,
-            post_id: post.id,
-            content,
-            description: content,
-            hashtags,
-            media_url: post.media_url,
-            media_urls: mediaUrls,
-            post_type: post.post_type,
-            linked_event_id: linkedEvent?.id || null,
-            linked_event_title: linkedEvent?.title || null,
-          });
-          if (data.status !== "success") throw new Error(data.message || "Could not update post.");
-          if (data.post) {
-            const updatedPost = normalizePostFromApi(data.post);
-            Object.assign(post, updatedPost, {
-              content: updatedPost.content || content,
-              description: updatedPost.description || content,
-              hashtags: updatedPost.hashtags?.length ? updatedPost.hashtags : hashtags,
-              media_url: updatedPost.media_url || mediaUrls[0] || null,
-              media_urls: updatedPost.media_urls?.length ? updatedPost.media_urls : mediaUrls,
-              linkedEvent: updatedPost.linkedEvent || (linkedEvent ? { id: linkedEvent.id, title: linkedEvent.title } : null),
-              linkedEvents: updatedPost.linkedEvents?.length ? updatedPost.linkedEvents : (linkedEvent ? [linkedEvent.title] : []),
-            });
-            renderFeed();
-          }
-          showToast("Post updated.");
-        } catch (err) {
-          console.error(err);
-          showToast(err.message || "Could not update post.");
-        }
-      } else {
-        showToast("Post updated.");
-
-    async function togglePostReaction(postId, reactionKey) {
-      const post = feedPosts.find((p) => String(p.id) === String(postId));
-      if (!post) return;
-
-      playReactionSound(reactionKey);
-
-      if (!post.reactionCounts) post.reactionCounts = {};
-      FEED_REACTIONS.forEach(({ key }) => {
-        if (typeof post.reactionCounts[key] !== "number") {
-          post.reactionCounts[key] = Number(post.reactionCounts[key] || 0);
-        }
-      });
-
-      const previous = post.selectedReaction;
-      if (previous === reactionKey) {
-        post.reactionCounts[reactionKey] = Math.max(0, Number(post.reactionCounts[reactionKey] || 0) - 1);
-        post.selectedReaction = null;
-      } else {
-        if (previous) {
-          post.reactionCounts[previous] = Math.max(0, Number(post.reactionCounts[previous] || 0) - 1);
-        }
-        post.reactionCounts[reactionKey] = Number(post.reactionCounts[reactionKey] || 0) + 1;
-        post.selectedReaction = reactionKey;
-      }
-
-      setLocalFeedReaction(postId, post.selectedReaction);
-      renderFeed();
-
-      if (!currentUserObj?.id || String(postId).startsWith("local_")) {
-        return;
-      }
-
-      try {
-        const data = await syncPostReactionSilently(postId, post.selectedReaction || null);
-        if (!data) {
-          if (!reactionSyncNoticeShown && reactionSyncMode === "disabled") {
-            reactionSyncNoticeShown = true;
-            showToast("Reaction saved locally. Sync will resume when backend is available.");
-          }
-          return;
-        }
-
-        const serverMerged = mergeFeedReactionState(
-          postId,
-          data.reaction_counts || post.reactionCounts,
-          data.selected_reaction ?? post.selectedReaction,
-        );
-        post.reactionCounts = serverMerged.reactionCounts;
-        post.selectedReaction = serverMerged.selectedReaction;
-        setLocalFeedReaction(postId, post.selectedReaction);
-        renderFeed();
-      } catch (err) {
-        // Keep local persisted reaction even when backend sync is unavailable.
-        if (!reactionSyncNoticeShown) {
-          reactionSyncNoticeShown = true;
-          showToast("Reaction saved locally. Sync will resume when backend is available.");
-        }
-      }
-    }
-
-    
-    function hidePost(postId) {
-      setPostHidden(postId, true);
-      closeAllPostMenus();
-      renderFeed();
-      showToast("Post hidden from your feed.");
-    }
-
-      const optimisticPost = {
-        id: `local_${Date.now()}`,
-        author: currentUserObj.socialProfile?.name || currentUserObj.name || "You",
-        initials: getSocialAvatar(currentUserObj.socialProfile?.name || currentUserObj.name || "Y"),
-      closePostMenus();
-      const post = feedPosts.find((p) => String(p.id) === String(postId));
-      if (!post) return;
-      if (!(await showConfirm("Delete post?", "This cannot be undone.", { confirmText: "Delete", danger: true }))) return;
-      const local = isLocalPostId(post.id);
-      feedPosts = feedPosts.filter((p) => String(p.id) !== String(postId));
-      renderFeed();
-      if (!local && currentUserObj?.id) {
-        try {
-          const data = await api("delete_post", {
-            user_id: currentUserObj.id,
-            post_id: postId,
-          });
-          if (data.status !== "success") throw new Error(data.message || "Could not delete post.");
-          showToast("Post deleted.");
-        } catch (err) {
-          console.error(err);
-          showToast(err.message || "Could not delete post.");
-        }
-      } else {
-        showToast("Post deleted.");
-      }
-    }
-
-    function getArchivedPostIds() {
-      const key = "pawcircle_archived_posts_" + (currentUserObj?.email || "guest");
-      return JSON.parse(localStorage.getItem(key) || "[]");
-    }
-
-    function saveArchivedPostIds(ids) {
-      const key = "pawcircle_archived_posts_" + (currentUserObj?.email || "guest");
-      localStorage.setItem(key, JSON.stringify(ids));
-    }
-
-    function archivePost(postId) {
-      closePostMenus();
-      const ids = getArchivedPostIds();
-      if (!ids.includes(String(postId))) ids.push(String(postId));
-      saveArchivedPostIds(ids);
-      renderFeed();
-      showToast("Post archived and hidden from your feed.");
-    }
-
-    function unarchivePost(postId) {
-      let ids = getArchivedPostIds();
-      ids = ids.filter((id) => String(id) !== String(postId));
-      saveArchivedPostIds(ids);
-      renderFeed();
-      // Re-render the archived panel if we are currently viewing it
-      if (typeof renderAccountSettings === 'function' && accountSettingsState.activeSection === 'archived') {
-        renderAccountSettings();
-      }
-      showToast('Post restored to your feed.');
-    }
-
-    function renderSettingsArchivedPanelHtml() {
-      const archivedIds = getArchivedPostIds();
-      const allPosts = typeof feedPosts !== 'undefined' ? feedPosts : [];
-      const archivedPosts = archivedIds
-        .map((id) => allPosts.find((p) => String(p.id) === String(id)))
-        .filter(Boolean);
-
-      let cardsHtml = '';
-      if (archivedPosts.length === 0 && archivedIds.length === 0) {
-        cardsHtml = `
-          <div class="flex flex-col items-center justify-center py-16 text-center">
-            <div class="w-16 h-16 bg-amber-50 dark:bg-amber-900/20 rounded-2xl flex items-center justify-center mb-4">
-              <i data-lucide="archive-x" class="w-8 h-8 text-amber-400"></i>
-            </div>
-            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">No archived posts</p>
-            <p class="text-gray-400 dark:text-gray-500 text-xs mt-1">Posts you archive from your feed will appear here.</p>
-          </div>`;
-      } else if (archivedPosts.length === 0 && archivedIds.length > 0) {
-        // IDs exist but posts are not loaded yet (e.g. feed hasn't loaded)
-        cardsHtml = `
-          <div class="flex flex-col items-center justify-center py-16 text-center">
-            <div class="w-16 h-16 bg-amber-50 dark:bg-amber-900/20 rounded-2xl flex items-center justify-center mb-4">
-              <i data-lucide="archive" class="w-8 h-8 text-amber-400"></i>
-            </div>
-            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">${archivedIds.length} archived post${archivedIds.length > 1 ? 's' : ''}</p>
-            <p class="text-gray-400 dark:text-gray-500 text-xs mt-1">Visit the feed first to load post details, then return here to view them.</p>
-          </div>`;
-      } else {
-        archivedPosts.forEach((post) => {
-          const author = typeof escapeHtml === 'function' ? escapeHtml(post.author || 'Unknown') : (post.author || 'Unknown');
-          const initials = (post.author || 'U').charAt(0).toUpperCase();
-          const snippet = (post.content || '').replace(/<[^>]*>/g, '').slice(0, 120);
-          const safeSnippet = typeof escapeHtml === 'function' ? escapeHtml(snippet) : snippet;
-          const timeStr = post.created_at ? formatDateTime(post.created_at) : (post.time || '');
-          cardsHtml += `
-            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 flex items-start gap-4">
-              <div class="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-200 flex items-center justify-center font-bold text-sm flex-shrink-0">${initials}</div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2">
-                  <span class="font-bold text-sm text-gray-800 dark:text-gray-200">${author}</span>
-                  <span class="text-xs text-gray-400">${timeStr}</span>
-                </div>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">${safeSnippet}${snippet.length >= 120 ? '…' : ''}</p>
-              </div>
-              <button onclick="unarchivePost('${String(post.id).replace(/'/g, "\\\'")}')" class="no-faith-hover px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 text-xs font-bold border border-amber-200 dark:border-amber-800 flex items-center gap-1 flex-shrink-0 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors" style="--no-faith-hover-bg: #fef3c7; --no-faith-hover-color: #b45309; --no-faith-hover-border: #fbbf24;"><i data-lucide="archive-restore" class="w-3.5 h-3.5"></i> Unarchive</button>
-            </div>`;
-        });
-      }
-
-      return `
-        <div class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
-          <div class="flex items-center justify-between gap-3 mb-6">
-            <div>
-              <h3 class="text-xl font-bold text-gray-900 dark:text-white">Archived posts</h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Posts you\'ve hidden from your feed. Unarchive to restore them.</p>
-            </div>
-            <i data-lucide="archive" class="w-5 h-5 text-amber-500"></i>
-          </div>
-          <div class="space-y-3">
-            ${cardsHtml}
-          </div>
-        </div>`;
-    }
-
-    function renderShareFriendsList() {
-      const list = document.getElementById("share-friends-list");
-      if (!list) return;
-      const friends =
-        typeof globalFriends !== "undefined" && Array.isArray(globalFriends)
-          ? globalFriends
-          : [];
-      if (!friends.length) {
-        list.innerHTML = `<p class="text-sm text-gray-500 dark:text-gray-400 text-center py-6">No friends yet. Add friends to share posts with them in chat.</p>`;
-        return;
-      }
-      list.innerHTML = friends
-        .map((f) => {
-          const fid = f.id || f.user_id;
-          const name = f.name || "Member";
-          const initials = f.initials || getSocialAvatar(name);
-          return `
-          <div class="flex items-center justify-between gap-3 px-1 py-2">
-            <div class="flex items-center gap-3 min-w-0">
-              <div class="w-9 h-9 rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/50 dark:text-brand-200 flex items-center justify-center font-bold text-sm flex-shrink-0">${initials}</div>
-              <span class="font-semibold text-sm text-gray-800 dark:text-gray-200 truncate">${escapeHtml(name)}</span>
-            </div>
-            <button onclick="shareToFriend('${String(fid).replace(/'/g, "\\'")}', '${String(name).replace(/'/g, "\\'")}')" style="--no-faith-hover-bg: var(--brand-500,#e04848); --no-faith-hover-color:#fff; --no-faith-hover-border:var(--brand-500,#e04848);" class="no-faith-hover px-3 py-1.5 rounded-lg bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-300 text-xs font-bold flex items-center gap-1 flex-shrink-0"><i data-lucide="send" class="w-3.5 h-3.5"></i> Send</button>
-          </div>`;
-        })
-        .join("");
-      if (typeof lucide !== "undefined") lucide.createIcons();
-    }
-
-    async function shareToFriend(friendId, friendName) {
-      let link = "";
-      let text = "";
-      if (shareModalItemType === "event") {
-        link = buildEventShareUrl(shareModalItemId);
-        const evts = JSON.parse(localStorage.getItem("pawcircle_calendar_events") || "[]");
-        const event = evts.find((e) => String(e.id) === String(shareModalItemId) || String(e.db_id) === String(shareModalItemId));
-        const title = event?.title || "Pet Community event";
-        const subtitle = event?.date ? ` on ${event.date}` : "";
-        text = `📌 Shared an event: ${title}${subtitle} ${link}`;
-      } else {
-        link = getPostShareLink(shareModalItemId);
-        const post = feedPosts.find((p) => String(p.id) === String(shareModalItemId));
-        const snippet = post && post.content ? `"${post.content.slice(0, 80)}${post.content.length > 80 ? "…" : ""}" ` : "";
-        text = `📌 Shared a post${post ? ` by ${post.author}` : ""}: ${snippet}${link}`;
-      }
-      closeShareModal();
-      if (!currentUserObj?.id) {
-        showToast("Sign in to share via chat.");
-        return;
-      }
-      try {
-        const data = await api("send_direct_message", {
-          user_id: currentUserObj.id,
-          friend_id: friendId,
-          content: text,
-        });
-        if (data.status !== "success") throw new Error(data.message || "Could not share.");
-        if (typeof getDirectChat === "function" && typeof findFriendById === "function") {
-          const friend = findFriendById(friendId);
-          if (friend) {
-            const chat = getDirectChat(friendId);
-            chat.messages.push({
-              client_id: createLocalMessageId(),
-              sender: currentUserObj.socialProfile?.name || currentUserObj.name || "You",
-              sender_id: currentUserObj.id,
-              recipient_id: friendId,
-              text,
-              media: null,
-              created_at: new Date().toISOString(),
-              status: "sent",
-            });
-            chat.messages = dedupeDirectMessages(chat.messages);
-            if (typeof refreshOpenFriendChatIfNeeded === "function") {
-              refreshOpenFriendChatIfNeeded(friendId, friend);
-            }
-          }
-        }
-        showToast(`Shared with ${friendName}!`);
-      } catch (err) {
-        console.error(err);
-        showToast(err.message || `Could not share with ${friendName}.`);
-        specialBlock: "",
-        likes: 0,
-        comments: 0,
-        isLiked: false,
-        commentList: [],
-        commentsLoaded: false,
-        avatarClass:
-          "bg-brand-100 text-brand-900 dark:bg-brand-900/50 dark:text-brand-100",
-        profilePhoto: currentUserObj.profile_photo_url || currentUserObj?.socialProfile?.profile_photo_url || getPrimaryLandingPetImage(currentUserObj) || null,
-        reactionCounts: FEED_REACTIONS.reduce((acc, r) => {
-          acc[r.key] = 0;
-          return acc;
-        }, {}),
-        selectedReaction: null,
-      };
-
-      feedPosts.unshift(optimisticPost);
       const hashtags = collectPostHashtags("feed-post-hashtags", "feed-post-hashtags-chips");
       const linkedEvent = getSelectedPostEvent("feed-post-event-input", "feed-post-event-id");
       if (document.getElementById("feed-post-event-input")?.value?.trim() && !linkedEvent) return;
@@ -16327,12 +15161,10 @@ function initializeSocialFeed() {
         return;
       }
 
-      const mediaFile = selectedFeedMediaFile;
-      const finalContent = content;
-      renderFeed();
-
-      try {
-        let mediaUrl = null;
+      const optimisticPost = {
+        id: `local_${Date.now()}`,
+        author: currentUserObj.socialProfile?.name || currentUserObj.name || "You",
+        initials: getSocialAvatar(currentUserObj.socialProfile?.name || currentUserObj.name || "Y"),
         time: media.length ? "Uploading..." : "Posting...",
         title,
         content,
@@ -16346,14 +15178,64 @@ function initializeSocialFeed() {
         community: audience.community,
         religion: audience.religion,
         audience: audience.label,
+        specialBlock: "",
+        likes: 0,
+        comments: 0,
+        isLiked: false,
+        commentList: [],
+        commentsLoaded: false,
+        avatarClass:
+          "bg-brand-100 text-brand-900 dark:bg-brand-900/50 dark:text-brand-100",
+        profilePhoto: currentUserObj.profile_photo_url || null,
+      };
+
+      feedPosts.unshift(optimisticPost);
+      resetPostComposer();
+      setPostComposerBusy(true, media.length ? "Uploading media..." : "Posting...");
+      renderFeed();
+
+      try {
+        let mediaUrl = null;
+        let mediaUrls = [];
+        let postType = "text";
+
+        if (media.length) {
+          for (const item of media) {
+            if (item.url) {
+              mediaUrls.push(item.url);
+              continue;
+            }
+            const uploadData = await uploadPhotoToSupabase(item.file, {
+              bucket: "post-media",
+              prefix: item.postType === "video" ? "post-video" : "post-image",
+              userId: currentUserObj.id,
+              detailed: true,
+            });
+            const uploadedUrl = uploadData.url || uploadData.photo_url;
+            if (uploadedUrl) mediaUrls.push(uploadedUrl);
+          }
+          mediaUrl = mediaUrls[0] || null;
+          postType = media.some((item) => item.postType === "video") ? "video" : "image";
+          optimisticPost.time = "Posting...";
+          optimisticPost.media_url = mediaUrl;
+          optimisticPost.media_urls = [...mediaUrls];
+          setPostComposerBusy(true, "Saving post...");
+          renderFeed();
         }
 
         const data = await api("create_post", {
           user_id: currentUserObj.id,
-      resetPostComposer();
-      setPostComposerBusy(true, media.length ? "Uploading media..." : "Posting...");
-
-      clearFeedMediaSelection();
+          title,
+          content,
+          description: content,
+          hashtags,
+          post_type: postType,
+          media_url: mediaUrl,
+          media_urls: mediaUrls,
+          linked_event_id: linkedEvent?.id || null,
+          linked_event_title: linkedEvent?.title || null,
+          community: audience.community,
+          religion: audience.religion,
         });
 
         if (data.status !== "success") {
@@ -16381,92 +15263,6 @@ function initializeSocialFeed() {
         });
         setPostComposerBusy(false);
       }
-    }
-
-    function openFeedMediaPicker() {
-      const picker = document.getElementById("feed-media-input");
-      if (picker) picker.click();
-    }
-
-    function clearFeedMediaSelection() {
-      const picker = document.getElementById("feed-media-input");
-      const previewBox = document.getElementById("feed-media-preview");
-      const previewImg = document.getElementById("feed-media-preview-img");
-      const previewVideo = document.getElementById("feed-media-preview-video");
-      const mediaName = document.getElementById("feed-media-name");
-      const mediaKind = document.getElementById("feed-media-kind");
-
-      if (picker) picker.value = "";
-      if (previewBox) previewBox.classList.add("hidden");
-
-      if (previewImg) {
-        previewImg.src = "";
-        previewImg.classList.add("hidden");
-      }
-
-      if (previewVideo) {
-        previewVideo.src = "";
-        previewVideo.classList.add("hidden");
-      }
-
-      if (mediaName) mediaName.textContent = "";
-      if (mediaKind) mediaKind.textContent = "Media";
-
-      if (selectedFeedMediaPreviewUrl) {
-        URL.revokeObjectURL(selectedFeedMediaPreviewUrl);
-      }
-      selectedFeedMediaPreviewUrl = "";
-      selectedFeedMediaFile = null;
-    }
-
-    function handleFeedMediaSelection(input) {
-      const file = input?.files?.[0];
-      if (!file) {
-        clearFeedMediaSelection();
-        return;
-      }
-
-      const isImage = String(file.type || "").startsWith("image/");
-      const isVideo = String(file.type || "").startsWith("video/");
-      if (!isImage && !isVideo) {
-        alert("Please select an image or video file.");
-        clearFeedMediaSelection();
-        return;
-      }
-
-      const maxBytes = 50 * 1024 * 1024;
-      if (file.size > maxBytes) {
-        alert("Selected file is too large. Please choose a file under 50 MB.");
-        clearFeedMediaSelection();
-        return;
-      }
-
-      const previewBox = document.getElementById("feed-media-preview");
-      const previewImg = document.getElementById("feed-media-preview-img");
-      const previewVideo = document.getElementById("feed-media-preview-video");
-      const mediaName = document.getElementById("feed-media-name");
-      const mediaKind = document.getElementById("feed-media-kind");
-
-      selectedFeedMediaFile = file;
-      if (selectedFeedMediaPreviewUrl) {
-        URL.revokeObjectURL(selectedFeedMediaPreviewUrl);
-      }
-      selectedFeedMediaPreviewUrl = URL.createObjectURL(file);
-
-      if (mediaName) mediaName.textContent = file.name;
-      if (mediaKind) mediaKind.textContent = isVideo ? "Video" : "Photo";
-
-      if (previewImg) {
-        previewImg.classList.toggle("hidden", !isImage);
-        previewImg.src = isImage ? selectedFeedMediaPreviewUrl : "";
-      }
-
-      if (previewVideo) {
-        previewVideo.classList.toggle("hidden", !isVideo);
-        previewVideo.src = isVideo ? selectedFeedMediaPreviewUrl : "";
-      }
-
-      if (previewBox) previewBox.classList.remove("hidden");
     }
 
 
@@ -17666,31 +16462,18 @@ function initializeSocialFeed() {
       const trendingContainer = document.getElementById("social-trending");
       if (!trendingContainer) return;
 
-        let mediaUrls = [];
-        let postType = "text";
+      const religionKey = currentUserObj?.religion || communityName || "Hindu";
+      trendingContainer.innerHTML = `
+        <div class="flex items-center justify-center h-full py-8 text-xs text-gray-500 dark:text-gray-400">
+          <i data-lucide="loader" class="w-4 h-4 mr-2 animate-spin"></i> Loading pet services...
+        </div>`;
+      lucide.createIcons();
 
-        if (media.length) {
-          for (const item of media) {
-            if (item.url) {
-              mediaUrls.push(item.url);
-              continue;
-            }
-            const uploadData = await uploadPhotoToSupabase(item.file, {
-              bucket: "post-media",
-              prefix: item.postType === "video" ? "post-video" : "post-image",
-              userId: currentUserObj.id,
-              detailed: true,
-            });
-            const uploadedUrl = uploadData.url || uploadData.photo_url;
-            if (uploadedUrl) mediaUrls.push(uploadedUrl);
-          }
-          mediaUrl = mediaUrls[0] || null;
-          postType = media.some((item) => item.postType === "video") ? "video" : "image";
-          optimisticPost.time = "Posting...";
-          optimisticPost.media_url = mediaUrl;
-          optimisticPost.media_urls = [...mediaUrls];
-          setPostComposerBusy(true, "Saving post...");
-          renderFeed();
+      const religionData = await fetchPetServiceSection(religionKey);
+      const books = religionData.books || [];
+
+      window.pawcirclePetServiceCache = window.pawcirclePetServiceCache || {};
+      books.forEach((book) => { window.pawcirclePetServiceCache[book.id] = book; });
 
       const titleEl = document.getElementById("trending-title");
       const subtitleEl = document.getElementById("trending-subtitle");
@@ -18903,7 +17686,9 @@ function initializeSocialFeed() {
       { tab: "granth", label: "Dharmic Granth", icon: "book-open-text", color: "amber" },
       { tab: "festivals", label: "Festivals", icon: "party-popper", color: "orange" },
       { tab: "playdate", label: "Playdate", icon: "heart-handshake", color: "pink" },
-
+      // Obituaries & PawCircle hidden for now (code retained).
+      // { tab: "obituaries", label: "Obituaries", icon: "flower", color: "gray" },
+      // { view: "view-content-hub", label: "PawCircle", icon: "tv-2", color: "red" },
     ];
 
     function renderRightQuickLinks(activeTab) {
@@ -18928,7 +17713,7 @@ function initializeSocialFeed() {
     const LEFT_AD_SLIDES = [
       { icon: "heart-handshake", tag: "Playdate", title: "Find your match", text: "AI-assisted playdate within your community, with kundli & numerology scoring.", cta: "Open Playdate", action: "switchSocialTab('playdate')" },
       { icon: "calendar-heart", tag: "Happening now", title: "Pet Community events", text: "Upcoming festivals, gatherings and celebrations near you.", cta: "See Events", action: "switchSocialTab('events')" },
-      { icon: "play-circle", tag: "PawStream", title: "Live pet streams", text: "Join live pet playdates and streaming sessions.", cta: "Watch Live", action: "switchSocialTab('live-events')" },
+      { icon: "play-circle", tag: "eDarshan", title: "Live darshan & aarti", text: "Join live temple streams and pawcircle sessions.", cta: "Watch Live", action: "switchSocialTab('live-events')" },
       { icon: "landmark", tag: "Spotlight", title: "Discover samaj groups", text: "Connect with trending community groups and networks.", cta: "Explore Groups", action: "switchSocialTab('groups')" },
     ];
 
@@ -28243,9 +27028,6 @@ function initializeSocialFeed() {
       } catch (err) {
         box.innerHTML = `<div class="rounded-2xl border border-red-200 dark:border-red-900/60 bg-red-50 dark:bg-red-950/30 p-4 text-sm text-red-700 dark:text-red-300">${escapeHtml(err.message || "Could not load analytics.")}</div>`;
       }
-      if (currentUserObj && currentUserObj.email) {
-        applyPetVisualTheme(currentUserObj);
-      }
       lucide.createIcons();
     }
 
@@ -34049,6 +32831,7 @@ function initializeSocialFeed() {
           populateMemberDashboard(user);
           // Always restore into the feed; never auto-open the application form.
           initializeSocialFeed();
+              switchView("view-member-dashboard");
           document.body.style.visibility = 'visible';
           return;
         }
@@ -34064,6 +32847,7 @@ function initializeSocialFeed() {
           persistCurrentSession(authUser);
           populateMemberDashboard(authUser);
           initializeSocialFeed();
+              switchView("view-member-dashboard");
           document.body.style.visibility = 'visible';
           return;
         }
@@ -36600,9 +35384,462 @@ function initializeSocialFeed() {
       if (panel) panel.classList.remove('open');
     };
 
-    </script>
+    /* ================================================================
+       MODULE 4 – CONTENT HUB
+    ================================================================ */
 
-  <script>
+    // Working sample media so the player actually plays (royalty-free public samples).
+    const CH_V = 'https://storage.googleapis.com/gtv-videos-bucket/sample/';
+    const CH_A = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-';
+    const chThumb = (color, text) => `https://placehold.co/400x225/${color}/ffffff?text=${encodeURIComponent(text)}`;
+
+    // Each entry is tagged with a religion so the hub can show only the user's faith.
+    const CH_ALL_CONTENT = [
+      // Hindu
+      { id: 'h-v1', religion: 'Hindu', type: 'video', title: 'Bhagavad Gita Chapter 2 Discourse', speaker: 'Swami Sarvapriyananda', thumb: chThumb('f97316', 'Gita Ch.2'), src: CH_V + 'BigBuckBunny.mp4' },
+      { id: 'h-v2', religion: 'Hindu', type: 'video', trending: true, title: 'Ramayana Katha Sunderkand', speaker: 'Morari Bapu', thumb: chThumb('ea580c', 'Ram Katha'), src: CH_V + 'ElephantsDream.mp4' },
+      { id: 'h-a1', religion: 'Hindu', type: 'audio', title: 'Hanuman Chalisa', speaker: 'Hari Om Sharan', thumb: chThumb('f97316', 'Chalisa'), src: CH_A + '1.mp3' },
+      { id: 'h-a2', religion: 'Hindu', type: 'audio', trending: true, title: 'Om Namah Shivaya Dhun', speaker: 'Anuradha Paudwal', thumb: chThumb('ea580c', 'Shiv Dhun'), src: CH_A + '2.mp3' },
+
+      // Muslim
+      { id: 'm-v1', religion: 'Muslim', type: 'video', title: 'Juma Khutbah on Inner Peace', speaker: 'Sheikh Omar Suleiman', thumb: chThumb('10b981', 'Khutbah'), src: CH_V + 'ForBiggerBlazes.mp4' },
+      { id: 'm-v2', religion: 'Muslim', type: 'video', trending: true, title: 'Seerah of the Prophet', speaker: 'Mufti Menk', thumb: chThumb('059669', 'Seerah'), src: CH_V + 'ForBiggerEscapes.mp4' },
+      { id: 'm-a1', religion: 'Muslim', type: 'audio', title: 'Surah Al-Rahman Recitation', speaker: 'Sheikh Mishary Rashid', thumb: chThumb('10b981', 'Tilawat'), src: CH_A + '3.mp3' },
+      { id: 'm-a2', religion: 'Muslim', type: 'audio', trending: true, title: 'Surah Yaseen', speaker: 'Sheikh Sudais', thumb: chThumb('059669', 'Yaseen'), src: CH_A + '4.mp3' },
+
+      // Sikh
+      { id: 's-v1', religion: 'Sikh', type: 'video', title: 'Guru Granth Sahib Katha', speaker: 'Giani Pinderpal Singh', thumb: chThumb('3b82f6', 'Katha'), src: CH_V + 'ForBiggerFun.mp4' },
+      { id: 's-v2', religion: 'Sikh', type: 'video', trending: true, title: 'Sakhi of Guru Nanak Dev Ji', speaker: 'Bhai Sahib', thumb: chThumb('2563eb', 'Sakhi'), src: CH_V + 'ForBiggerJoyrides.mp4' },
+      { id: 's-a1', religion: 'Sikh', type: 'audio', title: 'Waheguru Simran', speaker: 'Bhai Harjinder Singh', thumb: chThumb('3b82f6', 'Simran'), src: CH_A + '5.mp3' },
+      { id: 's-a2', religion: 'Sikh', type: 'audio', trending: true, title: 'Japji Sahib Path', speaker: 'Bhai Gurpreet Singh', thumb: chThumb('2563eb', 'Japji'), src: CH_A + '6.mp3' },
+
+      // Christian
+      { id: 'c-v1', religion: 'Christian', type: 'video', title: 'Sunday Homily on Love and Forgiveness', speaker: 'Fr. Mike Schmitz', thumb: chThumb('8b5cf6', 'Homily'), src: CH_V + 'ForBiggerMeltdowns.mp4' },
+      { id: 'c-v2', religion: 'Christian', type: 'video', trending: true, title: 'The Sermon on the Mount', speaker: 'Pastor John', thumb: chThumb('7c3aed', 'Sermon'), src: CH_V + 'SubaruOutbackOnStreetAndDirt.mp4' },
+      { id: 'c-a1', religion: 'Christian', type: 'audio', title: 'Amazing Grace Choir', speaker: 'Brooklyn Tabernacle Choir', thumb: chThumb('8b5cf6', 'Hymn'), src: CH_A + '7.mp3' },
+      { id: 'c-a2', religion: 'Christian', type: 'audio', trending: true, title: 'How Great Thou Art', speaker: 'Pet Community Choir', thumb: chThumb('7c3aed', 'Worship'), src: CH_A + '8.mp3' },
+
+      // Buddhist
+      { id: 'b-v1', religion: 'Buddhist', type: 'video', title: 'Buddha Dhamma Talk', speaker: 'Ajahn Brahm', thumb: chThumb('f59e0b', 'Dhamma'), src: CH_V + 'TearsOfSteel.mp4' },
+      { id: 'b-v2', religion: 'Buddhist', type: 'video', trending: true, title: 'Mindfulness and the Four Noble Truths', speaker: 'Thich Nhat Hanh', thumb: chThumb('d97706', 'Mindfulness'), src: CH_V + 'VolkswagenGTIReview.mp4' },
+      { id: 'b-a1', religion: 'Buddhist', type: 'audio', title: 'Metta Meditation Chant', speaker: 'Imee Ooi', thumb: chThumb('f59e0b', 'Metta'), src: CH_A + '9.mp3' },
+      { id: 'b-a2', religion: 'Buddhist', type: 'audio', trending: true, title: 'Heart Sutra Recitation', speaker: 'Sangha', thumb: chThumb('d97706', 'Sutra'), src: CH_A + '10.mp3' },
+
+      // Jain
+      { id: 'j-v1', religion: 'Jain', type: 'video', title: 'Mahavir Jayanti Pravachan', speaker: 'Muni Tarun Sagar Ji', thumb: chThumb('ef4444', 'Mahavir'), src: CH_V + 'WeAreGoingOnBullrun.mp4' },
+      { id: 'j-v2', religion: 'Jain', type: 'video', trending: true, title: 'Paryushana and the Path of Ahimsa', speaker: 'Acharya Vidyasagar', thumb: chThumb('dc2626', 'Paryushana'), src: CH_V + 'WhatCarCanYouGetForAGrand.mp4' },
+      { id: 'j-a1', religion: 'Jain', type: 'audio', title: 'Navkar Mantra', speaker: 'Stavan Pack', thumb: chThumb('ef4444', 'Navkar'), src: CH_A + '11.mp3' },
+      { id: 'j-a2', religion: 'Jain', type: 'audio', trending: true, title: 'Bhaktamar Stotra', speaker: 'Pandit Ji', thumb: chThumb('dc2626', 'Stotra'), src: CH_A + '12.mp3' },
+
+      // Parsi
+      { id: 'p-v1', religion: 'Parsi', type: 'video', title: 'Zarathushtra and the Gathas Explained', speaker: 'Ervad Dr. Ramiyar', thumb: chThumb('e04848', 'Gathas'), src: CH_V + 'BigBuckBunny.mp4' },
+      { id: 'p-a1', religion: 'Parsi', type: 'audio', title: 'Ashem Vohu Prayer', speaker: 'Mobed', thumb: chThumb('e04848', 'Prayer'), src: CH_A + '13.mp3' },
+      { id: 'p-a2', religion: 'Parsi', type: 'audio', trending: true, title: 'Yatha Ahu Vairyo', speaker: 'Mobed', thumb: chThumb('b91c1c', 'Yatha'), src: CH_A + '14.mp3' },
+    ];
+
+    // Curated devotional YouTube channels that run live broadcasts. We embed each
+    // channel's *current* live stream via YouTube's keyless endpoint:
+    //   https://www.youtube.com/embed/live_stream?channel=<CHANNEL_ID>
+    // YouTube automatically surfaces whatever that channel is streaming live right
+    // now (and shows an offline state otherwise) — no API key or quota required.
+    const CH_LIVE_CHANNELS = [
+      { religion: 'Hindu', name: 'Aastha TV', desc: 'Bhajans, aarti & live pawcircle', channelId: 'UCRUAdVm9ZOF4JheOd8qIQHA', accent: '#f97316' },
+      { religion: 'Hindu', name: 'Sanskar TV', desc: 'Devotional & satsang, 24/7', channelId: 'UCT_QwW7Tbew5qrYNb2auqAQ', accent: '#ea580c' },
+      { religion: 'Hindu', name: 'Satsang', desc: 'Spiritual discourses', channelId: 'UCJeQx6mAyNdPUc9sJA866Xw', accent: '#d97706' },
+      { religion: 'Sikh', name: 'SGPC Sri Amritsar', desc: 'Live Gurbani Kirtan — Sri Harmandir Sahib', channelId: 'UCYn6UEtQ771a_OWSiNBoG8w', accent: '#2563eb' },
+      { religion: 'Muslim', name: 'Makkah Live TV', desc: 'Quran recitation from Makkah', channelId: 'UC04RHDai67rTJ-MX8Dq2CqA', accent: '#10b981' },
+      { religion: 'Christian', name: 'EWTN', desc: 'Live Catholic Mass & devotions', channelId: 'UCijDos-LUTh9RQvSCMQqN6Q', accent: '#8b5cf6' },
+      { religion: 'Christian', name: 'Daily TV Mass', desc: 'Daily Catholic Mass', channelId: 'UCi6JtCVy4XKu4BSG-AE2chg', accent: '#7c3aed' },
+      { religion: 'Buddhist', name: 'Plum Village', desc: 'Dharma talks & guided meditation', channelId: 'UCcv7KJIAsiddB2YRegvrF7g', accent: '#f59e0b' },
+      { religion: 'Jain', name: 'Paras Channel', desc: 'Jain bhakti, stavan & pawcircle', channelId: 'UC_CSVqktYBaCMSLrmDNyGxA', accent: '#ef4444' },
+    ];
+
+    // Resolve the religion whose content we should show.
+    function chUserReligion() {
+      const r = currentUserObj?.religion || currentUserObj?.socialProfile?.religion || '';
+      const known = ['Hindu', 'Muslim', 'Sikh', 'Christian', 'Buddhist', 'Jain', 'Parsi'];
+      return known.includes(r) ? r : '';
+    }
+
+    // The active, religion-filtered content list (falls back to all when religion unknown).
+    function chVisibleContent() {
+      const rel = chUserReligion();
+      return rel ? CH_ALL_CONTENT.filter(i => i.religion === rel) : CH_ALL_CONTENT;
+    }
+
+    function renderContentHub() {
+      // Mirror the user's faith accent onto the hub.
+      if (typeof getFaithAccentColor === 'function') {
+        document.documentElement.style.setProperty('--faith-accent', getFaithAccentColor(currentUserObj?.religion));
+      }
+      const rel = chUserReligion();
+      const subtitle = document.getElementById('ch-subtitle');
+      if (subtitle) subtitle.textContent = rel
+        ? `Live darshan, kirtan & pawcircle for the ${rel} community`
+        : 'Live darshan, kirtan & pawcircle from across faiths';
+
+      // The user's-faith channels are featured; the rest are offered to explore.
+      const mine = rel ? CH_LIVE_CHANNELS.filter(c => c.religion === rel) : [];
+      const featured = mine.length ? mine : CH_LIVE_CHANNELS.slice();
+      const explore = CH_LIVE_CHANNELS.filter(c => !featured.includes(c));
+
+      // Hero wiring
+      const heroRel = document.getElementById('ch-hero-rel');
+      if (heroRel) heroRel.textContent = rel ? `for the ${rel} community` : 'every day';
+      const heroCount = document.getElementById('ch-hero-count');
+      if (heroCount) heroCount.textContent = String(CH_LIVE_CHANNELS.length);
+      const hero = document.getElementById('ch-hero');
+      if (hero) hero.classList.remove('hidden');
+
+      chFeaturedChannelId = featured[0]?.channelId || null;
+      renderCHFeatured('ch-featured-slot', featured);
+      renderCHRow('ch-row-video', explore);
+
+      // Toggle section visibility / empty state
+      const toggle = (secId, has) => { const el = document.getElementById(secId); if (el) el.classList.toggle('hidden', !has); };
+      toggle('ch-section-featured', featured.length);
+      toggle('ch-section-video', explore.length);
+      toggle('ch-section-audio', false);   // audio/trending replaced by live channels
+      toggle('ch-section-trending', false);
+      const empty = document.getElementById('ch-empty-state');
+      if (empty) empty.classList.toggle('hidden', CH_LIVE_CHANNELS.length > 0);
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    let chFeaturedChannelId = null;
+    function chPlayFeatured() {
+      const ch = CH_LIVE_CHANNELS.find(c => c.channelId === chFeaturedChannelId) || CH_LIVE_CHANNELS[0];
+      if (ch) chPlayChannel(ch.channelId, ch.name, ch.desc);
+    }
+
+    // Keyless gradient art for a live channel card (no external thumbnail needed).
+    function chChannelArt(ch) {
+      const a = ch.accent || 'var(--faith-accent,#e04848)';
+      return `<div class="ch-thumb-media" style="background:linear-gradient(135deg, ${a} 0%, color-mix(in srgb, ${a} 55%, #1a1a1a) 100%); display:flex; align-items:center; justify-content:center;">
+          <span class="ch-thumb-tag">${escapeHtml(ch.religion)}</span>
+          <span class="ch-type-pill" style="background:#dc2626;"><span style="width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block"></span> LIVE</span>
+          <i data-lucide="radio-tower" style="width:38px;height:38px;color:rgba(255,255,255,.92)"></i>
+          <div class="ch-play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>`;
+    }
+
+    // Builds a safe onclick string (single-quoted JS args inside a double-quoted attribute).
+    function chChannelOnclick(ch) {
+      const esc = (s) => String(s).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+      return `chPlayChannel('${esc(ch.channelId)}', '${esc(ch.name)}', '${esc(ch.desc)}')`;
+    }
+
+    function renderCHRow(containerId, channels) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      el.innerHTML = channels.map(ch => `
+        <div class="ch-thumb" onclick="${chChannelOnclick(ch)}">
+          ${chChannelArt(ch)}
+          <div class="ch-thumb-label">
+            <div class="truncate">${escapeHtml(ch.name)}</div>
+            <div class="ch-thumb-sub truncate"><i data-lucide="radio" class="w-3 h-3"></i> ${escapeHtml(ch.desc)}</div>
+          </div>
+        </div>`).join('');
+    }
+
+    function renderCHFeatured(containerId, channels) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      el.innerHTML = channels.map(ch => {
+        const a = ch.accent || 'var(--faith-accent,#e04848)';
+        return `<div class="ch-featured" onclick="${chChannelOnclick(ch)}" style="background:linear-gradient(135deg, ${a} 0%, color-mix(in srgb, ${a} 50%, #111) 100%);">
+          <div class="ch-featured-scrim">
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-black uppercase mb-2"><span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> Live</span>
+            <h4 class="font-bold text-lg leading-snug">${escapeHtml(ch.name)}</h4>
+            <p class="text-sm mt-1" style="color: rgba(255,255,255,.85)">${escapeHtml(ch.desc)}</p>
+            <span class="mt-3 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white text-gray-900 text-xs font-bold">
+              <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i> Watch live
+            </span>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // Embeds a channel's current live broadcast via YouTube's keyless live_stream endpoint.
+    function chPlayChannel(channelId, name, desc) {
+      const section = document.getElementById('ch-player-section');
+      const ytWrap = document.getElementById('ch-yt-wrap');
+      const yt = document.getElementById('ch-yt-player');
+      const video = document.getElementById('ch-video-player');
+      const audio = document.getElementById('ch-audio-player');
+      const controls = document.getElementById('ch-custom-controls');
+      const liveBadge = document.getElementById('ch-live-badge');
+      if (!section) return;
+
+      // Stop any native sample players, swap in the YouTube live embed.
+      if (video) { try { video.pause(); } catch (e) { } video.style.display = 'none'; video.removeAttribute('src'); }
+      if (audio) { try { audio.pause(); } catch (e) { } audio.style.display = 'none'; audio.removeAttribute('src'); }
+      if (controls) controls.style.display = 'none';
+      if (ytWrap) ytWrap.style.display = 'block';
+      if (yt) yt.src = `https://www.youtube.com/embed/live_stream?channel=${encodeURIComponent(channelId)}&autoplay=1&rel=0`;
+
+      const titleEl = document.getElementById('ch-now-playing-title');
+      const subEl = document.getElementById('ch-now-playing-sub');
+      if (titleEl) titleEl.textContent = name || 'Live stream';
+      if (subEl) subEl.textContent = desc || '';
+      if (liveBadge) { liveBadge.classList.remove('hidden'); liveBadge.classList.add('inline-flex'); }
+
+      section.classList.remove('hidden');
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function chPlay(id) {
+      const item = CH_ALL_CONTENT.find(i => i.id === id);
+      if (!item) return;
+      const rowId = item.type === 'audio' ? 'ch-row-audio' : 'ch-row-video';
+
+      const isAudio = rowId === 'ch-row-audio' || !!item.isAudio;
+      const section = document.getElementById('ch-player-section');
+      const video = document.getElementById('ch-video-player');
+      const audio = document.getElementById('ch-audio-player');
+      const controls = document.getElementById('ch-custom-controls');
+
+      document.getElementById('ch-now-playing-title').textContent = item.title;
+      document.getElementById('ch-now-playing-sub').textContent = item.speaker;
+
+      if (isAudio) {
+        video.style.display = 'none'; controls.style.display = 'none';
+        audio.style.display = 'block';
+        audio.src = item.src || '';
+        audio.play().catch(() => { });
+      } else {
+        audio.style.display = 'none';
+        video.style.display = 'block'; controls.style.display = 'flex';
+        video.src = item.src || '';
+        video.play().catch(() => { });
+        chBindVideoEvents();
+      }
+
+      section.classList.remove('hidden');
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function chBindVideoEvents() {
+      const video = document.getElementById('ch-video-player');
+      const fill = document.getElementById('ch-progress-fill');
+      const time = document.getElementById('ch-time-display');
+      if (!video) return;
+
+      video.ontimeupdate = () => {
+        if (!video.duration) return;
+        fill.style.width = (video.currentTime / video.duration * 100) + '%';
+        time.textContent = chFmtTime(video.currentTime) + ' / ' + chFmtTime(video.duration);
+      };
+    }
+
+    function chFmtTime(s) {
+      const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+      return `${m}:${String(sec).padStart(2, '0')}`;
+    }
+
+    function chTogglePlay() {
+      const video = document.getElementById('ch-video-player');
+      const btn = document.getElementById('ch-play-btn');
+      if (!video) return;
+      if (video.paused) {
+        video.play();
+        btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+      } else {
+        video.pause();
+        btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor"><path d="M8 5v14l11-7z"/></svg>';
+      }
+    }
+
+    function chSeek(e) {
+      const video = document.getElementById('ch-video-player');
+      const bar = document.getElementById('ch-progress-bar');
+      if (!video || !bar) return;
+      const rect = bar.getBoundingClientRect();
+      video.currentTime = ((e.clientX - rect.left) / rect.width) * video.duration;
+    }
+
+    function chSetVolume(v) {
+      const video = document.getElementById('ch-video-player');
+      if (video) video.volume = parseFloat(v);
+    }
+
+    function chToggleMute() {
+      const video = document.getElementById('ch-video-player');
+      if (!video) return;
+      video.muted = !video.muted;
+      const icon = document.getElementById('ch-mute-icon');
+      if (icon) {
+        icon.querySelector('path').setAttribute('d', video.muted
+          ? 'M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.796 8.796 0 0 0 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 18L19 19.27 20.27 18 5.27 3 4.27 3zM12 4L9.91 6.09 12 8.18V4z'
+          : 'M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z');
+      }
+    }
+
+  </script>
+
+  <!-- ==================== CONTENT HUB ==================== -->
+  <div id="view-content-hub" class="view-section min-h-screen flex-col w-full">
+    <!-- Header bar (theme-aware, faith-accented) -->
+    <div class="px-6 py-4 flex items-center justify-between sticky top-0 z-50 backdrop-blur-sm"
+      style="background: color-mix(in srgb, var(--faith-accent,#e04848) 12%, var(--ch-bg)); border-bottom: 1px solid var(--ch-border);">
+      <div class="flex items-center gap-3">
+        <span class="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0"
+          style="background: var(--faith-accent,#e04848)">
+          <i data-lucide="tv-2" class="w-5 h-5"></i>
+        </span>
+        <div>
+          <h2 class="font-bold text-lg leading-tight" style="font-family:'Poppins',sans-serif; color: var(--ch-text)">
+            PawCircle</h2>
+          <p class="text-xs" id="ch-subtitle" style="color: var(--ch-subtext)">Discourses, kirtans &amp; spiritual
+            content</p>
+        </div>
+      </div>
+      <button onclick="switchView('view-social-feed')"
+        class="no-faith-hover flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+        style="background: var(--faith-accent,#e04848); color:#fff;">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+      </button>
+    </div>
+
+    <div class="px-6 py-6 space-y-10 min-h-screen" style="background: var(--ch-bg)">
+
+      <!-- Hero banner -->
+      <div id="ch-hero" class="ch-hero">
+        <span class="ch-hero-eyebrow"><i data-lucide="sparkles" class="w-3 h-3"></i> Spiritual Streaming</span>
+        <h2 class="mt-4 text-3xl sm:text-4xl font-black leading-tight" style="font-family:'DM Serif Display', serif;">
+          Nourish your soul, <span id="ch-hero-rel">every day</span>.
+        </h2>
+        <p class="mt-2 text-sm sm:text-base max-w-xl" style="color: rgba(255,255,255,.85)">
+          Stream discourses, kirtans, bhajans and sacred recitations curated for your community — anytime, anywhere.
+        </p>
+        <div class="mt-5 flex flex-wrap items-center gap-3">
+          <button id="ch-hero-cta" onclick="chPlayFeatured()" class="no-faith-hover inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-gray-900 text-sm font-bold shadow-lg hover:scale-[1.03] transition-transform">
+            <i data-lucide="play" class="w-4 h-4 fill-current"></i> Start watching
+          </button>
+          <span class="inline-flex items-center gap-2 text-xs font-semibold" style="color: rgba(255,255,255,.85)">
+            <i data-lucide="library" class="w-4 h-4"></i> <span id="ch-hero-count">0</span> pieces of content
+          </span>
+        </div>
+      </div>
+
+      <!-- Active player -->
+      <div id="ch-player-section" class="max-w-3xl mx-auto hidden">
+        <div class="ch-player-wrap mb-3">
+          <!-- YouTube live embed -->
+          <div id="ch-yt-wrap" style="display:none; position:relative; width:100%; aspect-ratio:16/9; background:#000;">
+            <iframe id="ch-yt-player" class="absolute inset-0 w-full h-full" style="border:0;"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+          </div>
+          <video id="ch-video-player" controls preload="metadata" class="w-full max-h-[360px] bg-black"
+            style="display:none"></video>
+          <audio id="ch-audio-player" controls preload="metadata" class="w-full" style="display:none"></audio>
+          <!-- Custom controls overlay for video -->
+          <div class="ch-player-controls" id="ch-custom-controls" style="display:none">
+            <button class="ch-ctrl-btn" id="ch-play-btn" onclick="chTogglePlay()">
+              <svg viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </button>
+            <div class="ch-progress" id="ch-progress-bar" onclick="chSeek(event)">
+              <div class="ch-progress-fill" id="ch-progress-fill"></div>
+            </div>
+            <span class="ch-time" id="ch-time-display">0:00 / 0:00</span>
+            <input type="range" class="ch-vol" id="ch-vol-slider" min="0" max="1" step="0.05" value="1"
+              oninput="chSetVolume(this.value)">
+            <button class="ch-ctrl-btn" onclick="chToggleMute()">
+              <svg viewBox="0 0 24 24" id="ch-mute-icon">
+                <path
+                  d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="ch-live-badge" class="hidden items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-black uppercase tracking-wide">
+            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> Live
+          </span>
+          <h3 class="font-bold text-base" id="ch-now-playing-title" style="color: var(--ch-text)"></h3>
+        </div>
+        <p class="text-sm mt-0.5" id="ch-now-playing-sub" style="color: var(--ch-subtext)"></p>
+      </div>
+
+      <!-- Empty state when the user's religion has no content -->
+      <div id="ch-empty-state" class="hidden max-w-md mx-auto text-center py-16">
+        <span class="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white"
+          style="background: var(--faith-accent,#e04848)">
+          <i data-lucide="tv-2" class="w-7 h-7"></i>
+        </span>
+        <h3 class="font-bold text-lg" style="color: var(--ch-text)">No discourses yet</h3>
+        <p class="text-sm mt-1" style="color: var(--ch-subtext)">We're still curating spiritual content for your
+          community. Check back soon.</p>
+      </div>
+
+      <!-- Featured spotlight -->
+      <div id="ch-section-featured" class="hidden">
+        <div class="ch-section-head">
+          <span class="ch-section-bar"></span>
+          <i data-lucide="radio-tower" class="w-5 h-5" style="color:var(--faith-accent,#e04848)"></i>
+          <h3 class="font-bold text-lg" style="color: var(--ch-text)">Live for your community</h3>
+        </div>
+        <div id="ch-featured-slot" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+
+      <!-- Row: Recent Pravachans (Video) -->
+      <div id="ch-section-video">
+        <div class="ch-section-head">
+          <span class="ch-section-bar"></span>
+          <i data-lucide="compass" class="w-5 h-5" style="color:var(--faith-accent,#e04848)"></i>
+          <h3 class="font-bold text-lg" style="color: var(--ch-text)">Explore all faith channels</h3>
+        </div>
+        <div class="ch-row-scroll" id="ch-row-video"></div>
+      </div>
+
+      <!-- Row: Kirtans (Audio) -->
+      <div id="ch-section-audio">
+        <div class="ch-section-head">
+          <span class="ch-section-bar"></span>
+          <i data-lucide="music" class="w-5 h-5" style="color:var(--faith-accent,#e04848)"></i>
+          <h3 class="font-bold text-lg" style="color: var(--ch-text)">Kirtans &amp; Bhajans</h3>
+        </div>
+        <div class="ch-row-scroll" id="ch-row-audio"></div>
+      </div>
+
+      <!-- Row: Trending -->
+      <div id="ch-section-trending">
+        <div class="ch-section-head">
+          <span class="ch-section-bar"></span>
+          <i data-lucide="flame" class="w-5 h-5" style="color:var(--faith-accent,#e04848)"></i>
+          <h3 class="font-bold text-lg" style="color: var(--ch-text)">Trending This Week</h3>
+        </div>
+        <div class="ch-row-scroll" id="ch-row-trending"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="remove-friend-confirm-modal"
+    class="fixed inset-0 z-[10000] hidden items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4">
+    <div
+      class="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-sm flex flex-col p-6 animate-[fadeSlideIn_0.3s_ease] text-center relative">
+      <div
+        class="w-16 h-16 bg-red-100 dark:bg-red-900/30 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+      </div>
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2 font-serif">Remove Friend</h3>
+      <p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Are you sure you want to remove <strong id="rfc-name"
+          class="text-gray-800 dark:text-gray-200"></strong> from your friends? You will no longer see their private
+        updates.</p>
+      <div class="flex gap-3 w-full">
+        <button onclick="closeRemoveFriendConfirm()"
+          class="flex-1 py-2.5 rounded-xl text-sm font-bold border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Cancel</button>
+        <button id="rfc-confirm-btn"
+          class="flex-1 py-2.5 rounded-xl text-sm font-bold bg-red-600 text-white hover:bg-red-700 transition-colors shadow-lg shadow-red-500/20">Remove</button>
+      </div>
+    </div>
+  </div>
+<script>
     // Mascot animation
     setTimeout(function() {
       var mascot = document.getElementById('mascot');
@@ -36696,6 +35933,94 @@ function initializeSocialFeed() {
         });
       }
     }, 500);
+
+    function getPostById(postId) {
+      return feedPosts.find((p) => String(p.id) === String(postId));
+    }
+
+    function getPostSharePayload(postId) {
+      const post = getPostById(postId);
+      const text = post?.content ? String(post.content).trim() : "Check out this PawdCast post";
+      const shortText = text.length > 140 ? `${text.slice(0, 137)}...` : text;
+      const url = `${window.location.origin}${window.location.pathname}#pawdcast-${encodeURIComponent(String(postId))}`;
+      const title = `${post?.author || "PawCircle"} on PawdCast`;
+      return { post, title, text: shortText, url };
+    }
+
+    function copyPostLink(postId) {
+      const payload = getPostSharePayload(postId);
+      const write = navigator?.clipboard?.writeText
+        ? navigator.clipboard.writeText(payload.url)
+        : Promise.reject(new Error("Clipboard API unavailable"));
+
+      write
+        .then(() => showToast("Post link copied."))
+        .catch(() => {
+          const ok = window.prompt("Copy post link:", payload.url);
+          if (ok !== null) showToast("Post link ready to copy.");
+        });
+    }
+
+    async function sharePostNative(postId) {
+      const payload = getPostSharePayload(postId);
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: payload.title, text: payload.text, url: payload.url });
+        } catch (_) { }
+      } else {
+        copyPostLink(postId);
+        return;
+      }
+    }
+
+    let reactionAudioCtx = null;
+    function getReactionAudioContext() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return null;
+        if (!reactionAudioCtx) reactionAudioCtx = new AudioCtx();
+        return reactionAudioCtx;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function playReactionSound(reactionKey) {
+      const ctx = getReactionAudioContext();
+      if (!ctx) return;
+
+      const now = ctx.currentTime;
+      const master = ctx.createGain();
+      master.connect(ctx.destination);
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
+
+      const beep = (freq, start, duration, type = "sine", gainVal = 0.08) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now + start);
+        gain.gain.setValueAtTime(0.0001, now + start);
+        gain.gain.exponentialRampToValueAtTime(gainVal, now + start + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + start + duration);
+        osc.connect(gain);
+        gain.connect(master);
+        osc.start(now + start);
+        osc.stop(now + start + duration + 0.03);
+      };
+
+      if (reactionKey === "bone" || reactionKey === "Liked") {
+        beep(440, 0, 0.08); beep(554, 0.1, 0.12);
+      } else if (reactionKey === "bark" || reactionKey === "Ashirwad given") {
+        beep(150, 0, 0.1, "sawtooth"); beep(120, 0.1, 0.15, "sawtooth");
+      } else if (reactionKey === "heart" || reactionKey === "Loved") {
+        beep(523.25, 0, 0.1); beep(659.25, 0.1, 0.15); beep(783.99, 0.2, 0.2);
+      } else {
+        beep(330, 0, 0.08); beep(440, 0.1, 0.12);
+      }
+    }
+
 </script>
   </body>
 

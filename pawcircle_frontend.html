@@ -16,7 +16,293 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- <link rel="stylesheet" href="https://source.zoom.us/6.1.0/css/bootstrap.css" />
   <link rel="stylesheet" href="https://source.zoom.us/6.1.0/css/react-select.css" /> -->
-  <script>
+  
+<!-- --- PORTAL TRANSITION HTML --- -->
+<style>
+  /* ---------- portal transition ---------- */
+  .portal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+    transition: opacity 0.35s ease;
+  }
+
+  .portal-overlay.active {
+    opacity: 1;
+  }
+
+  .portal-flash {
+    position: absolute;
+    inset: -25%;
+    background: radial-gradient(circle, #FFFBEF 0%, var(--brand-200, #ffa95a) 32%, var(--brand-400, #ff5a5a) 58%, var(--brand-900, #7a2222) 100%);
+    opacity: 0;
+    transform: scale(0.25);
+  }
+
+  .portal-flash.run {
+    animation: flashSeq 2.3s cubic-bezier(.45, 0, .2, 1) forwards;
+  }
+
+  @keyframes flashSeq {
+    0% { opacity: 0; transform: scale(0.25); }
+    32% { opacity: 1; transform: scale(1.3); }
+    54% { opacity: 1; transform: scale(1.65); }
+    100% { opacity: 0; transform: scale(2.6); }
+  }
+
+  .portal-rays {
+    position: absolute;
+    width: 240%;
+    height: 240%;
+    background: conic-gradient(from 0deg,
+        rgba(255, 248, 236, 0) 0deg, rgba(255, 248, 236, 0.5) 6deg, rgba(255, 248, 236, 0) 14deg,
+        rgba(242, 169, 59, 0) 70deg, rgba(242, 169, 59, 0.4) 78deg, rgba(242, 169, 59, 0) 86deg,
+        rgba(255, 122, 92, 0) 150deg, rgba(255, 122, 92, 0.35) 158deg, rgba(255, 122, 92, 0) 166deg,
+        rgba(255, 248, 236, 0) 230deg, rgba(255, 248, 236, 0.4) 238deg, rgba(255, 248, 236, 0) 246deg,
+        transparent 360deg);
+    opacity: 0;
+    transform: rotate(0deg) scale(0.4);
+  }
+
+  .portal-rays.run {
+    animation: raysSeq 2.3s ease-out forwards;
+  }
+
+  @keyframes raysSeq {
+    0% { opacity: 0; transform: rotate(0deg) scale(0.4); }
+    30% { opacity: 0.85; }
+    60% { opacity: 0.6; transform: rotate(150deg) scale(1.05); }
+    100% { opacity: 0; transform: rotate(240deg) scale(1.3); }
+  }
+
+  .portal-ring {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    opacity: 0;
+  }
+
+  .portal-ring.run {
+    animation: ringSeq 2.3s cubic-bezier(.22, 1, .36, 1) forwards;
+  }
+
+  .portal-ring .ring-outer {
+    fill: none;
+    stroke: #FFF8EC;
+    stroke-width: 1.6;
+    stroke-dasharray: 5 11;
+  }
+
+  .portal-ring .ring-inner {
+    fill: none;
+    stroke: var(--brand-300, #ff8b5a);
+    stroke-width: 1.1;
+  }
+
+  .portal-ring .ring-glyph {
+    fill: #FFF8EC;
+  }
+
+  @keyframes ringSeq {
+    0% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+    22% { opacity: 1; transform: scale(1) rotate(50deg); }
+    55% { opacity: 0.9; transform: scale(2.3) rotate(170deg); }
+    100% { opacity: 0; transform: scale(7) rotate(280deg); }
+  }
+
+  .portal-sparks {
+    position: absolute;
+    inset: 0;
+  }
+
+  .portal-spark {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+    animation: portalSparkFly 1.5s ease-out forwards;
+  }
+
+  @keyframes portalSparkFly {
+    from { transform: translate(-50%, -50%) rotate(0deg) scale(0.3); opacity: 1; }
+    to { transform: translate(var(--tx), var(--ty)) rotate(var(--tr)) scale(1.1); opacity: 0; }
+  }
+
+  .portal-side-host {
+    position: absolute;
+    inset: 0;
+  }
+
+  .portal-side {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    animation: flySide 2.05s cubic-bezier(.33, 0, .2, 1) forwards;
+    filter: drop-shadow(0 2px 6px rgba(22, 36, 28, 0.25));
+  }
+
+  @keyframes flySide {
+    0% { opacity: 0; transform: translate(0, 0) rotate(0deg) scale(0.55); }
+    12% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(1.05); }
+  }
+
+  .confetti-piece {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    fill: var(--brand-300, #ff8b5a);
+    pointer-events: none;
+    animation: confettiPop 0.9s ease-out forwards;
+  }
+
+  @keyframes confettiPop {
+    from { transform: translate(-50%, -50%) rotate(0deg) scale(0.6); opacity: 1; }
+    to { transform: translate(var(--tx), var(--ty)) rotate(var(--tr)) scale(1); opacity: 0; }
+  }
+</style>
+
+<div class="portal-overlay" id="portalOverlay" aria-hidden="true">
+  <div class="portal-flash" id="portalFlash"></div>
+  <div class="portal-rays" id="portalRays"></div>
+  <svg class="portal-ring" id="portalRing" viewBox="0 0 200 200">
+    <circle class="ring-outer" cx="100" cy="100" r="78" />
+    <circle class="ring-inner" cx="100" cy="100" r="62" />
+    <path class="ring-glyph" d="M100 18 L104 30 L116 32 L104 34 L100 46 L96 34 L84 32 L96 30 Z" />
+    <path class="ring-glyph" d="M170 100 L162 104 L160 116 L158 104 L146 100 L158 96 L160 84 L162 96 Z" />
+    <path class="ring-glyph" d="M30 100 L38 104 L40 116 L42 104 L54 100 L42 96 L40 84 L38 96 Z" />
+  </svg>
+  <div class="portal-sparks" id="portalSparks"></div>
+  <div class="portal-side-host" id="portalSideHost"></div>
+</div>
+
+<script>
+  function burstConfetti(btn) {
+    btn.style.position = 'relative';
+    btn.style.overflow = 'hidden';
+    for (var i = 0; i < 14; i++) {
+      var span = document.createElement('span');
+      span.className = 'confetti-piece';
+      var angle = Math.random() * Math.PI * 2;
+      var dist = 40 + Math.random() * 60;
+      var tx = Math.cos(angle) * dist;
+      var ty = Math.sin(angle) * dist - 20;
+      span.style.setProperty('--tx', tx + 'px');
+      span.style.setProperty('--ty', ty + 'px');
+      span.style.setProperty('--tr', (Math.random() * 360) + 'deg');
+      span.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14"><ellipse cx="12" cy="15.2" rx="6" ry="5"/><ellipse cx="5" cy="8" rx="2.5" ry="3.1"/><ellipse cx="11.2" cy="5.2" rx="2.5" ry="3.1"/><ellipse cx="17.4" cy="8" rx="2.5" ry="3.1"/><ellipse cx="20" cy="12.4" rx="2.2" ry="2.9"/></svg>';
+      btn.appendChild(span);
+      setTimeout(function(s) { return function() { s.remove(); }; }(span), 950);
+    }
+  }
+
+  function spawnPortalSparks() {
+    var host = document.getElementById('portalSparks');
+    host.innerHTML = '';
+    var pawIcon = '<svg viewBox="0 0 24 24" width="100%" height="100%"><ellipse cx="12" cy="15.2" rx="6" ry="5"/><ellipse cx="5" cy="8" rx="2.5" ry="3.1"/><ellipse cx="11.2" cy="5.2" rx="2.5" ry="3.1"/><ellipse cx="17.4" cy="8" rx="2.5" ry="3.1"/><ellipse cx="20" cy="12.4" rx="2.2" ry="2.9"/></svg>';
+    var starIcon = '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z"/></svg>';
+    var colors = ['#FFF8EC', '#ffa95a', '#ff5a5a'];
+    for (var i = 0; i < 22; i++) {
+      var span = document.createElement('span');
+      span.className = 'portal-spark';
+      var angle = Math.random() * Math.PI * 2;
+      var dist = 160 + Math.random() * 340;
+      var tx = Math.cos(angle) * dist;
+      var ty = Math.sin(angle) * dist;
+      span.style.setProperty('--tx', tx + 'px');
+      span.style.setProperty('--ty', ty + 'px');
+      span.style.setProperty('--tr', (Math.random() * 360) + 'deg');
+      span.style.color = colors[Math.floor(Math.random() * colors.length)];
+      span.style.fill = 'currentColor';
+      span.style.animationDelay = (Math.random() * 0.25) + 's';
+      span.innerHTML = Math.random() < 0.6 ? pawIcon : starIcon;
+      host.appendChild(span);
+      setTimeout(function(s) { return function() { s.remove(); }; }(span), 1850);
+    }
+  }
+
+  function spawnSideFlyers() {
+    var host = document.getElementById('portalSideHost');
+    host.innerHTML = '';
+    var icons = {
+      paw: '<svg viewBox="0 0 24 24" width="100%" height="100%"><ellipse cx="12" cy="15.2" rx="6" ry="5"/><ellipse cx="5" cy="8" rx="2.5" ry="3.1"/><ellipse cx="11.2" cy="5.2" rx="2.5" ry="3.1"/><ellipse cx="17.4" cy="8" rx="2.5" ry="3.1"/><ellipse cx="20" cy="12.4" rx="2.2" ry="2.9"/></svg>',
+      bone: '<svg viewBox="0 0 24 24" width="100%" height="100%"><rect x="7" y="10.4" width="10" height="3.2" rx="1.4"/><circle cx="5" cy="9" r="2.7"/><circle cx="5" cy="15" r="2.7"/><circle cx="19" cy="9" r="2.7"/><circle cx="19" cy="15" r="2.7"/></svg>',
+      star: '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z"/></svg>'
+    };
+    var palette = {
+      paw: ['#ffa95a', '#ff5a5a'],
+      bone: ['#FFF8EC'],
+      star: ['#FFF8EC', '#ffa95a']
+    };
+    var keys = Object.keys(icons);
+    var count = 16;
+    for (var i = 0; i < count; i++) {
+      var fromLeft = i % 2 === 0;
+      var key = keys[Math.floor(Math.random() * keys.length)];
+      var colors = palette[key];
+      var span = document.createElement('span');
+      span.className = 'portal-side';
+      var size = 24 + Math.random() * 22;
+      span.style.width = size + 'px';
+      span.style.height = size + 'px';
+      span.style.top = (6 + Math.random() * 84) + 'vh';
+      if (fromLeft) { span.style.left = '-54px'; } else { span.style.right = '-54px'; }
+      var travel = (window.innerWidth || 1200) * (0.42 + Math.random() * 0.32);
+      var dx = fromLeft ? travel : -travel;
+      var dy = (Math.random() - 0.5) * 180;
+      var rot = (fromLeft ? 1 : -1) * (160 + Math.random() * 340);
+      span.style.setProperty('--dx', dx + 'px');
+      span.style.setProperty('--dy', dy + 'px');
+      span.style.setProperty('--rot', rot + 'deg');
+      span.style.color = colors[Math.floor(Math.random() * colors.length)];
+      span.style.fill = 'currentColor';
+      span.style.animationDelay = (Math.random() * 0.45) + 's';
+      span.innerHTML = icons[key];
+      host.appendChild(span);
+      setTimeout(function(s) { return function() { s.remove(); }; }(span), 2650);
+    }
+  }
+
+  function playPortalTransition(callback) {
+    var overlay = document.getElementById('portalOverlay');
+    var flash = document.getElementById('portalFlash');
+    var rays = document.getElementById('portalRays');
+    var ring = document.getElementById('portalRing');
+
+    overlay.classList.add('active');
+    flash.classList.add('run');
+    rays.classList.add('run');
+    ring.classList.add('run');
+    spawnPortalSparks();
+    spawnSideFlyers();
+
+    setTimeout(function() {
+      if (typeof callback === 'function') {
+        callback();
+      }
+    }, 950);
+
+    setTimeout(function() {
+      overlay.classList.remove('active');
+      flash.classList.remove('run');
+      rays.classList.remove('run');
+      ring.classList.remove('run');
+    }, 2600);
+  }
+</script>
+<!-- ------------------------------ -->
+<script>
     tailwind.config = {
       darkMode: "class",
       theme: {
@@ -3732,7 +4018,336 @@
         grid-template-columns: 1fr;
       }
     }
-  </style>
+  
+/* --- PORTAL TRANSITION CSS --- */
+.confetti-piece {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 14px;
+      height: 14px;
+      fill: var(--marigold);
+      pointer-events: none;
+      animation: confettiPop 0.9s ease-out forwards;
+    }
+
+    @keyframes confettiPop {
+      from {
+        transform: translate(-50%, -50%) rotate(0deg) scale(0.6);
+        opacity: 1;
+      }
+
+      to {
+        transform: translate(var(--tx), var(--ty)) rotate(var(--tr)) scale(1);
+        opacity: 0;
+      }
+    }
+
+    /* mascot */
+    .mascot {
+      position: absolute;
+      top: -58px;
+      right: 6px;
+      width: 78px;
+      height: 78px;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .mascot .tail {
+      transform-origin: 88px 86px;
+      animation: wag 1.4s ease-in-out infinite;
+    }
+
+    .mascot.excited .tail {
+      animation: wag 0.35s ease-in-out infinite;
+    }
+
+    @keyframes wag {
+
+      0%,
+      100% {
+        transform: rotate(-8deg);
+      }
+
+      50% {
+        transform: rotate(18deg);
+      }
+    }
+
+    .mascot .ear-l,
+    .mascot .ear-r {
+      transform-origin: 36px 30px;
+      transition: transform 0.25s ease;
+    }
+
+    .mascot.perk .ear-l {
+      transform: rotate(-8deg) translateY(-3px);
+    }
+
+    .mascot.perk .ear-r {
+      transform-origin: 84px 30px;
+      transform: rotate(8deg) translateY(-3px);
+    }
+
+    .mascot .pupil {
+      transition: transform 0.06s linear;
+    }
+
+    .mascot .lids {
+      transform-origin: center;
+      transform: scaleY(0);
+      transition: transform 0.08s ease;
+    }
+
+    .mascot.blink .lids {
+      transform: scaleY(1);
+    }
+
+    .mascot .paw-l,
+    .mascot .paw-r {
+      transition: transform 0.32s cubic-bezier(.34, 1.4, .4, 1);
+    }
+
+    .mascot.covering .paw-l {
+      transform: translateY(-46px) translateX(2px) rotate(-4deg);
+    }
+
+    .mascot.covering .paw-r {
+      transform: translateY(-46px) translateX(-2px) rotate(4deg);
+    }
+
+    .mascot.excited {
+      animation: jump 0.5s ease-in-out infinite;
+    }
+
+    @keyframes jump {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+    }
+
+    /* mobile brand shown only on narrow screens */
+    .mobile-brand {
+      display: none;
+    }
+
+    /* ---------- portal transition ---------- */
+    .portal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      overflow: hidden;
+      transition: opacity 0.35s ease;
+    }
+
+    .portal-overlay.active {
+      opacity: 1;
+    }
+
+    .portal-flash {
+      position: absolute;
+      inset: -25%;
+      background: radial-gradient(circle, #FFFBEF 0%, var(--marigold) 32%, var(--coral) 58%, var(--ink) 100%);
+      opacity: 0;
+      transform: scale(0.25);
+    }
+
+    .portal-flash.run {
+      animation: flashSeq 2.3s cubic-bezier(.45, 0, .2, 1) forwards;
+    }
+
+    @keyframes flashSeq {
+      0% {
+        opacity: 0;
+        transform: scale(0.25);
+      }
+
+      32% {
+        opacity: 1;
+        transform: scale(1.3);
+      }
+
+      54% {
+        opacity: 1;
+        transform: scale(1.65);
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(2.6);
+      }
+    }
+
+    .portal-rays {
+      position: absolute;
+      width: 240%;
+      height: 240%;
+      background: conic-gradient(from 0deg,
+          rgba(255, 248, 236, 0) 0deg, rgba(255, 248, 236, 0.5) 6deg, rgba(255, 248, 236, 0) 14deg,
+          rgba(242, 169, 59, 0) 70deg, rgba(242, 169, 59, 0.4) 78deg, rgba(242, 169, 59, 0) 86deg,
+          rgba(255, 122, 92, 0) 150deg, rgba(255, 122, 92, 0.35) 158deg, rgba(255, 122, 92, 0) 166deg,
+          rgba(255, 248, 236, 0) 230deg, rgba(255, 248, 236, 0.4) 238deg, rgba(255, 248, 236, 0) 246deg,
+          transparent 360deg);
+      opacity: 0;
+      transform: rotate(0deg) scale(0.4);
+    }
+
+    .portal-rays.run {
+      animation: raysSeq 2.3s ease-out forwards;
+    }
+
+    @keyframes raysSeq {
+      0% {
+        opacity: 0;
+        transform: rotate(0deg) scale(0.4);
+      }
+
+      30% {
+        opacity: 0.85;
+      }
+
+      60% {
+        opacity: 0.6;
+        transform: rotate(150deg) scale(1.05);
+      }
+
+      100% {
+        opacity: 0;
+        transform: rotate(240deg) scale(1.3);
+      }
+    }
+
+    .portal-ring {
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      opacity: 0;
+    }
+
+    .portal-ring.run {
+      animation: ringSeq 2.3s cubic-bezier(.22, 1, .36, 1) forwards;
+    }
+
+    .portal-ring .ring-outer {
+      fill: none;
+      stroke: #FFF8EC;
+      stroke-width: 1.6;
+      stroke-dasharray: 5 11;
+    }
+
+    .portal-ring .ring-inner {
+      fill: none;
+      stroke: var(--marigold);
+      stroke-width: 1.1;
+    }
+
+    .portal-ring .ring-glyph {
+      fill: #FFF8EC;
+    }
+
+    @keyframes ringSeq {
+      0% {
+        opacity: 0;
+        transform: scale(0.2) rotate(0deg);
+      }
+
+      22% {
+        opacity: 1;
+        transform: scale(1) rotate(50deg);
+      }
+
+      55% {
+        opacity: 0.9;
+        transform: scale(2.3) rotate(170deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(7) rotate(280deg);
+      }
+    }
+
+    .portal-sparks {
+      position: absolute;
+      inset: 0;
+    }
+
+    .portal-spark {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+      animation: portalSparkFly 1.5s ease-out forwards;
+    }
+
+    @keyframes portalSparkFly {
+      from {
+        transform: translate(-50%, -50%) rotate(0deg) scale(0.3);
+        opacity: 1;
+      }
+
+      to {
+        transform: translate(var(--tx), var(--ty)) rotate(var(--tr)) scale(1.1);
+        opacity: 0;
+      }
+    }
+
+    .portal-side-host {
+      position: absolute;
+      inset: 0;
+    }
+
+    .portal-side {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0;
+      animation: flySide 2.05s cubic-bezier(.33, 0, .2, 1) forwards;
+      filter: drop-shadow(0 2px 6px rgba(22, 36, 28, 0.25));
+    }
+
+    @keyframes flySide {
+      0% {
+        opacity: 0;
+        transform: translate(0, 0) rotate(0deg) scale(0.55);
+      }
+
+      12% {
+        opacity: 1;
+      }
+
+      80% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(1.05);
+      }
+    }
+/* ----------------------------- */
+</style>
 <style>
     :root {
       --ink: #1d4ed8;
@@ -7224,20 +7839,40 @@
           if (isOfflineDemoMode()) {
             if (!isTestShortcutAttempt) {
               showError("public", "Offline demo uses user, userH, userM, userC, userB, userP, userS, userJ or userO with a blank password.");
+              btn.disabled = false;
+              btn.innerText = "Sign in";
               return;
             }
             const demoUser = buildOfflineDemoUser(email);
-            populateMemberDashboard(demoUser);
-            initializeSocialFeed();
-            showToast("Offline demo mode. Backend calls are disabled.", "info");
+            burstConfetti(btn);
+            btn.classList.add("!bg-green-500", "!border-green-500");
+            btn.innerText = "Welcome back!";
+            playPortalTransition(() => {
+              populateMemberDashboard(demoUser);
+              initializeSocialFeed();
+              showToast("Offline demo mode. Backend calls are disabled.", "info");
+              btn.classList.remove("!bg-green-500", "!border-green-500");
+              btn.disabled = false;
+              btn.innerText = "Sign in";
+              document.getElementById("public-login-form").reset();
+            });
             return;
           }
 
           try {
             const authData = await loginWithSupabaseAuth(email, password);
             if (authData?.status === "success" && authData.user) {
-              populateMemberDashboard(authData.user);
-              initializeSocialFeed();
+              burstConfetti(btn);
+              btn.classList.add("!bg-green-500", "!border-green-500");
+              btn.innerText = "Welcome back!";
+              playPortalTransition(() => {
+                populateMemberDashboard(authData.user);
+                initializeSocialFeed();
+                btn.classList.remove("!bg-green-500", "!border-green-500");
+                btn.disabled = false;
+                btn.innerText = "Sign in";
+                document.getElementById("public-login-form").reset();
+              });
               return;
             }
           } catch (authErr) {
@@ -7254,17 +7889,27 @@
           });
           const data = await res.json();
           if (data.status === "success") {
-            populateMemberDashboard(data.user);
-            // Always land on the feed; the profile form is only opened on demand
-            // (via the bell notification or the dashboard's "Apply" prompt).
-            initializeSocialFeed();
+            burstConfetti(btn);
+            btn.classList.add("!bg-green-500", "!border-green-500");
+            btn.innerText = "Welcome back!";
+            playPortalTransition(() => {
+              populateMemberDashboard(data.user);
+              // Always land on the feed; the profile form is only opened on demand
+              // (via the bell notification or the dashboard's "Apply" prompt).
+              initializeSocialFeed();
+              btn.classList.remove("!bg-green-500", "!border-green-500");
+              btn.disabled = false;
+              btn.innerText = "Sign in";
+              document.getElementById("public-login-form").reset();
+            });
           } else {
             showError("public", data.message || "Invalid email or password.");
+            btn.disabled = false;
+            btn.innerText = "Sign in";
           }
         } catch (err) {
           console.warn("Login request failed:", err);
           showError("public", "Could not reach the secure login service. Please try again.");
-        } finally {
           btn.disabled = false;
           btn.innerText = "Sign in";
         }
@@ -10471,7 +11116,126 @@
       persistCurrentSession(currentUserObj);
     }
 
-    function initializeSocialFeed() {
+    
+/* --- PORTAL TRANSITION JS --- */
+function burstConfetti(btn) {
+        for (var i = 0; i < 14; i++) {
+          var span = document.createElement('span');
+          span.className = 'confetti-piece';
+          var angle = Math.random() * Math.PI * 2;
+          var dist = 40 + Math.random() * 60;
+          var tx = Math.cos(angle) * dist;
+          var ty = Math.sin(angle) * dist - 20;
+          span.style.setProperty('--tx', tx + 'px');
+          span.style.setProperty('--ty', ty + 'px');
+          span.style.setProperty('--tr', (Math.random() * 360) + 'deg');
+          span.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14"><use href="#icon-paw" xlink:href="#icon-paw"/></svg>';
+          btn.appendChild(span);
+          setTimeout(function (s) { return function () { s.remove(); }; }(span), 950);
+        }
+      }
+
+      function spawnPortalSparks() {
+        var host = document.getElementById('portalSparks');
+        var pawIcon = '<svg viewBox="0 0 24 24" width="100%" height="100%"><use href="#icon-paw" xlink:href="#icon-paw"/></svg>';
+        var starIcon = '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z"/></svg>';
+        var colors = ['#FFF8EC', '#F2A93B', '#FF7A5C'];
+        for (var i = 0; i < 22; i++) {
+          var span = document.createElement('span');
+          span.className = 'portal-spark';
+          var angle = Math.random() * Math.PI * 2;
+          var dist = 160 + Math.random() * 340;
+          var tx = Math.cos(angle) * dist;
+          var ty = Math.sin(angle) * dist;
+          span.style.setProperty('--tx', tx + 'px');
+          span.style.setProperty('--ty', ty + 'px');
+          span.style.setProperty('--tr', (Math.random() * 360) + 'deg');
+          span.style.color = colors[Math.floor(Math.random() * colors.length)];
+          span.style.fill = 'currentColor';
+          span.style.animationDelay = (Math.random() * 0.25) + 's';
+          span.innerHTML = Math.random() < 0.6 ? pawIcon : starIcon;
+          host.appendChild(span);
+          setTimeout(function (s) { return function () { s.remove(); }; }(span), 1850);
+        }
+      }
+
+      function spawnSideFlyers() {
+        var host = document.getElementById('portalSideHost');
+        var icons = {
+          paw: '<svg viewBox="0 0 24 24" width="100%" height="100%"><use href="#icon-paw" xlink:href="#icon-paw"/></svg>',
+          bone: '<svg viewBox="0 0 24 24" width="100%" height="100%"><rect x="7" y="10.4" width="10" height="3.2" rx="1.4"/><circle cx="5" cy="9" r="2.7"/><circle cx="5" cy="15" r="2.7"/><circle cx="19" cy="9" r="2.7"/><circle cx="19" cy="15" r="2.7"/></svg>',
+          ball: '<svg viewBox="0 0 24 24" width="100%" height="100%"><circle cx="12" cy="12" r="9"/><path d="M4.5 7 C8 10 8 14 4.5 17" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.4"/><path d="M19.5 7 C16 10 16 14 19.5 17" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.4"/></svg>',
+          leaf: '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 21 C4 17 4 7 12 3 C20 7 20 17 12 21 Z"/><path d="M12 21 V3" fill="none" stroke="rgba(0,0,0,0.18)" stroke-width="1"/></svg>',
+          star: '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z"/></svg>'
+        };
+        var palette = {
+          paw: ['#F2A93B', '#FF7A5C'],
+          bone: ['#FFF8EC'],
+          ball: ['#FF7A5C', '#F2A93B'],
+          leaf: ['#6B8F71'],
+          star: ['#FFF8EC', '#F2A93B']
+        };
+        var keys = Object.keys(icons);
+        var count = 16;
+        for (var i = 0; i < count; i++) {
+          var fromLeft = i % 2 === 0;
+          var key = keys[Math.floor(Math.random() * keys.length)];
+          var colors = palette[key];
+          var span = document.createElement('span');
+          span.className = 'portal-side';
+          var size = 24 + Math.random() * 22;
+          span.style.width = size + 'px';
+          span.style.height = size + 'px';
+          span.style.top = (6 + Math.random() * 84) + 'vh';
+          if (fromLeft) { span.style.left = '-54px'; } else { span.style.right = '-54px'; }
+          var travel = (window.innerWidth || 1200) * (0.42 + Math.random() * 0.32);
+          var dx = fromLeft ? travel : -travel;
+          var dy = (Math.random() - 0.5) * 180;
+          var rot = (fromLeft ? 1 : -1) * (160 + Math.random() * 340);
+          span.style.setProperty('--dx', dx + 'px');
+          span.style.setProperty('--dy', dy + 'px');
+          span.style.setProperty('--rot', rot + 'deg');
+          span.style.color = colors[Math.floor(Math.random() * colors.length)];
+          span.style.fill = 'currentColor';
+          span.style.animationDelay = (Math.random() * 0.45) + 's';
+          span.innerHTML = icons[key];
+          host.appendChild(span);
+          setTimeout(function (s) { return function () { s.remove(); }; }(span), 2650);
+        }
+      }
+
+      function playPortalTransition(name, callback) {
+        var overlay = document.getElementById('portalOverlay');
+        var flash = document.getElementById('portalFlash');
+        var rays = document.getElementById('portalRays');
+        var ring = document.getElementById('portalRing');
+        var loginPage = document.querySelector('.page');
+        
+
+        overlay.classList.add('active');
+        flash.classList.add('run');
+        rays.classList.add('run');
+        ring.classList.add('run');
+        spawnPortalSparks();
+        spawnSideFlyers();
+
+        setTimeout(function () {
+          
+          
+          if (callback) callback();
+          window.scrollTo(0, 0);
+        }, 950);
+
+        setTimeout(function () {
+          overlay.classList.remove('active');
+          flash.classList.remove('run');
+          rays.classList.remove('run');
+          ring.classList.remove('run');
+        }, 2600);
+      }
+/* ---------------------------- */
+
+function initializeSocialFeed() {
       // Setup Profile Data from the authenticated backend profile/session.
       const appData = {};
 
@@ -35132,6 +35896,34 @@
             eyeToggle.setAttribute('aria-label', 'Show password');
           }
           updateCover();
+        });
+      }
+
+      // Paw mouse trail for sign up
+      var den = document.getElementById('den');
+      if (den) {
+        var lastTrace = 0;
+        den.addEventListener('mousemove', function (e) {
+          var now = Date.now();
+          if (now - lastTrace < 140) return;
+          lastTrace = now;
+          var rect = den.getBoundingClientRect();
+          var dot = document.createElement('div');
+          dot.style.position = 'absolute';
+          dot.style.left = (e.clientX - rect.left - 7) + 'px';
+          dot.style.top = (e.clientY - rect.top - 7) + 'px';
+          dot.style.width = '14px';
+          dot.style.height = '14px';
+          dot.style.opacity = '0.5';
+          dot.style.pointerEvents = 'none';
+          dot.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+          dot.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" style="fill:#F2A93B"><use href="#icon-paw" xlink:href="#icon-paw"/></svg>';
+          den.appendChild(dot);
+          requestAnimationFrame(function () {
+            dot.style.opacity = '0';
+            dot.style.transform = 'scale(0.4)';
+          });
+          setTimeout(function () { dot.remove(); }, 850);
         });
       }
     }, 500);

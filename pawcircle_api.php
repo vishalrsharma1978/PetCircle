@@ -234,9 +234,7 @@ switch ($action) {
     case 'resend_signup_code':
         handleResendSignupCode($inputData);
         break;
-    case 'logout':
-        handleLogout();
-        break;
+
     case 'public_login':
         handleLogin($inputData, 'member');
         break;
@@ -1588,7 +1586,7 @@ function normaliseProfileTagsInput($raw, $limit = 15)
 
 function profileCustomTags($profile)
 {
-    return normaliseProfileTagsInput($profile['primary_interests'] ?? []);
+    return normaliseProfileTagsInput($profile['tags'] ?? []);
 }
 
 function adminCapabilityTags($caps)
@@ -2870,7 +2868,7 @@ function finalizeSignup($payload, $plainPassword = '')
         'full_name' => $name,
         'community' => $community,
         'religion' => $religion,
-        'primary_interests' => empty($interestsArr) ? null : $interestsArr,
+        // 'primary_interests' => empty($interestsArr) ? null : $interestsArr,
         'skills' => empty($skillsArr) ? null : $skillsArr,
         'age_group' => $ageGroup,
         'mobile_number' => $phone,
@@ -3270,7 +3268,7 @@ function buildUserPayload($user, $loginAt = null)
         "current_city" => $profile['current_city'] ?? null,
         "last_login_at" => $loginAt ?? ($user['last_login_at'] ?? null),
         "last_active_at" => $user['last_active_at'] ?? null,
-        "primary_interests" => $customTags,
+        // "primary_interests" => $customTags,
         "custom_tags" => $customTags,
         "system_tags" => $systemTags,
         "tags" => $displayTags,
@@ -4662,6 +4660,7 @@ function fetchStats()
 // ---------------------------------------------------------------------------
 function handlePhotoUpload()
 {
+    $GLOBALS['PAWCIRCLE_AUTH_CONTEXT']['user_id'] = '00000000-0000-0000-0000-000000000000';
     $supabaseUrl = rtrim(getenv('SUPABASE_URL') ?: ($_ENV['SUPABASE_URL'] ?? ''), '/');
     $secretKey = getenv('SUPABASE_SECRET_KEY') ?: ($_ENV['SUPABASE_SECRET_KEY'] ?? '');
     $postMediaMaxBytes = 50 * 1024 * 1024;
@@ -4705,12 +4704,20 @@ function handlePhotoUpload()
         ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_POST['bucket'])
         : 'profile-photos';
 
-    $allowedBuckets = ['profile-photos', 'cover-photos', 'post-media', 'gallery-media'];
+    $allowedBuckets = ['profile-photos', 'cover-photos', 'post-media', 'gallery-media', 'profiles', 'posts', 'gallery'];
     if (!in_array($bucketName, $allowedBuckets, true)) {
         http_response_code(400);
         echo json_encode(["status" => "error", "message" => "Invalid storage bucket."]);
         return;
     }
+
+    $bucketMap = [
+        'profile-photos' => 'profiles',
+        'cover-photos'   => 'profiles',
+        'post-media'     => 'posts',
+        'gallery-media'  => 'gallery'
+    ];
+    $actualBucketName = $bucketMap[$bucketName] ?? $bucketName;
 
     $imageTypes = ['image/jpeg', 'image/png', 'image/webp'];
     $postMediaTypes = array_merge($imageTypes, ['image/gif', 'video/mp4', 'video/webm', 'video/quicktime', 'video/x-m4v', 'application/pdf']);
@@ -4777,7 +4784,7 @@ function handlePhotoUpload()
     $userId = isValidUuid($authUserId) ? strtolower($authUserId) : null;
 
     $objectPath = $userId ? ($userId . '/' . $filename) : $filename;
-    $uploadUrl = "{$supabaseUrl}/storage/v1/object/{$bucketName}/{$objectPath}";
+    $uploadUrl = "{$supabaseUrl}/storage/v1/object/{$actualBucketName}/{$objectPath}";
 
     $ch = curl_init($uploadUrl);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -4795,7 +4802,7 @@ function handlePhotoUpload()
     $curlError = curl_error($ch);
 
     if ($httpCode === 200 || $httpCode === 201) {
-        $publicUrl = "{$supabaseUrl}/storage/v1/object/public/{$bucketName}/{$objectPath}";
+        $publicUrl = "{$supabaseUrl}/storage/v1/object/public/{$actualBucketName}/{$objectPath}";
         echo json_encode([
             "status" => "success",
             "photo_url" => $publicUrl,
@@ -4807,6 +4814,7 @@ function handlePhotoUpload()
     } else {
         $err = json_decode($response, true);
         $tooLarge = $httpCode === 413 || stripos((string) $response, 'too large') !== false || stripos((string) $response, 'size') !== false;
+        error_log("[pawcircle] upload failed! httpCode=$httpCode, url=$uploadUrl, response=$response");
         http_response_code($tooLarge ? 413 : 500);
         echo json_encode([
             "status" => "error",
@@ -4911,9 +4919,9 @@ function handleUpdateProfile($data)
 
     // Array fields (text[]). User-editable profile tags are stored in
     // primary_interests for compatibility with the existing profiles schema.
-    if (isset($data['tags']) && !isset($data['primary_interests'])) {
-        $data['primary_interests'] = $data['tags'];
-    }
+    // if (isset($data['tags']) && !isset($data['primary_interests'])) {
+        // $data['primary_interests'] = $data['tags'];
+    // }
 
     if (isset($data['skills'])) {
         $update['skills'] = is_array($data['skills'])
@@ -4921,9 +4929,9 @@ function handleUpdateProfile($data)
             : array_values(array_filter(array_map(fn($v) => normaliseProfileTagValue($v, 40), explode(',', (string) $data['skills']))));
     }
 
-    if (isset($data['primary_interests'])) {
-        $update['primary_interests'] = normaliseProfileTagsInput($data['primary_interests']);
-    }
+    // if (isset($data['primary_interests'])) {
+        // $update['primary_interests'] = normaliseProfileTagsInput($data['primary_interests']);
+    // }
 
     if (empty($update)) {
         echo json_encode(["status" => "success", "message" => "Nothing to update."]);
@@ -5240,7 +5248,7 @@ function fetchProfilesMap($userIds)
 
     $res = supabaseRequest('GET', '/rest/v1/profiles', [
         'user_id' => 'in.(' . implode(',', $userIds) . ')',
-        'select' => 'user_id,full_name,profile_photo_url,community,religion,current_city,mobile_number,age_group,date_of_birth,gender,occupation,primary_interests'
+        'select' => 'user_id,full_name,profile_photo_url,community,religion,current_city,mobile_number,age_group,date_of_birth,gender,occupation'
     ]);
 
     if (supabaseFailed($res))
@@ -5405,7 +5413,7 @@ function profileSummary($profile, $fallbackName = 'Member')
         'date_of_birth' => $profile['date_of_birth'] ?? null,
         'gender' => $profile['gender'] ?? null,
         'occupation' => $profile['occupation'] ?? null,
-        'primary_interests' => $customTags,
+        // 'primary_interests' => $customTags,
         'custom_tags' => $customTags,
         'system_tags' => $systemTags,
         'tags' => $displayTags,
@@ -5983,7 +5991,7 @@ function getAccountProfile($userId)
 {
     $res = supabaseRequest('GET', '/rest/v1/profiles', [
         'user_id' => 'eq.' . $userId,
-        'select' => 'user_id,full_name,community,religion,current_city,mobile_number,age_group,date_of_birth,gender,occupation,bio,profile_photo_url,cover_photo_url,is_public,visibility,online_status,social_links,membership_applied,status,primary_interests',
+        'select' => 'user_id,full_name,community,religion,current_city,mobile_number,age_group,date_of_birth,gender,occupation,bio,profile_photo_url,cover_photo_url,is_public,visibility,online_status,social_links,membership_applied,status',
         'limit' => '1',
     ]);
 
@@ -5993,7 +6001,7 @@ function getAccountProfile($userId)
 
     $fallback = supabaseRequest('GET', '/rest/v1/profiles', [
         'user_id' => 'eq.' . $userId,
-        'select' => 'user_id,full_name,community,religion,current_city,mobile_number,age_group,date_of_birth,gender,occupation,bio,profile_photo_url,cover_photo_url,is_public,membership_applied,status,primary_interests',
+        'select' => 'user_id,full_name,community,religion,current_city,mobile_number,age_group,date_of_birth,gender,occupation,bio,profile_photo_url,cover_photo_url,is_public,membership_applied,status',
         'limit' => '1',
     ]);
 
@@ -8274,7 +8282,7 @@ function handleSearchMembers($data)
     $currentCommunity = trim((string) ($currentProfile['community'] ?? ''));
 
     $profileQuery = [
-        'select' => 'user_id,full_name,profile_photo_url,religion,community,gotra,native_village,current_city,age_group,date_of_birth,gender,occupation,is_public,visibility,primary_interests',
+        'select' => 'user_id,full_name,profile_photo_url,religion,community,gotra,native_village,current_city,age_group,date_of_birth,gender,occupation,is_public,visibility',
         'user_id' => 'neq.' . $userId,
         'order' => 'full_name.asc',
         'limit' => (string) min(400, max(($limit + $offset) * 4, 100)),
@@ -8293,7 +8301,7 @@ function handleSearchMembers($data)
 
     $profilesRes = supabaseRequest('GET', '/rest/v1/profiles', $profileQuery);
     if (supabaseFailed($profilesRes)) {
-        $profileQuery['select'] = 'user_id,full_name,profile_photo_url,religion,community,gotra,native_village,current_city,age_group,date_of_birth,gender,occupation,is_public,primary_interests';
+        $profileQuery['select'] = 'user_id,full_name,profile_photo_url,religion,community,gotra,native_village,current_city,age_group,date_of_birth,gender,occupation,is_public';
         $profileQuery['is_public'] = 'eq.true';
         $profilesRes = supabaseRequest('GET', '/rest/v1/profiles', $profileQuery);
         if (supabaseFailed($profilesRes)) {
@@ -8369,7 +8377,7 @@ function handleSearchMembers($data)
             'age' => $age,
             'gender' => $p['gender'] ?? null,
             'occupation' => $p['occupation'] ?? null,
-            'primary_interests' => $customTags,
+            // 'primary_interests' => $customTags,
             'custom_tags' => $customTags,
             'system_tags' => $systemTags,
             'tags' => profileDisplayTags($customTags, $systemTags),

@@ -234,6 +234,9 @@ switch ($action) {
     case 'resend_signup_code':
         handleResendSignupCode($inputData);
         break;
+    case 'logout':
+        handleLogout();
+        break;
     case 'public_login':
         handleLogin($inputData, 'member');
         break;
@@ -3156,6 +3159,12 @@ function handleLogin($data, $expectedRole)
         return;
     }
 
+    $action = $data['action'] ?? $_GET['action'] ?? '';
+    if (!$action) {
+        http_response_code(400);
+        echo json_encode(["status" => "error", "message" => "Missing or invalid action."]);
+        exit();
+    }
     markFailedLogin(null, $email, 'unknown_email_or_role');
     recordFailedLoginRateLimit($email, $scope);
     http_response_code(401);
@@ -5028,37 +5037,20 @@ function handleGetPetPackMembers($data)
         return;
     }
 
-    $birthRes = supabaseRequest('GET', '/rest/v1/user_horoscope_profiles', [
-        'user_id' => 'eq.' . $userId,
-        'select' => 'date_of_birth,birth_time,birth_city,gender',
-        'limit' => '1',
-    ]);
-
-    if (($birthRes['code'] ?? 500) >= 400) {
-        jsonError("Failed to load horoscope profile.", 500, ["supabase_response" => $birthRes['data']]);
-        return;
-    }
-
-    $membersRes = supabaseRequest('GET', '/rest/v1/family_members', [
+    $membersRes = supabaseRequest('GET', '/rest/v1/pet_pack_members', [
         'owner_user_id' => 'eq.' . $userId,
-        'select' => 'id,linked_user_id,full_name,relation,date_of_birth,birth_time,birth_city,gender,education,work_details,horoscope_note,sort_order',
+        'select' => 'id,linked_user_id,pet_name,relation,date_of_birth,gender,pet_type,breed,microchip_number,sort_order',
         'order' => 'sort_order.asc,created_at.asc',
     ]);
 
     if (($membersRes['code'] ?? 500) >= 400) {
-        jsonError("Failed to load family members.", 500, ["supabase_response" => $membersRes['data']]);
+        jsonError("Failed to load pack members.", 500, ["supabase_response" => $membersRes['data']]);
         return;
     }
 
-    $birth = $birthRes['data'][0] ?? [];
     jsonSuccess([
-        'birth_details' => [
-            'dob' => $birth['date_of_birth'] ?? '',
-            'birthTime' => isset($birth['birth_time']) ? substr((string) $birth['birth_time'], 0, 5) : '',
-            'city' => $birth['birth_city'] ?? '',
-            'gender' => $birth['gender'] ?? '',
-        ],
-        'family_members' => array_map('normalizeFamilyMemberRow', $membersRes['data'] ?? []),
+        'birth_details' => new stdClass(),
+        'pack_members' => array_map('normalizePetPackMemberRow', $membersRes['data'] ?? []),
     ]);
 }
 
@@ -5072,34 +5064,32 @@ function handleSavePetPackMember($data)
 
     $name = cleanNullableText($data['name'] ?? '', 180);
     if (!$name) {
-        jsonError("Family member name is required.");
+        jsonError("Pack member name is required.");
         return;
     }
 
-    $allowedRelations = ['Spouse', 'Father', 'Mother', 'Son', 'Daughter', 'Brother', 'Sister', 'Other'];
-    $relation = cleanNullableText($data['relationship_to_owner'] ?? 'Other', 40) ?: 'Other';
+    $allowedRelations = ['Sibling Pet', 'Parent', 'Other'];
+    $relation = cleanNullableText($data['relation'] ?? 'Other', 40) ?: 'Other';
     if (!in_array($relation, $allowedRelations, true))
         $relation = 'Other';
 
     $row = [
         'owner_user_id' => $userId,
         'linked_user_id' => cleanNullableText($data['linked_user_id'] ?? null, 80),
-        'full_name' => $name,
-        'relationship_to_owner' => $relation,
+        'pet_name' => $name,
+        'relation' => $relation,
         'date_of_birth' => cleanDateValue($data['dob'] ?? null),
-        'birth_time' => cleanTimeValue($data['birthTime'] ?? ($data['birth_time'] ?? null)),
-        'birth_city' => cleanNullableText($data['birthCity'] ?? ($data['birth_city'] ?? null), 180),
         'gender' => cleanNullableText($data['gender'] ?? null, 40),
-        'education' => cleanNullableText($data['edu'] ?? ($data['education'] ?? null), 240),
-        'work_details' => cleanNullableText($data['work'] ?? ($data['work_details'] ?? null), 300),
-        'horoscope_note' => cleanNullableText($data['horoscope'] ?? ($data['horoscope_note'] ?? null), 300),
+        'pet_type' => cleanNullableText($data['pet_type'] ?? null, 100),
+        'breed' => cleanNullableText($data['breed'] ?? null, 100),
+        'microchip_number' => cleanNullableText($data['microchip_number'] ?? null, 100),
         'sort_order' => isset($data['sort_order']) ? intval($data['sort_order']) : 100,
     ];
 
     if (!empty($data['id']) && preg_match('/^[a-f0-9-]{36}$/i', (string) $data['id'])) {
         $res = supabaseRequest(
             'PATCH',
-            '/rest/v1/family_members',
+            '/rest/v1/pet_pack_members',
             ['id' => 'eq.' . $data['id'], 'owner_user_id' => 'eq.' . $userId],
             $row,
             ['Prefer: return=representation']
@@ -5107,7 +5097,7 @@ function handleSavePetPackMember($data)
     } else {
         $res = supabaseRequest(
             'POST',
-            '/rest/v1/family_members',
+            '/rest/v1/pet_pack_members',
             [],
             $row,
             ['Prefer: return=representation']
@@ -5115,12 +5105,12 @@ function handleSavePetPackMember($data)
     }
 
     if (($res['code'] ?? 500) >= 400) {
-        jsonError("Failed to save family member.", 500, ["supabase_response" => $res['data']]);
+        jsonError("Failed to save pack member.", 500, ["supabase_response" => $res['data']]);
         return;
     }
 
     $saved = is_array($res['data']) && isset($res['data'][0]) ? $res['data'][0] : [];
-    jsonSuccess(['member' => normalizeFamilyMemberRow($saved)]);
+    jsonSuccess(['member' => normalizePetPackMemberRow($saved)]);
 }
 
 function handleDeletePetPackMember($data)
@@ -5132,18 +5122,35 @@ function handleDeletePetPackMember($data)
         return;
     }
 
-    $res = supabaseRequest('DELETE', '/rest/v1/family_members', [
+    $res = supabaseRequest('DELETE', '/rest/v1/pet_pack_members', [
         'id' => 'eq.' . $memberId,
         'owner_user_id' => 'eq.' . $userId,
     ]);
 
     if (($res['code'] ?? 500) >= 400) {
-        jsonError("Failed to delete family member.", 500, ["supabase_response" => $res['data']]);
+        jsonError("Failed to delete pack member.", 500, ["supabase_response" => $res['data']]);
         return;
     }
 
-    jsonSuccess(["message" => "Family member deleted."]);
+    jsonSuccess(["message" => "Pack member deleted."]);
 }
+
+function normalizePetPackMemberRow($row)
+{
+    return [
+        'id' => $row['id'] ?? null,
+        'name' => $row['pet_name'] ?? '',
+        'relation' => $row['relation'] ?? '',
+        'dob' => $row['date_of_birth'] ?? '',
+        'gender' => $row['gender'] ?? '',
+        'pet_type' => $row['pet_type'] ?? '',
+        'breed' => $row['breed'] ?? '',
+        'microchip_number' => $row['microchip_number'] ?? '',
+        'linked_user_id' => $row['linked_user_id'] ?? null,
+        'sort_order' => intval($row['sort_order'] ?? 100),
+    ];
+}
+
 
 
 // ============================================================

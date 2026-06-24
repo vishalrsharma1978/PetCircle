@@ -5479,7 +5479,7 @@
 
               <div class="field">
                 <label for="reg-religion">Pet Type</label>
-                <select id="reg-religion" required onchange="updateBreedOptions('reg-religion', 'reg-breed'); toggleCustomBreedInput();  updateSignupWatermark(this.value); setPreferredEntryPetType(this.value); if(typeof hydrateEntryMascotArt === 'function') hydrateEntryMascotArt(this.value);">
+                <select id="reg-religion" required onchange="updateBreedOptions('reg-religion', 'reg-breed'); toggleCustomBreedInput();  updateSignupWatermark(this.value); if(typeof hydrateEntryMascotArt === 'function') hydrateEntryMascotArt(this.value);">
                   <option value="">Select Pet Type...</option>
                   <option>Dog</option>
                   <option>Cat</option>
@@ -5635,6 +5635,7 @@
       </div>
     </div>
   </div>
+</div>
 
   <!-- ==================== MEMBER DASHBOARD ==================== -->
   <div id="view-member-dashboard" class="view-section min-h-screen bg-gray-50 flex-col transition-colors duration-500">
@@ -9660,7 +9661,7 @@
         case "logout":
         case "track_activity":
           return ok({ activity_recorded: false, last_active_at: new Date().toISOString() });
-        case "get_pack_data":
+        case "get_pet_pack_members":
           return ok({ pack_members: [], birth_details: {} });
         case "get_notifications":
           return ok({ notifications: [], unread_count: 0 });
@@ -29644,7 +29645,7 @@
     async function loadPackDataFromDatabase() {
       if (!currentUserObj?.id) return;
       try {
-        const data = await api("get_pack_data", { user_id: currentUserObj.id });
+        const data = await api("get_pet_pack_members", { user_id: currentUserObj.id });
         if (data.status !== "success") {
           console.warn("Pack data load failed:", data.message || data);
           return;
@@ -31023,7 +31024,7 @@
       let savedMember = localMember;
       if (currentUserObj?.id) {
         try {
-          const data = await api("save_pack_member", {
+          const data = await api("save_pet_pack_member", {
             user_id: currentUserObj.id,
             name,
             relation,
@@ -31075,7 +31076,7 @@
         persistCurrentSession(currentUserObj);
         if (currentUserObj?.id) {
           try {
-            const data = await api("delete_pack_member", { user_id: currentUserObj.id, member_id: id });
+            const data = await api("delete_pet_pack_member", { user_id: currentUserObj.id, member_id: id });
             if (data.status !== "success") throw new Error(data.message || "Delete failed");
           } catch (err) {
             console.warn("Could not delete pack member from database:", err);
@@ -33517,7 +33518,7 @@
       }
       renderUserProfilePackTree(name, [], { loading: true });
       try {
-        const data = await api("get_pack_data", { target_user_id: userId });
+        const data = await api("get_pet_pack_members", { target_user_id: userId });
         if (data.status !== "success") throw new Error(data.message || "Could not load pack tree.");
         const members = Array.isArray(data.pack_members) ? data.pack_members : [];
         userProfilePackCache[cacheKey] = members;

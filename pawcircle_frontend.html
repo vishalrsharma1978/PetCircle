@@ -5817,15 +5817,37 @@
   </svg>
 
   <!-- ==================== PUBLIC LOGIN ==================== -->
-  <div id="view-public-login"
-    class="view-section active h-screen overflow-hidden flex-col lg:flex-row items-stretch">
 
-    <!-- ── LEFT: Pet Pet Pet Pet Community Pulse Pane ───────────────────────────────────── -->
-    <div id="lp-left-pane" class="w-full lg:flex-[1.35] h-full flex flex-col p-6 sm:p-8 lg:p-10 overflow-y-auto sidebar-scroll" style="background:linear-gradient(135deg,#fffbeb 0%,#f0fdf4 55%,#ecfeff 100%);transition:background 0.8s ease">
+  <div id="view-public-login" class="view-section active h-screen overflow-hidden flex flex-col lg:flex-row items-stretch w-full">
+
+    <!-- ── LEFT PANE: Feature Showcase & Feed ────────────────────────────── -->
+    <div id="lp-left-pane" class="w-full lg:w-1/2 h-full flex flex-col p-6 sm:p-8 lg:p-10 overflow-y-auto sidebar-scroll relative" style="background:linear-gradient(135deg,#fffbeb 0%,#f0fdf4 55%,#ecfeff 100%); transition:background 0.8s ease">
+      
+      <!-- Trailing Paws Background (from signup) -->
+      <section class="den" id="login-den" aria-hidden="true" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; opacity: 0.7; z-index: 0;">
+        <svg class="trail" viewBox="0 0 480 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 100%; height: 100%;">
+          <path id="loginTrailPath" d="M 60 30 C 210 110 20 230 220 290 S 50 460 250 520 S 30 690 230 760 S 70 850 190 890" fill="none" stroke="currentColor" stroke-opacity="0.1" stroke-width="2" />
+          <g opacity="0">
+            <use href="#icon-paw" xlink:href="#icon-paw" width="18" height="18" x="-9" y="-9" />
+            <animateMotion dur="10s" begin="0s" repeatCount="indefinite" rotate="auto"><mpath href="#loginTrailPath" xlink:href="#loginTrailPath" /></animateMotion>
+            <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="0s" repeatCount="indefinite" />
+          </g>
+          <g opacity="0">
+            <use href="#icon-paw" xlink:href="#icon-paw" width="18" height="18" x="-9" y="-9" />
+            <animateMotion dur="10s" begin="3s" repeatCount="indefinite" rotate="auto"><mpath href="#loginTrailPath" xlink:href="#loginTrailPath" /></animateMotion>
+            <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="3s" repeatCount="indefinite" />
+          </g>
+          <g opacity="0">
+            <use href="#icon-paw" xlink:href="#icon-paw" width="18" height="18" x="-9" y="-9" />
+            <animateMotion dur="10s" begin="6s" repeatCount="indefinite" rotate="auto"><mpath href="#loginTrailPath" xlink:href="#loginTrailPath" /></animateMotion>
+            <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="6s" repeatCount="indefinite" />
+          </g>
+        </svg>
+      </section>
 
       <!-- Brand header -->
-      <div class="flex items-center gap-3 mb-4 flex-shrink-0">
-        <div class="w-11 h-11 rounded-2xl bg-sky-50 border border-amber-200/70 flex items-center justify-center relative shadow-sm flex-shrink-0">
+      <div class="flex items-center gap-3 mb-4 flex-shrink-0 relative z-10">
+        <div class="w-11 h-11 rounded-2xl bg-white/60 border border-amber-200/70 flex items-center justify-center relative shadow-sm flex-shrink-0 backdrop-blur-md">
           <i data-lucide="paw-print" class="w-4.5 h-4.5 text-violet-900"></i>
           <i data-lucide="paw-print" class="w-2.5 h-2.5 text-violet-700 absolute right-1.5 top-1.5"></i>
         </div>
@@ -5833,93 +5855,132 @@
           <div class="text-2xl font-bold tracking-tight text-gray-900 leading-tight" style="font-family: 'DM Serif Display'">PawCircle</div>
           <div class="text-[11px] font-black text-amber-500 tracking-[0.2em] uppercase">Pet Community</div>
         </div>
-        <span class="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200/80 flex-shrink-0">
+        <span class="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100/80 text-green-700 border border-green-200/80 flex-shrink-0 backdrop-blur-sm">
           <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse inline-block"></span>
           <span id="lp-online-count">— online</span>
         </span>
       </div>
 
-      <!-- Live rotating feed card — populated by initLoginFeed() -->
-      <div id="lp-feed-card" class="flex-1 min-h-[420px] lg:min-h-[520px] rounded-2xl bg-white/85 border border-white/90 shadow-md p-5 mb-3 backdrop-blur-sm"></div>
+      <!-- Live rotating feed card -->
+      <div id="lp-feed-card" class="flex-1 min-h-[420px] lg:min-h-[520px] rounded-2xl bg-white/85 border border-white/90 shadow-md p-5 mb-3 backdrop-blur-sm relative z-10 transition-all duration-500"></div>
 
-      <!-- Activity ticker — populated by initLoginFeed() -->
-      <div id="lp-activity-ticker" class="flex-shrink-0 flex items-center gap-2 flex-wrap mb-3"></div>
-
-      <!-- Hidden showcase kept in DOM for JS hydration but not displayed -->
+      <!-- Activity ticker -->
+      <div id="lp-activity-ticker" class="flex-shrink-0 flex items-center gap-2 flex-wrap mb-3 relative z-10"></div>
+      
+      <!-- Hidden showcase -->
       <div id="public-theme-showcase" class="hidden"></div>
     </div>
 
-    <!-- ── RIGHT: Login Form Pane ────────────────────────────────────────── -->
-    <div class="w-full lg:flex-1 h-full flex flex-col items-center justify-center bg-white lg:border-l lg:border-gray-100 p-6 sm:p-8 overflow-hidden">
-      <div class="w-full max-w-xs rounded-[1.75rem] border-2 border-brand-200/70 bg-white/92 p-5 sm:p-6 shadow-lg shadow-brand-200/30">
-
-        <!-- Portal branding -->
-        <div class="mb-5">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#ff7a66] to-[#ff5e77] flex items-center justify-center shadow-sm">
-              <i data-lucide="users" class="w-6 h-6 text-white"></i>
-            </div>
-            <div class="leading-tight">
-              <div class="text-[2rem] font-bold text-slate-900" style="font-family: 'DM Serif Display'">PawCircle</div>
-            </div>
+    <!-- ── RIGHT PANE: Login Form ────────────────────────────────────────── -->
+    <div id="lp-right-pane" class="w-full lg:w-1/2 h-full flex flex-col items-center justify-center bg-white border-t lg:border-t-0 lg:border-l border-gray-100 p-6 sm:p-8 overflow-y-auto" style="--login-accent: #f97316; transition: --login-accent 0.5s ease;">
+      
+      <div class="w-full max-w-sm">
+        
+        <!-- Welcome Header -->
+        <div class="mb-8 text-center">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-sm mb-4 transition-colors duration-500" style="background: var(--login-accent);">
+            <i data-lucide="users" class="w-7 h-7 text-white"></i>
           </div>
-          <h3 class="text-2xl font-bold text-gray-900" style="font-family: 'DM Serif Display'">Welcome back</h3>
-          <p class="mt-1 text-sm text-gray-500">Let the tail-wagging fun begin!!</p>
+          <h3 class="text-3xl font-bold text-gray-900" style="font-family: 'DM Serif Display'">Welcome back</h3>
+          <p class="mt-2 text-sm text-gray-500">Let the tail-wagging fun begin!</p>
         </div>
 
-        <!-- Error banner -->
-        <div id="public-error"
-          class="hidden mb-4 bg-red-50 border-l-4 border-brand-400 p-3 rounded-lg text-sm text-red-700"></div>
+        <div id="public-error" class="hidden mb-6 bg-red-50 border-l-4 border-red-400 p-3 rounded-lg text-sm text-red-700"></div>
 
-        <!-- Login form -->
-        <form id="public-login-form" novalidate class="space-y-4">
+        <form id="public-login-form" novalidate class="space-y-5">
+          <!-- Pet Type Selector -->
           <div>
-            <label class="block text-sm font-medium text-gray-700">Email address</label>
-            <div class="mt-1 input-icon-wrap">
-              <i data-lucide="mail" class="icon h-4 w-4"></i>
-              <input type="email" id="public-email" required
-                class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-300 text-sm bg-gray-50/70"
-                placeholder="you@example.com" />
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Your Pet Type</label>
+            <div class="relative">
+              <select id="login-pet-type" class="block w-full pl-4 pr-10 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-transparent text-sm bg-gray-50 appearance-none transition-all focus-ring-dynamic" onchange="handleLoginPetTypeChange(this.value)">
+                <option value="">I don't have a pet / Just exploring</option>
+                <option value="Dog">Dog</option>
+                <option value="Cat">Cat</option>
+                <option value="Bird">Bird</option>
+                <option value="Rabbit">Rabbit</option>
+                <option value="Fish">Fish</option>
+                <option value="Reptile">Reptile</option>
+                <option value="Small Pets">Small Pets</option>
+                <option value="Other">Other</option>
+              </select>
+              <i data-lucide="chevron-down" class="absolute right-3 top-3.5 w-4 h-4 text-gray-400 pointer-events-none"></i>
+            </div>
+            <style>
+              .focus-ring-dynamic:focus { box-shadow: 0 0 0 2px var(--login-accent); }
+            </style>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email address</label>
+            <div class="relative">
+              <i data-lucide="mail" class="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400 pointer-events-none"></i>
+              <input type="email" id="public-email" required class="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-transparent text-sm bg-gray-50 transition-all focus-ring-dynamic" placeholder="you@example.com" />
             </div>
           </div>
+          
           <div>
-            <label class="block text-sm font-medium text-gray-700">Password</label>
-            <div class="mt-1 input-icon-wrap">
-              <i data-lucide="lock" class="icon h-4 w-4"></i>
-              <input type="password" id="public-password" required
-                class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-300 text-sm bg-gray-50/70"
-                placeholder="••••••••" />
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
+            <div class="relative flex flex-col">
+              
+              <!-- Mascot integrated into input wrapper -->
+              <div class="absolute right-3 bottom-full mb-1 mascot-container pointer-events-none" style="width: 60px; height: 60px; right: 10px;">
+                <div class="mascot" id="login-mascot" style="position: relative; width: 100%; height: 100%; transform: scale(0.7); transform-origin: bottom right;">
+                  <svg viewBox="0 0 120 120" width="100%" height="100%">
+                    <ellipse class="tail" cx="92" cy="92" rx="10" ry="5" fill="#F2A93B" transform="rotate(20 88 86)" />
+                    <ellipse cx="60" cy="86" rx="33" ry="26" fill="#F2A93B" />
+                    <ellipse cx="60" cy="93" rx="18" ry="14" fill="#FFF8EC" />
+                    <ellipse class="ear-l" cx="35" cy="27" rx="11" ry="17" fill="#F2A93B" transform="rotate(-18 35 27)" />
+                    <ellipse class="ear-r" cx="85" cy="27" rx="11" ry="17" fill="#F2A93B" transform="rotate(18 85 27)" />
+                    <ellipse class="ear-l" cx="35" cy="29" rx="5" ry="9" fill="#FF7A5C" transform="rotate(-18 35 29)" />
+                    <ellipse class="ear-r" cx="85" cy="29" rx="5" ry="9" fill="#FF7A5C" transform="rotate(18 85 29)" />
+                    <circle cx="60" cy="49" r="29" fill="#F2A93B" />
+                    <circle cx="49" cy="47" r="9" fill="#FFF8EC" />
+                    <circle cx="71" cy="47" r="9" fill="#FFF8EC" />
+                    <circle class="pupil pupil-l" cx="49" cy="47" r="4" fill="#2B2420" />
+                    <circle class="pupil pupil-r" cx="71" cy="47" r="4" fill="#2B2420" />
+                    <rect class="lids" x="40" y="42" width="40" height="11" fill="#F2A93B" />
+                    <ellipse cx="60" cy="58" rx="4.2" ry="3" fill="#2B2420" />
+                    <ellipse class="paw-l" cx="47" cy="104" rx="13" ry="9" fill="#FFF8EC" style="transition: all 0.3s ease; transform-origin: center;" />
+                    <ellipse class="paw-r" cx="73" cy="104" rx="13" ry="9" fill="#FFF8EC" style="transition: all 0.3s ease; transform-origin: center;" />
+                  </svg>
+                </div>
+              </div>
+
+              <div class="relative w-full">
+                <i data-lucide="lock" class="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400 pointer-events-none"></i>
+                <input type="password" id="public-password" required class="block w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-transparent text-sm bg-gray-50 transition-all focus-ring-dynamic" placeholder="••••••••" data-pw-toggle="1" />
+                
+                <button type="button" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors" id="loginEyeToggle" aria-label="Show password">
+                  <i data-lucide="eye" id="loginEyeIcon" class="w-5 h-5"></i>
+                </button>
+              </div>
             </div>
           </div>
-          <button type="submit" id="public-submit-btn"
-            class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-brand-400 hover:bg-brand-300 transition-colors">
+          
+          <button type="submit" id="public-submit-btn" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white transition-all hover:-translate-y-0.5" style="background: var(--login-accent); box-shadow: 0 4px 14px 0 rgba(0,0,0,0.1);">
             Sign in
           </button>
         </form>
 
-        <!-- Create account -->
-        <div class="mt-4 text-sm border-t border-gray-100 pt-4 text-center">
-          <span class="text-gray-500">New to PawCircle?</span>
-          <button onclick="switchView('view-signup')"
-            class="font-medium text-brand-400 hover:text-brand-300 flex items-center justify-center w-full mt-2.5 py-2 bg-brand-100/15 rounded-xl transition-colors">
+        <!-- Links -->
+        <div class="mt-8 text-center">
+          <span class="text-sm text-gray-500">New to PawCircle?</span>
+          <button onclick="switchView('view-signup')" class="font-bold flex items-center justify-center w-full mt-3 py-3 rounded-xl transition-colors bg-gray-50 hover:bg-gray-100" style="color: var(--login-accent)">
             <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i> Create an Account
           </button>
         </div>
 
-        <!-- Admin access -->
-        <div class="mt-3 text-center">
-          <button onclick="switchView('view-admin-login')"
-            class="text-xs text-gray-400 hover:text-gray-600 transition-colors">
-            Admin Access
+        <div class="mt-6 text-center">
+          <button onclick="switchView('view-admin-login')" class="text-xs text-gray-400 hover:text-gray-600 transition-colors underline decoration-gray-300 underline-offset-4">
+            Admin Portal
           </button>
         </div>
 
       </div>
     </div>
-
   </div>
 
-  <!-- ==================== ADMIN LOGIN ==================== -->
+<!-- ==================== ADMIN LOGIN ==================== -->
   <div id="view-admin-login"
     class="view-section min-h-screen bg-gray-900 flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
@@ -7031,6 +7092,11 @@
           <div id="social-feed-posts" class="space-y-6">
             <!-- Posts will be injected here via JS -->
           </div>
+        </div>
+
+        <!-- Tab: Post Detail -->
+        <div id="social-tab-post-detail" class="social-tab-content space-y-6 hidden">
+          <div id="post-detail-view"></div>
         </div>
 
         <!-- Tab: Friends -->
@@ -14256,7 +14322,7 @@ function initializeSocialFeed() {
                     </div>`;
 
           const postHtml = `
-                <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 mb-4">
+                <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 mb-4 cursor-pointer hover:shadow-md transition-shadow" onclick="if(typeof handleFeedPostCardClick === 'function') handleFeedPostCardClick(event, '${postId}')">
                     <div class="p-4 border-b border-gray-50 dark:border-gray-800 flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             ${avatarHtml}
@@ -36373,6 +36439,12 @@ function initializeSocialFeed() {
       return themes[key] || themes.other;
     }
 
+    // ── LOGIN PET TYPE SELECTOR & MASCOT ────────────────────────
+    var loginFeedFeeds = null;
+    var loginFeedRotateTimer = null;
+    var loginFeedRenderFn = null;
+    var loginFeedCurrentIdx = 0;
+
     function initLoginFeed() {
       var pane     = document.getElementById('lp-left-pane');
       var card     = document.getElementById('lp-feed-card');
@@ -36380,7 +36452,7 @@ function initializeSocialFeed() {
       var onlineEl = document.getElementById('lp-online-count');
       if (!card) return;
 
-      var feeds = [
+      loginFeedFeeds = [
         {
           petTheme: 'Dog',
           icon: '🐕', grad: 'linear-gradient(135deg,#fffbeb 0%,#fef9c3 60%,#f0fdf4 100%)',
@@ -36473,22 +36545,26 @@ function initializeSocialFeed() {
         },
       ];
 
-      var idx = Math.floor(Math.random() * feeds.length);
-      var rotateTimer = null;
+      loginFeedCurrentIdx = Math.floor(Math.random() * loginFeedFeeds.length);
 
-      function renderFeed() {
-        var f = feeds[idx];
+      loginFeedRenderFn = function(forceTheme) {
+        if (forceTheme) {
+          var found = loginFeedFeeds.findIndex(function(f) { return f.petTheme === forceTheme; });
+          if (found >= 0) loginFeedCurrentIdx = found;
+        }
+
+        var f = loginFeedFeeds[loginFeedCurrentIdx];
         if (pane) pane.style.background = f.grad;
         if (onlineEl) onlineEl.textContent = (f.online + Math.floor(Math.random() * 14) - 7) + ' online';
 
         var tipsHtml = f.tips.map(function(t) {
           return '<div class="rounded-xl border px-2.5 py-2.5 text-center min-h-[92px] flex flex-col items-center justify-center ' + t.cls + '">' +
-                 '<div class="text-base mb-0.5">' + t.icon + '<\/div>' +
-                 '<div class="text-xs font-semibold leading-tight">' + t.label + '<br>' + t.sub + '<\/div><\/div>';
+                 '<div class="text-base mb-0.5">' + t.icon + '</div>' +
+                 '<div class="text-xs font-semibold leading-tight">' + t.label + '<br>' + t.sub + '</div></div>';
         }).join('');
 
         var tagsHtml = f.tags.map(function(tag) {
-          return '<span class="px-2 py-0.5 rounded-full bg-white border border-gray-200/70 text-xs font-medium text-gray-600">' + tag + '<\/span>';
+          return '<span class="px-2 py-0.5 rounded-full bg-white border border-gray-200/70 text-xs font-medium text-gray-600">' + tag + '</span>';
         }).join('');
 
         var galleryThemes = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Fish', 'Reptile']
@@ -36497,9 +36573,9 @@ function initializeSocialFeed() {
           var theme = getPetTheme(themeName);
           var art = PET_REAL_PHOTOS[themeName] || getPetIllustrationDataUrl(theme, 'badge');
           return '<div class="pet-community-strip-item rounded-xl border border-white/85 bg-white/76 p-2.5 shadow-sm">' +
-                   '<div class="h-28 rounded-lg" style="background-image:linear-gradient(135deg, color-mix(in srgb, ' + theme.accent + ' 18%, white), transparent 70%), url(\'' + art + '\');background-size:cover;background-position:center;"><\/div>' +
-                   '<div class="mt-1.5 text-[11px] font-bold text-gray-700 text-center leading-tight">' + theme.label + '<\/div>' +
-                 '<\/div>';
+                   '<div class="h-28 rounded-lg" style="background-image:linear-gradient(135deg, color-mix(in srgb, ' + theme.accent + ' 18%, white), transparent 70%), url(\'' + art + '\');background-size:cover;background-position:center;"></div>' +
+                   '<div class="mt-1.5 text-[11px] font-bold text-gray-700 text-center leading-tight">' + theme.label + '</div>' +
+                 '</div>';
         }).join('');
 
         card.innerHTML =
@@ -36507,24 +36583,24 @@ function initializeSocialFeed() {
           '<div class="flex items-center justify-between mb-2">' +
             '<span class="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-0.5 rounded-full bg-white border uppercase tracking-wide ' + f.chipCls + '">' +
               f.icon + ' ' + f.chipText +
-            '<\/span>' +
-            '<span class="text-xs text-gray-400">5 min read<\/span>' +
-          '<\/div>' +
-          '<h3 class="text-base font-bold text-gray-800 leading-snug mb-1.5" style="font-family:&apos;DM Serif Display&apos;">' + f.headline + '<\/h3>' +
-          '<p class="text-sm text-gray-600 leading-relaxed mb-3">' + f.excerpt + '<\/p>' +
-          '<div class="grid grid-cols-3 gap-2.5 mb-3 auto-rows-fr">' + tipsHtml + '<\/div>' +
-          '<div class="mt-auto flex items-center gap-2 flex-wrap">' + tagsHtml + '<\/div>' +
+            '</span>' +
+            '<span class="text-xs text-gray-400">5 min read</span>' +
+          '</div>' +
+          '<h3 class="text-base font-bold text-gray-800 leading-snug mb-1.5" style="font-family:\'DM Serif Display\';">' + f.headline + '</h3>' +
+          '<p class="text-sm text-gray-600 leading-relaxed mb-3">' + f.excerpt + '</p>' +
+          '<div class="grid grid-cols-3 gap-2.5 mb-3 auto-rows-fr">' + tipsHtml + '</div>' +
+          '<div class="mt-auto flex items-center gap-2 flex-wrap">' + tagsHtml + '</div>' +
           '<div class="mt-3 pt-3 border-t border-white/80">' +
-            '<div class="text-[11px] font-black uppercase tracking-[0.16em] text-gray-500 mb-2">Explore Pet Communities<\/div>' +
+            '<div class="text-[11px] font-black uppercase tracking-[0.16em] text-gray-500 mb-2">Explore Pet Communities</div>' +
             '<div class="pet-community-strip">' +
-              '<div class="pet-community-strip-track">' + communityGalleryHtml + '<\/div>' +
-            '<\/div>' +
-          '<\/div>' +
-          '<\/div>';
+              '<div class="pet-community-strip-track">' + communityGalleryHtml + '</div>' +
+            '</div>' +
+          '</div>' +
+          '</div>';
 
         if (ticker) {
           ticker.innerHTML = f.activity.map(function(a) {
-            return '<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-white/80 border border-gray-200/60 text-xs text-gray-600 shadow-sm">' + a + '<\/span>';
+            return '<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-white/80 border border-gray-200/60 text-xs text-gray-600 shadow-sm">' + a + '</span>';
           }).join('');
         }
 
@@ -36536,13 +36612,15 @@ function initializeSocialFeed() {
           card.style.transform = 'translateY(0)';
         });
 
-        idx = (idx + 1) % feeds.length;
+        if (!forceTheme) {
+          loginFeedCurrentIdx = (loginFeedCurrentIdx + 1) % loginFeedFeeds.length;
+        }
       }
 
       function start() {
-        clearInterval(rotateTimer);
-        renderFeed();
-        rotateTimer = setInterval(renderFeed, 7000);
+        clearInterval(loginFeedRotateTimer);
+        loginFeedRenderFn();
+        loginFeedRotateTimer = setInterval(loginFeedRenderFn, 7000);
       }
 
       start();
@@ -36551,9 +36629,266 @@ function initializeSocialFeed() {
       var loginView = document.getElementById('view-public-login');
       if (loginView) {
         new MutationObserver(function() {
-          if (loginView.classList.contains('active')) start();
+          if (loginView.classList.contains('active')) {
+             if(document.getElementById('login-pet-type').value) {
+                // Keep stopped
+             } else {
+                start();
+             }
+          }
         }).observe(loginView, { attributes: true, attributeFilter: ['class'] });
       }
+    }
+
+    function handleLoginPetTypeChange(type) {
+        var rightPane = document.getElementById('lp-right-pane');
+        if (!type) {
+            if (loginFeedRotateTimer) clearInterval(loginFeedRotateTimer);
+            loginFeedRotateTimer = setInterval(loginFeedRenderFn, 7000);
+            if (rightPane) rightPane.style.setProperty('--login-accent', '#f97316'); // Default brand
+            return;
+        }
+        
+        // Stop rotation
+        if (loginFeedRotateTimer) clearInterval(loginFeedRotateTimer);
+        
+        // Render specific theme
+        if (loginFeedRenderFn) loginFeedRenderFn(type);
+        
+        // Update accent color
+        var theme = getPetTheme(type);
+        if (rightPane && theme) {
+            rightPane.style.setProperty('--login-accent', theme.accent);
+        }
+    }
+
+    // Mascot Logic
+    document.addEventListener("DOMContentLoaded", function() {
+        var pwInput = document.getElementById('public-password');
+        var eyeToggle = document.getElementById('loginEyeToggle');
+        var eyeIcon = document.getElementById('loginEyeIcon');
+        
+        var loginPawL = document.querySelector('.login-paw-l');
+        var loginPawR = document.querySelector('.login-paw-r');
+        var loginMascot = document.getElementById('login-mascot');
+        
+        if (pwInput && eyeToggle && loginPawL && loginPawR && loginMascot) {
+            // Track mouse movement to move eyes if password is NOT shown
+            document.addEventListener('mousemove', function(e) {
+                if (pwInput.type === 'text') return; // Eyes are covered
+                var rect = loginMascot.getBoundingClientRect();
+                var centerX = rect.left + rect.width / 2;
+                var centerY = rect.top + rect.height / 2;
+                
+                var maxMove = 3;
+                var moveX = Math.max(-maxMove, Math.min(maxMove, (e.clientX - centerX) / 50));
+                var moveY = Math.max(-maxMove, Math.min(maxMove, (e.clientY - centerY) / 50));
+                
+                var pupils = loginMascot.querySelectorAll('.pupil');
+                pupils.forEach(function(p) {
+                    p.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                });
+            });
+
+            pwInput.addEventListener('focus', function() {
+                if (pwInput.type === 'password') {
+                    // Close eyes when typing
+                    var lids = loginMascot.querySelector('.lids');
+                    if(lids) lids.setAttribute('height', '28');
+                }
+            });
+            
+            pwInput.addEventListener('blur', function() {
+                if (pwInput.type === 'password') {
+                    // Open eyes
+                    var lids = loginMascot.querySelector('.lids');
+                    if(lids) lids.setAttribute('height', '11');
+                }
+            });
+
+            eyeToggle.addEventListener('click', function() {
+                var isText = pwInput.type === 'text';
+                if (isText) {
+                    // Hide password
+                    pwInput.type = 'password';
+                    eyeIcon.setAttribute('data-lucide', 'eye');
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                    // Open eyes
+                    var lids = loginMascot.querySelector('.lids');
+                    if(lids) lids.setAttribute('height', document.activeElement === pwInput ? '28' : '11');
+                    // Uncover eyes
+                    loginPawL.style.transform = '';
+                    loginPawR.style.transform = '';
+                } else {
+                    // Show password
+                    pwInput.type = 'text';
+                    eyeIcon.setAttribute('data-lucide', 'eye-off');
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                    // Cover eyes with paws
+                    loginPawL.style.transform = 'translate(-3px, -50px) rotate(15deg)';
+                    loginPawR.style.transform = 'translate(3px, -50px) rotate(-15deg)';
+                }
+            });
+        }
+    });
+
+    // ── FEED MEDIA LOGIC ──────────────────────────────────────
+    function openFeedMediaPicker() {
+        var input = document.getElementById("feed-media-input");
+        if (input) input.click();
+    }
+    
+    function clearFeedMediaSelection() {
+        var input = document.getElementById("feed-media-input");
+        var previewContainer = document.getElementById("feed-media-preview");
+        if (input) input.value = "";
+        if (previewContainer) {
+            previewContainer.classList.add("hidden");
+            previewContainer.innerHTML = "";
+        }
+    }
+    
+    function handleFeedMediaSelection(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+        var previewContainer = document.getElementById("feed-media-preview");
+        if (!previewContainer) return;
+        
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            previewContainer.classList.remove("hidden");
+            if (file.type.startsWith('video/')) {
+                previewContainer.innerHTML = `
+                    <div class="relative inline-block mt-2">
+                        <video src="${e.target.result}" class="max-h-48 rounded-lg" controls></video>
+                        <button onclick="clearFeedMediaSelection()" class="absolute -top-2 -right-2 bg-gray-900 text-white rounded-full p-1 shadow-md hover:bg-gray-800"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    </div>`;
+            } else {
+                previewContainer.innerHTML = `
+                    <div class="relative inline-block mt-2">
+                        <img src="${e.target.result}" class="max-h-48 rounded-lg object-contain" />
+                        <button onclick="clearFeedMediaSelection()" class="absolute -top-2 -right-2 bg-gray-900 text-white rounded-full p-1 shadow-md hover:bg-gray-800"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    </div>`;
+            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    // Patch createPost to include media
+    var originalCreatePost = window.createPost;
+    if (originalCreatePost) {
+        window.createPost = function(textId, hashId) {
+            var mediaInput = document.getElementById("feed-media-input");
+            var contentElem = document.getElementById(textId);
+            if (!contentElem) return;
+            
+            var content = contentElem.value.trim();
+            if (!content && (!mediaInput || !mediaInput.files[0])) return;
+            
+            if (mediaInput && mediaInput.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var newPost = {
+                        id: Date.now(),
+                        user_id: currentUserObj.id,
+                        author: currentUserObj.name,
+                        profilePhoto: currentUserObj.profilePhoto,
+                        content: content,
+                        media_url: e.target.result,
+                        time: "Just now",
+                        likes: 0,
+                        comments: 0
+                    };
+                    feedPosts.unshift(newPost);
+                    clearFeedMediaSelection();
+                    contentElem.value = "";
+                    renderFeed();
+                };
+                reader.readAsDataURL(mediaInput.files[0]);
+            } else {
+                originalCreatePost(textId, hashId);
+            }
+        };
+    }
+
+    // ── THREAD MANAGEMENT / POST DETAIL VIEW ────────────────────
+    function handleFeedPostCardClick(event, postId) {
+      if (event.defaultPrevented) return;
+      const interactive = event.target.closest("button, a, input, textarea, select, label, video, [data-no-post-open], .post-menu, .comment-menu");
+      if (interactive) return;
+      openPostDetail(postId);
+    }
+
+    function closePostDetail() {
+      switchSocialTab("feed", { skipScroll: true });
+      try {
+        const url = new URL(window.location.href);
+        if (url.searchParams.has("post")) {
+          url.searchParams.delete("post");
+          window.history.replaceState({}, "", url.toString());
+        }
+      } catch (e) { }
+    }
+
+    function openPostDetail(postId, options = {}) {
+      const post = feedPosts.find((p) => String(p.id) === String(postId));
+      if (!post) {
+        if (typeof showToast !== 'undefined') showToast("Post is no longer available.");
+        return;
+      }
+      switchSocialTab("post-detail", { remember: false, skipScroll: true });
+      renderPostDetail(postId);
+      if (options.updateUrl !== false) {
+        try {
+          const url = new URL(window.location.href);
+          url.searchParams.set("post", postId);
+          url.hash = "feed";
+          window.history.replaceState({}, "", url.toString());
+        } catch (e) { }
+      }
+      window.scrollTo({ top: 0, behavior: options.instant ? "auto" : "smooth" });
+    }
+
+    function renderPostDetail(postId) {
+      const container = document.getElementById("post-detail-view");
+      const post = feedPosts.find((p) => String(p.id) === String(postId));
+      if (!container || !post) return;
+      const safePostId = String(post.id).replace(/'/g, "\\'");
+      const safeAuthor = escapeHtml(post.author).replace(/'/g, "\\'");
+      const safeProfilePhoto = post.profilePhoto ? escapeHtml(post.profilePhoto).replace(/'/g, "\\'") : "";
+      const avatarHtml = post.profilePhoto
+        ? `<img src="${escapeHtml(post.profilePhoto)}" onclick="openUserProfile('${safeAuthor}', 'Community Member', '${String(post.user_id || '').replace(/'/g, "\\'")}', '${safeProfilePhoto}')" loading="lazy" decoding="async" class="w-11 h-11 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-brand-400 transition-all" alt="">`
+        : `<div onclick="openUserProfile('${safeAuthor}', 'Community Member', '${String(post.user_id || '').replace(/'/g, "\\'")}')" class="w-11 h-11 ${post.avatarClass || 'bg-gray-200 text-gray-700'} rounded-full flex items-center justify-center font-bold cursor-pointer hover:ring-2 hover:ring-brand-400 transition-all">${post.initials || 'U'}</div>`;
+      
+      const mediaHtml = post.media_url ? `<img src="${escapeHtml(post.media_url)}" class="mt-4 rounded-xl max-h-[500px] w-full object-contain bg-gray-50 border border-gray-100" />` : "";
+      const descriptionText = post.description || post.content || "";
+      const descriptionHtml = descriptionText ? `<p class="text-base leading-7 text-gray-800 whitespace-pre-wrap break-words mt-2">${escapeHtml(descriptionText)}</p>` : "";
+
+      container.innerHTML = `
+        <div class="mx-auto max-w-2xl space-y-4 pt-4">
+          <button type="button" onclick="closePostDetail()" class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-gray-700 hover:border-brand-200 hover:text-brand-600 transition-colors shadow-sm mb-2">
+            <i data-lucide="arrow-left" class="h-4 w-4"></i> Back to feed
+          </button>
+          <article class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-md">
+            <div class="flex items-start justify-between gap-4 border-b border-gray-50 p-4 sm:p-5">
+              <div class="flex min-w-0 items-start gap-3">
+                ${avatarHtml}
+                <div class="min-w-0">
+                  <div class="flex flex-wrap items-center gap-1.5 text-base font-bold text-gray-900">
+                    <span class="cursor-pointer hover:underline" onclick="openUserProfile('${safeAuthor}')">${escapeHtml(post.author)}</span>
+                  </div>
+                  <div class="mt-1 text-xs text-gray-500">${escapeHtml(post.time || 'Just now')}</div>
+                </div>
+              </div>
+            </div>
+            <div class="space-y-4 p-4 sm:p-5">
+              ${descriptionHtml}
+              ${mediaHtml}
+            </div>
+          </article>
+        </div>`;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     initLoginFeed();

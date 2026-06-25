@@ -36,7 +36,7 @@ if (file_exists($envFile)) {
 
 // Debug flag — when off (production), detailed Supabase/internal errors are logged
 // server-side and replaced with a generic message + request id for the client.
-define('PAWCIRCLE_DEBUG', in_array(strtolower((string) (getenv('PAWCIRCLE_DEBUG') ?: ($_ENV['PAWCIRCLE_DEBUG'] ?? ''))), ['1', 'true', 'yes', 'on'], true));
+define('PAWCIRCLE_DEBUG', true);
 
 // A short id attached to each response and error log line for correlation.
 function requestId()
@@ -4188,7 +4188,7 @@ function handleAdminListPosts($data)
     $limit = adminListLimit($data);
     $offset = adminOffset($data);
     $query = [
-        'select' => 'id,user_id,content,media_url,post_type,community,religion,is_deleted,created_at,updated_at',
+        'select' => 'id,user_id,content,media_url,post_type,breed,pet_type,is_deleted,created_at,updated_at,title,description,hashtags',
         'limit' => (string) $limit,
         'offset' => (string) $offset,
     ];
@@ -4200,10 +4200,10 @@ function handleAdminListPosts($data)
         $query['post_type'] = 'eq.' . $type;
     $religion = cleanPlainValue($data['religion'] ?? '', 80);
     if ($religion !== '')
-        $query['religion'] = 'eq.' . $religion;
+        $query['pet_type'] = 'eq.' . $religion;
     $community = cleanPlainValue($data['community'] ?? '', 120);
     if ($community !== '')
-        $query['community'] = 'eq.' . $community;
+        $query['breed'] = 'eq.' . $community;
     if (isset($data['deleted']) && $data['deleted'] !== '') {
         $query['is_deleted'] = 'eq.' . (filter_var($data['deleted'], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false');
     }
@@ -5248,7 +5248,7 @@ function fetchProfilesMap($userIds)
 
     $res = supabaseRequest('GET', '/rest/v1/profiles', [
         'user_id' => 'in.(' . implode(',', $userIds) . ')',
-        'select' => 'user_id,full_name,profile_photo_url,community,religion,current_city,mobile_number,age_group,date_of_birth,gender,occupation'
+        'select' => 'user_id,full_name,profile_photo_url,breed,pet_type,current_city,mobile_number,age_group,date_of_birth,gender,occupation'
     ]);
 
     if (supabaseFailed($res))
@@ -5261,6 +5261,8 @@ function fetchProfilesMap($userIds)
         if (!empty($profile['user_id'])) {
             $uid = strtolower((string) $profile['user_id']);
             $profile['admin_capabilities'] = $adminCapsMap[$uid] ?? [];
+            $profile['community'] = $profile['breed'] ?? '';
+            $profile['religion'] = $profile['pet_type'] ?? '';
             $map[$profile['user_id']] = $profile;
         }
     }
@@ -5624,6 +5626,13 @@ function enrichPosts($posts, $currentUserId = null)
         $post['comment_count'] = $commentCounts[$post['id']] ?? 0;
         $post['is_liked'] = !empty($likedByCurrent[$post['id']]);
 
+        if (isset($post['breed'])) {
+            $post['community'] = $post['breed'];
+        }
+        if (isset($post['pet_type'])) {
+            $post['religion'] = $post['pet_type'];
+        }
+
         // Frontend compatibility keys
         $post['likes'] = $post['like_count'];
         $post['comments'] = $post['comment_count'];
@@ -5924,9 +5933,15 @@ function handleCreatePost($data)
         'content' => $content === '' ? null : $content,
         'media_url' => $mediaUrl === '' ? null : $mediaUrl,
         'post_type' => $postType,
-        'community' => $community === '' ? null : $community,
-        'religion' => $religion === '' ? null : $religion,
+        'breed' => $community === '' ? null : $community,
+        'pet_type' => $religion === '' ? null : $religion,
+        'title' => cleanNullableText($data['title'] ?? null, 240),
+        'description' => cleanNullableText($data['description'] ?? null, 5000),
     ];
+
+    if (isset($data['hashtags']) && is_array($data['hashtags'])) {
+        $body['hashtags'] = array_values(array_filter($data['hashtags']));
+    }
 
     $res = supabaseRequest('POST', '/rest/v1/posts', [], $body, ['Prefer: return=representation']);
 
@@ -5945,7 +5960,7 @@ function handleGetPosts($data)
     $limit = isset($data['limit']) ? max(1, min((int) $data['limit'], 100)) : 10;
 
     $query = [
-        'select' => 'id,user_id,content,media_url,post_type,community,religion,is_deleted,created_at,updated_at',
+        'select' => 'id,user_id,content,media_url,post_type,breed,pet_type,is_deleted,created_at,updated_at,title,description,hashtags',
         'is_deleted' => 'eq.false',
         'order' => 'created_at.desc',
         'limit' => (string) $limit,
@@ -5958,16 +5973,16 @@ function handleGetPosts($data)
     if (empty($data['post_id'])) {
         $community = cleanPlainValue($data['community'] ?? '', 120);
         $religion = cleanPlainValue($data['religion'] ?? '', 80);
-        $visibilityFilters = ['and(community.is.null,religion.is.null)'];
+        $visibilityFilters = ['and(breed.is.null,pet_type.is.null)'];
 
         if ($religion !== '') {
-            $visibilityFilters[] = 'and(community.is.null,religion.eq.' . $religion . ')';
+            $visibilityFilters[] = 'and(breed.is.null,pet_type.eq.' . $religion . ')';
         }
 
         if ($community !== '') {
-            $filter = 'community.eq.' . $community;
+            $filter = 'breed.eq.' . $community;
             if ($religion !== '') {
-                $filter .= ',religion.eq.' . $religion;
+                $filter .= ',pet_type.eq.' . $religion;
             }
             $visibilityFilters[] = 'and(' . $filter . ')';
         }
@@ -5991,21 +6006,31 @@ function getAccountProfile($userId)
 {
     $res = supabaseRequest('GET', '/rest/v1/profiles', [
         'user_id' => 'eq.' . $userId,
-        'select' => 'user_id,full_name,community,religion,current_city,mobile_number,age_group,date_of_birth,gender,occupation,bio,profile_photo_url,cover_photo_url,is_public,visibility,online_status,social_links,membership_applied,status',
+        'select' => 'user_id,full_name,breed,pet_type,current_city,mobile_number,age_group,date_of_birth,gender,occupation,bio,profile_photo_url,cover_photo_url,is_public,visibility,online_status,social_links,membership_applied,status',
         'limit' => '1',
     ]);
 
-    if (!supabaseFailed($res)) {
-        return $res['data'][0] ?? [];
+    if (!supabaseFailed($res) && !empty($res['data'])) {
+        $profile = $res['data'][0];
+        $profile['community'] = $profile['breed'] ?? '';
+        $profile['religion'] = $profile['pet_type'] ?? '';
+        return $profile;
     }
 
     $fallback = supabaseRequest('GET', '/rest/v1/profiles', [
         'user_id' => 'eq.' . $userId,
-        'select' => 'user_id,full_name,community,religion,current_city,mobile_number,age_group,date_of_birth,gender,occupation,bio,profile_photo_url,cover_photo_url,is_public,membership_applied,status',
+        'select' => 'user_id,full_name,breed,pet_type,current_city,mobile_number,age_group,date_of_birth,gender,occupation,bio,profile_photo_url,cover_photo_url,is_public,membership_applied,status,primary_interests',
         'limit' => '1',
     ]);
 
-    return supabaseFailed($fallback) ? [] : ($fallback['data'][0] ?? []);
+    if (supabaseFailed($fallback) || empty($fallback['data'])) {
+        return [];
+    }
+
+    $profile = $fallback['data'][0];
+    $profile['community'] = $profile['breed'] ?? '';
+    $profile['religion'] = $profile['pet_type'] ?? '';
+    return $profile;
 }
 
 function normalizeVisibility($value)
@@ -6294,8 +6319,8 @@ function handleChangeReligionCommunity($data)
     $res = supabaseRequest('PATCH', '/rest/v1/profiles', [
         'user_id' => 'eq.' . $userId,
     ], [
-        'religion' => $religion,
-        'community' => $community,
+        'pet_type' => $religion,
+        'breed' => $community,
     ], ['Prefer: return=representation']);
 
     if (supabaseFailed($res)) {
@@ -6324,7 +6349,7 @@ function handleGetUserPosts($data)
     $res = supabaseRequest('GET', '/rest/v1/posts', [
         'user_id' => 'eq.' . $userId,
         'is_deleted' => 'eq.false',
-        'select' => 'id,user_id,content,media_url,post_type,community,religion,is_deleted,created_at,updated_at',
+        'select' => 'id,user_id,content,media_url,post_type,breed,pet_type,is_deleted,created_at,updated_at,title,description,hashtags',
         'order' => 'created_at.desc',
         'limit' => (string) $limit,
     ]);
@@ -6815,8 +6840,8 @@ function normalizeEventPayload($data)
         'location' => $location === '' ? null : $location,
         'is_online' => isset($data['is_online']) ? (bool) $data['is_online'] : !empty($data['meeting_url']) || !empty($data['link']),
         'meeting_url' => trim((string) ($data['meeting_url'] ?? $data['link'] ?? '')) ?: null,
-        'religion' => ($religion = cleanPlainValue($data['religion'] ?? '', 80)) === '' ? null : $religion,
-        'community' => ($community = cleanPlainValue($data['community'] ?? '', 120)) === '' ? null : $community,
+        'pet_type' => ($religion = cleanPlainValue($data['religion'] ?? '', 80)) === '' ? null : $religion,
+        'breed' => ($community = cleanPlainValue($data['community'] ?? '', 120)) === '' ? null : $community,
         'banner_url' => trim((string) ($data['banner_url'] ?? '')) ?: null,
         'recurrence_frequency' => $frequency,
         'visibility' => $visibility,
@@ -6958,7 +6983,7 @@ function handleDeleteEvent($data)
 
 function handleGetEvents($data)
 {
-    $select = 'id,title,description,event_date,event_time,location,is_online,meeting_url,religion,community,visibility,banner_url,created_by,created_at,updated_at';
+    $select = 'id,title,description,event_date,event_time,location,is_online,meeting_url,pet_type,breed,visibility,banner_url,created_by,created_at,updated_at';
     $query = [
         'select' => $select,
         'order' => 'event_date.asc,event_time.asc',
@@ -6972,16 +6997,16 @@ function handleGetEvents($data)
         $religion = cleanPlainValue($data['religion'] ?? '', 80);
         // Audience-visible events never include invite-only ones — those are
         // only reachable by explicitly invited people (fetched separately).
-        $visibilityFilters = ['and(community.is.null,religion.is.null)'];
+        $visibilityFilters = ['and(breed.is.null,pet_type.is.null)'];
 
         if ($religion !== '') {
-            $visibilityFilters[] = 'and(community.is.null,religion.eq.' . $religion . ')';
+            $visibilityFilters[] = 'and(breed.is.null,pet_type.eq.' . $religion . ')';
         }
 
         if ($community !== '') {
-            $filter = 'community.eq.' . $community;
+            $filter = 'breed.eq.' . $community;
             if ($religion !== '') {
-                $filter .= ',religion.eq.' . $religion;
+                $filter .= ',pet_type.eq.' . $religion;
             }
             $visibilityFilters[] = 'and(' . $filter . ')';
         }
@@ -7068,6 +7093,8 @@ function handleGetEvents($data)
     foreach ($events as &$event) {
         $profile = $profileMap[$event['created_by'] ?? ''] ?? [];
         $event['creator'] = profileSummary($profile);
+        $event['religion'] = $event['pet_type'] ?? '';
+        $event['community'] = $event['breed'] ?? '';
     }
     unset($event);
 

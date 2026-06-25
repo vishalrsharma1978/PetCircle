@@ -171,6 +171,51 @@
     from { transform: translate(-50%, -50%) rotate(0deg) scale(0.6); opacity: 1; }
     to { transform: translate(var(--tx), var(--ty)) rotate(var(--tr)) scale(1); opacity: 0; }
   }
+
+    @keyframes petCommunityStripScroll {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+
+    .pet-community-strip {
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .pet-community-strip-track {
+      display: flex;
+      align-items: stretch;
+      gap: 0.5rem;
+      width: max-content;
+      animation: petCommunityStripScroll 24s linear infinite;
+      will-change: transform;
+    }
+
+    .pet-community-strip:hover .pet-community-strip-track {
+      animation-play-state: paused;
+    }
+
+    .pet-community-strip-item {
+      width: 168px;
+      flex: 0 0 auto;
+    }
+
+    @media (max-width: 640px) {
+      .pet-community-strip-item {
+        width: 142px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .pet-community-strip-track {
+        animation: none;
+      }
+    }
+
 </style>
 
 <div class="portal-overlay" id="portalOverlay" aria-hidden="true">
@@ -188,6 +233,16 @@
 </div>
 
 <script>
+    const PET_REAL_PHOTOS = {
+      Dog: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=1200&q=85&auto=format&fit=crop',
+      Cat: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=1200&q=85&auto=format&fit=crop',
+      Bird: 'https://images.unsplash.com/photo-1452570053594-1b985d6ea890?w=1200&q=85&auto=format&fit=crop',
+      Rabbit: 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=1200&q=85&auto=format&fit=crop',
+      Fish: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=1200&q=85&auto=format&fit=crop',
+      Reptile: 'https://images.unsplash.com/photo-1531386151447-fd76ad50012f?w=1200&q=85&auto=format&fit=crop',
+      "Small Pets": 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=1200&q=85&auto=format&fit=crop',
+      Other: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=1200&q=85&auto=format&fit=crop',
+    };
   function burstConfetti(btn) {
     btn.style.position = 'relative';
     btn.style.overflow = 'hidden';
@@ -5776,7 +5831,7 @@
         </div>
         <div>
           <div class="text-2xl font-bold tracking-tight text-gray-900 leading-tight" style="font-family: 'DM Serif Display'">PawCircle</div>
-          <div class="text-[11px] font-black text-amber-500 tracking-[0.2em] uppercase">Pet Pet Pet Pet Pet Community</div>
+          <div class="text-[11px] font-black text-amber-500 tracking-[0.2em] uppercase">Pet Community</div>
         </div>
         <span class="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200/80 flex-shrink-0">
           <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse inline-block"></span>
@@ -7781,6 +7836,8 @@
       }
     }
 
+
+
     function switchView(viewId) {
       // Stop the PawCircle live stream when navigating away so audio doesn't linger.
       if (viewId !== "view-content-hub") {
@@ -7848,14 +7905,19 @@
             btn.classList.add("!bg-green-500", "!border-green-500");
             btn.innerText = "Welcome back!";
             playPortalTransition(() => {
-              populateMemberDashboard(demoUser);
-              initializeSocialFeed();
-              switchView("view-member-dashboard");
-              showToast("Offline demo mode. Backend calls are disabled.", "info");
-              btn.classList.remove("!bg-green-500", "!border-green-500");
-              btn.disabled = false;
-              btn.innerText = "Sign in";
-              document.getElementById("public-login-form").reset();
+              try {
+                populateMemberDashboard(demoUser);
+                initializeSocialFeed();
+                switchView("view-social-feed");
+                showToast("Offline demo mode. Backend calls are disabled.", "info");
+                btn.classList.remove("!bg-green-500", "!border-green-500");
+                btn.disabled = false;
+                btn.innerText = "Sign in";
+                document.getElementById("public-login-form").reset();
+              } catch (e) {
+                alert(e.stack || e.message || e);
+                console.error(e);
+              }
             });
             return;
           }
@@ -7867,13 +7929,18 @@
               btn.classList.add("!bg-green-500", "!border-green-500");
               btn.innerText = "Welcome back!";
               playPortalTransition(() => {
-                populateMemberDashboard(authData.user);
-                initializeSocialFeed();
-              switchView("view-member-dashboard");
-                btn.classList.remove("!bg-green-500", "!border-green-500");
-                btn.disabled = false;
-                btn.innerText = "Sign in";
-                document.getElementById("public-login-form").reset();
+                try {
+                  populateMemberDashboard(authData.user);
+                  initializeSocialFeed();
+                  switchView("view-social-feed");
+                  btn.classList.remove("!bg-green-500", "!border-green-500");
+                  btn.disabled = false;
+                  btn.innerText = "Sign in";
+                  document.getElementById("public-login-form").reset();
+                } catch (e) {
+                  alert(e.stack || e.message || e);
+                  console.error(e);
+                }
               });
               return;
             }
@@ -7895,15 +7962,20 @@
             btn.classList.add("!bg-green-500", "!border-green-500");
             btn.innerText = "Welcome back!";
             playPortalTransition(() => {
-              populateMemberDashboard(data.user);
-              // Always land on the feed; the profile form is only opened on demand
-              // (via the bell notification or the dashboard's "Apply" prompt).
-              initializeSocialFeed();
-              switchView("view-member-dashboard");
-              btn.classList.remove("!bg-green-500", "!border-green-500");
-              btn.disabled = false;
-              btn.innerText = "Sign in";
-              document.getElementById("public-login-form").reset();
+              try {
+                populateMemberDashboard(data.user);
+                // Always land on the feed; the profile form is only opened on demand
+                // (via the bell notification or the dashboard's "Apply" prompt).
+                initializeSocialFeed();
+                switchView("view-social-feed");
+                btn.classList.remove("!bg-green-500", "!border-green-500");
+                btn.disabled = false;
+                btn.innerText = "Sign in";
+                document.getElementById("public-login-form").reset();
+              } catch (e) {
+                alert(e.stack || e.message || e);
+                console.error(e);
+              }
             });
           } else {
             showError("public", data.message || "Invalid email or password.");
@@ -11207,35 +11279,7 @@ function burstConfetti(btn) {
         }
       }
 
-      function playPortalTransition(name, callback) {
-        var overlay = document.getElementById('portalOverlay');
-        var flash = document.getElementById('portalFlash');
-        var rays = document.getElementById('portalRays');
-        var ring = document.getElementById('portalRing');
-        var loginPage = document.querySelector('.page');
-        
 
-        overlay.classList.add('active');
-        flash.classList.add('run');
-        rays.classList.add('run');
-        ring.classList.add('run');
-        spawnPortalSparks();
-        spawnSideFlyers();
-
-        setTimeout(function () {
-          
-          
-          if (callback) callback();
-          window.scrollTo(0, 0);
-        }, 950);
-
-        setTimeout(function () {
-          overlay.classList.remove('active');
-          flash.classList.remove('run');
-          rays.classList.remove('run');
-          ring.classList.remove('run');
-        }, 2600);
-      }
 /* ---------------------------- */
 
 function initializeSocialFeed() {
@@ -36020,6 +36064,499 @@ function initializeSocialFeed() {
         beep(330, 0, 0.08); beep(440, 0.1, 0.12);
       }
     }
+
+
+    function getNormalizedPetInput(input = currentUserObj) {
+      if (typeof input === "string") {
+        return { petType: input.trim(), breedDetails: "" };
+      }
+      if (!input || typeof input !== "object") {
+        return { petType: "", breedDetails: "" };
+      }
+      return {
+        petType: String(
+          input.religion || input.pet_type || input.socialProfile?.religion || "",
+        ).trim(),
+        breedDetails: String(
+          input.socialProfile?.breedDetails ||
+          input.mother_tongue ||
+          input.breed_details ||
+          input.breed ||
+          "",
+        ).trim(),
+      };
+    }
+
+    function resolvePetThemeKey(input = currentUserObj) {
+      const { petType, breedDetails } = getNormalizedPetInput(input);
+      const profileText = `${petType} ${breedDetails}`.toLowerCase();
+
+      if (/(horse|pony|mare|stallion|foal|equestrian|equine)/.test(profileText)) {
+        return "horse";
+      }
+      if (
+        petType.toLowerCase() === "bird" ||
+        /(bird|parrot|cockatiel|budgie|canary|finch|macaw|lovebird)/.test(profileText)
+      ) {
+        return "bird";
+      }
+      if (
+        petType.toLowerCase() === "fish" ||
+        /(fish|guppy|goldfish|betta|koi|tetra|cichlid|aquatic)/.test(profileText)
+      ) {
+        return "fish";
+      }
+      if (
+        petType.toLowerCase() === "reptile" ||
+        /(reptile|snake|lizard|gecko|iguana|tortoise|turtle|python)/.test(profileText)
+      ) {
+        return "reptile";
+      }
+      if (
+        petType.toLowerCase() === "rabbit" ||
+        /(rabbit|bunny|hare)/.test(profileText)
+      ) {
+        return "rabbit";
+      }
+      if (
+        petType.toLowerCase() === "small pets" ||
+        /(hamster|guinea pig|ferret|chinchilla|gerbil|small pet)/.test(profileText)
+      ) {
+        return "small-pets";
+      }
+      if (
+        petType.toLowerCase() === "cat" ||
+        /(cat|kitten|persian|siamese|maine coon|ragdoll)/.test(profileText)
+      ) {
+        return "cat";
+      }
+      if (
+        petType.toLowerCase() === "dog" ||
+        /(dog|puppy|husky|labrador|beagle|pug|retriever|shepherd|indie mix|furry)/.test(profileText)
+      ) {
+        return "dog";
+      }
+      return "other";
+    }
+
+    function getPetTheme(input = currentUserObj) {
+      const key = resolvePetThemeKey(input);
+      const themes = {
+        dog: {
+          key: "dog",
+          label: "Dog",
+          landName: "Labrador Meadow",
+          mascotName: "Golden Labrador",
+          accent: "#ffab2e",
+          pastelBgClass: "bg-sky-50 dark:bg-stone-950",
+          signupGradient: "from-sky-100 via-yellow-50 to-lime-100",
+          darkClass: "bg-sky-900",
+          bannerGradient: "from-sky-400 via-amber-300 to-lime-300",
+          emoji: "🐶",
+          emblem: "🐾",
+          greeting: "Ready to play",
+          greetingEn: "Dog community",
+          highlight: {
+            title: "Sunny Pup Spotlight",
+            text: "Share park playdates, toy picks, cheerful walks, training wins, and wag-filled neighborhood moments.",
+          },
+          event: {
+            month: "Jun",
+            day: "22",
+            title: "Sunny Pup Playday",
+            place: "Meadow Circle Park",
+            desc: "Meet dog parents for fetch games, cheerful walks, toy swaps, and playful introductions.",
+          },
+          sectionEmoji: { feed: "🎾", friends: "🐾", connections: "📍", groups: "🌳", live: "☀️", events: "🎉", guides: "🦴", match: "💞", memorial: "🌈" },
+        },
+        cat: {
+          key: "cat",
+          label: "Cat",
+          accent: "#ff5ca8",
+          pastelBgClass: "bg-pink-50 dark:bg-stone-950",
+          signupGradient: "from-rose-100 via-pink-50 to-fuchsia-100",
+          darkClass: "bg-pink-900",
+          bannerGradient: "from-rose-500 via-pink-400 to-fuchsia-400",
+          emoji: "🐱",
+          emblem: "🐾",
+          greeting: "Cozy and curious",
+          greetingEn: "Cat community",
+          highlight: {
+            title: "Whisker Spotlight",
+            text: "Share enrichment ideas, favorite napping zones, and local rescue stories.",
+          },
+          event: {
+            month: "Apr",
+            day: "14",
+            title: "Cat Parent Coffee Meetup",
+            place: "Whiskers Cafe",
+            desc: "Meet local cat parents, swap enrichment ideas, and connect with rescue volunteers.",
+          },
+          sectionEmoji: { feed: "🧶", friends: "🐾", connections: "📍", groups: "🏠", live: "🎥", events: "🎀", guides: "🐟", match: "💞", memorial: "🌈" },
+        },
+        bird: {
+          key: "bird",
+          label: "Bird",
+          accent: "#1aa7ec",
+          pastelBgClass: "bg-cyan-50 dark:bg-slate-950",
+          signupGradient: "from-sky-100 via-cyan-50 to-teal-100",
+          darkClass: "bg-sky-900",
+          bannerGradient: "from-sky-500 via-cyan-400 to-teal-300",
+          emoji: "🦜",
+          emblem: "🪽",
+          greeting: "Wings up",
+          greetingEn: "Bird community",
+          highlight: {
+            title: "Aviary Spotlight",
+            text: "Compare enrichment perches, flight routines, and calm social introductions.",
+          },
+          event: {
+            month: "Jul",
+            day: "08",
+            title: "Bird Keeper Perch Talk",
+            place: "Skyline Aviary Club",
+            desc: "Trade habitat tips, diet notes, and socialization routines with fellow keepers.",
+          },
+          sectionEmoji: { feed: "🪶", friends: "🪽", connections: "📍", groups: "🌿", live: "🎥", events: "🎉", guides: "🌤️", match: "💞", memorial: "🌈" },
+        },
+        rabbit: {
+          key: "rabbit",
+          label: "Rabbit",
+          accent: "#7ecf6b",
+          pastelBgClass: "bg-lime-50 dark:bg-stone-950",
+          signupGradient: "from-lime-100 via-emerald-50 to-yellow-50",
+          darkClass: "bg-lime-900",
+          bannerGradient: "from-lime-400 via-emerald-400 to-amber-200",
+          emoji: "🐰",
+          emblem: "🥕",
+          greeting: "Hop in",
+          greetingEn: "Rabbit community",
+          highlight: {
+            title: "Warren Spotlight",
+            text: "Share bunny-safe spaces, bonding milestones, and forage-friendly routines.",
+          },
+          event: {
+            month: "May",
+            day: "11",
+            title: "Bunny Bonding Circle",
+            place: "Clover Community Hall",
+            desc: "Meet rabbit parents and talk bonding, enrichment tunnels, and grooming care.",
+          },
+          sectionEmoji: { feed: "🥕", friends: "🐰", connections: "📍", groups: "🌱", live: "🎥", events: "🎉", guides: "🥬", match: "💞", memorial: "🌈" },
+        },
+        fish: {
+          key: "fish",
+          label: "Fish",
+          accent: "#14c8d8",
+          pastelBgClass: "bg-sky-50 dark:bg-slate-950",
+          signupGradient: "from-cyan-100 via-sky-50 to-blue-100",
+          darkClass: "bg-cyan-900",
+          bannerGradient: "from-cyan-400 via-sky-400 to-blue-500",
+          emoji: "🐠",
+          emblem: "🫧",
+          greeting: "Dive in",
+          greetingEn: "Aquatic community",
+          highlight: {
+            title: "Reef Spotlight",
+            text: "Compare tank setups, water-care routines, and aquascape inspiration.",
+          },
+          event: {
+            month: "Aug",
+            day: "03",
+            title: "Aquascape Swap Session",
+            place: "Blue Current Studio",
+            desc: "Exchange aquascaping tips, tank maintenance routines, and fish-safe plant ideas.",
+          },
+          sectionEmoji: { feed: "🫧", friends: "🐠", connections: "📍", groups: "🌊", live: "🎥", events: "🎉", guides: "🪸", match: "💞", memorial: "🌈" },
+        },
+        reptile: {
+          key: "reptile",
+          label: "Reptile",
+          accent: "#19bf84",
+          pastelBgClass: "bg-emerald-50 dark:bg-slate-950",
+          signupGradient: "from-emerald-100 via-teal-50 to-lime-100",
+          darkClass: "bg-emerald-900",
+          bannerGradient: "from-emerald-500 via-teal-400 to-lime-300",
+          emoji: "🦎",
+          emblem: "🌵",
+          greeting: "Sun and scale",
+          greetingEn: "Reptile community",
+          highlight: {
+            title: "Terrarium Spotlight",
+            text: "Share basking setups, humidity wins, and safe enclosure upgrades.",
+          },
+          event: {
+            month: "Sep",
+            day: "19",
+            title: "Terrarium Build Meetup",
+            place: "Habitat Lab",
+            desc: "Compare enclosure layouts, heating setups, and enrichment ideas for exotic pets.",
+          },
+          sectionEmoji: { feed: "🌿", friends: "🦎", connections: "📍", groups: "🪵", live: "🎥", events: "🎉", guides: "☀️", match: "💞", memorial: "🌈" },
+        },
+        horse: {
+          key: "horse",
+          label: "Horse",
+          accent: "#c17b3f",
+          pastelBgClass: "bg-amber-50 dark:bg-stone-950",
+          signupGradient: "from-amber-100 via-orange-50 to-yellow-50",
+          darkClass: "bg-amber-900",
+          bannerGradient: "from-amber-600 via-orange-400 to-yellow-300",
+          emoji: "🐴",
+          emblem: "🏇",
+          greeting: "Stable and strong",
+          greetingEn: "Horse community",
+          highlight: {
+            title: "Stable Spotlight",
+            text: "Connect around riding trails, grooming routines, and breed-focused meetups.",
+          },
+          event: {
+            month: "Oct",
+            day: "05",
+            title: "Pony Pals Trail Day",
+            place: "Saddle Ridge Grounds",
+            desc: "Meet horse owners, trainers, and riders for a relaxed trail and care exchange.",
+          },
+          sectionEmoji: { feed: "🏇", friends: "🐴", connections: "📍", groups: "🏞️", live: "🎥", events: "🎉", guides: "🧲", match: "💞", memorial: "🌈" },
+        },
+        "small-pets": {
+          key: "small-pets",
+          label: "Small Pets",
+          accent: "#9d6cff",
+          pastelBgClass: "bg-violet-50 dark:bg-slate-950",
+          signupGradient: "from-violet-100 via-fuchsia-50 to-pink-100",
+          darkClass: "bg-violet-900",
+          bannerGradient: "from-violet-500 via-fuchsia-400 to-pink-300",
+          emoji: "🐹",
+          emblem: "🌰",
+          greeting: "Tiny but mighty",
+          greetingEn: "Small pet community",
+          highlight: {
+            title: "Pocket Pet Spotlight",
+            text: "Swap habitat upgrades, gentle handling tips, and nutrition ideas for small companions.",
+          },
+          event: {
+            month: "Nov",
+            day: "16",
+            title: "Pocket Pet Care Circle",
+            place: "Cozy Habitat Hub",
+            desc: "Share habitat hacks, enrichment toys, and rescue support for smaller companions.",
+          },
+          sectionEmoji: { feed: "🌰", friends: "🐹", connections: "📍", groups: "🏠", live: "🎥", events: "🎉", guides: "🧺", match: "💞", memorial: "🌈" },
+        },
+        other: {
+          key: "other",
+          label: "Pet",
+          accent: "#ff6b6b",
+          pastelBgClass: "bg-rose-50 dark:bg-slate-950",
+          signupGradient: "from-rose-100 via-orange-50 to-amber-50",
+          darkClass: "bg-rose-900",
+          bannerGradient: "from-rose-500 via-orange-400 to-amber-300",
+          emoji: "🐾",
+          emblem: "✨",
+          greeting: "Welcome",
+          greetingEn: "Pet community",
+          highlight: {
+            title: "Community Spotlight",
+            text: "Find nearby pet parents, exchange care ideas, and build trusted local circles.",
+          },
+          event: {
+            month: "Jun",
+            day: "22",
+            title: "Neighborhood Pet Walk",
+            place: "Central Park Loop",
+            desc: "Join a friendly community walk with quick intros for pet parents, walkers, and adopters.",
+          },
+          sectionEmoji: { feed: "✨", friends: "🐾", connections: "📍", groups: "🏡", live: "🎥", events: "🎉", guides: "📘", match: "💞", memorial: "🌈" },
+        },
+      };
+      return themes[key] || themes.other;
+    }
+
+    function initLoginFeed() {
+      var pane     = document.getElementById('lp-left-pane');
+      var card     = document.getElementById('lp-feed-card');
+      var ticker   = document.getElementById('lp-activity-ticker');
+      var onlineEl = document.getElementById('lp-online-count');
+      if (!card) return;
+
+      var feeds = [
+        {
+          petTheme: 'Dog',
+          icon: '🐕', grad: 'linear-gradient(135deg,#fffbeb 0%,#fef9c3 60%,#f0fdf4 100%)',
+          chipText: 'Dog Community · Active Now', chipCls: 'text-amber-700 border-amber-200',
+          headline: 'Golden Hour Walk Guide for Summer 2026',
+          excerpt: 'Vets recommend shifting walks to early morning and post-sunset as temperatures peak. Cool pavement prevents burned paws, while shorter shaded routes cut heatstroke risk. Always carry water and watch for excessive panting.',
+          tips: [
+            { icon: '💧', label: 'Fresh Water', sub: 'Every Hour',  cls: 'bg-sky-50 border-sky-100 text-sky-700' },
+            { icon: '🌅', label: 'Walk at',     sub: 'Dawn / Dusk', cls: 'bg-amber-50 border-amber-100 text-amber-700' },
+            { icon: '🐾', label: 'Paw Check',   sub: 'After Walk',  cls: 'bg-lime-50 border-lime-100 text-lime-700' },
+          ],
+          tags: ['🐕 Dogs', '☀️ Summer', '🌿 Wellness'],
+          activity: ['🐕 Dog Walk at Central Park · Sunday 7 am', '🙌 28 new dog parents joined today', '🏥 Vet Q&amp;A thread trending'],
+          online: 142,
+        },
+        {
+          petTheme: 'Cat',
+          icon: '🐈', grad: 'linear-gradient(135deg,#fdf4ff 0%,#ede9fe 60%,#f0f9ff 100%)',
+          chipText: 'Cat Community · Active Now', chipCls: 'text-purple-700 border-purple-200',
+          headline: 'Keeping Indoor Cats Cool &amp; Stimulated',
+          excerpt: 'Indoor cats need mental enrichment when hot weather keeps windows closed. Puzzle feeders, elevated perches, and window bird-feeders provide daily stimulation. Rotate toys weekly and schedule two play sessions daily to prevent boredom stress.',
+          tips: [
+            { icon: '🧩', label: 'Puzzle',  sub: 'Feeders',     cls: 'bg-purple-50 border-purple-100 text-purple-700' },
+            { icon: '🪟', label: 'Window',  sub: 'Bird Feeder', cls: 'bg-sky-50 border-sky-100 text-sky-700' },
+            { icon: '🎾', label: 'Play 2×', sub: 'Daily',       cls: 'bg-pink-50 border-pink-100 text-pink-700' },
+          ],
+          tags: ['🐈 Cats', '🏡 Indoor', '🌿 Enrichment'],
+          activity: ['🐈 New group: Indoor Cat Club · 52 members', '📸 52 photos shared today', '🏥 Live Vet Q&amp;A · Tonight 8 pm'],
+          online: 89,
+        },
+        {
+          petTheme: 'Bird',
+          icon: '🐦', grad: 'linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 60%,#ecfdf5 100%)',
+          chipText: 'Bird Community · Active Now', chipCls: 'text-sky-700 border-sky-200',
+          headline: 'Socialising Your Parrot: A Step-by-Step Guide',
+          excerpt: 'Building trust with a new parrot takes patience. Start with short 10-minute sessions near the cage without reaching in, offering treats through the bars. Gradually progress to step-up training with calm voices and positive reinforcement.',
+          tips: [
+            { icon: '🤝', label: 'Trust', sub: 'Sessions',    cls: 'bg-sky-50 border-sky-100 text-sky-700' },
+            { icon: '🍎', label: 'Treat', sub: 'Training',    cls: 'bg-green-50 border-green-100 text-green-700' },
+            { icon: '🔇', label: 'Calm',  sub: 'Environment', cls: 'bg-indigo-50 border-indigo-100 text-indigo-700' },
+          ],
+          tags: ['🐦 Birds', '🦜 Parrots', '💬 Training'],
+          activity: ['🐦 Parrot enrichment tips · 41 saves', '🎶 14 bird-call recordings shared', '📅 Bird Meet-Up · This Saturday'],
+          online: 34,
+        },
+        {
+          petTheme: 'Rabbit',
+          icon: '🐇', grad: 'linear-gradient(135deg,#fff1f2 0%,#fce7f3 60%,#fff7ed 100%)',
+          chipText: 'Rabbit Community · Active Now', chipCls: 'text-pink-700 border-pink-200',
+          headline: 'Rabbit-Proofing Your Home: The Essential Checklist',
+          excerpt: 'Free-roaming rabbits are happier and healthier, but preparation is key. Cover electrical cords, block gaps behind furniture, and protect baseboards. Rabbits chew naturally — redirect them with safe hay bundles and willow toys.',
+          tips: [
+            { icon: '🔌', label: 'Cover', sub: 'All Cords', cls: 'bg-pink-50 border-pink-100 text-pink-700' },
+            { icon: '🌾', label: 'Hay',   sub: 'Bundles',   cls: 'bg-amber-50 border-amber-100 text-amber-700' },
+            { icon: '🚧', label: 'Block', sub: 'All Gaps',  cls: 'bg-rose-50 border-rose-100 text-rose-700' },
+          ],
+          tags: ['🐇 Rabbits', '🏡 Safety', '🛡️ Proofing'],
+          activity: ['🐇 New bonded-pair photo posted', '🐣 Rescue spotlight: 3 bunnies available', '📦 Hay-haul bulk buy thread'],
+          online: 27,
+        },
+        {
+          petTheme: 'Fish',
+          icon: '🐠', grad: 'linear-gradient(135deg,#ecfeff 0%,#cffafe 60%,#f0fdf4 100%)',
+          chipText: 'Aquatics Community · Active Now', chipCls: 'text-cyan-700 border-cyan-200',
+          headline: 'Summer Aquarium Care: Keeping Water Temperatures Safe',
+          excerpt: 'Rising room temperatures push tank water above safe thresholds. Aim for 24–26 °C for tropical fish by running lights fewer hours, adding a fan across the water surface, or using frozen water bottles as a chiller. Test ammonia twice weekly.',
+          tips: [
+            { icon: '🌡️', label: '24–26°C',  sub: 'Target Temp',    cls: 'bg-cyan-50 border-cyan-100 text-cyan-700' },
+            { icon: '💨', label: 'Fan Over', sub: 'Water Surface',  cls: 'bg-sky-50 border-sky-100 text-sky-700' },
+            { icon: '🧪', label: 'Test 2×',  sub: 'Per Week',       cls: 'bg-teal-50 border-teal-100 text-teal-700' },
+          ],
+          tags: ['🐠 Fish', '🌊 Aquascaping', '☀️ Summer'],
+          activity: ['🐠 Aquascape build posted · 88 likes', '📊 Water test results thread', '🏆 Tank of the Month — vote now'],
+          online: 18,
+        },
+        {
+          petTheme: 'Reptile',
+          icon: '🦎', grad: 'linear-gradient(135deg,#f7fee7 0%,#ecfccb 60%,#fefce8 100%)',
+          chipText: 'Reptile Community · Active Now', chipCls: 'text-lime-700 border-lime-200',
+          headline: 'UVB Lighting &amp; Basking Zones: Getting It Right',
+          excerpt: 'Proper UVB exposure is critical for bone health in diurnal reptiles. Replace UVB bulbs every 12 months even if they still emit visible light — output degrades invisibly. Maintain a clear gradient: 35–38 °C hot side, 24–27 °C cool side.',
+          tips: [
+            { icon: '☀️', label: 'Replace UVB', sub: 'Every 12 mo', cls: 'bg-lime-50 border-lime-100 text-lime-700' },
+            { icon: '🌡️', label: 'Basking',     sub: '35–38 °C',   cls: 'bg-yellow-50 border-yellow-100 text-yellow-700' },
+            { icon: '❄️', label: 'Cool Side',   sub: '24–27 °C',   cls: 'bg-sky-50 border-sky-100 text-sky-700' },
+          ],
+          tags: ['🦎 Reptiles', '💡 UVB', '🐍 Husbandry'],
+          activity: ['🦎 Bioactive enclosure photos posted', '📷 Shed skin gallery · 9 new shots', '🩺 Exotic vet check-up guide posted'],
+          online: 22,
+        },
+      ];
+
+      var idx = Math.floor(Math.random() * feeds.length);
+      var rotateTimer = null;
+
+      function renderFeed() {
+        var f = feeds[idx];
+        if (pane) pane.style.background = f.grad;
+        if (onlineEl) onlineEl.textContent = (f.online + Math.floor(Math.random() * 14) - 7) + ' online';
+
+        var tipsHtml = f.tips.map(function(t) {
+          return '<div class="rounded-xl border px-2.5 py-2.5 text-center min-h-[92px] flex flex-col items-center justify-center ' + t.cls + '">' +
+                 '<div class="text-base mb-0.5">' + t.icon + '<\/div>' +
+                 '<div class="text-xs font-semibold leading-tight">' + t.label + '<br>' + t.sub + '<\/div><\/div>';
+        }).join('');
+
+        var tagsHtml = f.tags.map(function(tag) {
+          return '<span class="px-2 py-0.5 rounded-full bg-white border border-gray-200/70 text-xs font-medium text-gray-600">' + tag + '<\/span>';
+        }).join('');
+
+        var galleryThemes = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Fish', 'Reptile']
+          .filter(function(themeName) { return themeName !== f.petTheme; });
+        var communityGalleryHtml = galleryThemes.concat(galleryThemes).map(function(themeName) {
+          var theme = getPetTheme(themeName);
+          var art = PET_REAL_PHOTOS[themeName] || getPetIllustrationDataUrl(theme, 'badge');
+          return '<div class="pet-community-strip-item rounded-xl border border-white/85 bg-white/76 p-2.5 shadow-sm">' +
+                   '<div class="h-28 rounded-lg" style="background-image:linear-gradient(135deg, color-mix(in srgb, ' + theme.accent + ' 18%, white), transparent 70%), url(\'' + art + '\');background-size:cover;background-position:center;"><\/div>' +
+                   '<div class="mt-1.5 text-[11px] font-bold text-gray-700 text-center leading-tight">' + theme.label + '<\/div>' +
+                 '<\/div>';
+        }).join('');
+
+        card.innerHTML =
+          '<div class="h-full flex flex-col">' +
+          '<div class="flex items-center justify-between mb-2">' +
+            '<span class="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-0.5 rounded-full bg-white border uppercase tracking-wide ' + f.chipCls + '">' +
+              f.icon + ' ' + f.chipText +
+            '<\/span>' +
+            '<span class="text-xs text-gray-400">5 min read<\/span>' +
+          '<\/div>' +
+          '<h3 class="text-base font-bold text-gray-800 leading-snug mb-1.5" style="font-family:&apos;DM Serif Display&apos;">' + f.headline + '<\/h3>' +
+          '<p class="text-sm text-gray-600 leading-relaxed mb-3">' + f.excerpt + '<\/p>' +
+          '<div class="grid grid-cols-3 gap-2.5 mb-3 auto-rows-fr">' + tipsHtml + '<\/div>' +
+          '<div class="mt-auto flex items-center gap-2 flex-wrap">' + tagsHtml + '<\/div>' +
+          '<div class="mt-3 pt-3 border-t border-white/80">' +
+            '<div class="text-[11px] font-black uppercase tracking-[0.16em] text-gray-500 mb-2">Explore Pet Communities<\/div>' +
+            '<div class="pet-community-strip">' +
+              '<div class="pet-community-strip-track">' + communityGalleryHtml + '<\/div>' +
+            '<\/div>' +
+          '<\/div>' +
+          '<\/div>';
+
+        if (ticker) {
+          ticker.innerHTML = f.activity.map(function(a) {
+            return '<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-white/80 border border-gray-200/60 text-xs text-gray-600 shadow-sm">' + a + '<\/span>';
+          }).join('');
+        }
+
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(8px)';
+        requestAnimationFrame(function() {
+          card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        });
+
+        idx = (idx + 1) % feeds.length;
+      }
+
+      function start() {
+        clearInterval(rotateTimer);
+        renderFeed();
+        rotateTimer = setInterval(renderFeed, 7000);
+      }
+
+      start();
+
+      // Re-trigger each time the login view becomes active (after logout or back-nav)
+      var loginView = document.getElementById('view-public-login');
+      if (loginView) {
+        new MutationObserver(function() {
+          if (loginView.classList.contains('active')) start();
+        }).observe(loginView, { attributes: true, attributeFilter: ['class'] });
+      }
+    }
+
+    initLoginFeed();
 
 </script>
   </body>

@@ -36,7 +36,7 @@ if (file_exists($envFile)) {
 
 // Debug flag — when off (production), detailed Supabase/internal errors are logged
 // server-side and replaced with a generic message + request id for the client.
-define('PAWCIRCLE_DEBUG', true);
+define('PAWCIRCLE_DEBUG', in_array(strtolower((string) (getenv('PAWCIRCLE_DEBUG') ?: ($_ENV['PAWCIRCLE_DEBUG'] ?? ''))), ['1', 'true', 'yes', 'on'], true));
 
 // A short id attached to each response and error log line for correlation.
 function requestId()
@@ -5800,6 +5800,13 @@ function enrichGroups($groups, $currentUserId = null, $includeMembers = true)
     $profileMap = $includeMembers ? fetchProfilesMap($memberUserIds) : [];
 
     foreach ($groups as &$group) {
+        if (isset($group['breed'])) {
+            $group['community'] = $group['breed'];
+        }
+        if (isset($group['pet_type'])) {
+            $group['religion'] = $group['pet_type'];
+        }
+
         $gid = $group['id'];
         $rows = $membersByGroup[$gid] ?? [];
         $group['member_count'] = count($rows);
@@ -7447,8 +7454,8 @@ function handleCreateGroup($data)
         'name' => $name,
         'description' => cleanTextValue($data['description'] ?? $data['desc'] ?? '', 1000) ?: null,
         'avatar_url' => trim((string) ($data['avatar_url'] ?? '')) ?: null,
-        'community' => $community,
-        'religion' => $religion,
+        'breed' => $community,
+        'pet_type' => $religion,
         'created_by' => $data['user_id'],
         'is_private' => isset($data['is_private']) ? (bool) $data['is_private'] : false,
     ];
@@ -8166,7 +8173,7 @@ function handleGetGroups($data)
     $userCommunity = trim((string) ($data['community'] ?? ''));
     $groupsById = [];
 
-    $baseSelect = 'id,name,description,avatar_url,community,religion,created_by,is_private,pack_key,created_at,updated_at';
+    $baseSelect = 'id,name,description,avatar_url,breed,pet_type,created_by,is_private,pack_key,created_at,updated_at';
     $limit = isset($data['limit']) ? (string) max(1, min((int) $data['limit'], 100)) : '10';
 
     $queries = [];
@@ -8175,8 +8182,8 @@ function handleGetGroups($data)
     $queries[] = [
         'select' => $baseSelect,
         'is_private' => 'eq.false',
-        'religion' => 'is.null',
-        'community' => 'is.null',
+        'pet_type' => 'is.null',
+        'breed' => 'is.null',
         'order' => 'created_at.desc',
         'limit' => $limit,
     ];
@@ -8186,8 +8193,8 @@ function handleGetGroups($data)
         $queries[] = [
             'select' => $baseSelect,
             'is_private' => 'eq.false',
-            'religion' => 'eq.' . $userReligion,
-            'community' => 'is.null',
+            'pet_type' => 'eq.' . $userReligion,
+            'breed' => 'is.null',
             'order' => 'created_at.desc',
             'limit' => $limit,
         ];
@@ -8198,8 +8205,8 @@ function handleGetGroups($data)
         $queries[] = [
             'select' => $baseSelect,
             'is_private' => 'eq.false',
-            'religion' => 'eq.' . $userReligion,
-            'community' => 'eq.' . $userCommunity,
+            'pet_type' => 'eq.' . $userReligion,
+            'breed' => 'eq.' . $userCommunity,
             'order' => 'created_at.desc',
             'limit' => $limit,
         ];
@@ -8273,8 +8280,8 @@ function handleSearchMembers($data)
     $offset = isset($data['offset']) ? max(0, (int) $data['offset']) : 0;
     $queryText = cleanNullableText($data['query'] ?? '', 120);
     $filters = [
-        'religion' => cleanNullableText($data['religion'] ?? '', 120),
-        'community' => cleanNullableText($data['community'] ?? '', 160),
+        'pet_type' => cleanNullableText($data['religion'] ?? '', 120),
+        'breed' => cleanNullableText($data['community'] ?? '', 160),
         'gotra' => cleanNullableText($data['gotra'] ?? ($data['clan'] ?? ''), 160),
         'native_village' => cleanNullableText($data['native_village'] ?? '', 160),
         'current_city' => cleanNullableText($data['current_city'] ?? ($data['city'] ?? ''), 160),
@@ -8309,7 +8316,7 @@ function handleSearchMembers($data)
     $currentCommunity = trim((string) ($currentProfile['community'] ?? ''));
 
     $profileQuery = [
-        'select' => 'user_id,full_name,profile_photo_url,religion,community,gotra,native_village,current_city,age_group,date_of_birth,gender,occupation,is_public,visibility',
+        'select' => 'user_id,full_name,profile_photo_url,pet_type,breed,gotra,native_village,current_city,age_group,date_of_birth,gender,occupation,is_public,visibility',
         'user_id' => 'neq.' . $userId,
         'order' => 'full_name.asc',
         'limit' => (string) min(400, max(($limit + $offset) * 4, 100)),
@@ -8328,13 +8335,21 @@ function handleSearchMembers($data)
 
     $profilesRes = supabaseRequest('GET', '/rest/v1/profiles', $profileQuery);
     if (supabaseFailed($profilesRes)) {
-        $profileQuery['select'] = 'user_id,full_name,profile_photo_url,religion,community,gotra,native_village,current_city,age_group,date_of_birth,gender,occupation,is_public';
+        $profileQuery['select'] = 'user_id,full_name,profile_photo_url,pet_type,breed,gotra,native_village,current_city,age_group,date_of_birth,gender,occupation,is_public';
         $profileQuery['is_public'] = 'eq.true';
         $profilesRes = supabaseRequest('GET', '/rest/v1/profiles', $profileQuery);
         if (supabaseFailed($profilesRes)) {
             sendSupabaseError("Failed to search members.", $profilesRes);
             return;
         }
+    }
+
+    if (!empty($profilesRes['data'])) {
+        foreach ($profilesRes['data'] as &$p) {
+            $p['religion'] = $p['pet_type'] ?? '';
+            $p['community'] = $p['breed'] ?? '';
+        }
+        unset($p);
     }
 
     $ageMin = isset($data['age_min']) && $data['age_min'] !== '' ? (int) $data['age_min'] : null;

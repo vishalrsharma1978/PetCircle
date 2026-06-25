@@ -28,13 +28,15 @@
     align-items: center;
     justify-content: center;
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
     overflow: hidden;
-    transition: opacity 0.35s ease;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
   }
 
   .portal-overlay.active {
     opacity: 1;
+    visibility: visible;
   }
 
   .portal-flash {
@@ -5821,7 +5823,7 @@
   <div id="view-public-login" class="view-section active h-screen overflow-hidden flex flex-col lg:flex-row items-stretch w-full">
 
     <!-- ── LEFT PANE: Feature Showcase & Feed ────────────────────────────── -->
-    <div id="lp-left-pane" class="w-full lg:w-1/2 h-full flex flex-col p-6 sm:p-8 lg:p-10 overflow-y-auto sidebar-scroll relative" style="background:linear-gradient(135deg,#fffbeb 0%,#f0fdf4 55%,#ecfeff 100%); transition:background 0.8s ease">
+    <div id="lp-left-pane" class="w-full lg:w-1/2 h-full flex flex-col p-6 sm:p-8 lg:p-10 overflow-y-auto overflow-x-hidden sidebar-scroll relative" style="background:linear-gradient(135deg,#fffbeb 0%,#f0fdf4 55%,#ecfeff 100%); transition:background 0.8s ease">
       
       <!-- Trailing Paws Background (from signup) -->
       <section class="den" id="login-den" aria-hidden="true" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; opacity: 0.7; z-index: 0;">
@@ -5872,7 +5874,7 @@
     </div>
 
     <!-- ── RIGHT PANE: Login Form ────────────────────────────────────────── -->
-    <div id="lp-right-pane" class="w-full lg:w-1/2 h-full flex flex-col items-center justify-center bg-white border-t lg:border-t-0 lg:border-l border-gray-100 p-6 sm:p-8 overflow-y-auto" style="--login-accent: #f97316; transition: --login-accent 0.5s ease;">
+    <div id="lp-right-pane" class="w-full lg:w-1/2 h-full flex flex-col items-center justify-start pt-10 sm:pt-16 pb-8 bg-white border-t lg:border-t-0 lg:border-l border-gray-100 p-6 sm:px-8 overflow-y-auto overflow-x-hidden" style="--login-accent: #f97316; transition: --login-accent 0.5s ease;">
       
       <div class="w-full max-w-sm">
         

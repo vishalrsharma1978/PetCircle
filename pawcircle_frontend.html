@@ -16,168 +16,240 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- <link rel="stylesheet" href="https://source.zoom.us/6.1.0/css/bootstrap.css" />
   <link rel="stylesheet" href="https://source.zoom.us/6.1.0/css/react-select.css" /> -->
-  
-<!-- --- PORTAL TRANSITION HTML --- -->
-<style>
-  /* ---------- portal transition ---------- */
-  .portal-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    overflow: hidden;
-    transition: opacity 0.35s ease, visibility 0.35s ease;
-  }
 
-  .portal-overlay.active {
-    opacity: 1;
-    visibility: visible;
-  }
+  <!-- --- PORTAL TRANSITION HTML --- -->
+  <style>
+    /* ---------- portal transition ---------- */
+    .portal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      overflow: hidden;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
 
-  .portal-flash {
-    position: absolute;
-    inset: -25%;
-    background: radial-gradient(circle, #FFFBEF 0%, var(--brand-200, #ffa95a) 32%, var(--brand-400, #ff5a5a) 58%, var(--brand-900, #7a2222) 100%);
-    opacity: 0;
-    transform: scale(0.25);
-  }
+    .portal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
 
-  .portal-flash.run {
-    animation: flashSeq 2.3s cubic-bezier(.45, 0, .2, 1) forwards;
-  }
+    .portal-flash {
+      position: absolute;
+      inset: -25%;
+      background: radial-gradient(circle, #FFFBEF 0%, var(--brand-200, #ffa95a) 32%, var(--brand-400, #ff5a5a) 58%, var(--brand-900, #7a2222) 100%);
+      opacity: 0;
+      transform: scale(0.25);
+    }
 
-  @keyframes flashSeq {
-    0% { opacity: 0; transform: scale(0.25); }
-    32% { opacity: 1; transform: scale(1.3); }
-    54% { opacity: 1; transform: scale(1.65); }
-    100% { opacity: 0; transform: scale(2.6); }
-  }
+    .portal-flash.run {
+      animation: flashSeq 2.3s cubic-bezier(.45, 0, .2, 1) forwards;
+    }
 
-  .portal-rays {
-    position: absolute;
-    width: 240%;
-    height: 240%;
-    background: conic-gradient(from 0deg,
-        rgba(255, 248, 236, 0) 0deg, rgba(255, 248, 236, 0.5) 6deg, rgba(255, 248, 236, 0) 14deg,
-        rgba(242, 169, 59, 0) 70deg, rgba(242, 169, 59, 0.4) 78deg, rgba(242, 169, 59, 0) 86deg,
-        rgba(255, 122, 92, 0) 150deg, rgba(255, 122, 92, 0.35) 158deg, rgba(255, 122, 92, 0) 166deg,
-        rgba(255, 248, 236, 0) 230deg, rgba(255, 248, 236, 0.4) 238deg, rgba(255, 248, 236, 0) 246deg,
-        transparent 360deg);
-    opacity: 0;
-    transform: rotate(0deg) scale(0.4);
-  }
+    @keyframes flashSeq {
+      0% {
+        opacity: 0;
+        transform: scale(0.25);
+      }
 
-  .portal-rays.run {
-    animation: raysSeq 2.3s ease-out forwards;
-  }
+      32% {
+        opacity: 1;
+        transform: scale(1.3);
+      }
 
-  @keyframes raysSeq {
-    0% { opacity: 0; transform: rotate(0deg) scale(0.4); }
-    30% { opacity: 0.85; }
-    60% { opacity: 0.6; transform: rotate(150deg) scale(1.05); }
-    100% { opacity: 0; transform: rotate(240deg) scale(1.3); }
-  }
+      54% {
+        opacity: 1;
+        transform: scale(1.65);
+      }
 
-  .portal-ring {
-    position: absolute;
-    width: 160px;
-    height: 160px;
-    opacity: 0;
-  }
+      100% {
+        opacity: 0;
+        transform: scale(2.6);
+      }
+    }
 
-  .portal-ring.run {
-    animation: ringSeq 2.3s cubic-bezier(.22, 1, .36, 1) forwards;
-  }
+    .portal-rays {
+      position: absolute;
+      width: 240%;
+      height: 240%;
+      background: conic-gradient(from 0deg,
+          rgba(255, 248, 236, 0) 0deg, rgba(255, 248, 236, 0.5) 6deg, rgba(255, 248, 236, 0) 14deg,
+          rgba(242, 169, 59, 0) 70deg, rgba(242, 169, 59, 0.4) 78deg, rgba(242, 169, 59, 0) 86deg,
+          rgba(255, 122, 92, 0) 150deg, rgba(255, 122, 92, 0.35) 158deg, rgba(255, 122, 92, 0) 166deg,
+          rgba(255, 248, 236, 0) 230deg, rgba(255, 248, 236, 0.4) 238deg, rgba(255, 248, 236, 0) 246deg,
+          transparent 360deg);
+      opacity: 0;
+      transform: rotate(0deg) scale(0.4);
+    }
 
-  .portal-ring .ring-outer {
-    fill: none;
-    stroke: #FFF8EC;
-    stroke-width: 1.6;
-    stroke-dasharray: 5 11;
-  }
+    .portal-rays.run {
+      animation: raysSeq 2.3s ease-out forwards;
+    }
 
-  .portal-ring .ring-inner {
-    fill: none;
-    stroke: var(--brand-300, #ff8b5a);
-    stroke-width: 1.1;
-  }
+    @keyframes raysSeq {
+      0% {
+        opacity: 0;
+        transform: rotate(0deg) scale(0.4);
+      }
 
-  .portal-ring .ring-glyph {
-    fill: #FFF8EC;
-  }
+      30% {
+        opacity: 0.85;
+      }
 
-  @keyframes ringSeq {
-    0% { opacity: 0; transform: scale(0.2) rotate(0deg); }
-    22% { opacity: 1; transform: scale(1) rotate(50deg); }
-    55% { opacity: 0.9; transform: scale(2.3) rotate(170deg); }
-    100% { opacity: 0; transform: scale(7) rotate(280deg); }
-  }
+      60% {
+        opacity: 0.6;
+        transform: rotate(150deg) scale(1.05);
+      }
 
-  .portal-sparks {
-    position: absolute;
-    inset: 0;
-  }
+      100% {
+        opacity: 0;
+        transform: rotate(240deg) scale(1.3);
+      }
+    }
 
-  .portal-spark {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 20px;
-    height: 20px;
-    pointer-events: none;
-    animation: portalSparkFly 1.5s ease-out forwards;
-  }
+    .portal-ring {
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      opacity: 0;
+    }
 
-  @keyframes portalSparkFly {
-    from { transform: translate(-50%, -50%) rotate(0deg) scale(0.3); opacity: 1; }
-    to { transform: translate(var(--tx), var(--ty)) rotate(var(--tr)) scale(1.1); opacity: 0; }
-  }
+    .portal-ring.run {
+      animation: ringSeq 2.3s cubic-bezier(.22, 1, .36, 1) forwards;
+    }
 
-  .portal-side-host {
-    position: absolute;
-    inset: 0;
-  }
+    .portal-ring .ring-outer {
+      fill: none;
+      stroke: #FFF8EC;
+      stroke-width: 1.6;
+      stroke-dasharray: 5 11;
+    }
 
-  .portal-side {
-    position: absolute;
-    pointer-events: none;
-    opacity: 0;
-    animation: flySide 2.05s cubic-bezier(.33, 0, .2, 1) forwards;
-    filter: drop-shadow(0 2px 6px rgba(22, 36, 28, 0.25));
-  }
+    .portal-ring .ring-inner {
+      fill: none;
+      stroke: var(--brand-300, #ff8b5a);
+      stroke-width: 1.1;
+    }
 
-  @keyframes flySide {
-    0% { opacity: 0; transform: translate(0, 0) rotate(0deg) scale(0.55); }
-    12% { opacity: 1; }
-    80% { opacity: 1; }
-    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(1.05); }
-  }
+    .portal-ring .ring-glyph {
+      fill: #FFF8EC;
+    }
 
-  .confetti-piece {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 14px;
-    height: 14px;
-    fill: var(--brand-300, #ff8b5a);
-    pointer-events: none;
-    animation: confettiPop 0.9s ease-out forwards;
-  }
+    @keyframes ringSeq {
+      0% {
+        opacity: 0;
+        transform: scale(0.2) rotate(0deg);
+      }
 
-  @keyframes confettiPop {
-    from { transform: translate(-50%, -50%) rotate(0deg) scale(0.6); opacity: 1; }
-    to { transform: translate(var(--tx), var(--ty)) rotate(var(--tr)) scale(1); opacity: 0; }
-  }
+      22% {
+        opacity: 1;
+        transform: scale(1) rotate(50deg);
+      }
+
+      55% {
+        opacity: 0.9;
+        transform: scale(2.3) rotate(170deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(7) rotate(280deg);
+      }
+    }
+
+    .portal-sparks {
+      position: absolute;
+      inset: 0;
+    }
+
+    .portal-spark {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+      animation: portalSparkFly 1.5s ease-out forwards;
+    }
+
+    @keyframes portalSparkFly {
+      from {
+        transform: translate(-50%, -50%) rotate(0deg) scale(0.3);
+        opacity: 1;
+      }
+
+      to {
+        transform: translate(var(--tx), var(--ty)) rotate(var(--tr)) scale(1.1);
+        opacity: 0;
+      }
+    }
+
+    .portal-side-host {
+      position: absolute;
+      inset: 0;
+    }
+
+    .portal-side {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0;
+      animation: flySide 2.05s cubic-bezier(.33, 0, .2, 1) forwards;
+      filter: drop-shadow(0 2px 6px rgba(22, 36, 28, 0.25));
+    }
+
+    @keyframes flySide {
+      0% {
+        opacity: 0;
+        transform: translate(0, 0) rotate(0deg) scale(0.55);
+      }
+
+      12% {
+        opacity: 1;
+      }
+
+      80% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(1.05);
+      }
+    }
+
+    .confetti-piece {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 14px;
+      height: 14px;
+      fill: var(--brand-300, #ff8b5a);
+      pointer-events: none;
+      animation: confettiPop 0.9s ease-out forwards;
+    }
+
+    @keyframes confettiPop {
+      from {
+        transform: translate(-50%, -50%) rotate(0deg) scale(0.6);
+        opacity: 1;
+      }
+
+      to {
+        transform: translate(var(--tx), var(--ty)) rotate(var(--tr)) scale(1);
+        opacity: 0;
+      }
+    }
 
     @keyframes petCommunityStripScroll {
       0% {
         transform: translateX(0);
       }
+
       100% {
         transform: translateX(-50%);
       }
@@ -217,24 +289,23 @@
         animation: none;
       }
     }
+  </style>
 
-</style>
+  <div class="portal-overlay" id="portalOverlay" aria-hidden="true">
+    <div class="portal-flash" id="portalFlash"></div>
+    <div class="portal-rays" id="portalRays"></div>
+    <svg class="portal-ring" id="portalRing" viewBox="0 0 200 200">
+      <circle class="ring-outer" cx="100" cy="100" r="78" />
+      <circle class="ring-inner" cx="100" cy="100" r="62" />
+      <path class="ring-glyph" d="M100 18 L104 30 L116 32 L104 34 L100 46 L96 34 L84 32 L96 30 Z" />
+      <path class="ring-glyph" d="M170 100 L162 104 L160 116 L158 104 L146 100 L158 96 L160 84 L162 96 Z" />
+      <path class="ring-glyph" d="M30 100 L38 104 L40 116 L42 104 L54 100 L42 96 L40 84 L38 96 Z" />
+    </svg>
+    <div class="portal-sparks" id="portalSparks"></div>
+    <div class="portal-side-host" id="portalSideHost"></div>
+  </div>
 
-<div class="portal-overlay" id="portalOverlay" aria-hidden="true">
-  <div class="portal-flash" id="portalFlash"></div>
-  <div class="portal-rays" id="portalRays"></div>
-  <svg class="portal-ring" id="portalRing" viewBox="0 0 200 200">
-    <circle class="ring-outer" cx="100" cy="100" r="78" />
-    <circle class="ring-inner" cx="100" cy="100" r="62" />
-    <path class="ring-glyph" d="M100 18 L104 30 L116 32 L104 34 L100 46 L96 34 L84 32 L96 30 Z" />
-    <path class="ring-glyph" d="M170 100 L162 104 L160 116 L158 104 L146 100 L158 96 L160 84 L162 96 Z" />
-    <path class="ring-glyph" d="M30 100 L38 104 L40 116 L42 104 L54 100 L42 96 L40 84 L38 96 Z" />
-  </svg>
-  <div class="portal-sparks" id="portalSparks"></div>
-  <div class="portal-side-host" id="portalSideHost"></div>
-</div>
-
-<script>
+  <script>
     const PET_REAL_PHOTOS = {
       Dog: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=1200&q=85&auto=format&fit=crop',
       Cat: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=1200&q=85&auto=format&fit=crop',
@@ -245,121 +316,121 @@
       "Small Pets": 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=1200&q=85&auto=format&fit=crop',
       Other: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=1200&q=85&auto=format&fit=crop',
     };
-  function burstConfetti(btn) {
-    btn.style.position = 'relative';
-    btn.style.overflow = 'hidden';
-    for (var i = 0; i < 14; i++) {
-      var span = document.createElement('span');
-      span.className = 'confetti-piece';
-      var angle = Math.random() * Math.PI * 2;
-      var dist = 40 + Math.random() * 60;
-      var tx = Math.cos(angle) * dist;
-      var ty = Math.sin(angle) * dist - 20;
-      span.style.setProperty('--tx', tx + 'px');
-      span.style.setProperty('--ty', ty + 'px');
-      span.style.setProperty('--tr', (Math.random() * 360) + 'deg');
-      span.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14"><ellipse cx="12" cy="15.2" rx="6" ry="5"/><ellipse cx="5" cy="8" rx="2.5" ry="3.1"/><ellipse cx="11.2" cy="5.2" rx="2.5" ry="3.1"/><ellipse cx="17.4" cy="8" rx="2.5" ry="3.1"/><ellipse cx="20" cy="12.4" rx="2.2" ry="2.9"/></svg>';
-      btn.appendChild(span);
-      setTimeout(function(s) { return function() { s.remove(); }; }(span), 950);
-    }
-  }
-
-  function spawnPortalSparks() {
-    var host = document.getElementById('portalSparks');
-    host.innerHTML = '';
-    var pawIcon = '<svg viewBox="0 0 24 24" width="100%" height="100%"><ellipse cx="12" cy="15.2" rx="6" ry="5"/><ellipse cx="5" cy="8" rx="2.5" ry="3.1"/><ellipse cx="11.2" cy="5.2" rx="2.5" ry="3.1"/><ellipse cx="17.4" cy="8" rx="2.5" ry="3.1"/><ellipse cx="20" cy="12.4" rx="2.2" ry="2.9"/></svg>';
-    var starIcon = '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z"/></svg>';
-    var colors = ['#FFF8EC', '#ffa95a', '#ff5a5a'];
-    for (var i = 0; i < 22; i++) {
-      var span = document.createElement('span');
-      span.className = 'portal-spark';
-      var angle = Math.random() * Math.PI * 2;
-      var dist = 160 + Math.random() * 340;
-      var tx = Math.cos(angle) * dist;
-      var ty = Math.sin(angle) * dist;
-      span.style.setProperty('--tx', tx + 'px');
-      span.style.setProperty('--ty', ty + 'px');
-      span.style.setProperty('--tr', (Math.random() * 360) + 'deg');
-      span.style.color = colors[Math.floor(Math.random() * colors.length)];
-      span.style.fill = 'currentColor';
-      span.style.animationDelay = (Math.random() * 0.25) + 's';
-      span.innerHTML = Math.random() < 0.6 ? pawIcon : starIcon;
-      host.appendChild(span);
-      setTimeout(function(s) { return function() { s.remove(); }; }(span), 1850);
-    }
-  }
-
-  function spawnSideFlyers() {
-    var host = document.getElementById('portalSideHost');
-    host.innerHTML = '';
-    var icons = {
-      paw: '<svg viewBox="0 0 24 24" width="100%" height="100%"><ellipse cx="12" cy="15.2" rx="6" ry="5"/><ellipse cx="5" cy="8" rx="2.5" ry="3.1"/><ellipse cx="11.2" cy="5.2" rx="2.5" ry="3.1"/><ellipse cx="17.4" cy="8" rx="2.5" ry="3.1"/><ellipse cx="20" cy="12.4" rx="2.2" ry="2.9"/></svg>',
-      bone: '<svg viewBox="0 0 24 24" width="100%" height="100%"><rect x="7" y="10.4" width="10" height="3.2" rx="1.4"/><circle cx="5" cy="9" r="2.7"/><circle cx="5" cy="15" r="2.7"/><circle cx="19" cy="9" r="2.7"/><circle cx="19" cy="15" r="2.7"/></svg>',
-      star: '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z"/></svg>'
-    };
-    var palette = {
-      paw: ['#ffa95a', '#ff5a5a'],
-      bone: ['#FFF8EC'],
-      star: ['#FFF8EC', '#ffa95a']
-    };
-    var keys = Object.keys(icons);
-    var count = 16;
-    for (var i = 0; i < count; i++) {
-      var fromLeft = i % 2 === 0;
-      var key = keys[Math.floor(Math.random() * keys.length)];
-      var colors = palette[key];
-      var span = document.createElement('span');
-      span.className = 'portal-side';
-      var size = 24 + Math.random() * 22;
-      span.style.width = size + 'px';
-      span.style.height = size + 'px';
-      span.style.top = (6 + Math.random() * 84) + 'vh';
-      if (fromLeft) { span.style.left = '-54px'; } else { span.style.right = '-54px'; }
-      var travel = (window.innerWidth || 1200) * (0.42 + Math.random() * 0.32);
-      var dx = fromLeft ? travel : -travel;
-      var dy = (Math.random() - 0.5) * 180;
-      var rot = (fromLeft ? 1 : -1) * (160 + Math.random() * 340);
-      span.style.setProperty('--dx', dx + 'px');
-      span.style.setProperty('--dy', dy + 'px');
-      span.style.setProperty('--rot', rot + 'deg');
-      span.style.color = colors[Math.floor(Math.random() * colors.length)];
-      span.style.fill = 'currentColor';
-      span.style.animationDelay = (Math.random() * 0.45) + 's';
-      span.innerHTML = icons[key];
-      host.appendChild(span);
-      setTimeout(function(s) { return function() { s.remove(); }; }(span), 2650);
-    }
-  }
-
-  function playPortalTransition(callback) {
-    var overlay = document.getElementById('portalOverlay');
-    var flash = document.getElementById('portalFlash');
-    var rays = document.getElementById('portalRays');
-    var ring = document.getElementById('portalRing');
-
-    overlay.classList.add('active');
-    flash.classList.add('run');
-    rays.classList.add('run');
-    ring.classList.add('run');
-    spawnPortalSparks();
-    spawnSideFlyers();
-
-    setTimeout(function() {
-      if (typeof callback === 'function') {
-        callback();
+    function burstConfetti(btn) {
+      btn.style.position = 'relative';
+      btn.style.overflow = 'hidden';
+      for (var i = 0; i < 14; i++) {
+        var span = document.createElement('span');
+        span.className = 'confetti-piece';
+        var angle = Math.random() * Math.PI * 2;
+        var dist = 40 + Math.random() * 60;
+        var tx = Math.cos(angle) * dist;
+        var ty = Math.sin(angle) * dist - 20;
+        span.style.setProperty('--tx', tx + 'px');
+        span.style.setProperty('--ty', ty + 'px');
+        span.style.setProperty('--tr', (Math.random() * 360) + 'deg');
+        span.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14"><ellipse cx="12" cy="15.2" rx="6" ry="5"/><ellipse cx="5" cy="8" rx="2.5" ry="3.1"/><ellipse cx="11.2" cy="5.2" rx="2.5" ry="3.1"/><ellipse cx="17.4" cy="8" rx="2.5" ry="3.1"/><ellipse cx="20" cy="12.4" rx="2.2" ry="2.9"/></svg>';
+        btn.appendChild(span);
+        setTimeout(function (s) { return function () { s.remove(); }; }(span), 950);
       }
-    }, 950);
+    }
 
-    setTimeout(function() {
-      overlay.classList.remove('active');
-      flash.classList.remove('run');
-      rays.classList.remove('run');
-      ring.classList.remove('run');
-    }, 2600);
-  }
-</script>
-<!-- ------------------------------ -->
-<script>
+    function spawnPortalSparks() {
+      var host = document.getElementById('portalSparks');
+      host.innerHTML = '';
+      var pawIcon = '<svg viewBox="0 0 24 24" width="100%" height="100%"><ellipse cx="12" cy="15.2" rx="6" ry="5"/><ellipse cx="5" cy="8" rx="2.5" ry="3.1"/><ellipse cx="11.2" cy="5.2" rx="2.5" ry="3.1"/><ellipse cx="17.4" cy="8" rx="2.5" ry="3.1"/><ellipse cx="20" cy="12.4" rx="2.2" ry="2.9"/></svg>';
+      var starIcon = '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z"/></svg>';
+      var colors = ['#FFF8EC', '#ffa95a', '#ff5a5a'];
+      for (var i = 0; i < 22; i++) {
+        var span = document.createElement('span');
+        span.className = 'portal-spark';
+        var angle = Math.random() * Math.PI * 2;
+        var dist = 160 + Math.random() * 340;
+        var tx = Math.cos(angle) * dist;
+        var ty = Math.sin(angle) * dist;
+        span.style.setProperty('--tx', tx + 'px');
+        span.style.setProperty('--ty', ty + 'px');
+        span.style.setProperty('--tr', (Math.random() * 360) + 'deg');
+        span.style.color = colors[Math.floor(Math.random() * colors.length)];
+        span.style.fill = 'currentColor';
+        span.style.animationDelay = (Math.random() * 0.25) + 's';
+        span.innerHTML = Math.random() < 0.6 ? pawIcon : starIcon;
+        host.appendChild(span);
+        setTimeout(function (s) { return function () { s.remove(); }; }(span), 1850);
+      }
+    }
+
+    function spawnSideFlyers() {
+      var host = document.getElementById('portalSideHost');
+      host.innerHTML = '';
+      var icons = {
+        paw: '<svg viewBox="0 0 24 24" width="100%" height="100%"><ellipse cx="12" cy="15.2" rx="6" ry="5"/><ellipse cx="5" cy="8" rx="2.5" ry="3.1"/><ellipse cx="11.2" cy="5.2" rx="2.5" ry="3.1"/><ellipse cx="17.4" cy="8" rx="2.5" ry="3.1"/><ellipse cx="20" cy="12.4" rx="2.2" ry="2.9"/></svg>',
+        bone: '<svg viewBox="0 0 24 24" width="100%" height="100%"><rect x="7" y="10.4" width="10" height="3.2" rx="1.4"/><circle cx="5" cy="9" r="2.7"/><circle cx="5" cy="15" r="2.7"/><circle cx="19" cy="9" r="2.7"/><circle cx="19" cy="15" r="2.7"/></svg>',
+        star: '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z"/></svg>'
+      };
+      var palette = {
+        paw: ['#ffa95a', '#ff5a5a'],
+        bone: ['#FFF8EC'],
+        star: ['#FFF8EC', '#ffa95a']
+      };
+      var keys = Object.keys(icons);
+      var count = 16;
+      for (var i = 0; i < count; i++) {
+        var fromLeft = i % 2 === 0;
+        var key = keys[Math.floor(Math.random() * keys.length)];
+        var colors = palette[key];
+        var span = document.createElement('span');
+        span.className = 'portal-side';
+        var size = 24 + Math.random() * 22;
+        span.style.width = size + 'px';
+        span.style.height = size + 'px';
+        span.style.top = (6 + Math.random() * 84) + 'vh';
+        if (fromLeft) { span.style.left = '-54px'; } else { span.style.right = '-54px'; }
+        var travel = (window.innerWidth || 1200) * (0.42 + Math.random() * 0.32);
+        var dx = fromLeft ? travel : -travel;
+        var dy = (Math.random() - 0.5) * 180;
+        var rot = (fromLeft ? 1 : -1) * (160 + Math.random() * 340);
+        span.style.setProperty('--dx', dx + 'px');
+        span.style.setProperty('--dy', dy + 'px');
+        span.style.setProperty('--rot', rot + 'deg');
+        span.style.color = colors[Math.floor(Math.random() * colors.length)];
+        span.style.fill = 'currentColor';
+        span.style.animationDelay = (Math.random() * 0.45) + 's';
+        span.innerHTML = icons[key];
+        host.appendChild(span);
+        setTimeout(function (s) { return function () { s.remove(); }; }(span), 2650);
+      }
+    }
+
+    function playPortalTransition(callback) {
+      var overlay = document.getElementById('portalOverlay');
+      var flash = document.getElementById('portalFlash');
+      var rays = document.getElementById('portalRays');
+      var ring = document.getElementById('portalRing');
+
+      overlay.classList.add('active');
+      flash.classList.add('run');
+      rays.classList.add('run');
+      ring.classList.add('run');
+      spawnPortalSparks();
+      spawnSideFlyers();
+
+      setTimeout(function () {
+        if (typeof callback === 'function') {
+          callback();
+        }
+      }, 950);
+
+      setTimeout(function () {
+        overlay.classList.remove('active');
+        flash.classList.remove('run');
+        rays.classList.remove('run');
+        ring.classList.remove('run');
+      }, 2600);
+    }
+  </script>
+  <!-- ------------------------------ -->
+  <script>
     tailwind.config = {
       darkMode: "class",
       theme: {
@@ -1379,7 +1450,7 @@
       animation: fadeSlideIn 0.3s ease;
     }
 
-    .form-step + .form-step.active {
+    .form-step+.form-step.active {
       margin-top: 2.5rem;
     }
 
@@ -3938,6 +4009,7 @@
     }
 
     @keyframes signupFloat {
+
       0%,
       100% {
         transform: translateY(0);
@@ -3949,6 +4021,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
+
       .signup-story-panel::before,
       .signup-glass-card {
         animation: none;
@@ -4075,9 +4148,9 @@
         grid-template-columns: 1fr;
       }
     }
-  
-/* --- PORTAL TRANSITION CSS --- */
-.confetti-piece {
+
+    /* --- PORTAL TRANSITION CSS --- */
+    .confetti-piece {
       position: absolute;
       left: 50%;
       top: 50%;
@@ -4403,9 +4476,10 @@
         transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(1.05);
       }
     }
-/* ----------------------------- */
-</style>
-<style>
+
+    /* ----------------------------- */
+  </style>
+  <style>
     :root {
       --ink: #1d4ed8;
       --ink-soft: #3b82f6;
@@ -4425,7 +4499,7 @@
       box-sizing: border-box;
     }
 
-    
+
     #view-signup {
       margin: 0;
       padding: 0;
@@ -5820,81 +5894,109 @@
 
   <!-- ==================== PUBLIC LOGIN ==================== -->
 
-  <div id="view-public-login" class="view-section active h-screen overflow-hidden flex flex-col lg:flex-row items-stretch w-full">
+  <div id="view-public-login"
+    class="view-section active h-screen overflow-hidden flex flex-col lg:flex-row items-stretch w-full">
 
     <!-- ── LEFT PANE: Feature Showcase & Feed ────────────────────────────── -->
-    <div id="lp-left-pane" class="w-full lg:w-1/2 h-full flex flex-col p-6 sm:p-8 lg:p-10 overflow-y-auto overflow-x-hidden no-scrollbar relative" style="background:linear-gradient(135deg,#fffbeb 0%,#f0fdf4 55%,#ecfeff 100%); transition:background 0.8s ease">
-      
+    <div id="lp-left-pane"
+      class="w-full lg:w-1/2 h-full flex flex-col p-6 sm:p-8 lg:p-10 overflow-y-auto overflow-x-hidden no-scrollbar relative"
+      style="background:linear-gradient(135deg,#fffbeb 0%,#f0fdf4 55%,#ecfeff 100%); transition:background 0.8s ease">
+
       <!-- Trailing Paws Background (from signup) -->
-      <section class="den" id="login-den" aria-hidden="true" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; opacity: 0.7; z-index: 0;">
-        <svg class="trail" viewBox="0 0 480 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 100%; height: 100%;">
-          <path id="loginTrailPath" d="M 60 30 C 210 110 20 230 220 290 S 50 460 250 520 S 30 690 230 760 S 70 850 190 890" fill="none" stroke="currentColor" stroke-opacity="0.1" stroke-width="2" />
+      <section class="den" id="login-den" aria-hidden="true"
+        style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; opacity: 0.7; z-index: 0;">
+        <svg class="trail" viewBox="0 0 480 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 100%; height: 100%;">
+          <path id="loginTrailPath"
+            d="M 60 30 C 210 110 20 230 220 290 S 50 460 250 520 S 30 690 230 760 S 70 850 190 890" fill="none"
+            stroke="currentColor" stroke-opacity="0.1" stroke-width="2" />
           <g opacity="0">
             <use href="#icon-paw" xlink:href="#icon-paw" width="18" height="18" x="-9" y="-9" />
-            <animateMotion dur="10s" begin="0s" repeatCount="indefinite" rotate="auto"><mpath href="#loginTrailPath" xlink:href="#loginTrailPath" /></animateMotion>
-            <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="0s" repeatCount="indefinite" />
+            <animateMotion dur="10s" begin="0s" repeatCount="indefinite" rotate="auto">
+              <mpath href="#loginTrailPath" xlink:href="#loginTrailPath" />
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="0s"
+              repeatCount="indefinite" />
           </g>
           <g opacity="0">
             <use href="#icon-paw" xlink:href="#icon-paw" width="18" height="18" x="-9" y="-9" />
-            <animateMotion dur="10s" begin="3s" repeatCount="indefinite" rotate="auto"><mpath href="#loginTrailPath" xlink:href="#loginTrailPath" /></animateMotion>
-            <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="3s" repeatCount="indefinite" />
+            <animateMotion dur="10s" begin="3s" repeatCount="indefinite" rotate="auto">
+              <mpath href="#loginTrailPath" xlink:href="#loginTrailPath" />
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="3s"
+              repeatCount="indefinite" />
           </g>
           <g opacity="0">
             <use href="#icon-paw" xlink:href="#icon-paw" width="18" height="18" x="-9" y="-9" />
-            <animateMotion dur="10s" begin="6s" repeatCount="indefinite" rotate="auto"><mpath href="#loginTrailPath" xlink:href="#loginTrailPath" /></animateMotion>
-            <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="6s" repeatCount="indefinite" />
+            <animateMotion dur="10s" begin="6s" repeatCount="indefinite" rotate="auto">
+              <mpath href="#loginTrailPath" xlink:href="#loginTrailPath" />
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="6s"
+              repeatCount="indefinite" />
           </g>
         </svg>
       </section>
 
       <!-- Brand header -->
       <div class="flex items-center gap-3 mb-4 flex-shrink-0 relative z-10">
-        <div class="w-11 h-11 rounded-2xl bg-white/60 border border-amber-200/70 flex items-center justify-center relative shadow-sm flex-shrink-0 backdrop-blur-md">
+        <div
+          class="w-11 h-11 rounded-2xl bg-white/60 border border-amber-200/70 flex items-center justify-center relative shadow-sm flex-shrink-0 backdrop-blur-md">
           <i data-lucide="paw-print" class="w-4.5 h-4.5 text-violet-900"></i>
           <i data-lucide="paw-print" class="w-2.5 h-2.5 text-violet-700 absolute right-1.5 top-1.5"></i>
         </div>
         <div>
-          <div class="text-2xl font-bold tracking-tight text-gray-900 leading-tight" style="font-family: 'DM Serif Display'">PawCircle</div>
+          <div class="text-2xl font-bold tracking-tight text-gray-900 leading-tight"
+            style="font-family: 'DM Serif Display'">PawCircle</div>
           <div class="text-[11px] font-black text-amber-500 tracking-[0.2em] uppercase">Pet Community</div>
         </div>
-        <span class="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100/80 text-green-700 border border-green-200/80 flex-shrink-0 backdrop-blur-sm">
+        <span
+          class="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100/80 text-green-700 border border-green-200/80 flex-shrink-0 backdrop-blur-sm">
           <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse inline-block"></span>
           <span id="lp-online-count">— online</span>
         </span>
       </div>
 
       <!-- Live rotating feed card -->
-      <div id="lp-feed-card" class="flex-1 min-h-[420px] lg:min-h-[520px] rounded-2xl bg-white/85 border border-white/90 shadow-md p-5 mb-3 backdrop-blur-sm relative z-10 transition-all duration-500"></div>
+      <div id="lp-feed-card"
+        class="flex-1 min-h-[420px] lg:min-h-[520px] rounded-2xl bg-white/85 border border-white/90 shadow-md p-5 mb-3 backdrop-blur-sm relative z-10 transition-all duration-500">
+      </div>
 
       <!-- Activity ticker -->
       <div id="lp-activity-ticker" class="flex-shrink-0 flex items-center gap-2 flex-wrap mb-3 relative z-10"></div>
-      
+
       <!-- Hidden showcase -->
       <div id="public-theme-showcase" class="hidden"></div>
     </div>
 
     <!-- ── RIGHT PANE: Login Form ────────────────────────────────────────── -->
-    <div id="lp-right-pane" class="w-full lg:w-1/2 h-full flex flex-col items-center justify-start pt-10 sm:pt-16 pb-8 bg-white border-t lg:border-t-0 lg:border-l border-gray-100 p-6 sm:px-8 overflow-y-auto overflow-x-hidden" style="--login-accent: #f97316; transition: --login-accent 0.5s ease;">
-      
+    <div id="lp-right-pane"
+      class="w-full lg:w-1/2 h-full flex flex-col items-center justify-start pt-10 sm:pt-16 pb-8 bg-white border-t lg:border-t-0 lg:border-l border-gray-100 p-6 sm:px-8 overflow-y-auto overflow-x-hidden"
+      style="--login-accent: #f97316; transition: --login-accent 0.5s ease;">
+
       <div class="w-full max-w-sm">
-        
+
         <!-- Welcome Header -->
         <div class="mb-8 text-center">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-sm mb-4 transition-colors duration-500" style="background: var(--login-accent);">
+          <div
+            class="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-sm mb-4 transition-colors duration-500"
+            style="background: var(--login-accent);">
             <i data-lucide="users" class="w-7 h-7 text-white"></i>
           </div>
           <h3 class="text-3xl font-bold text-gray-900" style="font-family: 'DM Serif Display'">Welcome back</h3>
           <p class="mt-2 text-sm text-gray-500">Let the tail-wagging fun begin!</p>
         </div>
 
-        <div id="public-error" class="hidden mb-6 bg-red-50 border-l-4 border-red-400 p-3 rounded-lg text-sm text-red-700"></div>
+        <div id="public-error"
+          class="hidden mb-6 bg-red-50 border-l-4 border-red-400 p-3 rounded-lg text-sm text-red-700"></div>
 
         <form id="public-login-form" novalidate class="space-y-5">
           <!-- Pet Type Selector -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">Your Pet Type</label>
             <div class="relative">
-              <select id="login-pet-type" class="block w-full pl-4 pr-10 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-transparent text-sm bg-gray-50 appearance-none transition-all focus-ring-dynamic" onchange="handleLoginPetTypeChange(this.value)">
+              <select id="login-pet-type"
+                class="block w-full pl-4 pr-10 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-transparent text-sm bg-gray-50 appearance-none transition-all focus-ring-dynamic"
+                onchange="handleLoginPetTypeChange(this.value)">
                 <option value="">I don't have a pet / Just exploring</option>
                 <option value="Dog">Dog</option>
                 <option value="Cat">Cat</option>
@@ -5905,10 +6007,13 @@
                 <option value="Small Pets">Small Pets</option>
                 <option value="Other">Other</option>
               </select>
-              <i data-lucide="chevron-down" class="absolute right-3 top-3.5 w-4 h-4 text-gray-400 pointer-events-none"></i>
+              <i data-lucide="chevron-down"
+                class="absolute right-3 top-3.5 w-4 h-4 text-gray-400 pointer-events-none"></i>
             </div>
             <style>
-              .focus-ring-dynamic:focus { box-shadow: 0 0 0 2px var(--login-accent); }
+              .focus-ring-dynamic:focus {
+                box-shadow: 0 0 0 2px var(--login-accent);
+              }
             </style>
           </div>
 
@@ -5916,23 +6021,29 @@
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email address</label>
             <div class="relative">
               <i data-lucide="mail" class="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400 pointer-events-none"></i>
-              <input type="email" id="public-email" required class="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-transparent text-sm bg-gray-50 transition-all focus-ring-dynamic" placeholder="you@example.com" />
+              <input type="email" id="public-email" required
+                class="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-transparent text-sm bg-gray-50 transition-all focus-ring-dynamic"
+                placeholder="you@example.com" />
             </div>
           </div>
-          
+
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
             <div class="relative flex flex-col">
-              
+
               <!-- Mascot integrated into input wrapper -->
-              <div class="absolute right-3 bottom-full mb-1 mascot-container pointer-events-none" style="width: 60px; height: 60px; right: 10px;">
-                <div class="mascot" id="login-mascot" style="position: relative; width: 100%; height: 100%; transform: scale(0.7); transform-origin: bottom right;">
+              <div class="absolute right-3 bottom-full mb-1 mascot-container pointer-events-none"
+                style="width: 60px; height: 60px; right: 10px;">
+                <div class="mascot" id="login-mascot"
+                  style="position: relative; width: 100%; height: 100%; transform: scale(0.7); transform-origin: bottom right;">
                   <svg viewBox="0 0 120 120" width="100%" height="100%">
                     <ellipse class="tail" cx="92" cy="92" rx="10" ry="5" fill="#F2A93B" transform="rotate(20 88 86)" />
                     <ellipse cx="60" cy="86" rx="33" ry="26" fill="#F2A93B" />
                     <ellipse cx="60" cy="93" rx="18" ry="14" fill="#FFF8EC" />
-                    <ellipse class="ear-l" cx="35" cy="27" rx="11" ry="17" fill="#F2A93B" transform="rotate(-18 35 27)" />
-                    <ellipse class="ear-r" cx="85" cy="27" rx="11" ry="17" fill="#F2A93B" transform="rotate(18 85 27)" />
+                    <ellipse class="ear-l" cx="35" cy="27" rx="11" ry="17" fill="#F2A93B"
+                      transform="rotate(-18 35 27)" />
+                    <ellipse class="ear-r" cx="85" cy="27" rx="11" ry="17" fill="#F2A93B"
+                      transform="rotate(18 85 27)" />
                     <ellipse class="ear-l" cx="35" cy="29" rx="5" ry="9" fill="#FF7A5C" transform="rotate(-18 35 29)" />
                     <ellipse class="ear-r" cx="85" cy="29" rx="5" ry="9" fill="#FF7A5C" transform="rotate(18 85 29)" />
                     <circle cx="60" cy="49" r="29" fill="#F2A93B" />
@@ -5942,24 +6053,31 @@
                     <circle class="pupil pupil-r" cx="71" cy="47" r="4" fill="#2B2420" />
                     <rect class="lids" x="40" y="42" width="40" height="11" fill="#F2A93B" />
                     <ellipse cx="60" cy="58" rx="4.2" ry="3" fill="#2B2420" />
-                    <ellipse class="paw-l" cx="47" cy="104" rx="13" ry="9" fill="#FFF8EC" style="transition: all 0.3s ease; transform-origin: center;" />
-                    <ellipse class="paw-r" cx="73" cy="104" rx="13" ry="9" fill="#FFF8EC" style="transition: all 0.3s ease; transform-origin: center;" />
+                    <ellipse class="paw-l" cx="47" cy="104" rx="13" ry="9" fill="#FFF8EC"
+                      style="transition: all 0.3s ease; transform-origin: center;" />
+                    <ellipse class="paw-r" cx="73" cy="104" rx="13" ry="9" fill="#FFF8EC"
+                      style="transition: all 0.3s ease; transform-origin: center;" />
                   </svg>
                 </div>
               </div>
 
               <div class="relative w-full">
                 <i data-lucide="lock" class="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400 pointer-events-none"></i>
-                <input type="password" id="public-password" required class="block w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-transparent text-sm bg-gray-50 transition-all focus-ring-dynamic" placeholder="••••••••" data-pw-toggle="1" />
-                
-                <button type="button" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors" id="loginEyeToggle" aria-label="Show password">
+                <input type="password" id="public-password" required
+                  class="block w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-transparent text-sm bg-gray-50 transition-all focus-ring-dynamic"
+                  placeholder="••••••••" data-pw-toggle="1" />
+
+                <button type="button" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
+                  id="loginEyeToggle" aria-label="Show password">
                   <i data-lucide="eye" id="loginEyeIcon" class="w-5 h-5"></i>
                 </button>
               </div>
             </div>
           </div>
-          
-          <button type="submit" id="public-submit-btn" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white transition-all hover:-translate-y-0.5" style="background: var(--login-accent); box-shadow: 0 4px 14px 0 rgba(0,0,0,0.1);">
+
+          <button type="submit" id="public-submit-btn"
+            class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white transition-all hover:-translate-y-0.5"
+            style="background: var(--login-accent); box-shadow: 0 4px 14px 0 rgba(0,0,0,0.1);">
             Sign in
           </button>
         </form>
@@ -5967,13 +6085,16 @@
         <!-- Links -->
         <div class="mt-8 text-center">
           <span class="text-sm text-gray-500">New to PawCircle?</span>
-          <button onclick="switchView('view-signup')" class="font-bold flex items-center justify-center w-full mt-3 py-3 rounded-xl transition-colors bg-gray-50 hover:bg-gray-100" style="color: var(--login-accent)">
+          <button onclick="switchView('view-signup')"
+            class="font-bold flex items-center justify-center w-full mt-3 py-3 rounded-xl transition-colors bg-gray-50 hover:bg-gray-100"
+            style="color: var(--login-accent)">
             <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i> Create an Account
           </button>
         </div>
 
         <div class="mt-6 text-center">
-          <button onclick="switchView('view-admin-login')" class="text-xs text-gray-400 hover:text-gray-600 transition-colors underline decoration-gray-300 underline-offset-4">
+          <button onclick="switchView('view-admin-login')"
+            class="text-xs text-gray-400 hover:text-gray-600 transition-colors underline decoration-gray-300 underline-offset-4">
             Admin Portal
           </button>
         </div>
@@ -5982,7 +6103,7 @@
     </div>
   </div>
 
-<!-- ==================== ADMIN LOGIN ==================== -->
+  <!-- ==================== ADMIN LOGIN ==================== -->
   <div id="view-admin-login"
     class="view-section min-h-screen bg-gray-900 flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
@@ -6037,160 +6158,162 @@
 
   <!-- ==================== SIGNUP ==================== -->
   <div id="view-signup" class="view-section hidden h-screen overflow-hidden w-full">
-<div class="page" style="width: 100%;">
+    <div class="page" style="width: 100%;">
 
-    <section class="den" id="den" aria-hidden="true">
-      <svg class="trail" viewBox="0 0 480 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"
-        xmlns:xlink="http://www.w3.org/1999/xlink">
-        <path id="trailPath" d="M 60 30 C 210 110 20 230 220 290 S 50 460 250 520 S 30 690 230 760 S 70 850 190 890"
-          fill="none" stroke="#F2A93B" stroke-opacity="0.13" stroke-width="2" />
-        <g opacity="0">
-          <use href="#icon-paw" xlink:href="#icon-paw" width="18" height="18" x="-9" y="-9" />
-          <animateMotion dur="10s" begin="0s" repeatCount="indefinite" rotate="auto">
-            <mpath href="#trailPath" xlink:href="#trailPath" />
-          </animateMotion>
-          <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="0s"
-            repeatCount="indefinite" />
-        </g>
-        <g opacity="0">
-          <use href="#icon-paw" xlink:href="#icon-paw" width="18" height="18" x="-9" y="-9" />
-          <animateMotion dur="10s" begin="2.5s" repeatCount="indefinite" rotate="auto">
-            <mpath href="#trailPath" xlink:href="#trailPath" />
-          </animateMotion>
-          <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="2.5s"
-            repeatCount="indefinite" />
-        </g>
-        <g opacity="0">
-          <use href="#icon-paw" xlink:href="#icon-paw" width="18" height="18" x="-9" y="-9" />
-          <animateMotion dur="10s" begin="5s" repeatCount="indefinite" rotate="auto">
-            <mpath href="#trailPath" xlink:href="#trailPath" />
-          </animateMotion>
-          <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="5s"
-            repeatCount="indefinite" />
-        </g>
-        <g opacity="0">
-          <use href="#icon-paw" xlink:href="#icon-paw" width="18" height="18" x="-9" y="-9" />
-          <animateMotion dur="10s" begin="7.5s" repeatCount="indefinite" rotate="auto">
-            <mpath href="#trailPath" xlink:href="#trailPath" />
-          </animateMotion>
-          <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="7.5s"
-            repeatCount="indefinite" />
-        </g>
-      </svg>
-
-      <div class="wordmark">
-        <svg viewBox="0 0 24 24">
-          <use href="#icon-paw" xlink:href="#icon-paw" />
+      <section class="den" id="den" aria-hidden="true">
+        <svg class="trail" viewBox="0 0 480 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink">
+          <path id="trailPath" d="M 60 30 C 210 110 20 230 220 290 S 50 460 250 520 S 30 690 230 760 S 70 850 190 890"
+            fill="none" stroke="#F2A93B" stroke-opacity="0.13" stroke-width="2" />
+          <g opacity="0">
+            <use href="#icon-paw" xlink:href="#icon-paw" width="18" height="18" x="-9" y="-9" />
+            <animateMotion dur="10s" begin="0s" repeatCount="indefinite" rotate="auto">
+              <mpath href="#trailPath" xlink:href="#trailPath" />
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="0s"
+              repeatCount="indefinite" />
+          </g>
+          <g opacity="0">
+            <use href="#icon-paw" xlink:href="#icon-paw" width="18" height="18" x="-9" y="-9" />
+            <animateMotion dur="10s" begin="2.5s" repeatCount="indefinite" rotate="auto">
+              <mpath href="#trailPath" xlink:href="#trailPath" />
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="2.5s"
+              repeatCount="indefinite" />
+          </g>
+          <g opacity="0">
+            <use href="#icon-paw" xlink:href="#icon-paw" width="18" height="18" x="-9" y="-9" />
+            <animateMotion dur="10s" begin="5s" repeatCount="indefinite" rotate="auto">
+              <mpath href="#trailPath" xlink:href="#trailPath" />
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="5s"
+              repeatCount="indefinite" />
+          </g>
+          <g opacity="0">
+            <use href="#icon-paw" xlink:href="#icon-paw" width="18" height="18" x="-9" y="-9" />
+            <animateMotion dur="10s" begin="7.5s" repeatCount="indefinite" rotate="auto">
+              <mpath href="#trailPath" xlink:href="#trailPath" />
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.85;1" dur="10s" begin="7.5s"
+              repeatCount="indefinite" />
+          </g>
         </svg>
-        Pawcircle
-      </div>
 
-      <div class="badge">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z" />
-        </svg>
-        Pet-first membership
-      </div>
-
-      <h1>Find your <span class="accent">pack</span> on Pawcircle</h1>
-      <p class="lead">A warm corner of the internet for pets, their people, and the local communities that look out for
-        them.</p>
-
-      <ul class="bullets">
-        <li>
-          <span class="icon-chip"><svg viewBox="0 0 24 24">
-              <path d="M12 3 L20 6 V11 C20 16.4 16.4 20 12 21 C7.6 20 4 16.4 4 11 V6 Z" />
-            </svg></span>
-          Verified pet parents, real profiles
-        </li>
-        <li>
-          <span class="icon-chip"><svg viewBox="0 0 24 24">
-              <circle cx="8.5" cy="9" r="3" />
-              <path d="M2.5 19c0-4 2.7-6 6-6s6 2 6 6" />
-              <circle cx="17" cy="9.5" r="2.4" />
-              <path d="M14.6 19c0.2-3 2.1-5 4.4-5s4 1.6 4.4 4.4" />
-            </svg></span>
-          Meet playmates, sitters and trainers nearby
-        </li>
-        <li>
-          <span class="icon-chip"><svg viewBox="0 0 24 24">
-              <rect x="4" y="5" width="16" height="16" rx="2.4" />
-              <line x1="4" y1="9.5" x2="20" y2="9.5" />
-              <line x1="8.5" y1="3" x2="8.5" y2="7" />
-              <line x1="15.5" y1="3" x2="15.5" y2="7" />
-            </svg></span>
-          Meetups, adoption days and vet camps
-        </li>
-      </ul>
-
-      <div class="feature-cards">
-        <div class="fcard c1">
-          <span class="ic"><svg viewBox="0 0 24 24">
-              <path
-                d="M4 5.5 H20 A1.5 1.5 0 0 1 21.5 7 V15 A1.5 1.5 0 0 1 20 16.5 H10 L5.5 20 V16.5 H4 A1.5 1.5 0 0 1 2.5 15 V7 A1.5 1.5 0 0 1 4 5.5 Z" />
-            </svg></span>
-          <div>
-            <h4>Pack feed</h4>
-            <p>Walks, treats &amp; stories shared</p>
-          </div>
-        </div>
-        <div class="fcard c2">
-          <span class="ic"><svg viewBox="0 0 24 24">
-              <use href="#icon-paw" xlink:href="#icon-paw" />
-            </svg></span>
-          <div>
-            <h4>Verified tails</h4>
-            <p>Real pet parents, safer matches</p>
-          </div>
-        </div>
-        <div class="fcard c3">
-          <span class="ic"><svg viewBox="0 0 24 24">
-              <path d="M4 11 L12 4 L20 11 V20 H4 Z" />
-              <path d="M9.5 20 V14 H14.5 V20" />
-            </svg></span>
-          <div>
-            <h4>Local dens</h4>
-            <p>Meetups, parks &amp; groups nearby</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="signup">
-      <div class="signup-top">
-        Already part of the pack? <a id="signinLink" onclick="switchView('view-public-login')" style="cursor:pointer">Sign in</a>
-      </div>
-
-      <div class="signup-body">
-        <div class="mobile-brand">
+        <div class="wordmark">
           <svg viewBox="0 0 24 24">
             <use href="#icon-paw" xlink:href="#icon-paw" />
           </svg>
-          Pawcircle
+          PawCircle
         </div>
 
-        <h1>Join Pawcircle</h1>
-        <p class="sub">Tell us about you and your pet. You can finish the rest of the profile after verification.</p>
-
-        <button type="button" class="btn-google">
-          <svg viewBox="0 0 48 48">
-            <path fill="#FFC107"
-              d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z" />
-            <path fill="#FF3D00"
-              d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
-            <path fill="#4CAF50"
-              d="M24 44c5.5 0 10.4-1.9 14-5.4l-6.5-5.3C29.5 35 26.9 36 24 36c-5.3 0-9.6-3.3-11.3-7.9l-6.6 5.1C9.6 39.6 16.2 44 24 44z" />
-            <path fill="#1976D2"
-              d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.3 5.5l6.5 5.3C41.4 35.7 44 30.4 44 24c0-1.3-.1-2.7-.4-3.5z" />
+        <div class="badge">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z" />
           </svg>
-          Continue with Google
-        </button>
+          Pet-first membership
+        </div>
 
-        <div class="divider">or</div>
+        <h1>Find your <span class="accent">pack</span> on PawCircle</h1>
+        <p class="lead">A warm corner of the internet for pets, their people, and the local communities that look out
+          for
+          them.</p>
 
-        <div id="signup-error"
+        <ul class="bullets">
+          <li>
+            <span class="icon-chip"><svg viewBox="0 0 24 24">
+                <path d="M12 3 L20 6 V11 C20 16.4 16.4 20 12 21 C7.6 20 4 16.4 4 11 V6 Z" />
+              </svg></span>
+            Verified pet parents, real profiles
+          </li>
+          <li>
+            <span class="icon-chip"><svg viewBox="0 0 24 24">
+                <circle cx="8.5" cy="9" r="3" />
+                <path d="M2.5 19c0-4 2.7-6 6-6s6 2 6 6" />
+                <circle cx="17" cy="9.5" r="2.4" />
+                <path d="M14.6 19c0.2-3 2.1-5 4.4-5s4 1.6 4.4 4.4" />
+              </svg></span>
+            Meet playmates, sitters and trainers nearby
+          </li>
+          <li>
+            <span class="icon-chip"><svg viewBox="0 0 24 24">
+                <rect x="4" y="5" width="16" height="16" rx="2.4" />
+                <line x1="4" y1="9.5" x2="20" y2="9.5" />
+                <line x1="8.5" y1="3" x2="8.5" y2="7" />
+                <line x1="15.5" y1="3" x2="15.5" y2="7" />
+              </svg></span>
+            Meetups, adoption days and vet camps
+          </li>
+        </ul>
+
+        <div class="feature-cards">
+          <div class="fcard c1">
+            <span class="ic"><svg viewBox="0 0 24 24">
+                <path
+                  d="M4 5.5 H20 A1.5 1.5 0 0 1 21.5 7 V15 A1.5 1.5 0 0 1 20 16.5 H10 L5.5 20 V16.5 H4 A1.5 1.5 0 0 1 2.5 15 V7 A1.5 1.5 0 0 1 4 5.5 Z" />
+              </svg></span>
+            <div>
+              <h4>Pack feed</h4>
+              <p>Walks, treats &amp; stories shared</p>
+            </div>
+          </div>
+          <div class="fcard c2">
+            <span class="ic"><svg viewBox="0 0 24 24">
+                <use href="#icon-paw" xlink:href="#icon-paw" />
+              </svg></span>
+            <div>
+              <h4>Verified tails</h4>
+              <p>Real pet parents, safer matches</p>
+            </div>
+          </div>
+          <div class="fcard c3">
+            <span class="ic"><svg viewBox="0 0 24 24">
+                <path d="M4 11 L12 4 L20 11 V20 H4 Z" />
+                <path d="M9.5 20 V14 H14.5 V20" />
+              </svg></span>
+            <div>
+              <h4>Local dens</h4>
+              <p>Meetups, parks &amp; groups nearby</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="signup">
+        <div class="signup-top">
+          Already part of the pack? <a id="signinLink" onclick="switchView('view-public-login')"
+            style="cursor:pointer">Sign in</a>
+        </div>
+
+        <div class="signup-body">
+          <div class="mobile-brand">
+            <svg viewBox="0 0 24 24">
+              <use href="#icon-paw" xlink:href="#icon-paw" />
+            </svg>
+            PawCircle
+          </div>
+
+          <h1>Join PawCircle</h1>
+          <p class="sub">Tell us about you and your pet. You can finish the rest of the profile after verification.</p>
+
+          <button type="button" class="btn-google">
+            <svg viewBox="0 0 48 48">
+              <path fill="#FFC107"
+                d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z" />
+              <path fill="#FF3D00"
+                d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
+              <path fill="#4CAF50"
+                d="M24 44c5.5 0 10.4-1.9 14-5.4l-6.5-5.3C29.5 35 26.9 36 24 36c-5.3 0-9.6-3.3-11.3-7.9l-6.6 5.1C9.6 39.6 16.2 44 24 44z" />
+              <path fill="#1976D2"
+                d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.3 5.5l6.5 5.3C41.4 35.7 44 30.4 44 24c0-1.3-.1-2.7-.4-3.5z" />
+            </svg>
+            Continue with Google
+          </button>
+
+          <div class="divider">or</div>
+
+          <div id="signup-error"
             class="hidden mb-4 bg-red-50 border-l-4 border-brand-400 p-3 rounded-lg text-sm text-red-700"></div>
-                    <form id="signup-step-1" novalidate>
+          <form id="signup-step-1" novalidate>
             <div class="field">
               <label for="reg-name">Pet Name</label>
               <input type="text" id="reg-name" required placeholder="Enter pet name" autocomplete="off">
@@ -6212,7 +6335,8 @@
 
               <div class="field">
                 <label for="reg-religion">Pet Type</label>
-                <select id="reg-religion" required onchange="updateBreedOptions('reg-religion', 'reg-breed'); toggleCustomBreedInput();  updateSignupWatermark(this.value); if(typeof hydrateEntryMascotArt === 'function') hydrateEntryMascotArt(this.value);">
+                <select id="reg-religion" required
+                  onchange="updateBreedOptions('reg-religion', 'reg-breed'); toggleCustomBreedInput();  updateSignupWatermark(this.value); if(typeof hydrateEntryMascotArt === 'function') hydrateEntryMascotArt(this.value);">
                   <option value="">Select Pet Type...</option>
                   <option>Dog</option>
                   <option>Cat</option>
@@ -6247,8 +6371,11 @@
             <div class="field" id="reg-phone-wrap" style="display: none;">
               <label for="reg-phone">Mobile Phone Number</label>
               <div style="display:flex; gap:10px;">
-                <input type="tel" id="reg-phone" inputmode="numeric" pattern="[0-9+\-\s()]{8,15}" placeholder="Enter mobile number" style="flex:1;" />
-                <button type="button" id="reg-send-otp-btn" onclick="sendSignupOtp()" style="padding: 12px 14px; border-radius: 11px; background:#F2A93B; font-weight:bold; cursor:pointer; border:none; color:#2B2420;">Send Code</button>
+                <input type="tel" id="reg-phone" inputmode="numeric" pattern="[0-9+\-\s()]{8,15}"
+                  placeholder="Enter mobile number" style="flex:1;" />
+                <button type="button" id="reg-send-otp-btn" onclick="sendSignupOtp()"
+                  style="padding: 12px 14px; border-radius: 11px; background:#F2A93B; font-weight:bold; cursor:pointer; border:none; color:#2B2420;">Send
+                  Code</button>
               </div>
               <p id="reg-otp-status" class="hint" style="display:none;"></p>
             </div>
@@ -6256,8 +6383,10 @@
             <div class="field" id="reg-otp-wrap" style="display: none;">
               <label for="reg-otp-code">Verification Code</label>
               <div style="display:flex; gap:10px;">
-                <input type="text" id="reg-otp-code" inputmode="numeric" maxlength="6" placeholder="Enter 6-digit code" style="flex:1;" />
-                <button type="button" id="reg-verify-otp-btn" onclick="verifySignupOtp()" style="padding: 12px 14px; border-radius: 11px; background:#6d28d9; color:#fff; font-weight:bold; cursor:pointer; border:none;">Verify</button>
+                <input type="text" id="reg-otp-code" inputmode="numeric" maxlength="6" placeholder="Enter 6-digit code"
+                  style="flex:1;" />
+                <button type="button" id="reg-verify-otp-btn" onclick="verifySignupOtp()"
+                  style="padding: 12px 14px; border-radius: 11px; background:#6d28d9; color:#fff; font-weight:bold; cursor:pointer; border:none;">Verify</button>
               </div>
             </div>
 
@@ -6269,8 +6398,10 @@
                     <ellipse class="tail" cx="92" cy="92" rx="10" ry="5" fill="#F2A93B" transform="rotate(20 88 86)" />
                     <ellipse cx="60" cy="86" rx="33" ry="26" fill="#F2A93B" />
                     <ellipse cx="60" cy="93" rx="18" ry="14" fill="#FFF8EC" />
-                    <ellipse class="ear-l" cx="35" cy="27" rx="11" ry="17" fill="#F2A93B" transform="rotate(-18 35 27)" />
-                    <ellipse class="ear-r" cx="85" cy="27" rx="11" ry="17" fill="#F2A93B" transform="rotate(18 85 27)" />
+                    <ellipse class="ear-l" cx="35" cy="27" rx="11" ry="17" fill="#F2A93B"
+                      transform="rotate(-18 35 27)" />
+                    <ellipse class="ear-r" cx="85" cy="27" rx="11" ry="17" fill="#F2A93B"
+                      transform="rotate(18 85 27)" />
                     <ellipse class="ear-l" cx="35" cy="29" rx="5" ry="9" fill="#FF7A5C" transform="rotate(-18 35 29)" />
                     <ellipse class="ear-r" cx="85" cy="29" rx="5" ry="9" fill="#FF7A5C" transform="rotate(18 85 29)" />
                     <circle cx="60" cy="49" r="29" fill="#F2A93B" />
@@ -6284,11 +6415,13 @@
                     <ellipse class="paw-r" cx="73" cy="104" rx="13" ry="9" fill="#FFF8EC" />
                   </svg>
                 </div>
-                <input id="reg-password" type="password" required placeholder="Minimum 6 characters" autocomplete="new-password" data-pw-toggle="1">
+                <input id="reg-password" type="password" required placeholder="Minimum 6 characters"
+                  autocomplete="new-password" data-pw-toggle="1">
                 <button type="button" class="eye-toggle" id="eyeToggle" aria-label="Show password">
                   <svg id="eyeIcon" viewBox="0 0 24 24">
-                    <path d="M2 12 C5 6.5 9.5 4.5 12 4.5 C14.5 4.5 19 6.5 22 12 C19 17.5 14.5 19.5 12 19.5 C9.5 19.5 5 17.5 2 12 Z"/>
-                    <circle cx="12" cy="12" r="3"/>
+                    <path
+                      d="M2 12 C5 6.5 9.5 4.5 12 4.5 C14.5 4.5 19 6.5 22 12 C19 17.5 14.5 19.5 12 19.5 C9.5 19.5 5 17.5 2 12 Z" />
+                    <circle cx="12" cy="12" r="3" />
                   </svg>
                 </button>
               </div>
@@ -6298,77 +6431,77 @@
             <button type="submit" class="submit-btn" id="signup-submit-btn">
               <span id="submitLabel">Complete Signup</span>
               <svg id="submitIcon" viewBox="0 0 24 24" style="stroke: #FFF8EC;">
-                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
-                <path d="M9 12l2 2 4-4"/>
+                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+                <path d="M9 12l2 2 4-4" />
               </svg>
             </button>
           </form>
 
-        <p class="foot-note">By continuing, you agree to keep tails wagging and our community kind.</p>
-      </div>
-    </section>
+          <p class="foot-note">By continuing, you agree to keep tails wagging and our community kind.</p>
+        </div>
+      </section>
 
-  </div>
+    </div>
 
-  <!-- ==================== VERIFY EMAIL ==================== -->
-  <div id="view-verify-email"
-    class="view-section min-h-screen bg-gradient-to-br from-brand-100/20 via-brand-200/10 to-brand-400/10 flex-col justify-center py-12 sm:px-6 lg:px-8">
-    <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <div class="text-center mb-8">
-        <h2 class="text-3xl font-bold text-gray-900 flex items-center justify-center"
-          style="font-family: &quot;DM Serif Display&quot;">
-          <i data-lucide="mail-check" class="w-6 h-6 text-brand-400 mr-2"></i>
-          Verify your email
-        </h2>
-      </div>
-      <div class="bg-white py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-brand-200/30">
-        <p class="text-sm text-gray-600 text-center mb-1">
-          We've sent a 6-digit code to
-        </p>
-        <p id="verify-email-target" class="text-sm font-semibold text-gray-900 text-center mb-6 break-all"></p>
+    <!-- ==================== VERIFY EMAIL ==================== -->
+    <div id="view-verify-email"
+      class="view-section min-h-screen bg-gradient-to-br from-brand-100/20 via-brand-200/10 to-brand-400/10 flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-bold text-gray-900 flex items-center justify-center"
+            style="font-family: &quot;DM Serif Display&quot;">
+            <i data-lucide="mail-check" class="w-6 h-6 text-brand-400 mr-2"></i>
+            Verify your email
+          </h2>
+        </div>
+        <div class="bg-white py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-brand-200/30">
+          <p class="text-sm text-gray-600 text-center mb-1">
+            We've sent a 6-digit code to
+          </p>
+          <p id="verify-email-target" class="text-sm font-semibold text-gray-900 text-center mb-6 break-all"></p>
 
-        <div id="verify-error"
-          class="hidden mb-4 bg-red-50 border-l-4 border-brand-400 p-3 rounded text-sm text-red-700"></div>
+          <div id="verify-error"
+            class="hidden mb-4 bg-red-50 border-l-4 border-brand-400 p-3 rounded text-sm text-red-700"></div>
 
-        <form id="verify-email-form">
-          <div id="otp-inputs" class="flex flex-nowrap justify-center gap-1.5 sm:gap-3 mb-6" dir="ltr">
-            <input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" data-otp-index="0"
-              class="otp-box flex-1 min-w-0 max-w-[3rem] h-14 sm:h-16 text-center text-xl sm:text-2xl font-bold border-2 border-gray-300 rounded-xl focus:border-brand-400 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
-            <input type="text" inputmode="numeric" maxlength="1" data-otp-index="1"
-              class="otp-box flex-1 min-w-0 max-w-[3rem] h-14 sm:h-16 text-center text-xl sm:text-2xl font-bold border-2 border-gray-300 rounded-xl focus:border-brand-400 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
-            <input type="text" inputmode="numeric" maxlength="1" data-otp-index="2"
-              class="otp-box flex-1 min-w-0 max-w-[3rem] h-14 sm:h-16 text-center text-xl sm:text-2xl font-bold border-2 border-gray-300 rounded-xl focus:border-brand-400 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
-            <input type="text" inputmode="numeric" maxlength="1" data-otp-index="3"
-              class="otp-box flex-1 min-w-0 max-w-[3rem] h-14 sm:h-16 text-center text-xl sm:text-2xl font-bold border-2 border-gray-300 rounded-xl focus:border-brand-400 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
-            <input type="text" inputmode="numeric" maxlength="1" data-otp-index="4"
-              class="otp-box flex-1 min-w-0 max-w-[3rem] h-14 sm:h-16 text-center text-xl sm:text-2xl font-bold border-2 border-gray-300 rounded-xl focus:border-brand-400 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
-            <input type="text" inputmode="numeric" maxlength="1" data-otp-index="5"
-              class="otp-box flex-1 min-w-0 max-w-[3rem] h-14 sm:h-16 text-center text-xl sm:text-2xl font-bold border-2 border-gray-300 rounded-xl focus:border-brand-400 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
+          <form id="verify-email-form">
+            <div id="otp-inputs" class="flex flex-nowrap justify-center gap-1.5 sm:gap-3 mb-6" dir="ltr">
+              <input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" data-otp-index="0"
+                class="otp-box flex-1 min-w-0 max-w-[3rem] h-14 sm:h-16 text-center text-xl sm:text-2xl font-bold border-2 border-gray-300 rounded-xl focus:border-brand-400 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
+              <input type="text" inputmode="numeric" maxlength="1" data-otp-index="1"
+                class="otp-box flex-1 min-w-0 max-w-[3rem] h-14 sm:h-16 text-center text-xl sm:text-2xl font-bold border-2 border-gray-300 rounded-xl focus:border-brand-400 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
+              <input type="text" inputmode="numeric" maxlength="1" data-otp-index="2"
+                class="otp-box flex-1 min-w-0 max-w-[3rem] h-14 sm:h-16 text-center text-xl sm:text-2xl font-bold border-2 border-gray-300 rounded-xl focus:border-brand-400 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
+              <input type="text" inputmode="numeric" maxlength="1" data-otp-index="3"
+                class="otp-box flex-1 min-w-0 max-w-[3rem] h-14 sm:h-16 text-center text-xl sm:text-2xl font-bold border-2 border-gray-300 rounded-xl focus:border-brand-400 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
+              <input type="text" inputmode="numeric" maxlength="1" data-otp-index="4"
+                class="otp-box flex-1 min-w-0 max-w-[3rem] h-14 sm:h-16 text-center text-xl sm:text-2xl font-bold border-2 border-gray-300 rounded-xl focus:border-brand-400 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
+              <input type="text" inputmode="numeric" maxlength="1" data-otp-index="5"
+                class="otp-box flex-1 min-w-0 max-w-[3rem] h-14 sm:h-16 text-center text-xl sm:text-2xl font-bold border-2 border-gray-300 rounded-xl focus:border-brand-400 focus:ring-2 focus:ring-brand-200 outline-none transition-all" />
+            </div>
+
+            <button type="submit" id="verify-submit-btn"
+              class="bg-brand-400 hover:bg-brand-300 text-white px-8 py-3 rounded-lg font-bold flex items-center shadow-md transition-colors w-full justify-center disabled:opacity-60">
+              Verify &amp; Create Account
+              <i data-lucide="check-circle-2" class="w-5 h-5 ml-2"></i>
+            </button>
+          </form>
+
+          <div class="mt-5 text-center text-sm text-gray-600">
+            Didn't get the code?
+            <button id="verify-resend-btn" type="button"
+              class="font-medium text-brand-400 hover:text-brand-300 disabled:text-gray-400 disabled:no-underline">
+              Resend code
+            </button>
           </div>
-
-          <button type="submit" id="verify-submit-btn"
-            class="bg-brand-400 hover:bg-brand-300 text-white px-8 py-3 rounded-lg font-bold flex items-center shadow-md transition-colors w-full justify-center disabled:opacity-60">
-            Verify &amp; Create Account
-            <i data-lucide="check-circle-2" class="w-5 h-5 ml-2"></i>
-          </button>
-        </form>
-
-        <div class="mt-5 text-center text-sm text-gray-600">
-          Didn't get the code?
-          <button id="verify-resend-btn" type="button"
-            class="font-medium text-brand-400 hover:text-brand-300 disabled:text-gray-400 disabled:no-underline">
-            Resend code
+        </div>
+        <div class="mt-6 text-center">
+          <button onclick="switchView('view-signup')" class="text-sm font-medium text-gray-600 hover:text-brand-400">
+            &larr; Back to sign up
           </button>
         </div>
       </div>
-      <div class="mt-6 text-center">
-        <button onclick="switchView('view-signup')" class="text-sm font-medium text-gray-600 hover:text-brand-400">
-          &larr; Back to sign up
-        </button>
-      </div>
     </div>
   </div>
-</div>
 
   <!-- ==================== MEMBER DASHBOARD ==================== -->
   <div id="view-member-dashboard" class="view-section min-h-screen bg-gray-50 flex-col transition-colors duration-500">
@@ -7015,7 +7148,8 @@
                     <div id="feed-post-hashtags-chips" class="flex flex-wrap gap-2"></div>
                   </div>
                   <div class="space-y-2">
-                    <input type="text" id="feed-post-event-input" list="feed-post-event-options" placeholder="Link an event"
+                    <input type="text" id="feed-post-event-input" list="feed-post-event-options"
+                      placeholder="Link an event"
                       oninput="syncPostEventChoice('feed-post-event-input', 'feed-post-event-id')"
                       onchange="syncPostEventChoice('feed-post-event-input', 'feed-post-event-id')"
                       class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
@@ -7079,7 +7213,8 @@
               <input id="feed-post-media-url" type="url" inputmode="url" placeholder="https://example.com/image.jpg"
                 class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400">
               <button type="button" onclick="addPostMediaUrl()"
-                class="no-faith-hover rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">Add URL</button>
+                class="no-faith-hover rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">Add
+                URL</button>
             </div>
             <div class="mt-3 flex items-center justify-end gap-2">
               <button id="feed-post-submit-btn" onclick="submitPost()"
@@ -7829,12 +7964,12 @@
 
     const breedsByPetType = {
       Dog: [
-        "Labrador Retriever", "Golden Retriever", "German Shepherd", "Poodle", 
-        "Bulldog", "Beagle", "Rottweiler", "Dachshund", "Corgi", "Husky", 
+        "Labrador Retriever", "Golden Retriever", "German Shepherd", "Poodle",
+        "Bulldog", "Beagle", "Rottweiler", "Dachshund", "Corgi", "Husky",
         "Pug", "Shih Tzu", "Boxer", "Chihuahua", "Mixed Breed", "other"
       ],
       Cat: [
-        "Persian", "Maine Coon", "Siamese", "Ragdoll", "Bengal", "Sphynx", 
+        "Persian", "Maine Coon", "Siamese", "Ragdoll", "Bengal", "Sphynx",
         "British Shorthair", "Abyssinian", "Scottish Fold", "Mixed Breed", "other"
       ],
       Bird: [
@@ -8101,77 +8236,77 @@
         }
       });
 
-          // ── Signup ────────────────────────────────────────────────────────────
-      document
-        .getElementById("signup-step-1")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
-          const petName = document.getElementById("reg-name") ? document.getElementById("reg-name").value.trim() : "";
-          const parentName = document.getElementById("reg-parent-name") ? document.getElementById("reg-parent-name").value.trim() : "";
-          const email = document.getElementById("reg-email") ? document.getElementById("reg-email").value.trim() : "";
-          const password = document.getElementById("reg-password") ? document.getElementById("reg-password").value : "";
-          const petType = document.getElementById("reg-religion") ? document.getElementById("reg-religion").value : "Dog";
-          
-          let breed = document.getElementById("reg-breed") ? document.getElementById("reg-breed").value : "";
-          if (breed === "other") {
-            const customBreed = document.getElementById("reg-custom-breed");
-            if (customBreed) breed = customBreed.value.trim();
-          }
+    // ── Signup ────────────────────────────────────────────────────────────
+    document
+      .getElementById("signup-step-1")
+      .addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const petName = document.getElementById("reg-name") ? document.getElementById("reg-name").value.trim() : "";
+        const parentName = document.getElementById("reg-parent-name") ? document.getElementById("reg-parent-name").value.trim() : "";
+        const email = document.getElementById("reg-email") ? document.getElementById("reg-email").value.trim() : "";
+        const password = document.getElementById("reg-password") ? document.getElementById("reg-password").value : "";
+        const petType = document.getElementById("reg-religion") ? document.getElementById("reg-religion").value : "Dog";
 
-          if (!petName || !parentName || !email || !password) {
-            showError("signup", "Please fill in all fields.");
-            return;
-          }
-          if (password.length < 6) {
-            showError("signup", "Password must be at least 6 characters.");
-            return;
-          }
+        let breed = document.getElementById("reg-breed") ? document.getElementById("reg-breed").value : "";
+        if (breed === "other") {
+          const customBreed = document.getElementById("reg-custom-breed");
+          if (customBreed) breed = customBreed.value.trim();
+        }
 
-          const btn = document.getElementById("signup-submit-btn");
-          const orig = btn.innerHTML;
-          btn.innerHTML =
-            'Creating... <i data-lucide="loader" class="w-5 h-5 ml-2 animate-spin"></i>';
-          btn.disabled = true;
+        if (!petName || !parentName || !email || !password) {
+          showError("signup", "Please fill in all fields.");
+          return;
+        }
+        if (password.length < 6) {
+          showError("signup", "Password must be at least 6 characters.");
+          return;
+        }
+
+        const btn = document.getElementById("signup-submit-btn");
+        const orig = btn.innerHTML;
+        btn.innerHTML =
+          'Creating... <i data-lucide="loader" class="w-5 h-5 ml-2 animate-spin"></i>';
+        btn.disabled = true;
+        lucide.createIcons();
+
+        try {
+          const res = await fetch("pawcircle_api.php", {
+            method: "POST",
+            credentials: "include",
+            headers: secureJsonHeaders(),
+            body: JSON.stringify({
+              action: "signup",
+              pet_name: petName,
+              parent_name: parentName,
+              email: email,
+              password: password,
+              pet_type: petType,
+              breed: breed
+            }),
+          });
+          const data = await res.json();
+          if (data.status === "success" && data.verification_required) {
+            pendingVerifyPassword = password;
+            startEmailVerification(data.email || email);
+          } else if (data.status === "success") {
+            populateMemberDashboard(data.user, { openMembershipForm: true });
+            switchView("view-member-dashboard");
+            document.getElementById("signup-step-1").reset();
+          } else {
+            showError(
+              "signup",
+              data.message || "Signup failed. Please try again.",
+            );
+          }
+        } catch (err) {
+          console.warn("Signup request failed:", err);
+          showError("signup", "Could not reach the secure signup service. Please try again.");
+        } finally {
+          btn.innerHTML = orig;
+          btn.disabled = false;
           lucide.createIcons();
-
-          try {
-            const res = await fetch("pawcircle_api.php", {
-              method: "POST",
-              credentials: "include",
-              headers: secureJsonHeaders(),
-              body: JSON.stringify({
-                action: "signup",
-                pet_name: petName,
-                parent_name: parentName,
-                email: email,
-                password: password,
-                pet_type: petType,
-                breed: breed
-              }),
-            });
-            const data = await res.json();
-            if (data.status === "success" && data.verification_required) {
-              pendingVerifyPassword = password;
-              startEmailVerification(data.email || email);
-            } else if (data.status === "success") {
-              populateMemberDashboard(data.user, { openMembershipForm: true });
-              switchView("view-member-dashboard");
-              document.getElementById("signup-step-1").reset();
-            } else {
-              showError(
-                "signup",
-                data.message || "Signup failed. Please try again.",
-              );
-            }
-          } catch (err) {
-            console.warn("Signup request failed:", err);
-            showError("signup", "Could not reach the secure signup service. Please try again.");
-          } finally {
-            btn.innerHTML = orig;
-            btn.disabled = false;
-            lucide.createIcons();
-          }
-        });
+        }
+      });
 
 
 
@@ -11259,98 +11394,98 @@
       persistCurrentSession(currentUserObj);
     }
 
-    
-/* --- PORTAL TRANSITION JS --- */
-function burstConfetti(btn) {
-        for (var i = 0; i < 14; i++) {
-          var span = document.createElement('span');
-          span.className = 'confetti-piece';
-          var angle = Math.random() * Math.PI * 2;
-          var dist = 40 + Math.random() * 60;
-          var tx = Math.cos(angle) * dist;
-          var ty = Math.sin(angle) * dist - 20;
-          span.style.setProperty('--tx', tx + 'px');
-          span.style.setProperty('--ty', ty + 'px');
-          span.style.setProperty('--tr', (Math.random() * 360) + 'deg');
-          span.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14"><use href="#icon-paw" xlink:href="#icon-paw"/></svg>';
-          btn.appendChild(span);
-          setTimeout(function (s) { return function () { s.remove(); }; }(span), 950);
-        }
+
+    /* --- PORTAL TRANSITION JS --- */
+    function burstConfetti(btn) {
+      for (var i = 0; i < 14; i++) {
+        var span = document.createElement('span');
+        span.className = 'confetti-piece';
+        var angle = Math.random() * Math.PI * 2;
+        var dist = 40 + Math.random() * 60;
+        var tx = Math.cos(angle) * dist;
+        var ty = Math.sin(angle) * dist - 20;
+        span.style.setProperty('--tx', tx + 'px');
+        span.style.setProperty('--ty', ty + 'px');
+        span.style.setProperty('--tr', (Math.random() * 360) + 'deg');
+        span.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14"><use href="#icon-paw" xlink:href="#icon-paw"/></svg>';
+        btn.appendChild(span);
+        setTimeout(function (s) { return function () { s.remove(); }; }(span), 950);
       }
+    }
 
-      function spawnPortalSparks() {
-        var host = document.getElementById('portalSparks');
-        var pawIcon = '<svg viewBox="0 0 24 24" width="100%" height="100%"><use href="#icon-paw" xlink:href="#icon-paw"/></svg>';
-        var starIcon = '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z"/></svg>';
-        var colors = ['#FFF8EC', '#F2A93B', '#FF7A5C'];
-        for (var i = 0; i < 22; i++) {
-          var span = document.createElement('span');
-          span.className = 'portal-spark';
-          var angle = Math.random() * Math.PI * 2;
-          var dist = 160 + Math.random() * 340;
-          var tx = Math.cos(angle) * dist;
-          var ty = Math.sin(angle) * dist;
-          span.style.setProperty('--tx', tx + 'px');
-          span.style.setProperty('--ty', ty + 'px');
-          span.style.setProperty('--tr', (Math.random() * 360) + 'deg');
-          span.style.color = colors[Math.floor(Math.random() * colors.length)];
-          span.style.fill = 'currentColor';
-          span.style.animationDelay = (Math.random() * 0.25) + 's';
-          span.innerHTML = Math.random() < 0.6 ? pawIcon : starIcon;
-          host.appendChild(span);
-          setTimeout(function (s) { return function () { s.remove(); }; }(span), 1850);
-        }
+    function spawnPortalSparks() {
+      var host = document.getElementById('portalSparks');
+      var pawIcon = '<svg viewBox="0 0 24 24" width="100%" height="100%"><use href="#icon-paw" xlink:href="#icon-paw"/></svg>';
+      var starIcon = '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z"/></svg>';
+      var colors = ['#FFF8EC', '#F2A93B', '#FF7A5C'];
+      for (var i = 0; i < 22; i++) {
+        var span = document.createElement('span');
+        span.className = 'portal-spark';
+        var angle = Math.random() * Math.PI * 2;
+        var dist = 160 + Math.random() * 340;
+        var tx = Math.cos(angle) * dist;
+        var ty = Math.sin(angle) * dist;
+        span.style.setProperty('--tx', tx + 'px');
+        span.style.setProperty('--ty', ty + 'px');
+        span.style.setProperty('--tr', (Math.random() * 360) + 'deg');
+        span.style.color = colors[Math.floor(Math.random() * colors.length)];
+        span.style.fill = 'currentColor';
+        span.style.animationDelay = (Math.random() * 0.25) + 's';
+        span.innerHTML = Math.random() < 0.6 ? pawIcon : starIcon;
+        host.appendChild(span);
+        setTimeout(function (s) { return function () { s.remove(); }; }(span), 1850);
       }
+    }
 
-      function spawnSideFlyers() {
-        var host = document.getElementById('portalSideHost');
-        var icons = {
-          paw: '<svg viewBox="0 0 24 24" width="100%" height="100%"><use href="#icon-paw" xlink:href="#icon-paw"/></svg>',
-          bone: '<svg viewBox="0 0 24 24" width="100%" height="100%"><rect x="7" y="10.4" width="10" height="3.2" rx="1.4"/><circle cx="5" cy="9" r="2.7"/><circle cx="5" cy="15" r="2.7"/><circle cx="19" cy="9" r="2.7"/><circle cx="19" cy="15" r="2.7"/></svg>',
-          ball: '<svg viewBox="0 0 24 24" width="100%" height="100%"><circle cx="12" cy="12" r="9"/><path d="M4.5 7 C8 10 8 14 4.5 17" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.4"/><path d="M19.5 7 C16 10 16 14 19.5 17" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.4"/></svg>',
-          leaf: '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 21 C4 17 4 7 12 3 C20 7 20 17 12 21 Z"/><path d="M12 21 V3" fill="none" stroke="rgba(0,0,0,0.18)" stroke-width="1"/></svg>',
-          star: '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z"/></svg>'
-        };
-        var palette = {
-          paw: ['#F2A93B', '#FF7A5C'],
-          bone: ['#FFF8EC'],
-          ball: ['#FF7A5C', '#F2A93B'],
-          leaf: ['#6B8F71'],
-          star: ['#FFF8EC', '#F2A93B']
-        };
-        var keys = Object.keys(icons);
-        var count = 16;
-        for (var i = 0; i < count; i++) {
-          var fromLeft = i % 2 === 0;
-          var key = keys[Math.floor(Math.random() * keys.length)];
-          var colors = palette[key];
-          var span = document.createElement('span');
-          span.className = 'portal-side';
-          var size = 24 + Math.random() * 22;
-          span.style.width = size + 'px';
-          span.style.height = size + 'px';
-          span.style.top = (6 + Math.random() * 84) + 'vh';
-          if (fromLeft) { span.style.left = '-54px'; } else { span.style.right = '-54px'; }
-          var travel = (window.innerWidth || 1200) * (0.42 + Math.random() * 0.32);
-          var dx = fromLeft ? travel : -travel;
-          var dy = (Math.random() - 0.5) * 180;
-          var rot = (fromLeft ? 1 : -1) * (160 + Math.random() * 340);
-          span.style.setProperty('--dx', dx + 'px');
-          span.style.setProperty('--dy', dy + 'px');
-          span.style.setProperty('--rot', rot + 'deg');
-          span.style.color = colors[Math.floor(Math.random() * colors.length)];
-          span.style.fill = 'currentColor';
-          span.style.animationDelay = (Math.random() * 0.45) + 's';
-          span.innerHTML = icons[key];
-          host.appendChild(span);
-          setTimeout(function (s) { return function () { s.remove(); }; }(span), 2650);
-        }
+    function spawnSideFlyers() {
+      var host = document.getElementById('portalSideHost');
+      var icons = {
+        paw: '<svg viewBox="0 0 24 24" width="100%" height="100%"><use href="#icon-paw" xlink:href="#icon-paw"/></svg>',
+        bone: '<svg viewBox="0 0 24 24" width="100%" height="100%"><rect x="7" y="10.4" width="10" height="3.2" rx="1.4"/><circle cx="5" cy="9" r="2.7"/><circle cx="5" cy="15" r="2.7"/><circle cx="19" cy="9" r="2.7"/><circle cx="19" cy="15" r="2.7"/></svg>',
+        ball: '<svg viewBox="0 0 24 24" width="100%" height="100%"><circle cx="12" cy="12" r="9"/><path d="M4.5 7 C8 10 8 14 4.5 17" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.4"/><path d="M19.5 7 C16 10 16 14 19.5 17" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.4"/></svg>',
+        leaf: '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 21 C4 17 4 7 12 3 C20 7 20 17 12 21 Z"/><path d="M12 21 V3" fill="none" stroke="rgba(0,0,0,0.18)" stroke-width="1"/></svg>',
+        star: '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z"/></svg>'
+      };
+      var palette = {
+        paw: ['#F2A93B', '#FF7A5C'],
+        bone: ['#FFF8EC'],
+        ball: ['#FF7A5C', '#F2A93B'],
+        leaf: ['#6B8F71'],
+        star: ['#FFF8EC', '#F2A93B']
+      };
+      var keys = Object.keys(icons);
+      var count = 16;
+      for (var i = 0; i < count; i++) {
+        var fromLeft = i % 2 === 0;
+        var key = keys[Math.floor(Math.random() * keys.length)];
+        var colors = palette[key];
+        var span = document.createElement('span');
+        span.className = 'portal-side';
+        var size = 24 + Math.random() * 22;
+        span.style.width = size + 'px';
+        span.style.height = size + 'px';
+        span.style.top = (6 + Math.random() * 84) + 'vh';
+        if (fromLeft) { span.style.left = '-54px'; } else { span.style.right = '-54px'; }
+        var travel = (window.innerWidth || 1200) * (0.42 + Math.random() * 0.32);
+        var dx = fromLeft ? travel : -travel;
+        var dy = (Math.random() - 0.5) * 180;
+        var rot = (fromLeft ? 1 : -1) * (160 + Math.random() * 340);
+        span.style.setProperty('--dx', dx + 'px');
+        span.style.setProperty('--dy', dy + 'px');
+        span.style.setProperty('--rot', rot + 'deg');
+        span.style.color = colors[Math.floor(Math.random() * colors.length)];
+        span.style.fill = 'currentColor';
+        span.style.animationDelay = (Math.random() * 0.45) + 's';
+        span.innerHTML = icons[key];
+        host.appendChild(span);
+        setTimeout(function (s) { return function () { s.remove(); }; }(span), 2650);
       }
+    }
 
 
-/* ---------------------------- */
+    /* ---------------------------- */
 
-function initializeSocialFeed() {
+    function initializeSocialFeed() {
       // Setup Profile Data from the authenticated backend profile/session.
       const appData = {};
 
@@ -16423,8 +16558,8 @@ function initializeSocialFeed() {
       const selector = granthShowAllReligions
         ? `<div class="flex flex-wrap items-center gap-2">
              ${GRANTH_RELIGIONS.map((r) => `<button onclick="setGranthReligion('${r}')" class="px-4 py-1.5 rounded-full text-sm font-bold border transition-colors ${r === religionKey
-              ? "bg-amber-500 text-white border-amber-500 shadow-sm"
-              : "bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-amber-300"}">${r}</button>`).join("")}
+          ? "bg-amber-500 text-white border-amber-500 shadow-sm"
+          : "bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-amber-300"}">${r}</button>`).join("")}
              <button onclick="toggleGranthReligions()" class="px-4 py-1.5 rounded-full text-sm font-bold border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">Show fewer</button>
            </div>`
         : `<div><button onclick="toggleGranthReligions()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-sm"><i data-lucide="library" class="w-4 h-4"></i> View other religions</button></div>`;
@@ -21056,7 +21191,7 @@ function initializeSocialFeed() {
           }
           handleEventAudienceChange();
         }
-        
+
         switchEventInviteTab("friends");
         setTimeout(() => {
           const inviteCheckboxes = document.querySelectorAll(".event-invite-friend-checkbox");
@@ -29777,7 +29912,8 @@ function initializeSocialFeed() {
   <!-- Broadcast Message Modal -->
   <div id="broadcast-modal"
     class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[150] hidden flex-col items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
+    <div
+      class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
       <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
         <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
           <i data-lucide="megaphone" class="w-5 h-5 text-brand-500"></i> Broadcast a Message
@@ -29788,7 +29924,8 @@ function initializeSocialFeed() {
         </button>
       </div>
       <div class="p-6 space-y-4 overflow-y-auto modal-scroll">
-        <p class="text-xs text-gray-500 dark:text-gray-400">Send the same message to selected friends, communities &amp; groups.</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Send the same message to selected friends, communities &amp;
+          groups.</p>
         <div>
           <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Message</label>
           <textarea id="broadcast-message-text" rows="4" placeholder="Type your announcement..."
@@ -29801,13 +29938,17 @@ function initializeSocialFeed() {
           </div>
           <div class="flex gap-2 mb-2">
             <button type="button" id="broadcast-tab-friends" onclick="switchBroadcastTab('friends')"
-              class="px-3 py-1 rounded-full text-xs font-bold bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300 transition-colors"><i data-lucide="user" class="w-3 h-3 inline -mt-0.5"></i> Friends</button>
+              class="px-3 py-1 rounded-full text-xs font-bold bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300 transition-colors"><i
+                data-lucide="user" class="w-3 h-3 inline -mt-0.5"></i> Friends</button>
             <button type="button" id="broadcast-tab-groups" onclick="switchBroadcastTab('groups')"
-              class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><i data-lucide="users" class="w-3 h-3 inline -mt-0.5"></i> Groups</button>
+              class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><i
+                data-lucide="users" class="w-3 h-3 inline -mt-0.5"></i> Groups</button>
           </div>
           <div class="flex items-center gap-3 mb-2">
-            <button type="button" onclick="toggleAllBroadcastTargets(true)" class="text-xs font-bold text-brand-600 dark:text-brand-300 hover:underline">Select all</button>
-            <button type="button" onclick="toggleAllBroadcastTargets(false)" class="text-xs font-bold text-gray-500 dark:text-gray-400 hover:underline">Clear</button>
+            <button type="button" onclick="toggleAllBroadcastTargets(true)"
+              class="text-xs font-bold text-brand-600 dark:text-brand-300 hover:underline">Select all</button>
+            <button type="button" onclick="toggleAllBroadcastTargets(false)"
+              class="text-xs font-bold text-gray-500 dark:text-gray-400 hover:underline">Clear</button>
           </div>
           <div id="broadcast-friends-list"
             class="modal-scroll max-h-56 overflow-y-auto grid gap-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 p-2 border border-gray-100 dark:border-gray-700">
@@ -29817,7 +29958,8 @@ function initializeSocialFeed() {
           </div>
         </div>
       </div>
-      <div class="shrink-0 px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 flex justify-end gap-3">
+      <div
+        class="shrink-0 px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 flex justify-end gap-3">
         <button onclick="closeBroadcastModal()"
           class="px-5 py-2 text-gray-600 dark:text-gray-300 font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">Cancel</button>
         <button id="broadcast-send-btn" onclick="sendBroadcastMessage()"
@@ -29865,7 +30007,8 @@ function initializeSocialFeed() {
             class="w-full px-4 py-2 mb-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
             placeholder="Search friends to add…" />
           <div id="group-invite-list"
-            class="max-h-44 overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-800"></div>
+            class="max-h-44 overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-800">
+          </div>
         </div>
       </div>
       <div
@@ -29926,7 +30069,8 @@ function initializeSocialFeed() {
             <option value="few_friends">A few friends</option>
             <option value="invite_only">Invite only (only people I select)</option>
           </select>
-          <p id="event-audience-hint" class="hidden text-xs text-amber-600 dark:text-amber-400 mt-1.5 flex items-center gap-1">
+          <p id="event-audience-hint"
+            class="hidden text-xs text-amber-600 dark:text-amber-400 mt-1.5 flex items-center gap-1">
             <i data-lucide="lock" class="w-3.5 h-3.5"></i>
             Only the members & groups you select below will be able to see and connect to this event.
           </p>
@@ -29989,7 +30133,8 @@ function initializeSocialFeed() {
             <button type="button" id="event-invite-tab-friends" onclick="switchEventInviteTab('friends')"
               class="px-3 py-1 rounded-full text-xs font-bold bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300 transition-colors">Friends</button>
             <button type="button" id="event-invite-tab-groups" onclick="switchEventInviteTab('groups')"
-              class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><i data-lucide="megaphone" class="w-3 h-3 inline -mt-0.5"></i> Broadcast to Groups</button>
+              class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><i
+                data-lucide="megaphone" class="w-3 h-3 inline -mt-0.5"></i> Broadcast to Groups</button>
           </div>
           <div id="event-invite-friend-list"
             class="modal-scroll max-h-40 overflow-y-auto grid gap-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 p-2 border border-gray-100 dark:border-gray-700">
@@ -30150,7 +30295,8 @@ function initializeSocialFeed() {
             <input id="gallery-modal-url-input" type="url" inputmode="url" placeholder="https://example.com/image.jpg"
               class="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:border-brand-500">
             <button type="button" onclick="addGalleryMediaUrl()"
-              class="no-faith-hover px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-bold">Add URL</button>
+              class="no-faith-hover px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-bold">Add
+              URL</button>
           </div>
           <!-- Newly added media show as thumbnails only; the underlying storage URLs are never displayed. -->
           <textarea id="gallery-modal-media" class="hidden" aria-hidden="true" tabindex="-1"></textarea>
@@ -30172,7 +30318,8 @@ function initializeSocialFeed() {
   <div id="gallery-lightbox"
     class="gallery-lightbox fixed inset-0 z-[80] bg-white/95 dark:bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center">
     <img id="gallery-lightbox-post-bg" class="gallery-lightbox-post-bg" alt="" aria-hidden="true">
-    <div class="absolute top-5 left-0 right-0 z-30 flex items-center justify-between gap-4 px-5 sm:px-10 pointer-events-none">
+    <div
+      class="absolute top-5 left-0 right-0 z-30 flex items-center justify-between gap-4 px-5 sm:px-10 pointer-events-none">
       <div class="min-w-0">
         <p id="gallery-lightbox-title" class="text-gray-900 dark:text-white text-base sm:text-lg font-bold truncate">
           Gallery</p>
@@ -32943,7 +33090,7 @@ function initializeSocialFeed() {
           populateMemberDashboard(user);
           // Always restore into the feed; never auto-open the application form.
           initializeSocialFeed();
-              switchView("view-member-dashboard");
+          switchView("view-member-dashboard");
           document.body.style.visibility = 'visible';
           return;
         }
@@ -32959,7 +33106,7 @@ function initializeSocialFeed() {
           persistCurrentSession(authUser);
           populateMemberDashboard(authUser);
           initializeSocialFeed();
-              switchView("view-member-dashboard");
+          switchView("view-member-dashboard");
           document.body.style.visibility = 'visible';
           return;
         }
@@ -34191,7 +34338,8 @@ function initializeSocialFeed() {
       </div>
 
       <!-- Interactive Pack Tree (scrolls independently of the header) -->
-      <div class="user-profile-modal-body px-6 pb-6 pt-6 mt-4 flex-1 overflow-y-auto modal-scroll max-h-[55vh] rounded-b-3xl border-t border-gray-100 dark:border-gray-800">
+      <div
+        class="user-profile-modal-body px-6 pb-6 pt-6 mt-4 flex-1 overflow-y-auto modal-scroll max-h-[55vh] rounded-b-3xl border-t border-gray-100 dark:border-gray-800">
         <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
           <i data-lucide="network" class="w-4 h-4 text-brand-500"></i> Pack Tree (Interactive)
         </h3>
@@ -35826,7 +35974,8 @@ function initializeSocialFeed() {
           Stream discourses, kirtans, bhajans and sacred recitations curated for your community — anytime, anywhere.
         </p>
         <div class="mt-5 flex flex-wrap items-center gap-3">
-          <button id="ch-hero-cta" onclick="chPlayFeatured()" class="no-faith-hover inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-gray-900 text-sm font-bold shadow-lg hover:scale-[1.03] transition-transform">
+          <button id="ch-hero-cta" onclick="chPlayFeatured()"
+            class="no-faith-hover inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-gray-900 text-sm font-bold shadow-lg hover:scale-[1.03] transition-transform">
             <i data-lucide="play" class="w-4 h-4 fill-current"></i> Start watching
           </button>
           <span class="inline-flex items-center gap-2 text-xs font-semibold" style="color: rgba(255,255,255,.85)">
@@ -35869,7 +36018,8 @@ function initializeSocialFeed() {
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <span id="ch-live-badge" class="hidden items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-black uppercase tracking-wide">
+          <span id="ch-live-badge"
+            class="hidden items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-black uppercase tracking-wide">
             <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> Live
           </span>
           <h3 class="font-bold text-base" id="ch-now-playing-title" style="color: var(--ch-text)"></h3>
@@ -35951,9 +36101,9 @@ function initializeSocialFeed() {
       </div>
     </div>
   </div>
-<script>
+  <script>
     // Mascot animation
-    setTimeout(function() {
+    setTimeout(function () {
       var mascot = document.getElementById('mascot');
       var fullname = document.getElementById('reg-name');
       var password = document.getElementById('reg-password');
@@ -36448,9 +36598,9 @@ function initializeSocialFeed() {
     var loginFeedCurrentIdx = 0;
 
     function initLoginFeed() {
-      var pane     = document.getElementById('lp-left-pane');
-      var card     = document.getElementById('lp-feed-card');
-      var ticker   = document.getElementById('lp-activity-ticker');
+      var pane = document.getElementById('lp-left-pane');
+      var card = document.getElementById('lp-feed-card');
+      var ticker = document.getElementById('lp-activity-ticker');
       var onlineEl = document.getElementById('lp-online-count');
       if (!card) return;
 
@@ -36462,9 +36612,9 @@ function initializeSocialFeed() {
           headline: 'Golden Hour Walk Guide for Summer 2026',
           excerpt: 'Vets recommend shifting walks to early morning and post-sunset as temperatures peak. Cool pavement prevents burned paws, while shorter shaded routes cut heatstroke risk. Always carry water and watch for excessive panting.',
           tips: [
-            { icon: '💧', label: 'Fresh Water', sub: 'Every Hour',  cls: 'bg-sky-50 border-sky-100 text-sky-700' },
-            { icon: '🌅', label: 'Walk at',     sub: 'Dawn / Dusk', cls: 'bg-amber-50 border-amber-100 text-amber-700' },
-            { icon: '🐾', label: 'Paw Check',   sub: 'After Walk',  cls: 'bg-lime-50 border-lime-100 text-lime-700' },
+            { icon: '💧', label: 'Fresh Water', sub: 'Every Hour', cls: 'bg-sky-50 border-sky-100 text-sky-700' },
+            { icon: '🌅', label: 'Walk at', sub: 'Dawn / Dusk', cls: 'bg-amber-50 border-amber-100 text-amber-700' },
+            { icon: '🐾', label: 'Paw Check', sub: 'After Walk', cls: 'bg-lime-50 border-lime-100 text-lime-700' },
           ],
           tags: ['🐕 Dogs', '☀️ Summer', '🌿 Wellness'],
           activity: ['🐕 Dog Walk at Central Park · Sunday 7 am', '🙌 28 new dog parents joined today', '🏥 Vet Q&amp;A thread trending'],
@@ -36477,9 +36627,9 @@ function initializeSocialFeed() {
           headline: 'Keeping Indoor Cats Cool &amp; Stimulated',
           excerpt: 'Indoor cats need mental enrichment when hot weather keeps windows closed. Puzzle feeders, elevated perches, and window bird-feeders provide daily stimulation. Rotate toys weekly and schedule two play sessions daily to prevent boredom stress.',
           tips: [
-            { icon: '🧩', label: 'Puzzle',  sub: 'Feeders',     cls: 'bg-purple-50 border-purple-100 text-purple-700' },
-            { icon: '🪟', label: 'Window',  sub: 'Bird Feeder', cls: 'bg-sky-50 border-sky-100 text-sky-700' },
-            { icon: '🎾', label: 'Play 2×', sub: 'Daily',       cls: 'bg-pink-50 border-pink-100 text-pink-700' },
+            { icon: '🧩', label: 'Puzzle', sub: 'Feeders', cls: 'bg-purple-50 border-purple-100 text-purple-700' },
+            { icon: '🪟', label: 'Window', sub: 'Bird Feeder', cls: 'bg-sky-50 border-sky-100 text-sky-700' },
+            { icon: '🎾', label: 'Play 2×', sub: 'Daily', cls: 'bg-pink-50 border-pink-100 text-pink-700' },
           ],
           tags: ['🐈 Cats', '🏡 Indoor', '🌿 Enrichment'],
           activity: ['🐈 New group: Indoor Cat Club · 52 members', '📸 52 photos shared today', '🏥 Live Vet Q&amp;A · Tonight 8 pm'],
@@ -36492,9 +36642,9 @@ function initializeSocialFeed() {
           headline: 'Socialising Your Parrot: A Step-by-Step Guide',
           excerpt: 'Building trust with a new parrot takes patience. Start with short 10-minute sessions near the cage without reaching in, offering treats through the bars. Gradually progress to step-up training with calm voices and positive reinforcement.',
           tips: [
-            { icon: '🤝', label: 'Trust', sub: 'Sessions',    cls: 'bg-sky-50 border-sky-100 text-sky-700' },
-            { icon: '🍎', label: 'Treat', sub: 'Training',    cls: 'bg-green-50 border-green-100 text-green-700' },
-            { icon: '🔇', label: 'Calm',  sub: 'Environment', cls: 'bg-indigo-50 border-indigo-100 text-indigo-700' },
+            { icon: '🤝', label: 'Trust', sub: 'Sessions', cls: 'bg-sky-50 border-sky-100 text-sky-700' },
+            { icon: '🍎', label: 'Treat', sub: 'Training', cls: 'bg-green-50 border-green-100 text-green-700' },
+            { icon: '🔇', label: 'Calm', sub: 'Environment', cls: 'bg-indigo-50 border-indigo-100 text-indigo-700' },
           ],
           tags: ['🐦 Birds', '🦜 Parrots', '💬 Training'],
           activity: ['🐦 Parrot enrichment tips · 41 saves', '🎶 14 bird-call recordings shared', '📅 Bird Meet-Up · This Saturday'],
@@ -36508,8 +36658,8 @@ function initializeSocialFeed() {
           excerpt: 'Free-roaming rabbits are happier and healthier, but preparation is key. Cover electrical cords, block gaps behind furniture, and protect baseboards. Rabbits chew naturally — redirect them with safe hay bundles and willow toys.',
           tips: [
             { icon: '🔌', label: 'Cover', sub: 'All Cords', cls: 'bg-pink-50 border-pink-100 text-pink-700' },
-            { icon: '🌾', label: 'Hay',   sub: 'Bundles',   cls: 'bg-amber-50 border-amber-100 text-amber-700' },
-            { icon: '🚧', label: 'Block', sub: 'All Gaps',  cls: 'bg-rose-50 border-rose-100 text-rose-700' },
+            { icon: '🌾', label: 'Hay', sub: 'Bundles', cls: 'bg-amber-50 border-amber-100 text-amber-700' },
+            { icon: '🚧', label: 'Block', sub: 'All Gaps', cls: 'bg-rose-50 border-rose-100 text-rose-700' },
           ],
           tags: ['🐇 Rabbits', '🏡 Safety', '🛡️ Proofing'],
           activity: ['🐇 New bonded-pair photo posted', '🐣 Rescue spotlight: 3 bunnies available', '📦 Hay-haul bulk buy thread'],
@@ -36522,9 +36672,9 @@ function initializeSocialFeed() {
           headline: 'Summer Aquarium Care: Keeping Water Temperatures Safe',
           excerpt: 'Rising room temperatures push tank water above safe thresholds. Aim for 24–26 °C for tropical fish by running lights fewer hours, adding a fan across the water surface, or using frozen water bottles as a chiller. Test ammonia twice weekly.',
           tips: [
-            { icon: '🌡️', label: '24–26°C',  sub: 'Target Temp',    cls: 'bg-cyan-50 border-cyan-100 text-cyan-700' },
-            { icon: '💨', label: 'Fan Over', sub: 'Water Surface',  cls: 'bg-sky-50 border-sky-100 text-sky-700' },
-            { icon: '🧪', label: 'Test 2×',  sub: 'Per Week',       cls: 'bg-teal-50 border-teal-100 text-teal-700' },
+            { icon: '🌡️', label: '24–26°C', sub: 'Target Temp', cls: 'bg-cyan-50 border-cyan-100 text-cyan-700' },
+            { icon: '💨', label: 'Fan Over', sub: 'Water Surface', cls: 'bg-sky-50 border-sky-100 text-sky-700' },
+            { icon: '🧪', label: 'Test 2×', sub: 'Per Week', cls: 'bg-teal-50 border-teal-100 text-teal-700' },
           ],
           tags: ['🐠 Fish', '🌊 Aquascaping', '☀️ Summer'],
           activity: ['🐠 Aquascape build posted · 88 likes', '📊 Water test results thread', '🏆 Tank of the Month — vote now'],
@@ -36538,8 +36688,8 @@ function initializeSocialFeed() {
           excerpt: 'Proper UVB exposure is critical for bone health in diurnal reptiles. Replace UVB bulbs every 12 months even if they still emit visible light — output degrades invisibly. Maintain a clear gradient: 35–38 °C hot side, 24–27 °C cool side.',
           tips: [
             { icon: '☀️', label: 'Replace UVB', sub: 'Every 12 mo', cls: 'bg-lime-50 border-lime-100 text-lime-700' },
-            { icon: '🌡️', label: 'Basking',     sub: '35–38 °C',   cls: 'bg-yellow-50 border-yellow-100 text-yellow-700' },
-            { icon: '❄️', label: 'Cool Side',   sub: '24–27 °C',   cls: 'bg-sky-50 border-sky-100 text-sky-700' },
+            { icon: '🌡️', label: 'Basking', sub: '35–38 °C', cls: 'bg-yellow-50 border-yellow-100 text-yellow-700' },
+            { icon: '❄️', label: 'Cool Side', sub: '24–27 °C', cls: 'bg-sky-50 border-sky-100 text-sky-700' },
           ],
           tags: ['🦎 Reptiles', '💡 UVB', '🐍 Husbandry'],
           activity: ['🦎 Bioactive enclosure photos posted', '📷 Shed skin gallery · 9 new shots', '🩺 Exotic vet check-up guide posted'],
@@ -36549,9 +36699,9 @@ function initializeSocialFeed() {
 
       loginFeedCurrentIdx = Math.floor(Math.random() * loginFeedFeeds.length);
 
-      loginFeedRenderFn = function(forceTheme) {
+      loginFeedRenderFn = function (forceTheme) {
         if (forceTheme) {
-          var found = loginFeedFeeds.findIndex(function(f) { return f.petTheme === forceTheme; });
+          var found = loginFeedFeeds.findIndex(function (f) { return f.petTheme === forceTheme; });
           if (found >= 0) loginFeedCurrentIdx = found;
         }
 
@@ -36559,56 +36709,56 @@ function initializeSocialFeed() {
         if (pane) pane.style.background = f.grad;
         if (onlineEl) onlineEl.textContent = (f.online + Math.floor(Math.random() * 14) - 7) + ' online';
 
-        var tipsHtml = f.tips.map(function(t) {
+        var tipsHtml = f.tips.map(function (t) {
           return '<div class="rounded-xl border px-2.5 py-2.5 text-center min-h-[92px] flex flex-col items-center justify-center ' + t.cls + '">' +
-                 '<div class="text-base mb-0.5">' + t.icon + '</div>' +
-                 '<div class="text-xs font-semibold leading-tight">' + t.label + '<br>' + t.sub + '</div></div>';
+            '<div class="text-base mb-0.5">' + t.icon + '</div>' +
+            '<div class="text-xs font-semibold leading-tight">' + t.label + '<br>' + t.sub + '</div></div>';
         }).join('');
 
-        var tagsHtml = f.tags.map(function(tag) {
+        var tagsHtml = f.tags.map(function (tag) {
           return '<span class="px-2 py-0.5 rounded-full bg-white border border-gray-200/70 text-xs font-medium text-gray-600">' + tag + '</span>';
         }).join('');
 
         var galleryThemes = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Fish', 'Reptile']
-          .filter(function(themeName) { return themeName !== f.petTheme; });
-        var communityGalleryHtml = galleryThemes.concat(galleryThemes).map(function(themeName) {
+          .filter(function (themeName) { return themeName !== f.petTheme; });
+        var communityGalleryHtml = galleryThemes.concat(galleryThemes).map(function (themeName) {
           var theme = getPetTheme(themeName);
           var art = PET_REAL_PHOTOS[themeName] || getPetIllustrationDataUrl(theme, 'badge');
           return '<div class="pet-community-strip-item rounded-xl border border-white/85 bg-white/76 p-2.5 shadow-sm">' +
-                   '<div class="h-28 rounded-lg" style="background-image:linear-gradient(135deg, color-mix(in srgb, ' + theme.accent + ' 18%, white), transparent 70%), url(\'' + art + '\');background-size:cover;background-position:center;"></div>' +
-                   '<div class="mt-1.5 text-[11px] font-bold text-gray-700 text-center leading-tight">' + theme.label + '</div>' +
-                 '</div>';
+            '<div class="h-28 rounded-lg" style="background-image:linear-gradient(135deg, color-mix(in srgb, ' + theme.accent + ' 18%, white), transparent 70%), url(\'' + art + '\');background-size:cover;background-position:center;"></div>' +
+            '<div class="mt-1.5 text-[11px] font-bold text-gray-700 text-center leading-tight">' + theme.label + '</div>' +
+            '</div>';
         }).join('');
 
         card.innerHTML =
           '<div class="h-full flex flex-col">' +
           '<div class="flex items-center justify-between mb-2">' +
-            '<span class="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-0.5 rounded-full bg-white border uppercase tracking-wide ' + f.chipCls + '">' +
-              f.icon + ' ' + f.chipText +
-            '</span>' +
-            '<span class="text-xs text-gray-400">5 min read</span>' +
+          '<span class="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-0.5 rounded-full bg-white border uppercase tracking-wide ' + f.chipCls + '">' +
+          f.icon + ' ' + f.chipText +
+          '</span>' +
+          '<span class="text-xs text-gray-400">5 min read</span>' +
           '</div>' +
           '<h3 class="text-base font-bold text-gray-800 leading-snug mb-1.5" style="font-family:\'DM Serif Display\';">' + f.headline + '</h3>' +
           '<p class="text-sm text-gray-600 leading-relaxed mb-3">' + f.excerpt + '</p>' +
           '<div class="grid grid-cols-3 gap-2.5 mb-3 auto-rows-fr">' + tipsHtml + '</div>' +
           '<div class="mt-auto flex items-center gap-2 flex-wrap">' + tagsHtml + '</div>' +
           '<div class="mt-3 pt-3 border-t border-white/80">' +
-            '<div class="text-[11px] font-black uppercase tracking-[0.16em] text-gray-500 mb-2">Explore Pet Communities</div>' +
-            '<div class="pet-community-strip">' +
-              '<div class="pet-community-strip-track">' + communityGalleryHtml + '</div>' +
-            '</div>' +
+          '<div class="text-[11px] font-black uppercase tracking-[0.16em] text-gray-500 mb-2">Explore Pet Communities</div>' +
+          '<div class="pet-community-strip">' +
+          '<div class="pet-community-strip-track">' + communityGalleryHtml + '</div>' +
+          '</div>' +
           '</div>' +
           '</div>';
 
         if (ticker) {
-          ticker.innerHTML = f.activity.map(function(a) {
+          ticker.innerHTML = f.activity.map(function (a) {
             return '<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-white/80 border border-gray-200/60 text-xs text-gray-600 shadow-sm">' + a + '</span>';
           }).join('');
         }
 
         card.style.opacity = '0';
         card.style.transform = 'translateY(8px)';
-        requestAnimationFrame(function() {
+        requestAnimationFrame(function () {
           card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
           card.style.opacity = '1';
           card.style.transform = 'translateY(0)';
@@ -36630,188 +36780,188 @@ function initializeSocialFeed() {
       // Re-trigger each time the login view becomes active (after logout or back-nav)
       var loginView = document.getElementById('view-public-login');
       if (loginView) {
-        new MutationObserver(function() {
+        new MutationObserver(function () {
           if (loginView.classList.contains('active')) {
-             if(document.getElementById('login-pet-type').value) {
-                // Keep stopped
-             } else {
-                start();
-             }
+            if (document.getElementById('login-pet-type').value) {
+              // Keep stopped
+            } else {
+              start();
+            }
           }
         }).observe(loginView, { attributes: true, attributeFilter: ['class'] });
       }
     }
 
     function handleLoginPetTypeChange(type) {
-        var rightPane = document.getElementById('lp-right-pane');
-        if (!type) {
-            if (loginFeedRotateTimer) clearInterval(loginFeedRotateTimer);
-            loginFeedRotateTimer = setInterval(loginFeedRenderFn, 7000);
-            if (rightPane) rightPane.style.setProperty('--login-accent', '#f97316'); // Default brand
-            return;
-        }
-        
-        // Stop rotation
+      var rightPane = document.getElementById('lp-right-pane');
+      if (!type) {
         if (loginFeedRotateTimer) clearInterval(loginFeedRotateTimer);
-        
-        // Render specific theme
-        if (loginFeedRenderFn) loginFeedRenderFn(type);
-        
-        // Update accent color
-        var theme = getPetTheme(type);
-        if (rightPane && theme) {
-            rightPane.style.setProperty('--login-accent', theme.accent);
-        }
+        loginFeedRotateTimer = setInterval(loginFeedRenderFn, 7000);
+        if (rightPane) rightPane.style.setProperty('--login-accent', '#f97316'); // Default brand
+        return;
+      }
+
+      // Stop rotation
+      if (loginFeedRotateTimer) clearInterval(loginFeedRotateTimer);
+
+      // Render specific theme
+      if (loginFeedRenderFn) loginFeedRenderFn(type);
+
+      // Update accent color
+      var theme = getPetTheme(type);
+      if (rightPane && theme) {
+        rightPane.style.setProperty('--login-accent', theme.accent);
+      }
     }
 
     // Mascot Logic
-    document.addEventListener("DOMContentLoaded", function() {
-        var pwInput = document.getElementById('public-password');
-        var eyeToggle = document.getElementById('loginEyeToggle');
-        var eyeIcon = document.getElementById('loginEyeIcon');
-        
-        var loginPawL = document.querySelector('.login-paw-l');
-        var loginPawR = document.querySelector('.login-paw-r');
-        var loginMascot = document.getElementById('login-mascot');
-        
-        if (pwInput && eyeToggle && loginPawL && loginPawR && loginMascot) {
-            // Track mouse movement to move eyes if password is NOT shown
-            document.addEventListener('mousemove', function(e) {
-                if (pwInput.type === 'text') return; // Eyes are covered
-                var rect = loginMascot.getBoundingClientRect();
-                var centerX = rect.left + rect.width / 2;
-                var centerY = rect.top + rect.height / 2;
-                
-                var maxMove = 3;
-                var moveX = Math.max(-maxMove, Math.min(maxMove, (e.clientX - centerX) / 50));
-                var moveY = Math.max(-maxMove, Math.min(maxMove, (e.clientY - centerY) / 50));
-                
-                var pupils = loginMascot.querySelectorAll('.pupil');
-                pupils.forEach(function(p) {
-                    p.style.transform = `translate(${moveX}px, ${moveY}px)`;
-                });
-            });
+    document.addEventListener("DOMContentLoaded", function () {
+      var pwInput = document.getElementById('public-password');
+      var eyeToggle = document.getElementById('loginEyeToggle');
+      var eyeIcon = document.getElementById('loginEyeIcon');
 
-            pwInput.addEventListener('focus', function() {
-                if (pwInput.type === 'password') {
-                    // Close eyes when typing
-                    var lids = loginMascot.querySelector('.lids');
-                    if(lids) lids.setAttribute('height', '28');
-                }
-            });
-            
-            pwInput.addEventListener('blur', function() {
-                if (pwInput.type === 'password') {
-                    // Open eyes
-                    var lids = loginMascot.querySelector('.lids');
-                    if(lids) lids.setAttribute('height', '11');
-                }
-            });
+      var loginPawL = document.querySelector('.login-paw-l');
+      var loginPawR = document.querySelector('.login-paw-r');
+      var loginMascot = document.getElementById('login-mascot');
 
-            eyeToggle.addEventListener('click', function() {
-                var isText = pwInput.type === 'text';
-                if (isText) {
-                    // Hide password
-                    pwInput.type = 'password';
-                    eyeIcon.setAttribute('data-lucide', 'eye');
-                    if (typeof lucide !== 'undefined') lucide.createIcons();
-                    // Open eyes
-                    var lids = loginMascot.querySelector('.lids');
-                    if(lids) lids.setAttribute('height', document.activeElement === pwInput ? '28' : '11');
-                    // Uncover eyes
-                    loginPawL.style.transform = '';
-                    loginPawR.style.transform = '';
-                } else {
-                    // Show password
-                    pwInput.type = 'text';
-                    eyeIcon.setAttribute('data-lucide', 'eye-off');
-                    if (typeof lucide !== 'undefined') lucide.createIcons();
-                    // Cover eyes with paws
-                    loginPawL.style.transform = 'translate(-3px, -50px) rotate(15deg)';
-                    loginPawR.style.transform = 'translate(3px, -50px) rotate(-15deg)';
-                }
-            });
-        }
+      if (pwInput && eyeToggle && loginPawL && loginPawR && loginMascot) {
+        // Track mouse movement to move eyes if password is NOT shown
+        document.addEventListener('mousemove', function (e) {
+          if (pwInput.type === 'text') return; // Eyes are covered
+          var rect = loginMascot.getBoundingClientRect();
+          var centerX = rect.left + rect.width / 2;
+          var centerY = rect.top + rect.height / 2;
+
+          var maxMove = 3;
+          var moveX = Math.max(-maxMove, Math.min(maxMove, (e.clientX - centerX) / 50));
+          var moveY = Math.max(-maxMove, Math.min(maxMove, (e.clientY - centerY) / 50));
+
+          var pupils = loginMascot.querySelectorAll('.pupil');
+          pupils.forEach(function (p) {
+            p.style.transform = `translate(${moveX}px, ${moveY}px)`;
+          });
+        });
+
+        pwInput.addEventListener('focus', function () {
+          if (pwInput.type === 'password') {
+            // Close eyes when typing
+            var lids = loginMascot.querySelector('.lids');
+            if (lids) lids.setAttribute('height', '28');
+          }
+        });
+
+        pwInput.addEventListener('blur', function () {
+          if (pwInput.type === 'password') {
+            // Open eyes
+            var lids = loginMascot.querySelector('.lids');
+            if (lids) lids.setAttribute('height', '11');
+          }
+        });
+
+        eyeToggle.addEventListener('click', function () {
+          var isText = pwInput.type === 'text';
+          if (isText) {
+            // Hide password
+            pwInput.type = 'password';
+            eyeIcon.setAttribute('data-lucide', 'eye');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            // Open eyes
+            var lids = loginMascot.querySelector('.lids');
+            if (lids) lids.setAttribute('height', document.activeElement === pwInput ? '28' : '11');
+            // Uncover eyes
+            loginPawL.style.transform = '';
+            loginPawR.style.transform = '';
+          } else {
+            // Show password
+            pwInput.type = 'text';
+            eyeIcon.setAttribute('data-lucide', 'eye-off');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            // Cover eyes with paws
+            loginPawL.style.transform = 'translate(-3px, -50px) rotate(15deg)';
+            loginPawR.style.transform = 'translate(3px, -50px) rotate(-15deg)';
+          }
+        });
+      }
     });
 
     // ── FEED MEDIA LOGIC ──────────────────────────────────────
     function openFeedMediaPicker() {
-        var input = document.getElementById("feed-media-input");
-        if (input) input.click();
+      var input = document.getElementById("feed-media-input");
+      if (input) input.click();
     }
-    
+
     function clearFeedMediaSelection() {
-        var input = document.getElementById("feed-media-input");
-        var previewContainer = document.getElementById("feed-media-preview");
-        if (input) input.value = "";
-        if (previewContainer) {
-            previewContainer.classList.add("hidden");
-            previewContainer.innerHTML = "";
-        }
+      var input = document.getElementById("feed-media-input");
+      var previewContainer = document.getElementById("feed-media-preview");
+      if (input) input.value = "";
+      if (previewContainer) {
+        previewContainer.classList.add("hidden");
+        previewContainer.innerHTML = "";
+      }
     }
-    
+
     function handleFeedMediaSelection(event) {
-        var file = event.target.files[0];
-        if (!file) return;
-        var previewContainer = document.getElementById("feed-media-preview");
-        if (!previewContainer) return;
-        
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            previewContainer.classList.remove("hidden");
-            if (file.type.startsWith('video/')) {
-                previewContainer.innerHTML = `
+      var file = event.target.files[0];
+      if (!file) return;
+      var previewContainer = document.getElementById("feed-media-preview");
+      if (!previewContainer) return;
+
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        previewContainer.classList.remove("hidden");
+        if (file.type.startsWith('video/')) {
+          previewContainer.innerHTML = `
                     <div class="relative inline-block mt-2">
                         <video src="${e.target.result}" class="max-h-48 rounded-lg" controls></video>
                         <button onclick="clearFeedMediaSelection()" class="absolute -top-2 -right-2 bg-gray-900 text-white rounded-full p-1 shadow-md hover:bg-gray-800"><i data-lucide="x" class="w-4 h-4"></i></button>
                     </div>`;
-            } else {
-                previewContainer.innerHTML = `
+        } else {
+          previewContainer.innerHTML = `
                     <div class="relative inline-block mt-2">
                         <img src="${e.target.result}" class="max-h-48 rounded-lg object-contain" />
                         <button onclick="clearFeedMediaSelection()" class="absolute -top-2 -right-2 bg-gray-900 text-white rounded-full p-1 shadow-md hover:bg-gray-800"><i data-lucide="x" class="w-4 h-4"></i></button>
                     </div>`;
-            }
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-        };
-        reader.readAsDataURL(file);
+        }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      };
+      reader.readAsDataURL(file);
     }
-    
+
     // Patch createPost to include media
     var originalCreatePost = window.createPost;
     if (originalCreatePost) {
-        window.createPost = function(textId, hashId) {
-            var mediaInput = document.getElementById("feed-media-input");
-            var contentElem = document.getElementById(textId);
-            if (!contentElem) return;
-            
-            var content = contentElem.value.trim();
-            if (!content && (!mediaInput || !mediaInput.files[0])) return;
-            
-            if (mediaInput && mediaInput.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var newPost = {
-                        id: Date.now(),
-                        user_id: currentUserObj.id,
-                        author: currentUserObj.name,
-                        profilePhoto: currentUserObj.profilePhoto,
-                        content: content,
-                        media_url: e.target.result,
-                        time: "Just now",
-                        likes: 0,
-                        comments: 0
-                    };
-                    feedPosts.unshift(newPost);
-                    clearFeedMediaSelection();
-                    contentElem.value = "";
-                    renderFeed();
-                };
-                reader.readAsDataURL(mediaInput.files[0]);
-            } else {
-                originalCreatePost(textId, hashId);
-            }
-        };
+      window.createPost = function (textId, hashId) {
+        var mediaInput = document.getElementById("feed-media-input");
+        var contentElem = document.getElementById(textId);
+        if (!contentElem) return;
+
+        var content = contentElem.value.trim();
+        if (!content && (!mediaInput || !mediaInput.files[0])) return;
+
+        if (mediaInput && mediaInput.files[0]) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            var newPost = {
+              id: Date.now(),
+              user_id: currentUserObj.id,
+              author: currentUserObj.name,
+              profilePhoto: currentUserObj.profilePhoto,
+              content: content,
+              media_url: e.target.result,
+              time: "Just now",
+              likes: 0,
+              comments: 0
+            };
+            feedPosts.unshift(newPost);
+            clearFeedMediaSelection();
+            contentElem.value = "";
+            renderFeed();
+          };
+          reader.readAsDataURL(mediaInput.files[0]);
+        } else {
+          originalCreatePost(textId, hashId);
+        }
+      };
     }
 
     // ── THREAD MANAGEMENT / POST DETAIL VIEW ────────────────────
@@ -36862,7 +37012,7 @@ function initializeSocialFeed() {
       const avatarHtml = post.profilePhoto
         ? `<img src="${escapeHtml(post.profilePhoto)}" onclick="openUserProfile('${safeAuthor}', 'Community Member', '${String(post.user_id || '').replace(/'/g, "\\'")}', '${safeProfilePhoto}')" loading="lazy" decoding="async" class="w-11 h-11 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-brand-400 transition-all" alt="">`
         : `<div onclick="openUserProfile('${safeAuthor}', 'Community Member', '${String(post.user_id || '').replace(/'/g, "\\'")}')" class="w-11 h-11 ${post.avatarClass || 'bg-gray-200 text-gray-700'} rounded-full flex items-center justify-center font-bold cursor-pointer hover:ring-2 hover:ring-brand-400 transition-all">${post.initials || 'U'}</div>`;
-      
+
       const mediaHtml = post.media_url ? `<img src="${escapeHtml(post.media_url)}" class="mt-4 rounded-xl max-h-[500px] w-full object-contain bg-gray-50 border border-gray-100" />` : "";
       const descriptionText = post.description || post.content || "";
       const descriptionHtml = descriptionText ? `<p class="text-base leading-7 text-gray-800 whitespace-pre-wrap break-words mt-2">${escapeHtml(descriptionText)}</p>` : "";
@@ -36895,7 +37045,7 @@ function initializeSocialFeed() {
 
     initLoginFeed();
 
-</script>
-  </body>
+  </script>
+</body>
 
 </html>

@@ -65,3 +65,6 @@ esamaj_frontend.html
 
 # Temporary merge resolution files
 _merge_temp/
+
+graphify-out/
+.graphifyignore

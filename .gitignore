@@ -51,3 +51,10 @@ databasesecurityupdate.md
 backend_api.php
 burrow-signup.html
 esamaj_frontend.html
+
+*.txt
+*.py
+
+_merge_temp/
+_merge_temp/*
+_merge_temp/**

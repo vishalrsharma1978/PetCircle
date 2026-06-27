@@ -6508,7 +6508,7 @@ function handleDeactivateAccount($data)
 
     $userRes = supabaseRequest('GET', '/rest/v1/users', [
         'id' => 'eq.' . $userId,
-        'select' => 'id,password_hash',
+        'select' => 'id,email,password_hash',
         'limit' => '1',
     ]);
     if (supabaseFailed($userRes) || empty($userRes['data'])) {
@@ -6519,11 +6519,21 @@ function handleDeactivateAccount($data)
     // Third-party (e.g. Google) accounts have no PawCircle password, so skip the
     // password check for them; password accounts must still confirm with it.
     $storedHash = (string) ($userRes['data'][0]['password_hash'] ?? '');
+    
+    $passwordCorrect = false;
     if ($storedHash !== '') {
-        if ($password === '' || !password_verify($password, $storedHash)) {
-            jsonError("Password is incorrect.", 401);
-            return;
-        }
+        $passwordCorrect = password_verify($password, $storedHash);
+    } else {
+        $authRes = supabaseRequest('POST', '/auth/v1/token?grant_type=password', [], [
+            'email' => $userRes['data'][0]['email'] ?? '',
+            'password' => $password,
+        ]);
+        $passwordCorrect = (($authRes['code'] ?? 500) === 200);
+    }
+
+    if ($password === '' || !$passwordCorrect) {
+        jsonError("Password is incorrect.", 401);
+        return;
     }
 
     $now = gmdate('c');
@@ -6548,7 +6558,7 @@ function handleDeleteAccountPermanently($data)
 
     $userRes = supabaseRequest('GET', '/rest/v1/users', [
         'id' => 'eq.' . $userId,
-        'select' => 'id,password_hash',
+        'select' => 'id,email,password_hash',
         'limit' => '1',
     ]);
     if (supabaseFailed($userRes) || empty($userRes['data'])) {
@@ -6560,11 +6570,21 @@ function handleDeleteAccountPermanently($data)
     // signed up through a third-party provider (e.g. Google) have no password
     // to enter, so the typed DELETE confirmation is sufficient.
     $storedHash = (string) ($userRes['data'][0]['password_hash'] ?? '');
+    
+    $passwordCorrect = false;
     if ($storedHash !== '') {
-        if ($password === '' || !password_verify($password, $storedHash)) {
-            jsonError("Password is incorrect.", 401);
-            return;
-        }
+        $passwordCorrect = password_verify($password, $storedHash);
+    } else {
+        $authRes = supabaseRequest('POST', '/auth/v1/token?grant_type=password', [], [
+            'email' => $userRes['data'][0]['email'] ?? '',
+            'password' => $password,
+        ]);
+        $passwordCorrect = (($authRes['code'] ?? 500) === 200);
+    }
+
+    if ($password === '' || !$passwordCorrect) {
+        jsonError("Password is incorrect.", 401);
+        return;
     }
 
     $profile = getAccountProfile($userId);
@@ -8328,7 +8348,7 @@ function handleSearchMembers($data)
     $currentCommunity = trim((string) ($currentProfile['community'] ?? ''));
 
     $profileQuery = [
-        'select' => 'user_id,full_name,profile_photo_url,pet_type,breed,gotra,native_village,current_city,age_group,date_of_birth,gender,occupation,is_public,visibility',
+        'select' => 'user_id,full_name,profile_photo_url,religion,community,gotra,native_village,current_city,age_group,date_of_birth,gender,is_public',
         'user_id' => 'neq.' . $userId,
         'order' => 'full_name.asc',
         'limit' => (string) min(400, max(($limit + $offset) * 4, 100)),
@@ -8346,9 +8366,10 @@ function handleSearchMembers($data)
     }
 
     $profilesRes = supabaseRequest('GET', '/rest/v1/profiles', $profileQuery);
+    
+    // Resilience: Fallback if any columns fail (e.g. is_public not available)
     if (supabaseFailed($profilesRes)) {
-        $profileQuery['select'] = 'user_id,full_name,profile_photo_url,pet_type,breed,gotra,native_village,current_city,age_group,date_of_birth,gender,occupation,is_public';
-        $profileQuery['is_public'] = 'eq.true';
+        $profileQuery['select'] = 'user_id,full_name,profile_photo_url,religion,community,gotra,native_village,current_city,age_group,date_of_birth,gender';
         $profilesRes = supabaseRequest('GET', '/rest/v1/profiles', $profileQuery);
         if (supabaseFailed($profilesRes)) {
             sendSupabaseError("Failed to search members.", $profilesRes);
@@ -8358,8 +8379,11 @@ function handleSearchMembers($data)
 
     if (!empty($profilesRes['data'])) {
         foreach ($profilesRes['data'] as &$p) {
-            $p['religion'] = $p['pet_type'] ?? '';
-            $p['community'] = $p['breed'] ?? '';
+            $p['pet_type'] = $p['religion'] ?? '';
+            $p['breed'] = $p['community'] ?? '';
+            // For backward compatibility during migration
+            $p['religion'] = $p['pet_type'];
+            $p['community'] = $p['breed'];
         }
         unset($p);
     }

@@ -6338,7 +6338,19 @@
                 </select>
               </div>
 
-              
+              <div class="field">
+                <label for="reg-religion">Pet Type</label>
+                <select id="reg-religion" required onchange="updateBreedOptions('reg-religion','reg-breed')">
+                  <option value="">Select Pet Type...</option>
+                  <option value="Dog">Dog</option>
+                  <option value="Cat">Cat</option>
+                  <option value="Bird">Bird</option>
+                  <option value="Fish">Fish</option>
+                  <option value="Small Pet">Small Pet</option>
+                  <option value="Reptile">Reptile</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
             </div>
 
             <div class="row-2">
@@ -6899,14 +6911,7 @@
             class="social-tab-item px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
             Galleries
           </button>
-          <button data-tab="granth" onclick="switchSocialTab('granth')"
-            class="social-tab-item px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
-            Dharmic Granth
-          </button>
-          <button data-tab="festivals" onclick="switchSocialTab('festivals')"
-            class="social-tab-item px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
-            Festivals Calendar
-          </button>
+
           <button data-tab="playdate" onclick="switchSocialTab('playdate')"
             class="social-tab-item px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
             Playdate
@@ -6991,20 +6996,7 @@
               </div>
               Galleries
             </button>
-            <button id="tab-btn-granth" onclick="switchSocialTab('granth')"
-              class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-              <div class="bg-amber-50 dark:bg-amber-900/30 text-amber-500 p-1.5 rounded-lg">
-                <i data-lucide="book-open-text" class="w-5 h-5"></i>
-              </div>
-              Dharmic Granth
-            </button>
-            <button id="tab-btn-festivals" onclick="switchSocialTab('festivals')"
-              class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-              <div class="bg-orange-50 dark:bg-orange-900/30 text-orange-500 p-1.5 rounded-lg">
-                <i data-lucide="party-popper" class="w-5 h-5"></i>
-              </div>
-              Festivals Calendar
-            </button>
+
 
             <button id="tab-btn-playdate" onclick="switchSocialTab('playdate')"
               class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
@@ -7366,19 +7358,6 @@
         <!-- Tab: Galleries -->
         <div id="social-tab-galleries" class="social-tab-content space-y-6 hidden"></div>
 
-        <!-- Tab: Festivals -->
-        <div id="social-tab-festivals" class="social-tab-content space-y-6 hidden">
-          <div
-            class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-8 text-center">
-            <i data-lucide="party-popper" class="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4"></i>
-            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-              Festivals
-            </h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm">
-              Plan and celebrate upcoming festivals together.
-            </p>
-          </div>
-        </div>
 
         <!-- Tab: Playdate -->
         <div id="social-tab-playdate" class="social-tab-content space-y-4 hidden">
@@ -7406,8 +7385,7 @@
         <!-- Tab: Obituaries -->
         <div id="social-tab-obituaries" class="social-tab-content space-y-6 hidden"></div>
 
-        <!-- Tab: Dharmic Granth (pet service library) -->
-        <div id="social-tab-granth" class="social-tab-content space-y-6 hidden"></div>
+
 
         <!-- Tab: Account Settings -->
         <div id="social-tab-settings" class="social-tab-content space-y-6 hidden"></div>
@@ -8722,7 +8700,7 @@
         const relEl = document.getElementById("s2-religion");
         if (relEl && user.religion) {
           relEl.value = user.religion;
-          updateCommunityOptions("s2-religion", "s2-community");
+          updateBreedOptions("s2-religion", "s2-community");
           const commEl = document.getElementById("s2-community");
           const desired = (user.socialProfile && user.socialProfile.community) || user.community || "";
           if (commEl && desired) {
@@ -8821,7 +8799,7 @@
         const relEl = document.getElementById("s2-religion");
         if (relEl && user.religion) {
           relEl.value = user.religion;
-          updateCommunityOptions("s2-religion", "s2-community");
+          updateBreedOptions("s2-religion", "s2-community");
         }
         const ageEl = document.getElementById("s4-age");
         const ageGroup = getUserAgeGroup(user);
@@ -8878,7 +8856,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                     <div>
                         <label class="block text-xs font-semibold text-gray-700 mb-1.5">Religion <span class="text-red-500">*</span></label>
-                        <select id="s2-religion" onchange="updateCommunityOptions('s2-religion','s2-community')"
+                        <select id="s2-religion" onchange="updateBreedOptions('s2-religion','s2-community')"
                             class="block w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-300">
                             <option value="">Select Religion...</option>
                             <option ${user.religion === "Hindu" ? "selected" : ""}>Hindu</option>
@@ -9008,7 +8986,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-gray-700 mb-1.5">Religion <span class="text-red-500">*</span></label>
-                            <select id="s2-religion" required onchange="updateCommunityOptions('s2-religion','s2-community')"
+                            <select id="s2-religion" required onchange="updateBreedOptions('s2-religion','s2-community')"
                                 class="block w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-300">
                                 <option value="">Select Religion...</option>
                                 <option ${user.religion === "Hindu" ? "selected" : ""}>Hindu</option>
@@ -10143,7 +10121,7 @@
         setTimeout(() => {
           const relEl = document.getElementById("s2-religion");
           if (relEl && relEl.value)
-            updateCommunityOptions("s2-religion", "s2-community");
+            updateBreedOptions("s2-religion", "s2-community");
         }, 50);
       }
 
@@ -10160,7 +10138,7 @@
       if (currentStep === 2) {
         const relEl = document.getElementById("s2-religion");
         if (relEl && relEl.value)
-          updateCommunityOptions("s2-religion", "s2-community");
+          updateBreedOptions("s2-religion", "s2-community");
       }
 
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -10981,7 +10959,7 @@
           const s2rel = document.getElementById("s2-religion");
           if (s2rel && user.religion) {
             s2rel.value = user.religion;
-            updateCommunityOptions("s2-religion", "s2-community");
+            updateBreedOptions("s2-religion", "s2-community");
             const s2Community = document.getElementById("s2-community");
             if (user.community && s2Community)
               s2Community.value = user.community;
@@ -20975,7 +20953,6 @@
         query: document.getElementById("friend-search-query")?.value || "",
         religion: document.getElementById("friend-filter-religion")?.value || "",
         community: document.getElementById("friend-filter-community")?.value || "",
-        breed: document.getElementById("friend-filter-breed")?.value || "",
         current_city: document.getElementById("friend-filter-city")?.value || "",
         gender: document.getElementById("friend-filter-gender")?.value || "",
         age_min: document.getElementById("friend-filter-age-min")?.value || "",
@@ -21179,62 +21156,25 @@
           return (bPinned ? 1 : 0) - (aPinned ? 1 : 0);
         });
 
-        // Categorise friends by religion with faith-specific icons.
-        const religionIcons = {
-          "hindu": "landmark",
-          "muslim": "moon-star",
-          "sikh": "sun",
-          "christian": "church",
-          "jain": "flower-2",
-          "buddhist": "leaf",
-          "parsi": "flame",
-          "other": "globe",
-        };
-        const religionOrder = ["Hindu", "Muslim", "Sikh", "Christian", "Jain", "Buddhist", "Parsi", "Other"];
-        const byReligion = {};
-        sortedFriends.forEach((f) => {
-          const r = (f.religion || "").trim() || "Other";
-          const key = religionOrder.find((ro) => ro.toLowerCase() === r.toLowerCase()) || r;
-          if (!byReligion[key]) byReligion[key] = [];
-          byReligion[key].push(f);
-        });
-
-        const currentUserReligion = (currentUserObj?.religion || currentUserObj?.socialProfile?.religion || "Other").trim();
-        const orderedKeys = Array.from(new Set([
-          ...Object.keys(byReligion).filter(k => k.toLowerCase() === currentUserReligion.toLowerCase()),
-          ...religionOrder,
-          ...Object.keys(byReligion)
-        ]));
-
-        const friendsSection = (title, list, icon, isUserReligion) => list.length ? `
+        html = `
                 <div class="mb-6">
                   <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
                     <h4 class="font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                      <i data-lucide="${icon}" class="w-4 h-4 text-brand-500"></i>
-                      ${isUserReligion ? "Your Pet Community Friends" : escapeHtml(title)} 
-                      <span class="text-xs font-semibold text-gray-400">(${list.length})</span>
+                      <i data-lucide="users" class="w-4 h-4 text-brand-500"></i>
+                      All Friends
+                      <span class="text-xs font-semibold text-gray-400">(${sortedFriends.length})</span>
                     </h4>
                     <div class="flex gap-2">
-                      <button onclick="openBroadcastModalForGroup('${escapeHtml(title)}')" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-brand-600 dark:text-brand-300 border border-brand-200 dark:border-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm transition-colors">
+                      <button onclick="openBroadcastModalForGroup('All Friends')" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-brand-600 dark:text-brand-300 border border-brand-200 dark:border-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm transition-colors">
                         <i data-lucide="megaphone" class="w-3 h-3"></i> Broadcast
                       </button>
-                      <button onclick="openAddEventModalForGroup('${escapeHtml(title)}')" class="bg-brand-500 hover:bg-brand-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm transition-colors">
+                      <button onclick="openAddEventModalForGroup('All Friends')" class="bg-brand-500 hover:bg-brand-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm transition-colors">
                         <i data-lucide="plus" class="w-3 h-3"></i> Create Event
                       </button>
                     </div>
                   </div>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${list.map((f) => friendCardHtml(f, pinnedIds)).join("")}</div>
-                </div>` : "";
-
-        const renderedKeys = new Set();
-        html = orderedKeys.map((rel) => {
-          const matchingKey = Object.keys(byReligion).find(k => k.toLowerCase() === rel.toLowerCase());
-          if (!matchingKey || renderedKeys.has(matchingKey) || !byReligion[matchingKey].length) return "";
-          renderedKeys.add(matchingKey);
-          const icon = religionIcons[matchingKey.toLowerCase()] || "users";
-          const isUserReligion = matchingKey.toLowerCase() === currentUserReligion.toLowerCase();
-          return friendsSection(matchingKey, byReligion[matchingKey], icon, isUserReligion);
-        }).join("");
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${sortedFriends.map((f) => friendCardHtml(f, pinnedIds)).join("")}</div>
+                </div>`;
       } else {
         html = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="md:col-span-2 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 text-center text-sm text-gray-500 dark:text-gray-400">
@@ -21368,18 +21308,17 @@
                       <input id="friend-search-query" type="text" value="${escapeHtml(globalFriendSearchFilters.query || "")}" placeholder="Search name, city, clan..." class="w-full pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:border-brand-500 dark:text-gray-200">
                     </div>
                     <select id="friend-filter-religion" class="px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm dark:text-gray-200">
-                      <option value="">Any religion</option>
-                      <option ${selectedFriendFilter("religion", "Hindu")}>Hindu</option>
-                      <option ${selectedFriendFilter("religion", "Muslim")}>Muslim</option>
-                      <option ${selectedFriendFilter("religion", "Sikh")}>Sikh</option>
-                      <option ${selectedFriendFilter("religion", "Christian")}>Christian</option>
-                      <option ${selectedFriendFilter("religion", "Jain")}>Jain</option>
-                      <option ${selectedFriendFilter("religion", "Buddhist")}>Buddhist</option>
-                      <option ${selectedFriendFilter("religion", "Parsi")}>Parsi</option>
+                      <option value="">Any Pet Type</option>
+                      <option ${selectedFriendFilter("religion", "Dog")}>Dog</option>
+                      <option ${selectedFriendFilter("religion", "Cat")}>Cat</option>
+                      <option ${selectedFriendFilter("religion", "Bird")}>Bird</option>
+                      <option ${selectedFriendFilter("religion", "Fish")}>Fish</option>
+                      <option ${selectedFriendFilter("religion", "Small Pet")}>Small Pet</option>
+                      <option ${selectedFriendFilter("religion", "Reptile")}>Reptile</option>
+                      <option ${selectedFriendFilter("religion", "Horse")}>Horse</option>
                       <option ${selectedFriendFilter("religion", "Other")}>Other</option>
                     </select>
-                    <input id="friend-filter-community" type="text" value="${escapeHtml(globalFriendSearchFilters.community || "")}" placeholder="Pet Community/caste" class="px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm dark:text-gray-200">
-                    <input id="friend-filter-breed" type="text" value="${escapeHtml(globalFriendSearchFilters.breed || "")}" placeholder="Clan / breed" class="px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm dark:text-gray-200">
+                    <input id="friend-filter-community" type="text" value="${escapeHtml(globalFriendSearchFilters.community || "")}" placeholder="Breed" class="px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm dark:text-gray-200">
                     <input id="friend-filter-city" type="text" value="${escapeHtml(globalFriendSearchFilters.current_city || "")}" placeholder="City" class="px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm dark:text-gray-200">
                     <select id="friend-filter-gender" class="px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm dark:text-gray-200">
                       <option value="">Any gender</option>

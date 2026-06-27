@@ -6944,400 +6944,8 @@
             <!-- ── New feature shortcuts ── -->
             <div class="hidden pt-4 pb-1 px-1 text-xs font-black uppercase tracking-wider text-gray-400">Explore</div>
 
-          </div>
-
-        </div>
-      </aside>
-      <aside id="settings-left-sidebar" class="hidden lg:hidden flex-col w-72 flex-shrink-0 self-start">
-        <div class="space-y-2 pr-2">
-          <button type="button" onclick="switchSocialTab('feed')"
-            class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors">
-            <i data-lucide="arrow-left" class="w-5 h-5"></i>
-            Back to PawCircle
-          </button>
-          <div class="pt-6 pb-2 px-3 text-xs font-black uppercase tracking-wider text-gray-400">Account settings</div>
-          <button type="button" onclick="switchAccountSettingsSection('overview')" data-settings-section="overview"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="layout-grid" class="w-5 h-5 text-brand-500"></i> Overview</button>
-          <button type="button" onclick="switchAccountSettingsSection('personal')" data-settings-section="personal"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="id-card" class="w-5 h-5 text-blue-500"></i> Personal details</button>
-          <button type="button" onclick="switchAccountSettingsSection('security')" data-settings-section="security"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i> Security</button>
-          <button type="button" onclick="switchAccountSettingsSection('privacy')" data-settings-section="privacy"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="lock" class="w-5 h-5 text-green-600"></i> Privacy</button>
-          <button type="button" onclick="switchAccountSettingsSection('galleries')" data-settings-section="galleries"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="images" class="w-5 h-5 text-violet-500"></i> Events & galleries</button>
-          <button type="button" onclick="switchAccountSettingsSection('posts')" data-settings-section="posts"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="panel-top" class="w-5 h-5 text-pink-500"></i> Posts</button>
-          <button type="button" onclick="switchAccountSettingsSection('archived')" data-settings-section="archived"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="archive" class="w-5 h-5 text-amber-500"></i> Archived posts</button>
-          
-          <button type="button" onclick="switchAccountSettingsSection('pack')" data-settings-section="pack"
-            class="settings-side-btn no-faith-hover w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="network" class="w-5 h-5 text-teal-500"></i> Pack & pet_profile</button>
-          <button type="button" onclick="switchAccountSettingsSection('blocked')" data-settings-section="blocked"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="ban" class="w-5 h-5 text-gray-500"></i> Blocked accounts</button>
-          <button type="button" onclick="switchAccountSettingsSection('danger')" data-settings-section="danger"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="triangle-alert" class="w-5 h-5"></i> Account actions</button>
-        </div>
-      </aside>
-
-      <!-- Main Feed -->
-      <div id="social-main-column" class="flex-1 max-w-2xl mx-auto space-y-6">
-        <!-- Tab: Feed -->
-        <div id="social-tab-feed" class="social-tab-content space-y-6">
-          <!-- Smart Filters & Suvichar -->
-          <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
-            <div id="feed-filters" class="nav-scroll flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-              <button onclick="setActiveFilter(this, 'All Posts')"
-                class="feed-filter-btn px-6 py-2 rounded-full bg-[#f97316] text-white text-base font-bold whitespace-nowrap shadow-md hover:bg-[#ea580c] transition-colors border-2 border-[#f97316]">All Posts</button>
-              <button onclick="setActiveFilter(this, 'My Pack')"
-                class="feed-filter-btn px-6 py-2 rounded-full bg-white text-gray-600 hover:text-[#f97316] hover:border-[#f97316] text-base font-semibold whitespace-nowrap shadow-sm border-2 border-gray-200 transition-all">My Pack</button>
-              <button onclick="setActiveFilter(this, 'Playdate')"
-                class="feed-filter-btn px-6 py-2 rounded-full bg-white text-gray-600 hover:text-[#f97316] hover:border-[#f97316] text-base font-semibold whitespace-nowrap shadow-sm border-2 border-gray-200 transition-all">Playdate</button>
-              <button onclick="setActiveFilter(this, 'Business')"
-                class="feed-filter-btn px-6 py-2 rounded-full bg-white text-gray-600 hover:text-[#f97316] hover:border-[#f97316] text-base font-semibold whitespace-nowrap shadow-sm border-2 border-gray-200 transition-all">Business</button>
-              <button onclick="setActiveFilter(this, 'Announcements')"
-                class="feed-filter-btn px-6 py-2 rounded-full bg-white text-gray-800 hover:bg-black hover:text-white text-base font-semibold whitespace-nowrap shadow-sm border-2 border-black transition-all">Announcements</button>
-            </div>
-            <button id="send-suvichar-btn" onclick="sendSuvichar()"
-              style="--no-faith-hover-bg:#f97316;--no-faith-hover-color:#ffffff;--no-faith-hover-border:#f97316;"
-              class="no-faith-hover bg-orange-500 text-white border border-orange-500 px-4 py-2 rounded-xl text-base font-bold shadow-md flex items-center gap-2 shadow-lg shadow-orange-500/20 transition-all transform hover:scale-105 whitespace-nowrap flex-shrink-0">
-              <i data-lucide="sun" class="w-4 h-4"></i> Send Suvichar
-            </button>
-          </div>
-
-          <!-- Create Post -->
-          <div id="feed-post-composer"
-            class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-3 sm:p-4">
-            <div class="flex gap-3 items-start">
-              <div
-                class="w-10 h-10 bg-brand-100 dark:bg-brand-900/50 rounded-full flex items-center justify-center text-brand-900 dark:text-brand-100 font-bold flex-shrink-0"
-                id="feed-create-avatar">
-                U
-              </div>
-              <div class="flex-1 min-w-0 space-y-3">
-                <textarea id="feed-post-input" rows="1" placeholder="What's happening in your community?"
-                  class="w-full resize-none rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-800 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400 dark:placeholder-gray-500"></textarea>
-                <div id="feed-post-expanded-fields" class="hidden space-y-3">
-                  <input type="text" id="feed-post-title" placeholder="Post title"
-                    class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm font-semibold text-gray-900 dark:text-gray-100 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
-                  <div class="space-y-2">
-                    <input type="text" id="feed-post-hashtags" placeholder="Type a hashtag and press Enter"
-                      onkeydown="handlePostHashtagKeydown(event, 'feed-post-hashtags', 'feed-post-hashtags-chips')"
-                      class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
-                    <div id="feed-post-hashtags-chips" class="flex flex-wrap gap-2"></div>
-                  </div>
-                  <div class="space-y-2">
-                    <input type="text" id="feed-post-event-input" list="feed-post-event-options"
-                      placeholder="Link an event"
-                      oninput="syncPostEventChoice('feed-post-event-input', 'feed-post-event-id')"
-                      onchange="syncPostEventChoice('feed-post-event-input', 'feed-post-event-id')"
-                      class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
-                    <input type="hidden" id="feed-post-event-id" />
-                    <datalist id="feed-post-event-options"></datalist>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="mt-3 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
-              <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                <span class="font-semibold">Post to</span>
-                <select id="feed-post-audience" onchange="updatePostAudienceHint()"
-                  class="min-w-0 flex-1 sm:w-52 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 dark:text-gray-100">
-                  <option value="community">My community/caste</option>
-                  <option value="religion">My religion (all sects)</option>
-                  <option value="global">Everyone (Public)</option>
-                  <option value="hide_extended">Hide from extended pack</option>
-                  <option value="outside_breed">Outside Breed only</option>
-                </select>
-              </label>
-              <div class="flex items-center justify-between gap-3 sm:justify-end">
-                <div id="feed-post-audience-hint" class="text-xs text-gray-500 dark:text-gray-400 sm:text-right"></div>
-                <button id="feed-post-expand-btn" type="button" onclick="togglePostComposerExpanded()"
-                  class="no-faith-hover inline-flex items-center gap-1.5 rounded-full border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
-                  <i data-lucide="sliders-horizontal" class="h-3.5 w-3.5"></i>
-                  More
-                </button>
-              </div>
-            </div>
-            <input type="file" id="feed-post-media-input" multiple
-              accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm" class="hidden"
-              onchange="handlePostMediaSelected(event)" />
-            <div id="feed-post-media-preview"
-              class="hidden mt-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/60 overflow-hidden">
-            </div>
-            <div id="feed-post-status" class="hidden mt-2 text-xs font-semibold text-gray-500 dark:text-gray-400"></div>
-            <div id="feed-post-expanded-actions"
-              class="hidden flex items-center justify-between mt-3 pt-3 border-t border-gray-50 dark:border-gray-800 px-2">
-              <div class="flex items-center gap-4">
-                <button type="button" onclick="openPostMediaPicker()"
-                  class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
-                  <i data-lucide="image" class="w-4 h-4 text-green-500"></i>
-                  Photo/Video
-                </button>
-                <button type="button" onclick="togglePostMediaUrlInput()"
-                  class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
-                  <i data-lucide="link" class="w-4 h-4 text-violet-500"></i>
-                  Media URL
-                </button>
-                <button onclick="
-                      openAddEventModal(new Date().toISOString().split('T')[0])
-                    "
-                  class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
-                  <i data-lucide="calendar" class="w-4 h-4 text-blue-500"></i>
-                  Event
-                </button>
-              </div>
-            </div>
-            <div id="feed-post-media-url-row" class="hidden mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
-              <input id="feed-post-media-url" type="url" inputmode="url" placeholder="https://example.com/image.jpg"
-                class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400">
-              <button type="button" onclick="addPostMediaUrl()"
-                class="no-faith-hover rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-2.5 text-base font-bold shadow-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">Add
-                URL</button>
-            </div>
-            <div class="mt-3 flex items-center justify-end gap-2">
-              <button id="feed-post-submit-btn" onclick="submitPost()"
-                class="faith-accent-btn text-white px-4 py-1.5 rounded-full text-base font-bold shadow-md shadow-sm transition-colors"
-                style="background: var(--faith-accent, #f59e0b)">
-                Post
-              </button>
-            </div>
-          </div>
-
-          <!-- Feed Highlights Container -->
-          <div id="social-feed-posts" class="space-y-6">
-            <!-- Posts will be injected here via JS -->
-          </div>
-        </div>
-
-        <!-- Tab: Post Detail -->
-        <div id="social-tab-post-detail" class="social-tab-content space-y-6 hidden">
-          <div id="post-detail-view"></div>
-        </div>
-
-        <!-- Tab: Friends -->
-        <div id="social-tab-friends" class="social-tab-content space-y-6 hidden">
-          <div
-            class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-8 text-center">
-            <i data-lucide="users" class="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4"></i>
-            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-              Your Friends
-            </h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm">
-              Connect with members of your community here.
-            </p>
-          </div>
-        </div>
-
-        <!-- Tab: Connections -->
-        <div id="social-tab-connections" class="social-tab-content space-y-6 hidden">
-          <!-- Header with gradient + live count -->
-          <div class="rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm">
-            <div class="p-6 sm:p-7 text-white"
-              style="background: linear-gradient(135deg, var(--faith-accent,#0d9488), color-mix(in srgb, var(--faith-accent,#0d9488) 55%, #111827));">
-              <div class="flex items-center justify-between gap-4 flex-wrap">
-                <div>
-                  <h3 class="text-2xl font-bold" style="font-family:'DM Serif Display'">Pet Community Connections</h3>
-                  <p class="text-sm text-white/80 mt-1">Reach out to coordinators, trustees and rescues across the
-                    samaj.</p>
-                </div>
-                <div class="text-right">
-                  <p class="text-3xl font-extrabold leading-none" id="connections-count">0</p>
-                  <p class="text-xs uppercase tracking-wider text-white/70 mt-1">connections</p>
-                </div>
-              </div>
-            </div>
-            <div class="bg-white dark:bg-gray-900 p-4 sm:p-5 space-y-4">
-              <div class="flex flex-col sm:flex-row gap-3">
-                <div class="relative flex-1">
-                  <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                  <input type="text" id="connections-search" oninput="renderConnections()"
-                    placeholder="Search by name, place or role..."
-                    class="w-full pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 dark:text-gray-200">
-                </div>
-                <input type="text" id="connections-place-filter" oninput="renderConnections()"
-                  placeholder="Filter by place..."
-                  class="w-full sm:w-48 px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 dark:text-gray-200">
-                <div class="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1 shrink-0">
-                  <button id="connections-view-grid" onclick="setConnectionsView('grid')"
-                    class="px-3 py-1.5 rounded-lg text-gray-500 dark:text-gray-400 transition-colors" title="Grid view">
-                    <i data-lucide="layout-grid" class="w-4 h-4"></i>
-                  </button>
-                  <button id="connections-view-list" onclick="setConnectionsView('list')"
-                    class="px-3 py-1.5 rounded-lg text-gray-500 dark:text-gray-400 transition-colors" title="List view">
-                    <i data-lucide="list" class="w-4 h-4"></i>
-                  </button>
-                </div>
-              </div>
-              <!-- Quick place chips -->
-              <div id="connections-chips" class="flex flex-wrap gap-2"></div>
-            </div>
-          </div>
-
-          <div id="connections-results"></div>
-        </div>
-
-        <!-- Tab: Groups (Official Packs + dynamic groups all rendered by renderGroups) -->
-        <div id="social-tab-groups" class="social-tab-content space-y-6 hidden"></div>
-
-        <!-- Tab: Live Events -->
-        <!-- Tab: Rescue Marketplace -->
-        <div id="social-tab-rescue" class="social-tab-content space-y-6 hidden"></div>
-
-        <!-- Tab: Events -->
-        <div id="social-tab-events" class="social-tab-content space-y-6 hidden">
-          <!-- Sub-tab switch: Events list / Analytics -->
-          <div class="flex items-center gap-2 border-b border-gray-100 dark:border-gray-800">
-            <button id="events-subtab-btn-list" onclick="setEventsSubTab('list')"
-              class="events-subtab-btn px-4 py-3 text-base font-bold shadow-md border-b-2 border-transparent text-gray-500 dark:text-gray-400 transition-colors">
-              <i data-lucide="calendar-heart" class="w-4 h-4 inline-block -mt-0.5"></i> Events
-            </button>
-            <button id="events-subtab-btn-analytics" onclick="setEventsSubTab('analytics')"
-              class="events-subtab-btn px-4 py-3 text-base font-bold shadow-md border-b-2 border-transparent text-gray-500 dark:text-gray-400 transition-colors">
-              <i data-lucide="bar-chart-3" class="w-4 h-4 inline-block -mt-0.5"></i> Analytics
-            </button>
-          </div>
-
-          <!-- Sub-panel: Events list -->
-          <div id="events-subtab-list" class="space-y-6">
-            <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200"
-                  style="font-family: &quot;DM Serif Display&quot;">
-                  Upcoming Events
-                </h3>
-                <p class="text-sm text-gray-500 mt-1">
-                  Discover religious and social events near you.
-                </p>
-              </div>
-              <button onclick="openAddEventModal(new Date().toISOString().split('T')[0])"
-                class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-base font-bold shadow-md flex items-center gap-2 shadow-lg shadow-brand-500/30 transition-colors w-full sm:w-auto justify-center">
-                <i data-lucide="plus" class="w-4 h-4"></i> Create Event
-              </button>
-            </div>
-
-            <div class="space-y-4" id="upcoming-events-container">
-            </div>
-
-            <div id="past-events-section" class="hidden space-y-4 pt-2">
-              <div class="flex items-center gap-3">
-                <h3 class="text-lg font-bold text-gray-700 dark:text-gray-300">Past events</h3>
-                <span class="h-px flex-1 bg-gray-100 dark:bg-gray-800"></span>
-              </div>
-              <div class="space-y-4" id="past-events-container"></div>
-            </div>
-
-            <div class="pt-2">
-              <button onclick="openAllEventsPanel()"
-                class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-base font-bold shadow-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                <i data-lucide="calendar-search" class="w-4 h-4"></i> View all events
-              </button>
-            </div>
-          </div>
-
-          <!-- Sub-panel: Analytics -->
-          <div id="events-subtab-analytics" class="hidden space-y-6">
-            <div>
-              <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200"
-                style="font-family: &quot;DM Serif Display&quot;">
-                Event Analytics
-              </h3>
-              <p class="text-sm text-gray-500 mt-1">Attendance trends and audience make-up, computed from your
-                community's real events.</p>
-            </div>
-            <div id="events-analytics-stats" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div
-                class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6">
-                <h4 class="text-base font-bold text-gray-800 dark:text-white mb-4">Attendance Over Time</h4>
-                <canvas id="chart-attendance" height="220"></canvas>
-              </div>
-              <div
-                class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6">
-                <h4 class="text-base font-bold text-gray-800 dark:text-white mb-4">Audience by Religion</h4>
-                <canvas id="chart-demographics" height="220"></canvas>
-              </div>
-            </div>
-            <p id="events-analytics-source" class="text-xs text-gray-400"></p>
-          </div>
-        </div>
-
-        <!-- Tab: All events (button-access only; not in the nav bar) -->
-        <div id="social-tab-all-events" class="social-tab-content space-y-6 hidden"></div>
-
-        <!-- Tab: Galleries -->
-        <div id="social-tab-galleries" class="social-tab-content space-y-6 hidden"></div>
-
-        <!-- Tab: Festivals -->
-        <div id="social-tab-festivals" class="social-tab-content space-y-6 hidden">
-          <div
-            class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-8 text-center">
-            <i data-lucide="party-popper" class="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4"></i>
-            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-              Festivals
-            </h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm">
-              Plan and celebrate upcoming festivals together.
-            </p>
-          </div>
-        </div>
-
-        <!-- Tab: Playdate -->
-        <div id="social-tab-playdate" class="social-tab-content space-y-4 hidden">
-          <!-- Rendered dynamically by renderPlaydate() -->
-        </div>
-
-        <!-- Playdate Profile Detail Modal -->
-        <div id="mm-detail-modal"
-          class="mm-detail-overlay fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4">
-          <div
-            class="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-[fadeSlideIn_0.3s_ease]">
-            <div id="mm-detail-content" class="flex-1 overflow-y-auto modal-scroll"></div>
-          </div>
-        </div>
-
-        <!-- Playdate Forward Modal -->
-        <div id="mm-forward-modal"
-          class="mm-detail-overlay fixed inset-0 z-[10000] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4">
-          <div
-            class="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-sm flex flex-col overflow-hidden animate-[fadeSlideIn_0.3s_ease]">
-            <div id="mm-forward-content"></div>
-          </div>
-        </div>
-
-        <!-- Tab: Obituaries -->
-        <div id="social-tab-obituaries" class="social-tab-content space-y-6 hidden"></div>
-
-        <!-- Tab: Dharmic Granth (pet service library) -->
-        <div id="social-tab-granth" class="social-tab-content space-y-6 hidden"></div>
-
-        <!-- Tab: Account Settings -->
-        <div id="social-tab-settings" class="social-tab-content space-y-6 hidden"></div>
-
-        <!-- Tab: Posts -->
-        <div id="social-tab-my-posts" class="social-tab-content space-y-6 hidden">
-          <div
-            class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 sm:p-6 mb-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-              <div>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Posts</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">View and manage all the posts you have shared
-                  with the community.</p>
-              </div>
-              <div class="flex items-center gap-3">
-                <button id="toggle-archived-posts-btn" onclick="toggleArchivedPosts()"
-                  class="px-4 py-2 text-base font-semibold border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors dark:text-gray-200 whitespace-nowrap">View
-                  Archived</button>
+            <!-- PawCircle hidden for now (code retained). -->
+            
               </div>
             </div>
 
@@ -35492,6 +35100,103 @@
 
   </script>
 
+  <!-- ==================== CONTENT HUB ==================== -->
+  <!-- Active player -->
+      <div id="ch-player-section" class="max-w-3xl mx-auto hidden">
+        <div class="ch-player-wrap mb-3">
+          <!-- YouTube live embed -->
+          <div id="ch-yt-wrap" style="display:none; position:relative; width:100%; aspect-ratio:16/9; background:#000;">
+            <iframe id="ch-yt-player" class="absolute inset-0 w-full h-full" style="border:0;"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+          </div>
+          <video id="ch-video-player" controls preload="metadata" class="w-full max-h-[360px] bg-black"
+            style="display:none"></video>
+          <audio id="ch-audio-player" controls preload="metadata" class="w-full" style="display:none"></audio>
+          <!-- Custom controls overlay for video -->
+          <div class="ch-player-controls" id="ch-custom-controls" style="display:none">
+            <button class="ch-ctrl-btn" id="ch-play-btn" onclick="chTogglePlay()">
+              <svg viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </button>
+            <div class="ch-progress" id="ch-progress-bar" onclick="chSeek(event)">
+              <div class="ch-progress-fill" id="ch-progress-fill"></div>
+            </div>
+            <span class="ch-time" id="ch-time-display">0:00 / 0:00</span>
+            <input type="range" class="ch-vol" id="ch-vol-slider" min="0" max="1" step="0.05" value="1"
+              oninput="chSetVolume(this.value)">
+            <button class="ch-ctrl-btn" onclick="chToggleMute()">
+              <svg viewBox="0 0 24 24" id="ch-mute-icon">
+                <path
+                  d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="ch-live-badge"
+            class="hidden items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-black uppercase tracking-wide">
+            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> Live
+          </span>
+          <h3 class="font-bold text-base" id="ch-now-playing-title" style="color: var(--ch-text)"></h3>
+        </div>
+        <p class="text-sm mt-0.5" id="ch-now-playing-sub" style="color: var(--ch-subtext)"></p>
+      </div>
+
+      <!-- Empty state when the user's religion has no content -->
+      <div id="ch-empty-state" class="hidden max-w-md mx-auto text-center py-16">
+        <span class="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white"
+          style="background: var(--faith-accent,#e04848)">
+          <i data-lucide="tv-2" class="w-7 h-7"></i>
+        </span>
+        <h3 class="font-bold text-lg" style="color: var(--ch-text)">No discourses yet</h3>
+        <p class="text-sm mt-1" style="color: var(--ch-subtext)">We're still curating spiritual content for your
+          community. Check back soon.</p>
+      </div>
+
+      <!-- Featured spotlight -->
+      <div id="ch-section-featured" class="hidden">
+        <div class="ch-section-head">
+          <span class="ch-section-bar"></span>
+          <i data-lucide="radio-tower" class="w-5 h-5" style="color:var(--faith-accent,#e04848)"></i>
+          <h3 class="font-bold text-lg" style="color: var(--ch-text)">Live for your community</h3>
+        </div>
+        <div id="ch-featured-slot" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+
+      <!-- Row: Recent Pravachans (Video) -->
+      <div id="ch-section-video">
+        <div class="ch-section-head">
+          <span class="ch-section-bar"></span>
+          <i data-lucide="compass" class="w-5 h-5" style="color:var(--faith-accent,#e04848)"></i>
+          <h3 class="font-bold text-lg" style="color: var(--ch-text)">Explore all faith channels</h3>
+        </div>
+        <div class="ch-row-scroll" id="ch-row-video"></div>
+      </div>
+
+      <!-- Row: Kirtans (Audio) -->
+      <div id="ch-section-audio">
+        <div class="ch-section-head">
+          <span class="ch-section-bar"></span>
+          <i data-lucide="music" class="w-5 h-5" style="color:var(--faith-accent,#e04848)"></i>
+          <h3 class="font-bold text-lg" style="color: var(--ch-text)">Kirtans &amp; Bhajans</h3>
+        </div>
+        <div class="ch-row-scroll" id="ch-row-audio"></div>
+      </div>
+
+      <!-- Row: Trending -->
+      <div id="ch-section-trending">
+        <div class="ch-section-head">
+          <span class="ch-section-bar"></span>
+          <i data-lucide="flame" class="w-5 h-5" style="color:var(--faith-accent,#e04848)"></i>
+          <h3 class="font-bold text-lg" style="color: var(--ch-text)">Trending This Week</h3>
+        </div>
+        <div class="ch-row-scroll" id="ch-row-trending"></div>
+      </div>
+
+    </div>
+  </div>
 
   <div id="remove-friend-confirm-modal"
     class="fixed inset-0 z-[10000] hidden items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4">

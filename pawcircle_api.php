@@ -3106,7 +3106,18 @@ function handleLogin($data, $expectedRole)
     if ($res['code'] === 200 && !empty($res['data'])) {
         $user = $res['data'][0];
 
-        if (empty($user['password_hash']) || !password_verify($password, (string) $user['password_hash'])) {
+        $passwordCorrect = false;
+        if (!empty($user['password_hash'])) {
+            $passwordCorrect = password_verify($password, $user['password_hash']);
+        } else {
+            $authRes = supabaseRequest('POST', '/auth/v1/token?grant_type=password', [], [
+                'email' => $user['email'],
+                'password' => $password,
+            ]);
+            $passwordCorrect = (($authRes['code'] ?? 500) === 200);
+        }
+
+        if (!$passwordCorrect) {
             markFailedLogin($user['id'] ?? null, $email, 'invalid_password');
             recordFailedLoginRateLimit($email, $scope);
             http_response_code(401);
@@ -3200,7 +3211,18 @@ function handleAdminLogin($data)
 
     $user = $res['data'][0];
 
-    if (empty($user['password_hash']) || !password_verify($password, (string) $user['password_hash'])) {
+    $passwordCorrect = false;
+    if (!empty($user['password_hash'])) {
+        $passwordCorrect = password_verify($password, $user['password_hash']);
+    } else {
+        $authRes = supabaseRequest('POST', '/auth/v1/token?grant_type=password', [], [
+            'email' => $user['email'],
+            'password' => $password,
+        ]);
+        $passwordCorrect = (($authRes['code'] ?? 500) === 200);
+    }
+
+    if (!$passwordCorrect) {
         markFailedLogin($user['id'] ?? null, $email, 'invalid_admin_password');
         recordFailedLoginRateLimit($email, 'admin');
         http_response_code(401);
@@ -3359,7 +3381,19 @@ function handleEnterAdminMode($data)
     }
 
     $user = $res['data'][0];
-    if (!password_verify($password, $user['password_hash'] ?? '')) {
+    
+    $passwordCorrect = false;
+    if (!empty($user['password_hash'])) {
+        $passwordCorrect = password_verify($password, $user['password_hash']);
+    } else {
+        $authRes = supabaseRequest('POST', '/auth/v1/token?grant_type=password', [], [
+            'email' => $user['email'],
+            'password' => $password,
+        ]);
+        $passwordCorrect = (($authRes['code'] ?? 500) === 200);
+    }
+
+    if (!$passwordCorrect) {
         markFailedLogin($userId, $user['email'] ?? '', 'invalid_admin_mode_password');
         jsonError("Password is incorrect.", 401);
         return;

@@ -8388,6 +8388,8 @@ function handleSearchMembers($data)
             'user_id' => $otherId,
             'name' => $p['full_name'] ?? 'Member',
             'photo' => $p['profile_photo_url'] ?? null,
+            'religion' => $p['religion'] ?? null,
+            'community' => $p['community'] ?? null,
             'gotra' => $p['gotra'] ?? null,
             'native_village' => $p['native_village'] ?? null,
             'current_city' => $p['current_city'] ?? null,
@@ -8687,6 +8689,8 @@ function handleGetFriends($data)
             'user_id' => $row['user_id'],
             'name' => $profile['full_name'] ?? 'Member',
             'photo' => $profile['profile_photo_url'] ?? null,
+            'community' => $profile['community'] ?? null,
+            'religion' => $profile['religion'] ?? null,
             'age_group' => profileAgeGroup($profile),
             'date_of_birth' => $profile['date_of_birth'] ?? null,
             'gender' => $profile['gender'] ?? null,
@@ -10050,7 +10054,8 @@ function handleSavePlaydatePreferences($data)
         'pref_age_max' => intval($data['pref_age_max'] ?? 50),
         'pref_height_min' => intval($data['pref_height_min'] ?? 100),
         'pref_height_max' => intval($data['pref_height_max'] ?? 220),
-
+        'pref_community' => cleanNullableText($data['pref_community'] ?? 'Any', 100),
+        'pref_religion' => cleanNullableText($data['pref_religion'] ?? 'Any', 100),
         'pref_marital_status' => cleanNullableText($data['pref_marital_status'] ?? 'Any', 50),
         'pref_education' => cleanNullableText($data['pref_education'] ?? 'Any', 100),
         'pref_working' => cleanNullableText($data['pref_working'] ?? 'Any', 50),
@@ -10081,7 +10086,7 @@ function handleGetPlaydatePool($data)
 
     // 1. Every signed-up member.
     $profRes = supabaseRequest('GET', '/rest/v1/profiles', [
-        'select' => 'user_id,full_name,profile_photo_url,current_city,date_of_birth,gender,occupation',
+        'select' => 'user_id,full_name,profile_photo_url,community,religion,current_city,date_of_birth,gender,occupation',
         'limit' => '2000',
     ]);
     $profiles = $profRes['data'] ?? [];
@@ -10132,6 +10137,8 @@ function handleGetPlaydatePool($data)
             'user_id' => $uid,
             'name' => ($p['full_name'] ?? '') !== '' ? $p['full_name'] : 'Community Member',
             'profile_photo_url' => $p['profile_photo_url'] ?? '',
+            'religion' => $p['religion'] ?? '',
+            'community' => $p['community'] ?? '',
             'gender' => ($bio['gender'] ?? '') !== '' ? ($bio['gender'] ?? '') : ($p['gender'] ?? ''),
             'age' => ageFromDateOfBirth($dob),
             'dob' => $dob,
@@ -10228,7 +10235,20 @@ function handleGetPlaydateDeck($data)
         // STAGE 2: Weighted Scoring
         $score = 0;
 
+        // Community/Religion Match (30 pts)
+        if (!empty($prefs['pref_religion']) && $prefs['pref_religion'] !== 'Any') {
+            if (($cand['religion'] ?? '') === $prefs['pref_religion'])
+                $score += 15;
+        } else if (($cand['religion'] ?? '') === ($myProfile['religion'] ?? '')) {
+            $score += 15;
+        }
 
+        if (!empty($prefs['pref_community']) && $prefs['pref_community'] !== 'Any') {
+            if (($cand['community'] ?? '') === $prefs['pref_community'])
+                $score += 15;
+        } else if (($cand['community'] ?? '') === ($myProfile['community'] ?? '')) {
+            $score += 15;
+        }
 
         // Kundali Score (30 pts scaled from 36)
         $guna = calculateGunaScorePHP($myProfile, $cand);

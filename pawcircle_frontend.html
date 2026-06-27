@@ -6036,9 +6036,9 @@
               <div class="relative w-full">
                 <!-- Mascot integrated into input wrapper -->
                 <div class="absolute mascot-container pointer-events-none"
-                  style="width: 70px; height: 70px; right: 35px; top: 10px; z-index: 10;">
+                  style="width: 65px; height: 65px; right: 35px; top: 8px; z-index: 10;">
                   <div class="mascot" id="login-mascot"
-                    style="position: relative; width: 100%; height: 100%; transform: scale(1); transform-origin: bottom right;">
+                    style="position: relative; width: 100%; height: 100%; transform: scale(0.9); transform-origin: bottom right;">
                     <svg viewBox="0 0 120 120" width="100%" height="100%">
                       <ellipse class="tail" cx="92" cy="92" rx="10" ry="5" fill="#F2A93B" transform="rotate(20 88 86)" />
                       <ellipse cx="60" cy="86" rx="33" ry="26" fill="#F2A93B" />
@@ -6057,9 +6057,9 @@
                       <rect class="lids" x="40" y="42" width="40" height="11" fill="#F2A93B" />
                       <ellipse cx="60" cy="58" rx="4.2" ry="3" fill="#2B2420" />
                       <ellipse class="paw-l" cx="47" cy="104" rx="13" ry="9" fill="#FFF8EC"
-                        style="transition: all 0.3s ease; transform-origin: center;" />
+                        style="transition: all 0.3s ease; transform-origin: 47px 104px;" />
                       <ellipse class="paw-r" cx="73" cy="104" rx="13" ry="9" fill="#FFF8EC"
-                        style="transition: all 0.3s ease; transform-origin: center;" />
+                        style="transition: all 0.3s ease; transform-origin: 73px 104px;" />
                     </svg>
                   </div>
                 </div>
@@ -36273,8 +36273,8 @@
             eyeIcon.setAttribute('data-lucide', 'eye-off');
             if (typeof lucide !== 'undefined') lucide.createIcons();
             // Cover eyes with paws
-            loginPawL.style.transform = 'translate(3px, -33px) rotate(15deg)';
-            loginPawR.style.transform = 'translate(-3px, -33px) rotate(-15deg)';
+            loginPawL.style.transform = 'translate(2px, -57px) rotate(15deg)';
+            loginPawR.style.transform = 'translate(-2px, -57px) rotate(-15deg)';
           }
         });
       }

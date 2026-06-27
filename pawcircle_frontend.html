@@ -4240,11 +4240,11 @@
     }
 
     .mascot.covering .paw-l {
-      transform: translateY(-46px) translateX(2px) rotate(-4deg);
+      transform: translateY(-57px) translateX(2px) rotate(-4deg);
     }
 
     .mascot.covering .paw-r {
-      transform: translateY(-46px) translateX(-2px) rotate(4deg);
+      transform: translateY(-57px) translateX(-2px) rotate(4deg);
     }
 
     .mascot.excited {
@@ -5168,11 +5168,11 @@
     }
 
     .mascot.covering .paw-l {
-      transform: translateY(-46px) translateX(2px) rotate(-4deg);
+      transform: translateY(-57px) translateX(2px) rotate(-4deg);
     }
 
     .mascot.covering .paw-r {
-      transform: translateY(-46px) translateX(-2px) rotate(4deg);
+      transform: translateY(-57px) translateX(-2px) rotate(4deg);
     }
 
     .mascot.excited {
@@ -6400,8 +6400,10 @@
                     <circle class="pupil pupil-r" cx="71" cy="47" r="4" fill="#2B2420" />
                     <rect class="lids" x="40" y="42" width="40" height="11" fill="#F2A93B" />
                     <ellipse cx="60" cy="58" rx="4.2" ry="3" fill="#2B2420" />
-                    <ellipse class="paw-l" cx="47" cy="104" rx="13" ry="9" fill="#FFF8EC" />
-                    <ellipse class="paw-r" cx="73" cy="104" rx="13" ry="9" fill="#FFF8EC" />
+                    <ellipse class="paw-l" cx="47" cy="104" rx="13" ry="9" fill="#FFF8EC"
+                      style="transition: all 0.3s ease; transform-origin: 47px 104px;" />
+                    <ellipse class="paw-r" cx="73" cy="104" rx="13" ry="9" fill="#FFF8EC"
+                      style="transition: all 0.3s ease; transform-origin: 73px 104px;" />
                   </svg>
                 </div>
                 <input id="reg-password" type="password" required placeholder="Minimum 6 characters"
@@ -36238,20 +36240,29 @@
           });
         });
 
-        pwInput.addEventListener('focus', function () {
-          if (pwInput.type === 'password') {
-            // Close eyes when typing
-            var lids = loginMascot.querySelector('.lids');
-            if (lids) lids.setAttribute('height', '28');
-          }
-        });
-
-        pwInput.addEventListener('blur', function () {
-          if (pwInput.type === 'password') {
-            // Open eyes
+        function updateLoginCover() {
+          if (pwInput.type === 'password' && pwInput.value.length > 0) {
+            // Cover eyes with paws
+            loginPawL.style.transform = 'translate(2px, -57px) rotate(15deg)';
+            loginPawR.style.transform = 'translate(-2px, -57px) rotate(-15deg)';
             var lids = loginMascot.querySelector('.lids');
             if (lids) lids.setAttribute('height', '11');
+          } else {
+            // Uncover eyes
+            loginPawL.style.transform = '';
+            loginPawR.style.transform = '';
+            var lids = loginMascot.querySelector('.lids');
+            if (lids) lids.setAttribute('height', (document.activeElement === pwInput && pwInput.type === 'password') ? '28' : '11');
           }
+        }
+
+        pwInput.addEventListener('input', updateLoginCover);
+        pwInput.addEventListener('focus', updateLoginCover);
+        pwInput.addEventListener('blur', function () {
+          loginPawL.style.transform = '';
+          loginPawR.style.transform = '';
+          var lids = loginMascot.querySelector('.lids');
+          if (lids) lids.setAttribute('height', '11');
         });
 
         eyeToggle.addEventListener('click', function () {
@@ -36261,21 +36272,13 @@
             pwInput.type = 'password';
             eyeIcon.setAttribute('data-lucide', 'eye');
             if (typeof lucide !== 'undefined') lucide.createIcons();
-            // Open eyes
-            var lids = loginMascot.querySelector('.lids');
-            if (lids) lids.setAttribute('height', document.activeElement === pwInput ? '28' : '11');
-            // Uncover eyes
-            loginPawL.style.transform = '';
-            loginPawR.style.transform = '';
           } else {
             // Show password
             pwInput.type = 'text';
             eyeIcon.setAttribute('data-lucide', 'eye-off');
             if (typeof lucide !== 'undefined') lucide.createIcons();
-            // Cover eyes with paws
-            loginPawL.style.transform = 'translate(2px, -57px) rotate(15deg)';
-            loginPawR.style.transform = 'translate(-2px, -57px) rotate(-15deg)';
           }
+          updateLoginCover();
         });
       }
     });

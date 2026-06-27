@@ -423,8 +423,8 @@ switch ($action) {
     case 'change_account_credentials':
         handleChangeAccountCredentials($inputData);
         break;
-    case 'change_religion_community':
-        handleChangeReligionCommunity($inputData);
+    case 'change_pet_type_breed':
+        handleChangePetTypeBreed($inputData);
         break;
     case 'deactivate_account':
         handleDeactivateAccount($inputData);
@@ -981,8 +981,8 @@ function ensureProfileForAppUser($appUserId, $authUser, $data = [])
         $displayName = split_part_fallback($authUser['email'] ?? '', '@', 0, 'New Member');
     }
 
-    $religion = trim((string) ($data['religion'] ?? authMetadataValue($authUser, ['religion'], '')));
-    $community = trim((string) ($data['community'] ?? authMetadataValue($authUser, ['community'], '')));
+    $pet_type = trim((string) ($data['pet_type'] ?? authMetadataValue($authUser, ['pet_type'], '')));
+    $breed = trim((string) ($data['breed'] ?? authMetadataValue($authUser, ['breed'], '')));
 
     $insert = [
         'user_id' => $appUserId,
@@ -991,10 +991,10 @@ function ensureProfileForAppUser($appUserId, $authUser, $data = [])
         'privacy_accepted' => false,
         'accuracy_certified' => false,
     ];
-    if ($religion !== '')
-        $insert['religion'] = $religion;
-    if ($community !== '')
-        $insert['community'] = $community;
+    if ($pet_type !== '')
+        $insert['pet_type'] = $pet_type;
+    if ($breed !== '')
+        $insert['breed'] = $breed;
 
     supabaseRequest('POST', '/rest/v1/profiles', [], $insert, ['Prefer: resolution=ignore-duplicates,return=minimal']);
 
@@ -1006,10 +1006,10 @@ function ensureProfileForAppUser($appUserId, $authUser, $data = [])
     if ($avatarUrl !== '') {
         $patch['profile_photo_url'] = $avatarUrl;
     }
-    if ($religion !== '')
-        $patch['religion'] = $religion;
-    if ($community !== '')
-        $patch['community'] = $community;
+    if ($pet_type !== '')
+        $patch['pet_type'] = $pet_type;
+    if ($breed !== '')
+        $patch['breed'] = $breed;
 
     if (!empty($patch)) {
         supabaseRequest('PATCH', '/rest/v1/profiles', [
@@ -1220,7 +1220,7 @@ function isHttpsRequest()
     return (($_SERVER['HTTPS'] ?? '') === 'on') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
 }
 
-function setEsamajCookie($name, $value, $expires, $httpOnly)
+function setPetCircleCookie($name, $value, $expires, $httpOnly)
 {
     setcookie($name, $value, [
         'expires' => $expires,
@@ -1233,14 +1233,14 @@ function setEsamajCookie($name, $value, $expires, $httpOnly)
 
 function setSessionCookies($rawToken, $csrfToken, $expiresAtTs)
 {
-    setEsamajCookie(PAWCIRCLE_SESSION_COOKIE, $rawToken, $expiresAtTs, true);
-    setEsamajCookie(PAWCIRCLE_CSRF_COOKIE, $csrfToken, $expiresAtTs, false);
+    setPetCircleCookie(PAWCIRCLE_SESSION_COOKIE, $rawToken, $expiresAtTs, true);
+    setPetCircleCookie(PAWCIRCLE_CSRF_COOKIE, $csrfToken, $expiresAtTs, false);
 }
 
 function clearSessionCookies()
 {
-    setEsamajCookie(PAWCIRCLE_SESSION_COOKIE, '', time() - 3600, true);
-    setEsamajCookie(PAWCIRCLE_CSRF_COOKIE, '', time() - 3600, false);
+    setPetCircleCookie(PAWCIRCLE_SESSION_COOKIE, '', time() - 3600, true);
+    setPetCircleCookie(PAWCIRCLE_CSRF_COOKIE, '', time() - 3600, false);
 }
 
 function getBearerToken()
@@ -1443,10 +1443,10 @@ function normaliseAdminRole($role)
         'supreme_overlord_admin' => 'owner',
         'super_admin' => 'owner',
         'platform_admin' => 'platform_admin',
-        'religion_leader' => 'religion_admin',
-        'religion_admin' => 'religion_admin',
-        'community_manager' => 'community_admin',
-        'community_admin' => 'community_admin',
+        'pet_type_leader' => 'pet_type_admin',
+        'pet_type_admin' => 'pet_type_admin',
+        'breed_manager' => 'breed_admin',
+        'breed_admin' => 'breed_admin',
         'owner' => 'owner',
     ];
     return $aliases[$role] ?? '';
@@ -1484,8 +1484,8 @@ function adminCapabilityLabel($role, $scopeType, $scopeValue)
     $names = [
         'owner' => 'Owner',
         'platform_admin' => 'Platform admin',
-        'religion_admin' => 'Religion admin',
-        'community_admin' => 'Community admin',
+        'pet_type_admin' => 'Pet Type admin',
+        'breed_admin' => 'Breed admin',
     ];
     $label = $names[$role] ?? 'Admin';
     if ($scopeType !== 'global' && $scopeValue !== '' && $scopeValue !== '*') {
@@ -1501,7 +1501,7 @@ function normaliseAdminCapabilityRow($row)
         return null;
 
     $scopeType = strtolower(trim((string) ($row['scope_type'] ?? 'global')));
-    if (!in_array($scopeType, ['global', 'religion', 'community'], true)) {
+    if (!in_array($scopeType, ['global', 'pet_type', 'breed'], true)) {
         $scopeType = 'global';
     }
 
@@ -1575,16 +1575,16 @@ function isReservedProfileTag($tag)
         'owner',
         'admin',
         'platform admin',
-        'religion admin',
-        'community admin',
+        'pet_type admin',
+        'breed admin',
         'platform administrator',
-        'religion administrator',
-        'community administrator',
+        'pet_type administrator',
+        'breed administrator',
     ];
     if (in_array($normalized, $reserved, true))
         return true;
 
-    return preg_match('/^(owner|admin|platform\s+admin|religion\s+admin|community\s+admin)\b/i', $normalized) === 1;
+    return preg_match('/^(owner|admin|platform\s+admin|pet_type\s+admin|breed\s+admin)\b/i', $normalized) === 1;
 }
 
 function normaliseProfileTagsInput($raw, $limit = 15)
@@ -1795,15 +1795,15 @@ function testUsersEnabled()
 function testUserMap()
 {
     return [
-        'user' => ['name' => 'Test User', 'email' => 'test-user@pawcircle.local', 'religion' => 'Hindu', 'community' => 'General'],
-        'userh' => ['name' => 'Test Hindu User', 'email' => 'test-user-hindu@pawcircle.local', 'religion' => 'Hindu', 'community' => 'Caste No Bar'],
-        'userm' => ['name' => 'Test Muslim User', 'email' => 'test-user-muslim@pawcircle.local', 'religion' => 'Muslim', 'community' => 'Caste No Bar'],
-        'userc' => ['name' => 'Test Christian User', 'email' => 'test-user-christian@pawcircle.local', 'religion' => 'Christian', 'community' => 'Caste No Bar'],
-        'userb' => ['name' => 'Test Buddhist User', 'email' => 'test-user-buddhist@pawcircle.local', 'religion' => 'Buddhist', 'community' => 'Caste No Bar'],
-        'userp' => ['name' => 'Test Parsi User', 'email' => 'test-user-parsi@pawcircle.local', 'religion' => 'Parsi', 'community' => 'Caste No Bar'],
-        'users' => ['name' => 'Test Sikh User', 'email' => 'test-user-sikh@pawcircle.local', 'religion' => 'Sikh', 'community' => 'Caste No Bar'],
-        'userj' => ['name' => 'Test Jain User', 'email' => 'test-user-jain@pawcircle.local', 'religion' => 'Jain', 'community' => 'Caste No Bar'],
-        'usero' => ['name' => 'Test Other User', 'email' => 'test-user-other@pawcircle.local', 'religion' => 'Other', 'community' => 'Other'],
+        'user' => ['name' => 'Test User', 'email' => 'test-user@pawcircle.local', 'pet_type' => 'Dog', 'breed' => 'General'],
+        'userh' => ['name' => 'Test Hindu User', 'email' => 'test-user-hindu@pawcircle.local', 'pet_type' => 'Dog', 'breed' => 'Caste No Bar'],
+        'userm' => ['name' => 'Test Muslim User', 'email' => 'test-user-muslim@pawcircle.local', 'pet_type' => 'Cat', 'breed' => 'Caste No Bar'],
+        'userc' => ['name' => 'Test Christian User', 'email' => 'test-user-christian@pawcircle.local', 'pet_type' => 'Rabbit', 'breed' => 'Caste No Bar'],
+        'userb' => ['name' => 'Test Buddhist User', 'email' => 'test-user-buddhist@pawcircle.local', 'pet_type' => 'Reptile', 'breed' => 'Caste No Bar'],
+        'userp' => ['name' => 'Test Parsi User', 'email' => 'test-user-parsi@pawcircle.local', 'pet_type' => 'Small Pet', 'breed' => 'Caste No Bar'],
+        'users' => ['name' => 'Test Sikh User', 'email' => 'test-user-sikh@pawcircle.local', 'pet_type' => 'Bird', 'breed' => 'Caste No Bar'],
+        'userj' => ['name' => 'Test Jain User', 'email' => 'test-user-jain@pawcircle.local', 'pet_type' => 'Fish', 'breed' => 'Caste No Bar'],
+        'usero' => ['name' => 'Test Other User', 'email' => 'test-user-other@pawcircle.local', 'pet_type' => 'Other', 'breed' => 'Other'],
     ];
 }
 
@@ -2194,41 +2194,41 @@ function buildEbookFileRoute($bookId, $format = 'pdf', $intent = 'read', $mode =
         . '&mode=' . rawurlencode($mode);
 }
 
-function holyBookSectionMeta($religion)
+function holyBookSectionMeta($pet_type)
 {
-    $key = normalizeReligionKey($religion);
+    $key = normalizePetTypeKey($pet_type);
     $meta = [
-        'Hindu' => [
+        'Dog' => [
             'title' => 'Dharmic Granth',
             'subtitle' => 'धार्मिक ग्रंथ',
             'type' => 'pet service',
         ],
-        'Muslim' => [
+        'Cat' => [
             'title' => 'Islamic Texts',
             'subtitle' => 'النصوص الإسلامية',
             'type' => 'pet service',
         ],
-        'Sikh' => [
+        'Bird' => [
             'title' => 'Sikh Scripture',
             'subtitle' => 'ਸਿੱਖ ਧਰਮ ਗ੍ਰੰਥ',
             'type' => 'pet service',
         ],
-        'Christian' => [
+        'Rabbit' => [
             'title' => 'Christian Texts',
             'subtitle' => 'Holy Bible',
             'type' => 'pet service',
         ],
-        'Jain' => [
+        'Fish' => [
             'title' => 'Jain Agamas',
             'subtitle' => 'જૈન આગમ',
             'type' => 'pet service',
         ],
-        'Buddhist' => [
+        'Reptile' => [
             'title' => 'Buddhist Texts',
             'subtitle' => 'बौद्ध ग्रंथ',
             'type' => 'pet service',
         ],
-        'Parsi' => [
+        'Small Pet' => [
             'title' => 'Zoroastrian Texts',
             'subtitle' => 'Zend Avesta',
             'type' => 'pet service',
@@ -2248,20 +2248,20 @@ function stringContains($haystack, $needle)
 
 function holyBookUiMeta($book)
 {
-    $religion = normalizeReligionKey($book['service_type'] ?? '');
+    $pet_type = normalizePetTypeKey($book['service_type'] ?? '');
     $title = strtolower((string) ($book['title'] ?? ''));
 
-    $byReligion = [
-        'Hindu' => ['icon' => 'book-open', 'bg' => 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400'],
-        'Muslim' => ['icon' => 'book-open', 'bg' => 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'],
-        'Sikh' => ['icon' => 'book-open', 'bg' => 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'],
-        'Christian' => ['icon' => 'book-open', 'bg' => 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'],
-        'Jain' => ['icon' => 'book-open', 'bg' => 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400'],
-        'Buddhist' => ['icon' => 'book-open', 'bg' => 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'],
-        'Parsi' => ['icon' => 'book-open', 'bg' => 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400'],
+    $byPetType = [
+        'Dog' => ['icon' => 'book-open', 'bg' => 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400'],
+        'Cat' => ['icon' => 'book-open', 'bg' => 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'],
+        'Bird' => ['icon' => 'book-open', 'bg' => 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'],
+        'Rabbit' => ['icon' => 'book-open', 'bg' => 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'],
+        'Fish' => ['icon' => 'book-open', 'bg' => 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400'],
+        'Reptile' => ['icon' => 'book-open', 'bg' => 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'],
+        'Small Pet' => ['icon' => 'book-open', 'bg' => 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400'],
     ];
 
-    $ui = $byReligion[$religion] ?? ['icon' => 'book-open', 'bg' => 'bg-amber-50 text-amber-700'];
+    $ui = $byPetType[$pet_type] ?? ['icon' => 'book-open', 'bg' => 'bg-amber-50 text-amber-700'];
 
     if (stringContains($title, 'hadith') || stringContains($title, 'sahih') || stringContains($title, 'bible') || stringContains($title, 'ramayana')) {
         $ui['icon'] = 'book';
@@ -2276,23 +2276,23 @@ function holyBookUiMeta($book)
     return $ui;
 }
 
-function normalizeReligionKey($religion)
+function normalizePetTypeKey($pet_type)
 {
-    $religion = trim((string) $religion);
+    $pet_type = trim((string) $pet_type);
     $aliases = [
-        'Parsi / Zoroastrian' => 'Parsi',
-        'Zoroastrian' => 'Parsi',
-        'Zoroastrianism' => 'Parsi',
-        'Muslim' => 'Muslim',
-        'Islam' => 'Muslim',
-        'Islamic' => 'Muslim',
-        'Christianity' => 'Christian',
-        'Buddhism' => 'Buddhist',
-        'Jainism' => 'Jain',
-        'Sikhism' => 'Sikh',
-        'Hinduism' => 'Hindu',
+        'Parsi / Zoroastrian' => 'Small Pet',
+        'Zoroastrian' => 'Small Pet',
+        'Zoroastrianism' => 'Small Pet',
+        'Cat' => 'Cat',
+        'Islam' => 'Cat',
+        'Islamic' => 'Cat',
+        'Christianity' => 'Rabbit',
+        'Buddhism' => 'Reptile',
+        'Jainism' => 'Fish',
+        'Sikhism' => 'Bird',
+        'Hinduism' => 'Dog',
     ];
-    return $aliases[$religion] ?? ($religion ?: 'Hindu');
+    return $aliases[$pet_type] ?? ($pet_type ?: 'Dog');
 }
 
 function getPetServiceRows()
@@ -2325,7 +2325,7 @@ function normalisePetServiceRowForFrontend($row)
     }
 
     $row['slug'] = $slug;
-    $religion = normalizeReligionKey($row['service_type'] ?? '');
+    $pet_type = normalizePetTypeKey($row['service_type'] ?? '');
     $ui = holyBookUiMeta($row);
 
     $pdfUrl = resolvePetServiceUrl($row, 'pdf', 'read');
@@ -2363,7 +2363,7 @@ function normalisePetServiceRowForFrontend($row)
     return [
         'id' => $slug,
         'slug' => $slug,
-        'religion' => $religion,
+        'pet_type' => $pet_type,
         'title' => $row['title'] ?? 'Pet Service',
         'desc' => $desc,
         'description' => $row['description'] ?? '',
@@ -2438,11 +2438,11 @@ function handleGetPetServices($data)
         return;
     }
 
-    $religionKey = normalizeReligionKey($data['religion'] ?? ($_GET['religion'] ?? 'Hindu'));
+    $pet_typeKey = normalizePetTypeKey($data['pet_type'] ?? ($_GET['pet_type'] ?? 'Dog'));
     $books = [];
 
     foreach ($rows['data'] as $row) {
-        if (normalizeReligionKey($row['service_type'] ?? '') !== $religionKey) {
+        if (normalizePetTypeKey($row['service_type'] ?? '') !== $pet_typeKey) {
             continue;
         }
         $books[] = normalisePetServiceRowForFrontend($row);
@@ -2457,13 +2457,13 @@ function handleGetPetServices($data)
         return $orderA <=> $orderB;
     });
 
-    $section = holyBookSectionMeta($religionKey);
+    $section = holyBookSectionMeta($pet_typeKey);
     $section['books'] = $books;
 
     jsonSuccess([
         'backend_build' => PAWCIRCLE_BACKEND_BUILD,
         'backend_source' => 'supabase_pet_services_table',
-        'religion' => $religionKey,
+        'pet_type' => $pet_typeKey,
         'section' => $section,
         'read_options' => [
             'default' => 'scroll',
@@ -2695,12 +2695,12 @@ function handleEbookRedirect($data)
 // SIGNUP
 // ---------------------------------------------------------------------------
 function resolveTaxonomyValues($data) {
-        $community = $data['pet_community'] ?? $data['community'] ?? $data['breed_group'] ?? $data['interest_circle'] ?? null;
-        $religion = $data['pet_type'] ?? $data['animal_type'] ?? $data['religion'] ?? null;
+        $breed = $data['pet_breed'] ?? $data['breed'] ?? $data['breed_group'] ?? $data['interest_circle'] ?? null;
+        $pet_type = $data['pet_type'] ?? $data['animal_type'] ?? $data['pet_type'] ?? null;
 
         return [
-            'community' => $community,
-            'religion' => $religion,
+            'breed' => $breed,
+            'pet_type' => $pet_type,
         ];
     }
 
@@ -2853,8 +2853,8 @@ function finalizeSignup($payload, $plainPassword = '')
     $name = (string) ($payload['name'] ?? '');
     $email = filter_var((string) ($payload['email'] ?? ''), FILTER_SANITIZE_EMAIL);
     $passwordHash = (string) ($payload['password_hash'] ?? '');
-    $community = (string) ($payload['community'] ?? 'Not Specified');
-    $religion = (string) ($payload['religion'] ?? '');
+    $breed = (string) ($payload['breed'] ?? 'Not Specified');
+    $pet_type = (string) ($payload['pet_type'] ?? '');
     $ageGroup = (string) ($payload['age_group'] ?? '');
     $phone = (string) ($payload['mobile_number'] ?? '');
     $interestsArr = array_values((array) ($payload['interests'] ?? []));
@@ -2868,8 +2868,8 @@ function finalizeSignup($payload, $plainPassword = '')
     $metadata = [
         'full_name' => $name,
         'name' => $name,
-        'religion' => $religion,
-        'community' => $community,
+        'pet_type' => $pet_type,
+        'breed' => $breed,
         'source' => 'pawcircle_signup',
     ];
     if ($phone !== '')
@@ -2897,8 +2897,8 @@ function finalizeSignup($payload, $plainPassword = '')
     $authUser = $authCreate['user'];
     $user = linkOrCreateAppUserForSupabaseAuth($authUser, [
         'name' => $name,
-        'religion' => $religion,
-        'community' => $community,
+        'pet_type' => $pet_type,
+        'breed' => $breed,
     ]);
 
     if (!$user || empty($user['id'])) {
@@ -2909,8 +2909,8 @@ function finalizeSignup($payload, $plainPassword = '')
 
     $profilePatch = [
         'full_name' => $name,
-        'community' => $community,
-        'religion' => $religion,
+        'breed' => $breed,
+        'pet_type' => $pet_type,
         // 'primary_interests' => empty($interestsArr) ? null : $interestsArr,
         'skills' => empty($skillsArr) ? null : $skillsArr,
         'age_group' => $ageGroup,
@@ -2942,7 +2942,7 @@ function finalizeSignup($payload, $plainPassword = '')
         finishResponseEarly();
         $welcome = "🙏 Namaste $name! Welcome to PawCircle. Your account is ready. "
             . "Enable WhatsApp notifications in Privacy settings to get event reminders, "
-            . "eDarshan timings and community updates here.";
+            . "Park timings and breed updates here.";
         $r = sendWhatsAppMessage($phone, $welcome, proactiveWhatsappOpts($welcome));
         if (empty($r['ok'])) {
             error_log("[pawcircle][" . requestId() . "] signup welcome WhatsApp not sent for $email");
@@ -3070,8 +3070,8 @@ function handleTestUserLogin($shortcut)
         $profileRes = supabaseRequest('POST', '/rest/v1/profiles', [], [
             'user_id' => $userId,
             'full_name' => $test['name'],
-            'community' => $test['community'],
-            'religion' => $test['religion'],
+            'breed' => $test['breed'],
+            'pet_type' => $test['pet_type'],
             'membership_applied' => true,
             'status' => 'active',
             'age_group' => '26 - 40',
@@ -3321,8 +3321,8 @@ function buildUserPayload($user, $loginAt = null)
         "role" => $user['role'] ?? 'member',
         "pet_type" => $profile['pet_type'] ?? 'Dog',
         "breed" => $profile['breed'] ?? '',
-        "community" => $profile['breed'] ?? '',
-        "religion" => $profile['pet_type'] ?? '',
+        "breed" => $profile['breed'] ?? '',
+        "pet_type" => $profile['pet_type'] ?? '',
         "membership_applied" => $profile['membership_applied'] ?? false,
         "membership_status" => $profile['status'] ?? 'none',
         "profile_photo_url" => $profile['profile_photo_url'] ?? null,
@@ -3526,7 +3526,7 @@ function handleListAdminRoles($data)
         }
         $profilesRes = supabaseRequest('GET', '/rest/v1/profiles', [
             'user_id' => 'in.(' . implode(',', $userIds) . ')',
-            'select' => 'user_id,full_name,religion,community',
+            'select' => 'user_id,full_name,pet_type,breed',
         ]);
         if (!supabaseFailed($profilesRes)) {
             foreach (($profilesRes['data'] ?? []) as $profile) {
@@ -3540,8 +3540,8 @@ function handleListAdminRoles($data)
         $profile = $profiles[$userIdForRow] ?? [];
         $row['email'] = $users[$userIdForRow] ?? '';
         $row['full_name'] = $profile['full_name'] ?? '';
-        $row['religion'] = $profile['religion'] ?? '';
-        $row['community'] = $profile['community'] ?? '';
+        $row['pet_type'] = $profile['pet_type'] ?? '';
+        $row['breed'] = $profile['breed'] ?? '';
         $row['label'] = adminCapabilityLabel(normaliseAdminRole($row['role'] ?? ''), $row['scope_type'] ?? 'global', $row['scope_value'] ?? '*');
     }
     unset($row);
@@ -3578,7 +3578,7 @@ function handleGrantAdminRole($data)
 
     $targetUserId = requireUuid(resolveAdminTargetUserId($data), 'target_user_id');
     $role = normaliseAdminRole($data['role'] ?? '');
-    if (!in_array($role, ['owner', 'platform_admin', 'religion_admin', 'community_admin'], true)) {
+    if (!in_array($role, ['owner', 'platform_admin', 'pet_type_admin', 'breed_admin'], true)) {
         jsonError("Choose a valid admin role.", 400);
         return;
     }
@@ -3588,16 +3588,16 @@ function handleGrantAdminRole($data)
     if ($role === 'owner' || $role === 'platform_admin') {
         $scopeType = 'global';
         $scopeValue = '*';
-    } elseif ($role === 'religion_admin') {
-        $scopeType = 'religion';
+    } elseif ($role === 'pet_type_admin') {
+        $scopeType = 'pet_type';
         if ($scopeValue === '' || $scopeValue === '*') {
-            jsonError("Religion admins require a religion scope.", 400);
+            jsonError("Pet Type admins require a pet_type scope.", 400);
             return;
         }
-    } elseif ($role === 'community_admin') {
-        $scopeType = 'community';
+    } elseif ($role === 'breed_admin') {
+        $scopeType = 'breed';
         if ($scopeValue === '' || $scopeValue === '*') {
-            jsonError("Community admins require a community scope.", 400);
+            jsonError("Breed admins require a breed scope.", 400);
             return;
         }
     }
@@ -3638,7 +3638,7 @@ function handleUpdateAdminRole($data)
 
     $existing = $existingRes['data'][0];
     $role = normaliseAdminRole($data['role'] ?? '');
-    if (!in_array($role, ['owner', 'platform_admin', 'religion_admin', 'community_admin'], true)) {
+    if (!in_array($role, ['owner', 'platform_admin', 'pet_type_admin', 'breed_admin'], true)) {
         jsonError("Choose a valid admin role.", 400);
         return;
     }
@@ -3648,16 +3648,16 @@ function handleUpdateAdminRole($data)
     if ($role === 'owner' || $role === 'platform_admin') {
         $scopeType = 'global';
         $scopeValue = '*';
-    } elseif ($role === 'religion_admin') {
-        $scopeType = 'religion';
+    } elseif ($role === 'pet_type_admin') {
+        $scopeType = 'pet_type';
         if ($scopeValue === '' || $scopeValue === '*') {
-            jsonError("Religion admins require a religion scope.", 400);
+            jsonError("Pet Type admins require a pet_type scope.", 400);
             return;
         }
-    } elseif ($role === 'community_admin') {
-        $scopeType = 'community';
+    } elseif ($role === 'breed_admin') {
+        $scopeType = 'breed';
         if ($scopeValue === '' || $scopeValue === '*') {
-            jsonError("Community admins require a community scope.", 400);
+            jsonError("Breed admins require a breed scope.", 400);
             return;
         }
     }
@@ -3713,7 +3713,7 @@ function handleAdminGetUserDetail($data)
 
     $userRes = supabaseRequest('GET', '/rest/v1/users', [
         'id' => 'eq.' . $targetUserId,
-        'select' => 'id,email,role,created_at,last_login_at,last_active_at,deactivated_at,profiles(full_name,religion,community,status,visibility,online_status,profile_photo_url,cover_photo_url,mobile_number,current_city,occupation,date_of_birth)',
+        'select' => 'id,email,role,created_at,last_login_at,last_active_at,deactivated_at,profiles(full_name,pet_type,breed,status,visibility,online_status,profile_photo_url,cover_photo_url,mobile_number,current_city,occupation,date_of_birth)',
         'limit' => '1',
     ]);
     if (($userRes['code'] ?? 500) >= 400 || empty($userRes['data'])) {
@@ -3765,7 +3765,7 @@ function handleAdminGrantUserRole($data)
     requireOwnerCapability($actorId);
     $targetUserId = requireUuid($data['target_user_id'] ?? '', 'target_user_id');
     $role = normaliseAdminRole($data['role'] ?? '');
-    if (!in_array($role, ['owner', 'platform_admin', 'religion_admin', 'community_admin'], true)) {
+    if (!in_array($role, ['owner', 'platform_admin', 'pet_type_admin', 'breed_admin'], true)) {
         jsonError("Choose a valid admin role.", 400);
         return;
     }
@@ -3775,16 +3775,16 @@ function handleAdminGrantUserRole($data)
     if ($role === 'owner' || $role === 'platform_admin') {
         $scopeType = 'global';
         $scopeValue = '*';
-    } elseif ($role === 'religion_admin') {
-        $scopeType = 'religion';
+    } elseif ($role === 'pet_type_admin') {
+        $scopeType = 'pet_type';
         if ($scopeValue === '' || $scopeValue === '*') {
-            jsonError("Religion admins require a religion scope.", 400);
+            jsonError("Pet Type admins require a pet_type scope.", 400);
             return;
         }
-    } elseif ($role === 'community_admin') {
-        $scopeType = 'community';
+    } elseif ($role === 'breed_admin') {
+        $scopeType = 'breed';
         if ($scopeValue === '' || $scopeValue === '*') {
-            jsonError("Community admins require a community scope.", 400);
+            jsonError("Breed admins require a breed scope.", 400);
             return;
         }
     }
@@ -3996,16 +3996,16 @@ function handleAdminListUsers($data)
     $limit = adminListLimit($data);
     $offset = adminOffset($data);
     $sort = strtolower(cleanPlainValue($data['sort'] ?? 'created_desc', 40));
-    $phpSorts = ['name_asc', 'name_desc', 'religion_asc', 'religion_desc', 'community_asc', 'community_desc', 'status_asc', 'status_desc', 'active_asc'];
-    $religionFilters = adminChoiceList($data['religion'] ?? [], ['Hindu', 'Muslim', 'Sikh', 'Christian', 'Buddhist', 'Jain', 'Other']);
-    $communityFilter = cleanPlainValue($data['community'] ?? '', 120);
+    $phpSorts = ['name_asc', 'name_desc', 'pet_type_asc', 'pet_type_desc', 'breed_asc', 'breed_desc', 'status_asc', 'status_desc', 'active_asc'];
+    $pet_typeFilters = adminChoiceList($data['pet_type'] ?? [], ['Dog', 'Cat', 'Bird', 'Rabbit', 'Reptile', 'Fish', 'Other']);
+    $breedFilter = cleanPlainValue($data['breed'] ?? '', 120);
     $statusFilters = array_map('strtolower', adminChoiceList($data['status_filter'] ?? [], ['active', 'online', 'offline', 'deactivated']));
-    $needsPhpFilter = !empty($religionFilters) || $communityFilter !== '' || !empty($statusFilters);
+    $needsPhpFilter = !empty($pet_typeFilters) || $breedFilter !== '' || !empty($statusFilters);
     $needsPhpSort = in_array($sort, $phpSorts, true);
     $needsPhpPage = $needsPhpSort || $needsPhpFilter;
     $flagFilters = array_map('strtolower', adminChoiceList($data['flag_filter'] ?? [], ['flagged', 'watch', 'warning', 'blacklist', 'suspension', 'ban']));
     $query = [
-        'select' => 'id,email,role,created_at,last_login_at,last_active_at,deactivated_at,profiles(full_name,religion,community,status,visibility,online_status,profile_photo_url,mobile_number)',
+        'select' => 'id,email,role,created_at,last_login_at,last_active_at,deactivated_at,profiles(full_name,pet_type,breed,status,visibility,online_status,profile_photo_url,mobile_number)',
         'limit' => (string) ($needsPhpPage ? max(1000, $limit) : $limit),
         'offset' => (string) ($needsPhpPage ? 0 : $offset),
     ];
@@ -4080,12 +4080,12 @@ function handleAdminListUsers($data)
     }
 
     if ($needsPhpFilter) {
-        $users = array_values(array_filter($users, function ($row) use ($religionFilters, $communityFilter, $statusFilters) {
+        $users = array_values(array_filter($users, function ($row) use ($pet_typeFilters, $breedFilter, $statusFilters) {
             $profile = $row['profile'] ?? [];
-            if (!empty($religionFilters) && !in_array(strtolower((string) ($profile['religion'] ?? '')), array_map('strtolower', $religionFilters), true)) {
+            if (!empty($pet_typeFilters) && !in_array(strtolower((string) ($profile['pet_type'] ?? '')), array_map('strtolower', $pet_typeFilters), true)) {
                 return false;
             }
-            if ($communityFilter !== '' && stripos((string) ($profile['community'] ?? ''), $communityFilter) === false) {
+            if ($breedFilter !== '' && stripos((string) ($profile['breed'] ?? ''), $breedFilter) === false) {
                 return false;
             }
             if (!empty($statusFilters)) {
@@ -4139,16 +4139,16 @@ function handleAdminListUsers($data)
             $profileB = $b['profile'] ?? [];
             $valueA = match ($field) {
                 'name' => $profileA['full_name'] ?? $a['email'] ?? '',
-                'religion' => $profileA['religion'] ?? '',
-                'community' => $profileA['community'] ?? '',
+                'pet_type' => $profileA['pet_type'] ?? '',
+                'breed' => $profileA['breed'] ?? '',
                 'status' => $a['deactivated_at'] ? 'deactivated' : ($profileA['status'] ?? ''),
                 'active' => $a['last_active_at'] ?? '',
                 default => '',
             };
             $valueB = match ($field) {
                 'name' => $profileB['full_name'] ?? $b['email'] ?? '',
-                'religion' => $profileB['religion'] ?? '',
-                'community' => $profileB['community'] ?? '',
+                'pet_type' => $profileB['pet_type'] ?? '',
+                'breed' => $profileB['breed'] ?? '',
                 'status' => $b['deactivated_at'] ? 'deactivated' : ($profileB['status'] ?? ''),
                 'active' => $b['last_active_at'] ?? '',
                 default => '',
@@ -4275,12 +4275,12 @@ function handleAdminListPosts($data)
     $type = cleanPlainValue($data['post_type'] ?? '', 40);
     if ($type !== '')
         $query['post_type'] = 'eq.' . $type;
-    $religion = cleanPlainValue($data['religion'] ?? '', 80);
-    if ($religion !== '')
-        $query['pet_type'] = 'eq.' . $religion;
-    $community = cleanPlainValue($data['community'] ?? '', 120);
-    if ($community !== '')
-        $query['breed'] = 'eq.' . $community;
+    $pet_type = cleanPlainValue($data['pet_type'] ?? '', 80);
+    if ($pet_type !== '')
+        $query['pet_type'] = 'eq.' . $pet_type;
+    $breed = cleanPlainValue($data['breed'] ?? '', 120);
+    if ($breed !== '')
+        $query['breed'] = 'eq.' . $breed;
     if (isset($data['deleted']) && $data['deleted'] !== '') {
         $query['is_deleted'] = 'eq.' . (filter_var($data['deleted'], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false');
     }
@@ -4336,7 +4336,7 @@ function handleAdminListEvents($data)
     $limit = adminListLimit($data);
     $offset = adminOffset($data);
     $query = [
-        'select' => 'id,title,description,event_date,event_time,location,is_online,meeting_url,religion,community,created_by,created_at,updated_at',
+        'select' => 'id,title,description,event_date,event_time,location,is_online,meeting_url,pet_type,breed,created_by,created_at,updated_at',
         'limit' => (string) $limit,
         'offset' => (string) $offset,
     ];
@@ -4347,12 +4347,12 @@ function handleAdminListEvents($data)
         'created_asc' => 'created_at.asc',
         default => 'event_date.desc,event_time.desc',
     };
-    $religion = cleanPlainValue($data['religion'] ?? '', 80);
-    if ($religion !== '')
-        $query['religion'] = 'eq.' . $religion;
-    $community = cleanPlainValue($data['community'] ?? '', 120);
-    if ($community !== '')
-        $query['community'] = 'eq.' . $community;
+    $pet_type = cleanPlainValue($data['pet_type'] ?? '', 80);
+    if ($pet_type !== '')
+        $query['pet_type'] = 'eq.' . $pet_type;
+    $breed = cleanPlainValue($data['breed'] ?? '', 120);
+    if ($breed !== '')
+        $query['breed'] = 'eq.' . $breed;
     $search = trim((string) ($data['search'] ?? ''));
     if ($search !== '') {
         $safe = str_replace(['%', ',', '(', ')'], '', $search);
@@ -4540,7 +4540,7 @@ function handleAdminGetAnalytics($data)
 
     $since = gmdate('c', time() - (7 * 24 * 60 * 60));
     $recentUsers = recentRows('users', 'id,email,created_at,last_login_at,last_active_at,role', 500);
-    $recentPosts = recentRows('posts', 'id,user_id,post_type,religion,community,is_deleted,created_at', 500);
+    $recentPosts = recentRows('posts', 'id,user_id,post_type,pet_type,breed,is_deleted,created_at', 500);
     $recentSessions = recentRows('user_sessions', 'id,user_id,created_at,last_seen_at,revoked_at,expires_at', 500);
     $recentLoginEvents = recentRows('user_login_events', 'id,success,reason,created_at', 500);
 
@@ -4574,8 +4574,8 @@ function handleAdminGetAnalytics($data)
         ],
         'users_by_role' => bucketCounts($recentUsers, 'role'),
         'posts_by_type' => bucketCounts($recentPosts, 'post_type'),
-        'posts_by_religion' => bucketCounts($recentPosts, 'religion'),
-        'posts_by_community' => bucketCounts($recentPosts, 'community'),
+        'posts_by_pet_type' => bucketCounts($recentPosts, 'pet_type'),
+        'posts_by_breed' => bucketCounts($recentPosts, 'breed'),
         'generated_at' => nowIsoUtc(),
         'note' => 'Limited data demo. Counts are sampled through the current REST API. Grafana/Postgres metrics will be used for exact infrastructure analytics.',
     ]);
@@ -4586,16 +4586,16 @@ function handleAdminContactBook($data)
     $actorId = requireUuid($data['auth_user_id'] ?? '', 'user_id');
     requireGlobalAdminCapability($actorId);
 
-    $communityFilter = cleanPlainValue($data['community'] ?? '', 120);
+    $breedFilter = cleanPlainValue($data['breed'] ?? '', 120);
     $search = trim((string) ($data['search'] ?? ''));
 
     $query = [
-        'select' => 'full_name,community,religion,current_city,mobile_number',
-        'order' => 'community.asc.nullslast,full_name.asc.nullslast',
+        'select' => 'full_name,breed,pet_type,current_city,mobile_number',
+        'order' => 'breed.asc.nullslast,full_name.asc.nullslast',
         'limit' => '5000',
     ];
-    if ($communityFilter !== '') {
-        $query['community'] = 'ilike.*' . str_replace(['%', '*', ',', '(', ')'], '', $communityFilter) . '*';
+    if ($breedFilter !== '') {
+        $query['breed'] = 'ilike.*' . str_replace(['%', '*', ',', '(', ')'], '', $breedFilter) . '*';
     }
     if ($search !== '') {
         $query['full_name'] = 'ilike.*' . str_replace(['%', '*', ',', '(', ')'], '', $search) . '*';
@@ -4610,25 +4610,25 @@ function handleAdminContactBook($data)
     $contacts = [];
     $communities = [];
     foreach (($res['data'] ?? []) as $row) {
-        $community = trim((string) ($row['community'] ?? '')) ?: 'Unspecified';
-        $communities[$community] = ($communities[$community] ?? 0) + 1;
+        $breed = trim((string) ($row['breed'] ?? '')) ?: 'Unspecified';
+        $communities[$breed] = ($communities[$breed] ?? 0) + 1;
         $contacts[] = [
             'name' => $row['full_name'] ?? 'Member',
-            'community' => $community,
+            'breed' => $breed,
             'address' => $row['current_city'] ?? '',
             'phone' => $row['mobile_number'] ?? '',
-            'religion' => $row['religion'] ?? '',
+            'pet_type' => $row['pet_type'] ?? '',
         ];
     }
     ksort($communities);
-    $communityList = [];
+    $breedList = [];
     foreach ($communities as $name => $count) {
-        $communityList[] = ['community' => $name, 'count' => $count];
+        $breedList[] = ['breed' => $name, 'count' => $count];
     }
 
     jsonSuccess([
         'contacts' => $contacts,
-        'communities' => $communityList,
+        'communities' => $breedList,
         'total' => count($contacts),
     ]);
 }
@@ -4710,21 +4710,21 @@ function fetchStats()
         $totalUsers = (int) $m[1];
     }
 
-    // Community distribution (member profiles only via inner join)
+    // Breed distribution (member profiles only via inner join)
     $profilesRes = supabaseRequest('GET', '/rest/v1/profiles', [
-        'select' => 'community,users!inner(role)',
+        'select' => 'breed,users!inner(role)',
         'users.role' => 'eq.member',
     ]);
 
     $commCount = [];
     foreach (($profilesRes['data'] ?? []) as $p) {
-        $c = $p['community'] ?? 'Not Specified';
+        $c = $p['breed'] ?? 'Not Specified';
         $commCount[$c] = ($commCount[$c] ?? 0) + 1;
     }
 
     $communities = [];
     foreach ($commCount as $name => $count) {
-        $communities[] = ['community' => $name, 'count' => $count];
+        $communities[] = ['breed' => $name, 'count' => $count];
     }
     usort($communities, fn($a, $b) => $b['count'] - $a['count']);
 
@@ -5040,7 +5040,7 @@ function handleUpdateProfile($data)
         finishResponseEarly();
         $memberName = (string) ($update['full_name'] ?? 'Member');
         $confirm = "✅ $memberName, your PawCircle membership application has been received and approved. "
-            . "Welcome to the community! You'll now receive important updates and reminders here.";
+            . "Welcome to the breed! You'll now receive important updates and reminders here.";
         $number = (string) ($update['mobile_number'] ?? '');
         if ($number !== '') {
             sendWhatsAppMessage($number, $confirm, proactiveWhatsappOpts($confirm));
@@ -5338,8 +5338,8 @@ function fetchProfilesMap($userIds)
         if (!empty($profile['user_id'])) {
             $uid = strtolower((string) $profile['user_id']);
             $profile['admin_capabilities'] = $adminCapsMap[$uid] ?? [];
-            $profile['community'] = $profile['breed'] ?? '';
-            $profile['religion'] = $profile['pet_type'] ?? '';
+            $profile['breed'] = $profile['breed'] ?? '';
+            $profile['pet_type'] = $profile['pet_type'] ?? '';
             $map[$profile['user_id']] = $profile;
         }
     }
@@ -5419,19 +5419,19 @@ function captureJsonHandler($callback)
 function handleSocialBootstrap($data)
 {
     $userId = $data['user_id'] ?? '';
-    $community = $data['community'] ?? '';
-    $religion = $data['religion'] ?? '';
+    $breed = $data['breed'] ?? '';
+    $pet_type = $data['pet_type'] ?? '';
 
     if (!$userId) {
         jsonError("user_id is required.", 400);
         return;
     }
 
-    $postsData = captureJsonHandler(function () use ($userId, $community, $religion) {
+    $postsData = captureJsonHandler(function () use ($userId, $breed, $pet_type) {
         handleGetPosts([
             "user_id" => $userId,
-            "community" => $community,
-            "religion" => $religion
+            "breed" => $breed,
+            "pet_type" => $pet_type
         ]);
     });
 
@@ -5441,18 +5441,18 @@ function handleSocialBootstrap($data)
         ]);
     });
 
-    $groupsData = captureJsonHandler(function () use ($userId, $community, $religion) {
+    $groupsData = captureJsonHandler(function () use ($userId, $breed, $pet_type) {
         handleGetGroups([
             "user_id" => $userId,
-            "community" => $community,
-            "religion" => $religion
+            "breed" => $breed,
+            "pet_type" => $pet_type
         ]);
     });
 
-    $eventsData = captureJsonHandler(function () use ($community, $religion) {
+    $eventsData = captureJsonHandler(function () use ($breed, $pet_type) {
         handleGetEvents([
-            "community" => $community,
-            "religion" => $religion
+            "breed" => $breed,
+            "pet_type" => $pet_type
         ]);
     });
 
@@ -5484,8 +5484,8 @@ function profileSummary($profile, $fallbackName = 'Member')
         'full_name' => $name,
         'name' => $name,
         'profile_photo_url' => $profile['profile_photo_url'] ?? null,
-        'community' => $profile['community'] ?? null,
-        'religion' => $profile['religion'] ?? null,
+        'breed' => $profile['breed'] ?? null,
+        'pet_type' => $profile['pet_type'] ?? null,
         'current_city' => $profile['current_city'] ?? null,
         'mobile_number' => $profile['mobile_number'] ?? null,
         'age_group' => profileAgeGroup($profile),
@@ -5704,10 +5704,10 @@ function enrichPosts($posts, $currentUserId = null)
         $post['is_liked'] = !empty($likedByCurrent[$post['id']]);
 
         if (isset($post['breed'])) {
-            $post['community'] = $post['breed'];
+            $post['breed'] = $post['breed'];
         }
         if (isset($post['pet_type'])) {
-            $post['religion'] = $post['pet_type'];
+            $post['pet_type'] = $post['pet_type'];
         }
 
         // Frontend compatibility keys
@@ -5878,10 +5878,10 @@ function enrichGroups($groups, $currentUserId = null, $includeMembers = true)
 
     foreach ($groups as &$group) {
         if (isset($group['breed'])) {
-            $group['community'] = $group['breed'];
+            $group['breed'] = $group['breed'];
         }
         if (isset($group['pet_type'])) {
-            $group['religion'] = $group['pet_type'];
+            $group['pet_type'] = $group['pet_type'];
         }
 
         $gid = $group['id'];
@@ -5890,15 +5890,15 @@ function enrichGroups($groups, $currentUserId = null, $includeMembers = true)
         $group['is_member'] = false;
 
         // Derived visibility scope. No schema change required:
-        // global = everyone, religion = same religion, community = same religion + same community/caste.
-        $hasReligion = isset($group['religion']) && trim((string) $group['religion']) !== '';
-        $hasCommunity = isset($group['community']) && trim((string) $group['community']) !== '';
-        if (!$hasReligion && !$hasCommunity) {
+        // global = everyone, pet_type = same pet_type, breed = same pet_type + same breed/caste.
+        $hasPetType = isset($group['pet_type']) && trim((string) $group['pet_type']) !== '';
+        $hasBreed = isset($group['breed']) && trim((string) $group['breed']) !== '';
+        if (!$hasPetType && !$hasBreed) {
             $group['scope'] = 'global';
-        } elseif ($hasReligion && !$hasCommunity) {
-            $group['scope'] = 'religion';
+        } elseif ($hasPetType && !$hasBreed) {
+            $group['scope'] = 'pet_type';
         } else {
-            $group['scope'] = 'community';
+            $group['scope'] = 'breed';
         }
 
         $members = [];
@@ -6009,16 +6009,16 @@ function handleCreatePost($data)
         $postType = preg_match('/\.(mp4|webm)$/', $path) ? 'video' : 'image';
     }
 
-    $community = cleanPlainValue($data['community'] ?? '', 120);
-    $religion = cleanPlainValue($data['religion'] ?? '', 80);
+    $breed = cleanPlainValue($data['breed'] ?? '', 120);
+    $pet_type = cleanPlainValue($data['pet_type'] ?? '', 80);
 
     $body = [
         'user_id' => $data['user_id'],
         'content' => $content === '' ? null : $content,
         'media_url' => $mediaUrl === '' ? null : $mediaUrl,
         'post_type' => $postType,
-        'breed' => $community === '' ? null : $community,
-        'pet_type' => $religion === '' ? null : $religion,
+        'breed' => $breed === '' ? null : $breed,
+        'pet_type' => $pet_type === '' ? null : $pet_type,
         'title' => cleanNullableText($data['title'] ?? null, 240),
         'description' => cleanNullableText($data['description'] ?? null, 5000),
     ];
@@ -6055,18 +6055,18 @@ function handleGetPosts($data)
     }
 
     if (empty($data['post_id'])) {
-        $community = cleanPlainValue($data['community'] ?? '', 120);
-        $religion = cleanPlainValue($data['religion'] ?? '', 80);
+        $breed = cleanPlainValue($data['breed'] ?? '', 120);
+        $pet_type = cleanPlainValue($data['pet_type'] ?? '', 80);
         $visibilityFilters = ['and(breed.is.null,pet_type.is.null)'];
 
-        if ($religion !== '') {
-            $visibilityFilters[] = 'and(breed.is.null,pet_type.eq.' . $religion . ')';
+        if ($pet_type !== '') {
+            $visibilityFilters[] = 'and(breed.is.null,pet_type.eq.' . $pet_type . ')';
         }
 
-        if ($community !== '') {
-            $filter = 'breed.eq.' . $community;
-            if ($religion !== '') {
-                $filter .= ',pet_type.eq.' . $religion;
+        if ($breed !== '') {
+            $filter = 'breed.eq.' . $breed;
+            if ($pet_type !== '') {
+                $filter .= ',pet_type.eq.' . $pet_type;
             }
             $visibilityFilters[] = 'and(' . $filter . ')';
         }
@@ -6096,8 +6096,8 @@ function getAccountProfile($userId)
 
     if (!supabaseFailed($res) && !empty($res['data'])) {
         $profile = $res['data'][0];
-        $profile['community'] = $profile['breed'] ?? '';
-        $profile['religion'] = $profile['pet_type'] ?? '';
+        $profile['breed'] = $profile['breed'] ?? '';
+        $profile['pet_type'] = $profile['pet_type'] ?? '';
         return $profile;
     }
 
@@ -6112,15 +6112,15 @@ function getAccountProfile($userId)
     }
 
     $profile = $fallback['data'][0];
-    $profile['community'] = $profile['breed'] ?? '';
-    $profile['religion'] = $profile['pet_type'] ?? '';
+    $profile['breed'] = $profile['breed'] ?? '';
+    $profile['pet_type'] = $profile['pet_type'] ?? '';
     return $profile;
 }
 
 function normalizeVisibility($value)
 {
     $value = strtolower(trim((string) $value));
-    $allowed = ['public', 'community', 'religion', 'private'];
+    $allowed = ['public', 'breed', 'pet_type', 'private'];
     return in_array($value, $allowed, true) ? $value : 'public';
 }
 
@@ -6377,13 +6377,13 @@ function handleChangeAccountCredentials($data)
     jsonSuccess(["message" => "Account credentials updated."]);
 }
 
-function handleChangeReligionCommunity($data)
+function handleChangePetTypeBreed($data)
 {
     $userId = cleanNullableText($data['user_id'] ?? '', 80);
-    $religion = cleanNullableText($data['religion'] ?? '', 80);
-    $community = cleanNullableText($data['community'] ?? '', 140);
-    if (!$userId || !$religion || !$community) {
-        jsonError("user_id, religion and community are required.");
+    $pet_type = cleanNullableText($data['pet_type'] ?? '', 80);
+    $breed = cleanNullableText($data['breed'] ?? '', 140);
+    if (!$userId || !$pet_type || !$breed) {
+        jsonError("user_id, pet_type and breed are required.");
         return;
     }
 
@@ -6403,12 +6403,12 @@ function handleChangeReligionCommunity($data)
     $res = supabaseRequest('PATCH', '/rest/v1/profiles', [
         'user_id' => 'eq.' . $userId,
     ], [
-        'pet_type' => $religion,
-        'breed' => $community,
+        'pet_type' => $pet_type,
+        'breed' => $breed,
     ], ['Prefer: return=representation']);
 
     if (supabaseFailed($res)) {
-        sendSupabaseError("Failed to change religion/community.", $res);
+        sendSupabaseError("Failed to change pet_type/breed.", $res);
         return;
     }
 
@@ -6416,8 +6416,8 @@ function handleChangeReligionCommunity($data)
         "profile" => $res['data'][0] ?? getAccountProfile($userId),
         "removed_group_count" => count($removedGroupIds),
         "previous" => [
-            "religion" => $oldProfile['religion'] ?? null,
-            "community" => $oldProfile['community'] ?? null,
+            "pet_type" => $oldProfile['pet_type'] ?? null,
+            "breed" => $oldProfile['breed'] ?? null,
         ],
     ]);
 }
@@ -6930,7 +6930,7 @@ function normalizeEventPayload($data)
         $frequency = 'none';
     }
 
-    $allowedVisibility = ['public', 'community', 'religion', 'invite_only'];
+    $allowedVisibility = ['public', 'breed', 'pet_type', 'invite_only'];
     $visibility = strtolower(trim((string) ($data['visibility'] ?? 'public')));
     if (!in_array($visibility, $allowedVisibility, true)) {
         $visibility = 'public';
@@ -6944,8 +6944,8 @@ function normalizeEventPayload($data)
         'location' => $location === '' ? null : $location,
         'is_online' => isset($data['is_online']) ? (bool) $data['is_online'] : !empty($data['meeting_url']) || !empty($data['link']),
         'meeting_url' => trim((string) ($data['meeting_url'] ?? $data['link'] ?? '')) ?: null,
-        'pet_type' => ($religion = cleanPlainValue($data['religion'] ?? '', 80)) === '' ? null : $religion,
-        'breed' => ($community = cleanPlainValue($data['community'] ?? '', 120)) === '' ? null : $community,
+        'pet_type' => ($pet_type = cleanPlainValue($data['pet_type'] ?? '', 80)) === '' ? null : $pet_type,
+        'breed' => ($breed = cleanPlainValue($data['breed'] ?? '', 120)) === '' ? null : $breed,
         'banner_url' => trim((string) ($data['banner_url'] ?? '')) ?: null,
         'recurrence_frequency' => $frequency,
         
@@ -7002,7 +7002,7 @@ function handleSaveEvent($data)
     $invitesCreated = 0;
     $eventId = $event['id'] ?? null;
     $eventDate = $event['event_date'] ?? null;
-    $eventTitle = $event['title'] ?? 'Community event';
+    $eventTitle = $event['title'] ?? 'Breed event';
 
     foreach ($inviteeIds as $inviteeId) {
         if ($inviteeId === strtolower((string) $data['user_id']))
@@ -7175,8 +7175,8 @@ function handleGetEvents($data)
     foreach ($events as &$event) {
         $profile = $profileMap[$event['created_by'] ?? ''] ?? [];
         $event['creator'] = profileSummary($profile);
-        $event['religion'] = $event['pet_type'] ?? '';
-        $event['community'] = $event['breed'] ?? '';
+        $event['pet_type'] = $event['pet_type'] ?? '';
+        $event['breed'] = $event['breed'] ?? '';
     }
     unset($event);
 
@@ -7186,7 +7186,7 @@ function handleGetEvents($data)
 function normalizeGalleryVisibility($value)
 {
     $value = strtolower(cleanPlainValue($value ?? 'private', 40));
-    $allowed = ['public', 'community', 'religion', 'private'];
+    $allowed = ['public', 'breed', 'pet_type', 'private'];
     return in_array($value, $allowed, true) ? $value : 'private';
 }
 
@@ -7495,42 +7495,42 @@ function handleCreateGroup($data)
     }
 
     // Group visibility uses existing nullable columns, so no schema change is required:
-    // community = same religion + same community/caste
-    // religion  = same religion, any community/caste
+    // breed = same pet_type + same breed/caste
+    // pet_type  = same pet_type, any breed/caste
     // global    = everyone on PawCircle
-    $scope = strtolower(trim((string) ($data['scope'] ?? 'community')));
-    if (!in_array($scope, ['community', 'religion', 'global'], true)) {
-        $scope = 'community';
+    $scope = strtolower(trim((string) ($data['scope'] ?? 'breed')));
+    if (!in_array($scope, ['breed', 'pet_type', 'global'], true)) {
+        $scope = 'breed';
     }
 
-    $religion = trim((string) ($data['religion'] ?? ''));
-    $community = trim((string) ($data['community'] ?? ''));
+    $pet_type = trim((string) ($data['pet_type'] ?? ''));
+    $breed = trim((string) ($data['breed'] ?? ''));
 
     if ($scope === 'global') {
-        $religion = null;
-        $community = null;
-    } elseif ($scope === 'religion') {
-        if ($religion === '') {
-            jsonError("Your profile needs a religion before creating a religion-specific group.", 400);
+        $pet_type = null;
+        $breed = null;
+    } elseif ($scope === 'pet_type') {
+        if ($pet_type === '') {
+            jsonError("Your profile needs a pet_type before creating a pet_type-specific group.", 400);
             return;
         }
-        $religion = cleanTextValue($religion, 120);
-        $community = null;
+        $pet_type = cleanTextValue($pet_type, 120);
+        $breed = null;
     } else {
-        if ($religion === '' || $community === '') {
-            jsonError("Your profile needs both religion and community before creating a community-specific group.", 400);
+        if ($pet_type === '' || $breed === '') {
+            jsonError("Your profile needs both pet_type and breed before creating a breed-specific group.", 400);
             return;
         }
-        $religion = cleanTextValue($religion, 120);
-        $community = cleanTextValue($community, 120);
+        $pet_type = cleanTextValue($pet_type, 120);
+        $breed = cleanTextValue($breed, 120);
     }
 
     $body = [
         'name' => $name,
         'description' => cleanTextValue($data['description'] ?? $data['desc'] ?? '', 1000) ?: null,
         'avatar_url' => trim((string) ($data['avatar_url'] ?? '')) ?: null,
-        'breed' => $community,
-        'pet_type' => $religion,
+        'breed' => $breed,
+        'pet_type' => $pet_type,
         'created_by' => $data['user_id'],
         'is_private' => isset($data['is_private']) ? (bool) $data['is_private'] : false,
     ];
@@ -7799,8 +7799,8 @@ function handleJoinPack($data)
             'name' => $name,
             'description' => $description,
             'avatar_url' => null,
-            'community' => null,   // global scope: visible/joinable to everyone
-            'religion' => null,
+            'breed' => null,   // global scope: visible/joinable to everyone
+            'pet_type' => null,
             'created_by' => $userId,
             'is_private' => false,
             'pack_key' => $mandalKey,
@@ -7986,7 +7986,7 @@ function handleBroadcastMessage($data)
     $groupIds = is_array($rawGroupIds) ? array_values(array_unique(array_filter($rawGroupIds))) : [];
 
     if (empty($groupIds)) {
-        jsonError("Select at least one community or group to broadcast to.", 400);
+        jsonError("Select at least one breed or group to broadcast to.", 400);
         return;
     }
 
@@ -8244,8 +8244,8 @@ function handleGetGroup($data)
 function handleGetGroups($data)
 {
     $userId = $data['user_id'] ?? null;
-    $userReligion = trim((string) ($data['religion'] ?? ''));
-    $userCommunity = trim((string) ($data['community'] ?? ''));
+    $userPetType = trim((string) ($data['pet_type'] ?? ''));
+    $userBreed = trim((string) ($data['breed'] ?? ''));
     $groupsById = [];
 
     $baseSelect = 'id,name,description,avatar_url,breed,pet_type,created_by,is_private,pack_key,created_at,updated_at';
@@ -8263,25 +8263,25 @@ function handleGetGroups($data)
         'limit' => $limit,
     ];
 
-    // Religion-specific public groups: same religion, no community/caste restriction.
-    if ($userReligion !== '') {
+    // Pet Type-specific public groups: same pet_type, no breed/caste restriction.
+    if ($userPetType !== '') {
         $queries[] = [
             'select' => $baseSelect,
             'is_private' => 'eq.false',
-            'pet_type' => 'eq.' . $userReligion,
+            'pet_type' => 'eq.' . $userPetType,
             'breed' => 'is.null',
             'order' => 'created_at.desc',
             'limit' => $limit,
         ];
     }
 
-    // Community-specific public groups: same religion + same community/caste.
-    if ($userReligion !== '' && $userCommunity !== '') {
+    // Breed-specific public groups: same pet_type + same breed/caste.
+    if ($userPetType !== '' && $userBreed !== '') {
         $queries[] = [
             'select' => $baseSelect,
             'is_private' => 'eq.false',
-            'pet_type' => 'eq.' . $userReligion,
-            'breed' => 'eq.' . $userCommunity,
+            'pet_type' => 'eq.' . $userPetType,
+            'breed' => 'eq.' . $userBreed,
             'order' => 'created_at.desc',
             'limit' => $limit,
         ];
@@ -8355,8 +8355,8 @@ function handleSearchMembers($data)
     $offset = isset($data['offset']) ? max(0, (int) $data['offset']) : 0;
     $queryText = cleanNullableText($data['query'] ?? '', 120);
     $filters = [
-        'pet_type' => cleanNullableText($data['religion'] ?? '', 120),
-        'breed' => cleanNullableText($data['community'] ?? '', 160),
+        'pet_type' => cleanNullableText($data['pet_type'] ?? '', 120),
+        'breed' => cleanNullableText($data['breed'] ?? '', 160),
         'gotra' => cleanNullableText($data['gotra'] ?? ($data['clan'] ?? ''), 160),
         'native_village' => cleanNullableText($data['native_village'] ?? '', 160),
         'current_city' => cleanNullableText($data['current_city'] ?? ($data['city'] ?? ''), 160),
@@ -8387,11 +8387,11 @@ function handleSearchMembers($data)
     }
 
     $currentProfile = getAccountProfile($userId);
-    $currentReligion = trim((string) ($currentProfile['religion'] ?? ''));
-    $currentCommunity = trim((string) ($currentProfile['community'] ?? ''));
+    $currentPetType = trim((string) ($currentProfile['pet_type'] ?? ''));
+    $currentBreed = trim((string) ($currentProfile['breed'] ?? ''));
 
     $profileQuery = [
-        'select' => 'user_id,full_name,profile_photo_url,religion,community,gotra,native_village,current_city,age_group,date_of_birth,gender,is_public',
+        'select' => 'user_id,full_name,profile_photo_url,pet_type,breed,gotra,native_village,current_city,age_group,date_of_birth,gender,is_public',
         'user_id' => 'neq.' . $userId,
         'order' => 'full_name.asc',
         'limit' => (string) min(400, max(($limit + $offset) * 4, 100)),
@@ -8412,7 +8412,7 @@ function handleSearchMembers($data)
     
     // Resilience: Fallback if any columns fail (e.g. is_public not available)
     if (supabaseFailed($profilesRes)) {
-        $profileQuery['select'] = 'user_id,full_name,profile_photo_url,religion,community,gotra,native_village,current_city,age_group,date_of_birth,gender';
+        $profileQuery['select'] = 'user_id,full_name,profile_photo_url,pet_type,breed,gotra,native_village,current_city,age_group,date_of_birth,gender';
         $profilesRes = supabaseRequest('GET', '/rest/v1/profiles', $profileQuery);
         if (supabaseFailed($profilesRes)) {
             sendSupabaseError("Failed to search members.", $profilesRes);
@@ -8422,11 +8422,11 @@ function handleSearchMembers($data)
 
     if (!empty($profilesRes['data'])) {
         foreach ($profilesRes['data'] as &$p) {
-            $p['pet_type'] = $p['religion'] ?? '';
-            $p['breed'] = $p['community'] ?? '';
+            $p['pet_type'] = $p['pet_type'] ?? '';
+            $p['breed'] = $p['breed'] ?? '';
             // For backward compatibility during migration
-            $p['religion'] = $p['pet_type'];
-            $p['community'] = $p['breed'];
+            $p['pet_type'] = $p['pet_type'];
+            $p['breed'] = $p['breed'];
         }
         unset($p);
     }
@@ -8453,12 +8453,12 @@ function handleSearchMembers($data)
         $visibility = normalizeVisibility($p['visibility'] ?? (!empty($p['is_public']) ? 'public' : 'private'));
         if ($visibility === 'private')
             continue;
-        if ($visibility === 'religion' && $currentReligion !== '' && ($p['religion'] ?? '') !== $currentReligion)
+        if ($visibility === 'pet_type' && $currentPetType !== '' && ($p['pet_type'] ?? '') !== $currentPetType)
             continue;
-        if ($visibility === 'community') {
-            if ($currentReligion !== '' && ($p['religion'] ?? '') !== $currentReligion)
+        if ($visibility === 'breed') {
+            if ($currentPetType !== '' && ($p['pet_type'] ?? '') !== $currentPetType)
                 continue;
-            if ($currentCommunity !== '' && ($p['community'] ?? '') !== $currentCommunity)
+            if ($currentBreed !== '' && ($p['breed'] ?? '') !== $currentBreed)
                 continue;
         }
 
@@ -8489,8 +8489,8 @@ function handleSearchMembers($data)
             'user_id' => $otherId,
             'name' => $p['full_name'] ?? 'Member',
             'photo' => $p['profile_photo_url'] ?? null,
-            'religion' => $p['religion'] ?? null,
-            'community' => $p['community'] ?? null,
+            'pet_type' => $p['pet_type'] ?? null,
+            'breed' => $p['breed'] ?? null,
             'gotra' => $p['gotra'] ?? null,
             'native_village' => $p['native_village'] ?? null,
             'current_city' => $p['current_city'] ?? null,
@@ -8790,8 +8790,8 @@ function handleGetFriends($data)
             'user_id' => $row['user_id'],
             'name' => $profile['full_name'] ?? 'Member',
             'photo' => $profile['profile_photo_url'] ?? null,
-            'community' => $profile['community'] ?? null,
-            'religion' => $profile['religion'] ?? null,
+            'breed' => $profile['breed'] ?? null,
+            'pet_type' => $profile['pet_type'] ?? null,
             'age_group' => profileAgeGroup($profile),
             'date_of_birth' => $profile['date_of_birth'] ?? null,
             'gender' => $profile['gender'] ?? null,
@@ -10155,8 +10155,8 @@ function handleSavePlaydatePreferences($data)
         'pref_age_max' => intval($data['pref_age_max'] ?? 50),
         'pref_height_min' => intval($data['pref_height_min'] ?? 100),
         'pref_height_max' => intval($data['pref_height_max'] ?? 220),
-        'pref_community' => cleanNullableText($data['pref_community'] ?? 'Any', 100),
-        'pref_religion' => cleanNullableText($data['pref_religion'] ?? 'Any', 100),
+        'pref_breed' => cleanNullableText($data['pref_breed'] ?? 'Any', 100),
+        'pref_pet_type' => cleanNullableText($data['pref_pet_type'] ?? 'Any', 100),
         'pref_marital_status' => cleanNullableText($data['pref_marital_status'] ?? 'Any', 50),
         'pref_education' => cleanNullableText($data['pref_education'] ?? 'Any', 100),
         'pref_working' => cleanNullableText($data['pref_working'] ?? 'Any', 50),
@@ -10187,7 +10187,7 @@ function handleGetPlaydatePool($data)
 
     // 1. Every signed-up member.
     $profRes = supabaseRequest('GET', '/rest/v1/profiles', [
-        'select' => 'user_id,full_name,profile_photo_url,community,religion,current_city,date_of_birth,gender,occupation',
+        'select' => 'user_id,full_name,profile_photo_url,breed,pet_type,current_city,date_of_birth,gender,occupation',
         'limit' => '2000',
     ]);
     $profiles = $profRes['data'] ?? [];
@@ -10236,10 +10236,10 @@ function handleGetPlaydatePool($data)
         $out[] = [
             'id' => $uid,
             'user_id' => $uid,
-            'name' => ($p['full_name'] ?? '') !== '' ? $p['full_name'] : 'Community Member',
+            'name' => ($p['full_name'] ?? '') !== '' ? $p['full_name'] : 'Breed Member',
             'profile_photo_url' => $p['profile_photo_url'] ?? '',
-            'religion' => $p['religion'] ?? '',
-            'community' => $p['community'] ?? '',
+            'pet_type' => $p['pet_type'] ?? '',
+            'breed' => $p['breed'] ?? '',
             'gender' => ($bio['gender'] ?? '') !== '' ? ($bio['gender'] ?? '') : ($p['gender'] ?? ''),
             'age' => ageFromDateOfBirth($dob),
             'dob' => $dob,
@@ -10336,18 +10336,18 @@ function handleGetPlaydateDeck($data)
         // STAGE 2: Weighted Scoring
         $score = 0;
 
-        // Community/Religion Match (30 pts)
-        if (!empty($prefs['pref_religion']) && $prefs['pref_religion'] !== 'Any') {
-            if (($cand['religion'] ?? '') === $prefs['pref_religion'])
+        // Breed/Pet Type Match (30 pts)
+        if (!empty($prefs['pref_pet_type']) && $prefs['pref_pet_type'] !== 'Any') {
+            if (($cand['pet_type'] ?? '') === $prefs['pref_pet_type'])
                 $score += 15;
-        } else if (($cand['religion'] ?? '') === ($myProfile['religion'] ?? '')) {
+        } else if (($cand['pet_type'] ?? '') === ($myProfile['pet_type'] ?? '')) {
             $score += 15;
         }
 
-        if (!empty($prefs['pref_community']) && $prefs['pref_community'] !== 'Any') {
-            if (($cand['community'] ?? '') === $prefs['pref_community'])
+        if (!empty($prefs['pref_breed']) && $prefs['pref_breed'] !== 'Any') {
+            if (($cand['breed'] ?? '') === $prefs['pref_breed'])
                 $score += 15;
-        } else if (($cand['community'] ?? '') === ($myProfile['community'] ?? '')) {
+        } else if (($cand['breed'] ?? '') === ($myProfile['breed'] ?? '')) {
             $score += 15;
         }
 
@@ -10408,7 +10408,7 @@ function handleSwipePlaydate($data)
         } else {
             // Non-mutual like: notify the recipient that a connection request arrived,
             // so it lands in their playdate window and home notification screen.
-            $fromName = 'A community member';
+            $fromName = 'A breed member';
             $fromProfiles = fetchProfilesMap([$fromUserId]);
             if (!empty($fromProfiles[$fromUserId]['full_name'])) {
                 $fromName = $fromProfiles[$fromUserId]['full_name'];
@@ -10476,7 +10476,7 @@ function handleSubmitAdvertisingEnquiry($data)
     $message = substr(trim((string) ($data['message'] ?? '')), 0, 500);
 
     // Resolve the enquirer's display name for context.
-    $enquirerName = 'A community member';
+    $enquirerName = 'A breed member';
     $pm = fetchProfilesMap([$userId]);
     if (!empty($pm[$userId]['full_name'])) {
         $enquirerName = $pm[$userId]['full_name'];
@@ -10933,7 +10933,7 @@ function handleVerifyWhatsappNumber($data)
     // Confirm over WhatsApp after the response is sent so it never blocks the UI.
     finishResponseEarly();
     $confirm = "🎉 Your WhatsApp number is now linked to PawCircle. "
-        . "You'll receive event reminders, eDarshan timings and community updates here.";
+        . "You'll receive event reminders, Park timings and breed updates here.";
     sendWhatsAppMessage($number, $confirm, proactiveWhatsappOpts($confirm));
 }
 
@@ -11703,27 +11703,27 @@ function handleGetEventAnalytics($data)
     }
     $monthlyList = array_values($monthly);
 
-    // Religion demographics from profiles (for doughnut chart)
+    // Pet Type demographics from profiles (for doughnut chart)
     $demoRes = supabaseRequest('GET', '/rest/v1/profiles', [
-        'select' => 'religion',
+        'select' => 'pet_type',
     ]);
 
-    $religionCounts = [];
+    $pet_typeCounts = [];
     foreach (($demoRes['data'] ?? []) as $p) {
-        $rel = $p['religion'] ?? 'Unknown';
+        $rel = $p['pet_type'] ?? 'Unknown';
         if ($rel === '' || $rel === null)
             $rel = 'Unknown';
-        $religionCounts[$rel] = ($religionCounts[$rel] ?? 0) + 1;
+        $pet_typeCounts[$rel] = ($pet_typeCounts[$rel] ?? 0) + 1;
     }
-    arsort($religionCounts);
+    arsort($pet_typeCounts);
     $demographics = [];
-    foreach ($religionCounts as $rel => $count) {
-        $demographics[] = ['religion' => $rel, 'count' => $count];
+    foreach ($pet_typeCounts as $rel => $count) {
+        $demographics[] = ['pet_type' => $rel, 'count' => $count];
     }
 
     jsonSuccess([
         'monthly_attendance' => $monthlyList,
-        'religion_demographics' => $demographics,
+        'pet_type_demographics' => $demographics,
     ]);
 }
 
@@ -11737,7 +11737,7 @@ function handleGetServers($data)
     requireGlobalAdminCapability($actorId);
 
     $res = supabaseRequest('GET', '/rest/v1/servers', [
-        'select' => 'id,name,host,port,latitude,longitude,religion,status,latency_ms,created_at',
+        'select' => 'id,name,host,port,latitude,longitude,pet_type,status,latency_ms,created_at',
         'order' => 'name.asc'
     ]);
 
@@ -11751,11 +11751,11 @@ function handleGetServers($data)
     if (empty($servers)) {
         // Dynamic auto-seeding of default servers if database table is empty
         $defaultNodes = [
-            ['name' => 'US-West (Oregon)', 'host' => '54.212.10.45', 'port' => 443, 'latitude' => 45.823, 'longitude' => -120.312, 'religion' => 'global', 'status' => 'online', 'latency_ms' => 45],
-            ['name' => 'US-East (Virginia)', 'host' => '3.210.45.18', 'port' => 443, 'latitude' => 39.043, 'longitude' => -77.487, 'religion' => 'global', 'status' => 'online', 'latency_ms' => 82],
-            ['name' => 'EU-Central (Frankfurt)', 'host' => '18.197.80.3', 'port' => 443, 'latitude' => 50.110, 'longitude' => 8.682, 'religion' => 'global', 'status' => 'online', 'latency_ms' => 140],
-            ['name' => 'AP-South (Mumbai)', 'host' => '13.233.102.5', 'port' => 443, 'latitude' => 19.076, 'longitude' => 72.877, 'religion' => 'global', 'status' => 'online', 'latency_ms' => 15],
-            ['name' => 'AP-Northeast (Tokyo)', 'host' => '54.250.8.19', 'port' => 443, 'latitude' => 35.676, 'longitude' => 139.650, 'religion' => 'global', 'status' => 'online', 'latency_ms' => 115]
+            ['name' => 'US-West (Oregon)', 'host' => '54.212.10.45', 'port' => 443, 'latitude' => 45.823, 'longitude' => -120.312, 'pet_type' => 'global', 'status' => 'online', 'latency_ms' => 45],
+            ['name' => 'US-East (Virginia)', 'host' => '3.210.45.18', 'port' => 443, 'latitude' => 39.043, 'longitude' => -77.487, 'pet_type' => 'global', 'status' => 'online', 'latency_ms' => 82],
+            ['name' => 'EU-Central (Frankfurt)', 'host' => '18.197.80.3', 'port' => 443, 'latitude' => 50.110, 'longitude' => 8.682, 'pet_type' => 'global', 'status' => 'online', 'latency_ms' => 140],
+            ['name' => 'AP-South (Mumbai)', 'host' => '13.233.102.5', 'port' => 443, 'latitude' => 19.076, 'longitude' => 72.877, 'pet_type' => 'global', 'status' => 'online', 'latency_ms' => 15],
+            ['name' => 'AP-Northeast (Tokyo)', 'host' => '54.250.8.19', 'port' => 443, 'latitude' => 35.676, 'longitude' => 139.650, 'pet_type' => 'global', 'status' => 'online', 'latency_ms' => 115]
         ];
 
         foreach ($defaultNodes as $node) {
@@ -11765,7 +11765,7 @@ function handleGetServers($data)
 
         // Re-fetch seeded servers
         $res = supabaseRequest('GET', '/rest/v1/servers', [
-            'select' => 'id,name,host,port,latitude,longitude,religion,status,latency_ms,created_at',
+            'select' => 'id,name,host,port,latitude,longitude,pet_type,status,latency_ms,created_at',
             'order' => 'name.asc'
         ]);
 
@@ -11788,7 +11788,7 @@ function handleSaveServer($data)
     $port = isset($data['port']) ? (int) $data['port'] : null;
     $lat = isset($data['latitude']) ? (float) $data['latitude'] : null;
     $lon = isset($data['longitude']) ? (float) $data['longitude'] : null;
-    $religion = trim((string) ($data['religion'] ?? 'global'));
+    $pet_type = trim((string) ($data['pet_type'] ?? 'global'));
     $status = trim((string) ($data['status'] ?? 'online'));
 
     // If ID is provided, support partial updates
@@ -11804,8 +11804,8 @@ function handleSaveServer($data)
             $payload['latitude'] = $lat;
         if ($lon !== null)
             $payload['longitude'] = $lon;
-        if ($religion !== '')
-            $payload['religion'] = $religion;
+        if ($pet_type !== '')
+            $payload['pet_type'] = $pet_type;
         if ($status !== '')
             $payload['status'] = $status;
 
@@ -11830,7 +11830,7 @@ function handleSaveServer($data)
         'port' => $port,
         'latitude' => $lat,
         'longitude' => $lon,
-        'religion' => $religion,
+        'pet_type' => $pet_type,
         'status' => $status,
         'created_at' => nowIsoUtc()
     ], ['Prefer: return=representation']);

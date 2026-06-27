@@ -2913,7 +2913,6 @@ function finalizeSignup($payload, $plainPassword = '')
         'pet_type' => $pet_type,
         // 'primary_interests' => empty($interestsArr) ? null : $interestsArr,
         'skills' => empty($skillsArr) ? null : $skillsArr,
-        'age_group' => $ageGroup,
         'mobile_number' => $phone,
     ];
 
@@ -3074,7 +3073,6 @@ function handleTestUserLogin($shortcut)
             'pet_type' => $test['pet_type'],
             'membership_applied' => true,
             'status' => 'active',
-            'age_group' => '26 - 40',
         ], ['Prefer: return=minimal']);
 
         if (($profileRes['code'] ?? 500) >= 400) {
@@ -3130,21 +3128,9 @@ function handleLogin($data, $expectedRole)
 
     $res = supabaseRequest('GET', '/rest/v1/users', [
         'email' => 'eq.' . $email,
-        'select' => 'id,email,role,is_verified,verified_at,password_hash,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city,privacy_settings)',
+        'select' => 'id,email,role,password_hash,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city)',
         'limit' => '1',
     ]);
-
-    // Resilience: the phase-1/2 columns (is_verified/verified_at on users,
-    // privacy_settings on profiles) may not be migrated yet. When they are
-    // missing PostgREST returns a 400, which would otherwise fall through to
-    // "Invalid email or password" and lock every member out. Retry without them.
-    if (($res['code'] ?? 500) >= 400) {
-        $res = supabaseRequest('GET', '/rest/v1/users', [
-            'email' => 'eq.' . $email,
-            'select' => 'id,email,role,password_hash,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city)',
-            'limit' => '1',
-        ]);
-    }
 
     if ($res['code'] === 200 && !empty($res['data'])) {
         $user = $res['data'][0];
@@ -5325,7 +5311,7 @@ function fetchProfilesMap($userIds)
 
     $res = supabaseRequest('GET', '/rest/v1/profiles', [
         'user_id' => 'in.(' . implode(',', $userIds) . ')',
-        'select' => 'user_id,full_name,profile_photo_url,breed,pet_type,current_city,mobile_number,age_group,date_of_birth,gender,occupation'
+        'select' => 'user_id,full_name,profile_photo_url,breed,pet_type,current_city,mobile_number,date_of_birth,gender,occupation'
     ]);
 
     if (supabaseFailed($res))
@@ -5488,7 +5474,6 @@ function profileSummary($profile, $fallbackName = 'Member')
         'pet_type' => $profile['pet_type'] ?? null,
         'current_city' => $profile['current_city'] ?? null,
         'mobile_number' => $profile['mobile_number'] ?? null,
-        'age_group' => profileAgeGroup($profile),
         'date_of_birth' => $profile['date_of_birth'] ?? null,
         'gender' => $profile['gender'] ?? null,
         'occupation' => $profile['occupation'] ?? null,
@@ -6090,7 +6075,7 @@ function getAccountProfile($userId)
 {
     $res = supabaseRequest('GET', '/rest/v1/profiles', [
         'user_id' => 'eq.' . $userId,
-        'select' => 'user_id,full_name,breed,pet_type,current_city,mobile_number,age_group,date_of_birth,gender,occupation,bio,profile_photo_url,cover_photo_url,is_public,visibility,online_status,social_links,membership_applied,status',
+        'select' => 'user_id,full_name,breed,pet_type,current_city,mobile_number,date_of_birth,gender,occupation,bio,profile_photo_url,cover_photo_url,is_public,visibility,online_status,social_links,membership_applied,status',
         'limit' => '1',
     ]);
 
@@ -6103,7 +6088,7 @@ function getAccountProfile($userId)
 
     $fallback = supabaseRequest('GET', '/rest/v1/profiles', [
         'user_id' => 'eq.' . $userId,
-        'select' => 'user_id,full_name,breed,pet_type,current_city,mobile_number,age_group,date_of_birth,gender,occupation,bio,profile_photo_url,cover_photo_url,is_public,membership_applied,status,primary_interests',
+        'select' => 'user_id,full_name,breed,pet_type,current_city,mobile_number,date_of_birth,gender,occupation,bio,profile_photo_url,cover_photo_url,is_public,membership_applied,status,primary_interests',
         'limit' => '1',
     ]);
 
@@ -6223,7 +6208,6 @@ function handleUpdateAccountSettings($data)
         'occupation' => 'occupation',
         'gender' => 'gender',
         'date_of_birth' => 'date_of_birth',
-        'age_group' => 'age_group',
     ];
 
     foreach ($fieldMap as $inputKey => $profileKey) {
@@ -8357,10 +8341,7 @@ function handleSearchMembers($data)
     $filters = [
         'pet_type' => cleanNullableText($data['pet_type'] ?? '', 120),
         'breed' => cleanNullableText($data['breed'] ?? '', 160),
-        'gotra' => cleanNullableText($data['gotra'] ?? ($data['clan'] ?? ''), 160),
-        'native_village' => cleanNullableText($data['native_village'] ?? '', 160),
         'current_city' => cleanNullableText($data['current_city'] ?? ($data['city'] ?? ''), 160),
-        'age_group' => cleanNullableText($data['age_group'] ?? '', 80),
         'gender' => cleanNullableText($data['gender'] ?? '', 80),
     ];
 
@@ -8391,7 +8372,7 @@ function handleSearchMembers($data)
     $currentBreed = trim((string) ($currentProfile['breed'] ?? ''));
 
     $profileQuery = [
-        'select' => 'user_id,full_name,profile_photo_url,pet_type,breed,gotra,native_village,current_city,age_group,date_of_birth,gender,is_public',
+        'select' => 'user_id,full_name,profile_photo_url,pet_type,breed,current_city,date_of_birth,gender,is_public',
         'user_id' => 'neq.' . $userId,
         'order' => 'full_name.asc',
         'limit' => (string) min(400, max(($limit + $offset) * 4, 100)),
@@ -8405,14 +8386,14 @@ function handleSearchMembers($data)
 
     if ($queryText) {
         $safe = str_replace(['*', ',', '(', ')'], '', $queryText);
-        $profileQuery['or'] = '(full_name.ilike.*' . $safe . '*,current_city.ilike.*' . $safe . '*,native_village.ilike.*' . $safe . '*,gotra.ilike.*' . $safe . '*)';
+        $profileQuery['or'] = '(full_name.ilike.*' . $safe . '*,current_city.ilike.*' . $safe . '*)';
     }
 
     $profilesRes = supabaseRequest('GET', '/rest/v1/profiles', $profileQuery);
     
     // Resilience: Fallback if any columns fail (e.g. is_public not available)
     if (supabaseFailed($profilesRes)) {
-        $profileQuery['select'] = 'user_id,full_name,profile_photo_url,pet_type,breed,gotra,native_village,current_city,age_group,date_of_birth,gender';
+        $profileQuery['select'] = 'user_id,full_name,profile_photo_url,pet_type,breed,current_city,date_of_birth,gender';
         $profilesRes = supabaseRequest('GET', '/rest/v1/profiles', $profileQuery);
         if (supabaseFailed($profilesRes)) {
             sendSupabaseError("Failed to search members.", $profilesRes);
@@ -8491,10 +8472,7 @@ function handleSearchMembers($data)
             'photo' => $p['profile_photo_url'] ?? null,
             'pet_type' => $p['pet_type'] ?? null,
             'breed' => $p['breed'] ?? null,
-            'gotra' => $p['gotra'] ?? null,
-            'native_village' => $p['native_village'] ?? null,
             'current_city' => $p['current_city'] ?? null,
-            'age_group' => profileAgeGroup($p),
             'age' => $age,
             'gender' => $p['gender'] ?? null,
             'occupation' => $p['occupation'] ?? null,
@@ -8792,7 +8770,6 @@ function handleGetFriends($data)
             'photo' => $profile['profile_photo_url'] ?? null,
             'breed' => $profile['breed'] ?? null,
             'pet_type' => $profile['pet_type'] ?? null,
-            'age_group' => profileAgeGroup($profile),
             'date_of_birth' => $profile['date_of_birth'] ?? null,
             'gender' => $profile['gender'] ?? null,
             'occupation' => $profile['occupation'] ?? null,
@@ -9910,7 +9887,6 @@ function handleSavePlaydateProfile($data)
         'annual_income' => substr(trim((string) ($data['annual_income'] ?? '')), 0, 30),
         'current_city' => substr(trim((string) ($data['current_city'] ?? '')), 0, 100),
         'current_country' => substr(trim((string) ($data['current_country'] ?? '')), 0, 60),
-        'gotra' => substr(trim((string) ($data['gotra'] ?? '')), 0, 50),
         'rashi' => substr(trim((string) ($data['rashi'] ?? '')), 0, 30),
         'nakshatra' => substr(trim((string) ($data['nakshatra'] ?? '')), 0, 40),
         'mangalik' => substr(trim((string) ($data['mangalik'] ?? '')), 0, 20),
@@ -10253,7 +10229,6 @@ function handleGetPlaydatePool($data)
             'education' => $bio['highest_education'] ?? '',
             'occupation' => ($bio['occupation'] ?? '') !== '' ? ($bio['occupation'] ?? '') : ($p['occupation'] ?? ''),
             'income' => $bio['annual_income'] ?? '',
-            'gotra' => $bio['gotra'] ?? '',
             'rashi' => $bio['rashi'] ?? '',
             'nakshatra' => $bio['nakshatra'] ?? '',
             'mangalik' => $bio['mangalik'] ?? '',

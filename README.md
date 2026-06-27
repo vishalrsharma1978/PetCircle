@@ -12,7 +12,8 @@ This copy keeps the existing HTML, JavaScript, and PHP architecture, but retarge
 - Match-oriented connections for playdates, foster/adoption discovery, and pet-parent networking
 - Community event flows for walks, adoption drives, clinics, and meetup sessions
 - Pet-specific branding and onboarding copy under the PawCircle name
-- Backend aliases for `pet_type` and `pet_community` while preserving the original database fields
+- Completely purged legacy human-matrimony/astrology logic (gotra, native village, etc.)
+- Database natively migrated to use `pet_type` and `breed` instead of legacy columns
 
 ## Project Structure
 
@@ -20,8 +21,7 @@ This copy keeps the existing HTML, JavaScript, and PHP architecture, but retarge
 pet_community_proj/
 ├── pawcircle_frontend.html Main single-page frontend for PawCircle
 ├── pawcircle_api.php       PHP API layer backed by Supabase REST
-├── pawcircle_legacy.js     Legacy helper file
-├── pawcircle_schema.sql    Database schema used by the copied app
+├── sql_scripts/            Directory containing all database schema and data dumps
 ├── Dockerfile              Container build file
 ├── pawcircle_media_transcoder/ Optional video processing tools
 ├── img/                    Existing image assets from the copied project
@@ -32,15 +32,7 @@ pet_community_proj/
 
 ### Per-community feeds
 
-Posts are filtered by the existing `religion` and `community` columns, which PawCircle now treats as:
-
-- `religion` -> pet type
-- `community` -> community focus
-
-The copied backend also accepts these alias names:
-
-- `pet_type`
-- `pet_community`
+Posts are natively filtered by the `pet_type` and `breed` columns in the database. 
 
 ### Local groups
 
@@ -62,7 +54,7 @@ The original social connection model is reused as a lightweight pet match system
 
 ### Community events
 
-The copied app supports event creation and listing for:
+The app supports event creation and listing for:
 
 - adoption camps
 - vaccination drives
@@ -72,12 +64,12 @@ The copied app supports event creation and listing for:
 
 ## Backend Notes
 
-The underlying schema still stores taxonomy in the original fields:
+The backend has been fully updated and cleaned up from its original eSamaj origins.
+The underlying Supabase schema has been natively migrated:
+- `religion` has been renamed to `pet_type`
+- `community` has been renamed to `breed`
 
-- `religion`
-- `community`
-
-To reduce migration work, PawCircle maps pet-specific terms onto those existing columns. The copied backend now accepts both naming styles when handling signups and social data requests.
+All legacy astrology and matchmaking filters (`gotra`, `rashi`, `mangalik`, `native_village`, `age_group`) have been dropped from both the database and the API logic to prevent 500 server errors and maintain strict pet-domain focus.
 
 ## Running Locally
 
@@ -102,11 +94,10 @@ php -S localhost:8000
 Then open:
 
 ```text
-http://localhost:8000/pet_community_proj/pawcircle_frontend.html
+http://localhost:8000/pawcircle_frontend.html
 ```
 
 ## Suggested Next Steps
 
 1. Replace the remaining inherited image assets with actual pet-community artwork.
 2. Seed Supabase with pet-specific demo groups, events, and posts.
-3. If you want stricter naming parity, rename the inherited `religion` and `community` columns in a dedicated schema migration.

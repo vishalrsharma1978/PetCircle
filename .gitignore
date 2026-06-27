@@ -30,45 +30,29 @@ dist-ssr
 *.pem
 *.key
 service-role*.json
-tmp_script_*.js
 
-index1.html
-POSTS_REFINEMENT_PLAN.md
-prompt.md
-*s.md
-
-*.sql
-POSTS_REFINEMENT_PLAN.md
-.claude
+# Data and Schema dumps (we keep sql_scripts/schema.sql but ignore others if needed, though they are inside sql_scripts now)
+# We will not globally ignore *.sql so that schema files can be checked in.
+# Ignoring specific data dumps if they are generated locally:
+sql_scripts/data.sql
+sql_scripts/schema_dump_final.sql
 
 # powershells
 *.ps*
 
-*diff*.txt
-databasesecurityupdate.md
-*.md
-
-backend_api.php
-burrow-signup.html
-esamaj_frontend.html
-
-# python scripts
-*.py
-
-# Database
-*.sql
-
 # other
-*.md
 *.png
 *.txt
 
 # Temporary merge resolution files
 _merge_temp/
 
+# Graphify
 graphify-out/
 .graphifyignore
 
+# Patches
 *.patch
-scratch/
-scratch*
+
+*.md
+sql_scripts/

@@ -6851,7 +6851,7 @@ function normalizeEventPayload($data)
         'breed' => ($community = cleanPlainValue($data['community'] ?? '', 120)) === '' ? null : $community,
         'banner_url' => trim((string) ($data['banner_url'] ?? '')) ?: null,
         'recurrence_frequency' => $frequency,
-        'visibility' => $visibility,
+        
     ];
 }
 
@@ -6990,7 +6990,7 @@ function handleDeleteEvent($data)
 
 function handleGetEvents($data)
 {
-    $select = 'id,title,description,event_date,event_time,location,is_online,meeting_url,pet_type,breed,visibility,banner_url,created_by,created_at,updated_at';
+    $select = 'id,title,description,event_date,event_time,location,is_online,meeting_url,pet_type,breed,banner_url,created_by,created_at,updated_at';
     $query = [
         'select' => $select,
         'order' => 'event_date.asc,event_time.asc',
@@ -6999,28 +6999,6 @@ function handleGetEvents($data)
 
     $userId = cleanPlainValue($data['user_id'] ?? '', 80);
 
-    if (empty($data['event_id']) && empty($data['created_by'])) {
-        $community = cleanPlainValue($data['community'] ?? '', 120);
-        $religion = cleanPlainValue($data['religion'] ?? '', 80);
-        // Audience-visible events never include invite-only ones — those are
-        // only reachable by explicitly invited people (fetched separately).
-        $visibilityFilters = ['and(breed.is.null,pet_type.is.null)'];
-
-        if ($religion !== '') {
-            $visibilityFilters[] = 'and(breed.is.null,pet_type.eq.' . $religion . ')';
-        }
-
-        if ($community !== '') {
-            $filter = 'breed.eq.' . $community;
-            if ($religion !== '') {
-                $filter .= ',pet_type.eq.' . $religion;
-            }
-            $visibilityFilters[] = 'and(' . $filter . ')';
-        }
-
-        $query['or'] = '(' . implode(',', $visibilityFilters) . ')';
-        $query['visibility'] = 'neq.invite_only';
-    }
     if (!empty($data['event_id']))
         $query['id'] = 'eq.' . $data['event_id'];
     if (!empty($data['created_by']))

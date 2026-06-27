@@ -68,3 +68,7 @@ _merge_temp/
 
 graphify-out/
 .graphifyignore
+
+*.patch
+scratch/
+scratch*

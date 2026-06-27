@@ -6422,7 +6422,7 @@
                       style="transition: all 0.3s ease; transform-origin: 73px 104px;" />
                   </svg>
                 </div>
-                <input id="reg-password" type="password" required placeholder="Minimum 6 characters"
+                <input id="reg-password" type="password" required placeholder="Minimum 10 characters"
                   autocomplete="new-password" data-pw-toggle="1">
                 <button type="button" class="eye-toggle" id="eyeToggle" aria-label="Show password">
                   <svg id="eyeIcon" viewBox="0 0 24 24">
@@ -6432,7 +6432,7 @@
                   </svg>
                 </button>
               </div>
-              <p class="hint">Minimum 6 characters. Use letters, numbers, and a dash of personality.</p>
+              <p class="hint">Minimum 10 characters. Use letters, numbers, and a dash of personality.</p>
             </div>
 
             <button type="submit" class="submit-btn" id="signup-submit-btn">
@@ -8208,8 +8208,8 @@
           showError("signup", "Please fill in all fields.");
           return;
         }
-        if (password.length < 6) {
-          showError("signup", "Password must be at least 6 characters.");
+        if (password.length < 10) {
+          showError("signup", "Password must be at least 10 characters.");
           return;
         }
 

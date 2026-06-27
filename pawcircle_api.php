@@ -34,6 +34,39 @@ if (file_exists($envFile)) {
     }
 }
 
+function resolveCaBundlePath()
+{
+    $fromEnv = trim((string) (getenv('CA_BUNDLE_PATH') ?: ($_ENV['CA_BUNDLE_PATH'] ?? '')));
+    if ($fromEnv !== '' && is_file($fromEnv)) {
+        return $fromEnv;
+    }
+
+    $localBundle = __DIR__ . '/cacert.pem';
+    if (is_file($localBundle)) {
+        return $localBundle;
+    }
+
+    $iniBundle = trim((string) ini_get('curl.cainfo'));
+    if ($iniBundle !== '' && is_file($iniBundle)) {
+        return $iniBundle;
+    }
+
+    $iniOpenSsl = trim((string) ini_get('openssl.cafile'));
+    if ($iniOpenSsl !== '' && is_file($iniOpenSsl)) {
+        return $iniOpenSsl;
+    }
+
+    return '';
+}
+
+function applyCurlTlsOptions($ch)
+{
+    $caPath = resolveCaBundlePath();
+    if ($caPath !== '') {
+        curl_setopt($ch, CURLOPT_CAINFO, $caPath);
+    }
+}
+
 // Debug flag — when off (production), detailed Supabase/internal errors are logged
 // server-side and replaced with a generic message + request id for the client.
 define('PAWCIRCLE_DEBUG', in_array(strtolower((string) (getenv('PAWCIRCLE_DEBUG') ?: ($_ENV['PAWCIRCLE_DEBUG'] ?? ''))), ['1', 'true', 'yes', 'on'], true));
@@ -126,6 +159,7 @@ function supabaseRequest($method, $path, $query = [], $body = null, $extraHeader
     $ch = curl_init($endpoint);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+    applyCurlTlsOptions($ch);
 
     $defaultHeaders = [
         "apikey: {$secretKey}",
@@ -768,6 +802,7 @@ function supabaseAuthAdminRequest($method, $path, $body = null)
         ],
         CURLOPT_TIMEOUT => 15,
     ]);
+    applyCurlTlsOptions($ch);
 
     if ($body !== null) {
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
@@ -851,6 +886,7 @@ function getSupabaseAuthUserFromToken($accessToken)
         ],
         CURLOPT_TIMEOUT => 10,
     ]);
+    applyCurlTlsOptions($ch);
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -2914,9 +2950,9 @@ function finalizeSignup($payload, $plainPassword = '')
     }
 }
     function handleSignup($data) {
-        if (empty($data['pet_name']) || (empty($data['email']) && empty($data['mobile_number'])) || empty($data['password'])) {
+        if (empty($data['pet_name']) || empty($data['email']) || empty($data['password'])) {
             http_response_code(400);
-            echo json_encode(["status" => "error", "message" => "Pet name, email/phone, and password are required."]);
+            echo json_encode(["status" => "error", "message" => "Pet name, email, and password are required."]);
             return;
         }
 
@@ -2934,9 +2970,9 @@ function finalizeSignup($payload, $plainPassword = '')
             return;
         }
 
-        if (strlen($password) < 6) {
+        if (strlen($password) < 10) {
             http_response_code(400);
-            echo json_encode(["status" => "error", "message" => "Password must be at least 6 characters."]);
+            echo json_encode(["status" => "error", "message" => "Password must be at least 10 characters."]);
             return;
         }
 

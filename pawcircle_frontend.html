@@ -11402,10 +11402,14 @@
         currentUserObj.socialProfile.name,
       );
       applyCoverPhoto(currentUserObj.cover_photo_url || null);
-      document.getElementById("sidebar-profile-name").innerText =
-        currentUserObj.socialProfile.name;
-      document.getElementById("profile-modal-title-name").innerText =
-        currentUserObj.socialProfile.name;
+      const sidebarProfileName = document.getElementById("sidebar-profile-name");
+      if (sidebarProfileName) {
+        sidebarProfileName.innerText = currentUserObj.socialProfile.name;
+      }
+      const profileModalTitleName = document.getElementById("profile-modal-title-name");
+      if (profileModalTitleName) {
+        profileModalTitleName.innerText = currentUserObj.socialProfile.name;
+      }
 
 
       // Populate header with logo and greetings
@@ -17139,8 +17143,14 @@
 
         // Keep existing uploaded avatar (if any) instead of resetting to initials on Save
         renderProfileAvatar(currentUserObj.profile_photo_url, name);
-        document.getElementById("sidebar-profile-name").innerText = name;
-        document.getElementById("profile-modal-title-name").innerText = name;
+        const sidebarProfileNameUpdate = document.getElementById("sidebar-profile-name");
+        if (sidebarProfileNameUpdate) {
+          sidebarProfileNameUpdate.innerText = name;
+        }
+        const profileModalTitleNameUpdate = document.getElementById("profile-modal-title-name");
+        if (profileModalTitleNameUpdate) {
+          profileModalTitleNameUpdate.innerText = name;
+        }
         renderCoverProfileTags();
 
         persistCurrentSession(currentUserObj);

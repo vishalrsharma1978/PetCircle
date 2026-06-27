@@ -1210,6 +1210,13 @@ function clearSessionCookies()
 function getBearerToken()
 {
     $header = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+    
+    // Apache often strips the Authorization header by default
+    if (empty($header) && function_exists('apache_request_headers')) {
+        $headers = apache_request_headers();
+        $header = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+    }
+
     if (preg_match('/Bearer\s+(.+)/i', $header, $m)) {
         return trim($m[1]);
     }

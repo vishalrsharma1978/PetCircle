@@ -6909,87 +6909,7 @@
             Obituaries
           </button>
           <!-- PawCircle hidden for now (code retained). -->
-          <button onclick="switchView('view-content-hub')"
-            class="social-tab-item hidden px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
-            PawCircle
-          </button>
-
-          <div id="social-tab-indicator"
-            class="absolute bottom-0 h-0.5 bg-brand-500 transition-all duration-300 ease-out"></div>
-        </div>
-      </div>
-    </div>
-    <!-- ======= End Cover Photo Header ======= -->
-
-    <div id="main-content-area" class="max-w-7xl mx-auto w-full px-4 py-6 flex flex-col lg:flex-row gap-6 relative">
-      <!-- Left Sidebar -->
-      <aside id="social-left-sidebar" class="hidden lg:flex flex-col w-64 flex-shrink-0 self-start">
-        <div class="flex-1 min-h-0 space-y-1 pr-2">
-          <!-- Hidden compatibility nodes for legacy JS that reference sidebar profile -->
-          <span id="sidebar-profile-avatar" class="hidden"><span id="sidebar-profile-avatar-letter"></span><img
-              id="sidebar-profile-avatar-img" src="" alt="" /></span><span id="sidebar-profile-name"
-            class="hidden"></span>
-          <div class="h-4"></div>
-
-          <!-- Legacy left navigation kept in DOM (hidden); navigation now lives in the top tab strip & right-side Quick Links -->
-          <div class="flex flex-col gap-1 mt-4">
-            <button id="tab-btn-feed" onclick="switchSocialTab('feed')"
-              class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-              <div class="bg-amber-50 dark:bg-amber-900/30 text-amber-500 p-1.5 rounded-lg">
-                <i data-lucide="layout-list" class="w-5 h-5"></i>
-              </div>
-              Feed
-            </button>
-            <button id="tab-btn-friends" onclick="switchSocialTab('friends')"
-              class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-              <div class="bg-blue-50 dark:bg-blue-900/30 text-blue-500 p-1.5 rounded-lg">
-                <i data-lucide="users" class="w-5 h-5"></i>
-              </div>
-              Friends
-            </button>
-            <button id="tab-btn-connections" onclick="switchSocialTab('connections')"
-              class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-              <div class="bg-teal-50 dark:bg-teal-900/30 text-teal-500 p-1.5 rounded-lg">
-                <i data-lucide="link" class="w-5 h-5"></i>
-              </div>
-              Connections
-            </button>
-            <button id="tab-btn-groups" onclick="switchSocialTab('groups')"
-              class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-              <div class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 p-1.5 rounded-lg">
-                <i data-lucide="landmark" class="w-5 h-5"></i>
-              </div>
-              Groups
-            </button>
-            
-            <button id="tab-btn-rescue" onclick="switchSocialTab('rescue')"
-              class="social-tab-btn hidden w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-              <div class="bg-rose-50 dark:bg-rose-900/30 text-rose-500 p-1.5 rounded-lg shrink-0">
-                <i data-lucide="hand-heart" class="w-5 h-5"></i>
-              </div>
-              <span class="flex-1 text-left leading-tight whitespace-normal">Rescue Marketplace</span>
-            </button>
-            <button id="tab-btn-events" onclick="switchSocialTab('events')"
-              class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-              <div class="bg-purple-50 dark:bg-purple-900/30 text-purple-500 p-1.5 rounded-lg">
-                <i data-lucide="calendar-heart" class="w-5 h-5"></i>
-              </div>
-              Pet Community Events
-            </button>
-            <button id="tab-btn-galleries" onclick="switchSocialTab('galleries')"
-              class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-              <div class="bg-violet-50 dark:bg-violet-900/30 text-violet-500 p-1.5 rounded-lg">
-                <i data-lucide="images" class="w-5 h-5"></i>
-              </div>
-              Galleries
-            </button>
-            <button id="tab-btn-granth" onclick="switchSocialTab('granth')"
-              class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-              <div class="bg-amber-50 dark:bg-amber-900/30 text-amber-500 p-1.5 rounded-lg">
-                <i data-lucide="book-open-text" class="w-5 h-5"></i>
-              </div>
-              Dharmic Granth
-            </button>
+          
             <button id="tab-btn-festivals" onclick="switchSocialTab('festivals')"
               class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
               <div class="bg-orange-50 dark:bg-orange-900/30 text-orange-500 p-1.5 rounded-lg">
@@ -7017,407 +6937,7 @@
             <div class="hidden pt-4 pb-1 px-1 text-xs font-black uppercase tracking-wider text-gray-400">Explore</div>
 
             <!-- PawCircle hidden for now (code retained). -->
-            <button onclick="switchView('view-content-hub')"
-              class="social-tab-btn no-faith-hover hidden w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-              <div class="bg-red-50 dark:bg-red-900/30 text-red-500 p-1.5 rounded-lg">
-                <i data-lucide="tv-2" class="w-5 h-5"></i>
-              </div>
-              PawCircle
-            </button>
-          </div>
-
-        </div>
-      </aside>
-      <aside id="settings-left-sidebar" class="hidden lg:hidden flex-col w-72 flex-shrink-0 self-start">
-        <div class="space-y-2 pr-2">
-          <button type="button" onclick="switchSocialTab('feed')"
-            class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors">
-            <i data-lucide="arrow-left" class="w-5 h-5"></i>
-            Back to PawCircle
-          </button>
-          <div class="pt-6 pb-2 px-3 text-xs font-black uppercase tracking-wider text-gray-400">Account settings</div>
-          <button type="button" onclick="switchAccountSettingsSection('overview')" data-settings-section="overview"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="layout-grid" class="w-5 h-5 text-brand-500"></i> Overview</button>
-          <button type="button" onclick="switchAccountSettingsSection('personal')" data-settings-section="personal"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="id-card" class="w-5 h-5 text-blue-500"></i> Personal details</button>
-          <button type="button" onclick="switchAccountSettingsSection('security')" data-settings-section="security"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i> Security</button>
-          <button type="button" onclick="switchAccountSettingsSection('privacy')" data-settings-section="privacy"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="lock" class="w-5 h-5 text-green-600"></i> Privacy</button>
-          <button type="button" onclick="switchAccountSettingsSection('galleries')" data-settings-section="galleries"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="images" class="w-5 h-5 text-violet-500"></i> Events & galleries</button>
-          <button type="button" onclick="switchAccountSettingsSection('posts')" data-settings-section="posts"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="panel-top" class="w-5 h-5 text-pink-500"></i> Posts</button>
-          <button type="button" onclick="switchAccountSettingsSection('archived')" data-settings-section="archived"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="archive" class="w-5 h-5 text-amber-500"></i> Archived posts</button>
-          
-          <button type="button" onclick="switchAccountSettingsSection('pack')" data-settings-section="pack"
-            class="settings-side-btn no-faith-hover w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="network" class="w-5 h-5 text-teal-500"></i> Pack & pet_profile</button>
-          <button type="button" onclick="switchAccountSettingsSection('blocked')" data-settings-section="blocked"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="ban" class="w-5 h-5 text-gray-500"></i> Blocked accounts</button>
-          <button type="button" onclick="switchAccountSettingsSection('danger')" data-settings-section="danger"
-            class="settings-side-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-white dark:hover:bg-gray-900 font-semibold transition-colors"><i
-              data-lucide="triangle-alert" class="w-5 h-5"></i> Account actions</button>
-        </div>
-      </aside>
-
-      <!-- Main Feed -->
-      <div id="social-main-column" class="flex-1 max-w-2xl mx-auto space-y-6">
-        <!-- Tab: Feed -->
-        <div id="social-tab-feed" class="social-tab-content space-y-6">
-          <!-- Smart Filters & Suvichar -->
-          <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
-            <div id="feed-filters" class="nav-scroll flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-              <button onclick="setActiveFilter(this, 'All Posts')"
-                class="feed-filter-btn px-6 py-2 rounded-full bg-[#f97316] text-white text-base font-bold whitespace-nowrap shadow-md hover:bg-[#ea580c] transition-colors border-2 border-[#f97316]">All Posts</button>
-              <button onclick="setActiveFilter(this, 'My Pack')"
-                class="feed-filter-btn px-6 py-2 rounded-full bg-white text-gray-600 hover:text-[#f97316] hover:border-[#f97316] text-base font-semibold whitespace-nowrap shadow-sm border-2 border-gray-200 transition-all">My Pack</button>
-              <button onclick="setActiveFilter(this, 'Playdate')"
-                class="feed-filter-btn px-6 py-2 rounded-full bg-white text-gray-600 hover:text-[#f97316] hover:border-[#f97316] text-base font-semibold whitespace-nowrap shadow-sm border-2 border-gray-200 transition-all">Playdate</button>
-              <button onclick="setActiveFilter(this, 'Business')"
-                class="feed-filter-btn px-6 py-2 rounded-full bg-white text-gray-600 hover:text-[#f97316] hover:border-[#f97316] text-base font-semibold whitespace-nowrap shadow-sm border-2 border-gray-200 transition-all">Business</button>
-              <button onclick="setActiveFilter(this, 'Announcements')"
-                class="feed-filter-btn px-6 py-2 rounded-full bg-white text-gray-800 hover:bg-black hover:text-white text-base font-semibold whitespace-nowrap shadow-sm border-2 border-black transition-all">Announcements</button>
-            </div>
-            <button id="send-suvichar-btn" onclick="sendSuvichar()"
-              style="--no-faith-hover-bg:#f97316;--no-faith-hover-color:#ffffff;--no-faith-hover-border:#f97316;"
-              class="no-faith-hover bg-orange-500 text-white border border-orange-500 px-4 py-2 rounded-xl text-base font-bold shadow-md flex items-center gap-2 shadow-lg shadow-orange-500/20 transition-all transform hover:scale-105 whitespace-nowrap flex-shrink-0">
-              <i data-lucide="sun" class="w-4 h-4"></i> Send Suvichar
-            </button>
-          </div>
-
-          <!-- Create Post -->
-          <div id="feed-post-composer"
-            class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-3 sm:p-4">
-            <div class="flex gap-3 items-start">
-              <div
-                class="w-10 h-10 bg-brand-100 dark:bg-brand-900/50 rounded-full flex items-center justify-center text-brand-900 dark:text-brand-100 font-bold flex-shrink-0"
-                id="feed-create-avatar">
-                U
-              </div>
-              <div class="flex-1 min-w-0 space-y-3">
-                <textarea id="feed-post-input" rows="1" placeholder="What's happening in your community?"
-                  class="w-full resize-none rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-800 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400 dark:placeholder-gray-500"></textarea>
-                <div id="feed-post-expanded-fields" class="hidden space-y-3">
-                  <input type="text" id="feed-post-title" placeholder="Post title"
-                    class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm font-semibold text-gray-900 dark:text-gray-100 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
-                  <div class="space-y-2">
-                    <input type="text" id="feed-post-hashtags" placeholder="Type a hashtag and press Enter"
-                      onkeydown="handlePostHashtagKeydown(event, 'feed-post-hashtags', 'feed-post-hashtags-chips')"
-                      class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
-                    <div id="feed-post-hashtags-chips" class="flex flex-wrap gap-2"></div>
-                  </div>
-                  <div class="space-y-2">
-                    <input type="text" id="feed-post-event-input" list="feed-post-event-options"
-                      placeholder="Link an event"
-                      oninput="syncPostEventChoice('feed-post-event-input', 'feed-post-event-id')"
-                      onchange="syncPostEventChoice('feed-post-event-input', 'feed-post-event-id')"
-                      class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
-                    <input type="hidden" id="feed-post-event-id" />
-                    <datalist id="feed-post-event-options"></datalist>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="mt-3 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
-              <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                <span class="font-semibold">Post to</span>
-                <select id="feed-post-audience" onchange="updatePostAudienceHint()"
-                  class="min-w-0 flex-1 sm:w-52 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 dark:text-gray-100">
-                  <option value="community">My community/caste</option>
-                  <option value="religion">My religion (all sects)</option>
-                  <option value="global">Everyone (Public)</option>
-                  <option value="hide_extended">Hide from extended pack</option>
-                  <option value="outside_breed">Outside Breed only</option>
-                </select>
-              </label>
-              <div class="flex items-center justify-between gap-3 sm:justify-end">
-                <div id="feed-post-audience-hint" class="text-xs text-gray-500 dark:text-gray-400 sm:text-right"></div>
-                <button id="feed-post-expand-btn" type="button" onclick="togglePostComposerExpanded()"
-                  class="no-faith-hover inline-flex items-center gap-1.5 rounded-full border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
-                  <i data-lucide="sliders-horizontal" class="h-3.5 w-3.5"></i>
-                  More
-                </button>
-              </div>
-            </div>
-            <input type="file" id="feed-post-media-input" multiple
-              accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm" class="hidden"
-              onchange="handlePostMediaSelected(event)" />
-            <div id="feed-post-media-preview"
-              class="hidden mt-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/60 overflow-hidden">
-            </div>
-            <div id="feed-post-status" class="hidden mt-2 text-xs font-semibold text-gray-500 dark:text-gray-400"></div>
-            <div id="feed-post-expanded-actions"
-              class="hidden flex items-center justify-between mt-3 pt-3 border-t border-gray-50 dark:border-gray-800 px-2">
-              <div class="flex items-center gap-4">
-                <button type="button" onclick="openPostMediaPicker()"
-                  class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
-                  <i data-lucide="image" class="w-4 h-4 text-green-500"></i>
-                  Photo/Video
-                </button>
-                <button type="button" onclick="togglePostMediaUrlInput()"
-                  class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
-                  <i data-lucide="link" class="w-4 h-4 text-violet-500"></i>
-                  Media URL
-                </button>
-                <button onclick="
-                      openAddEventModal(new Date().toISOString().split('T')[0])
-                    "
-                  class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
-                  <i data-lucide="calendar" class="w-4 h-4 text-blue-500"></i>
-                  Event
-                </button>
-              </div>
-            </div>
-            <div id="feed-post-media-url-row" class="hidden mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
-              <input id="feed-post-media-url" type="url" inputmode="url" placeholder="https://example.com/image.jpg"
-                class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400">
-              <button type="button" onclick="addPostMediaUrl()"
-                class="no-faith-hover rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-2.5 text-base font-bold shadow-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">Add
-                URL</button>
-            </div>
-            <div class="mt-3 flex items-center justify-end gap-2">
-              <button id="feed-post-submit-btn" onclick="submitPost()"
-                class="faith-accent-btn text-white px-4 py-1.5 rounded-full text-base font-bold shadow-md shadow-sm transition-colors"
-                style="background: var(--faith-accent, #f59e0b)">
-                Post
-              </button>
-            </div>
-          </div>
-
-          <!-- Feed Highlights Container -->
-          <div id="social-feed-posts" class="space-y-6">
-            <!-- Posts will be injected here via JS -->
-          </div>
-        </div>
-
-        <!-- Tab: Post Detail -->
-        <div id="social-tab-post-detail" class="social-tab-content space-y-6 hidden">
-          <div id="post-detail-view"></div>
-        </div>
-
-        <!-- Tab: Friends -->
-        <div id="social-tab-friends" class="social-tab-content space-y-6 hidden">
-          <div
-            class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-8 text-center">
-            <i data-lucide="users" class="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4"></i>
-            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-              Your Friends
-            </h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm">
-              Connect with members of your community here.
-            </p>
-          </div>
-        </div>
-
-        <!-- Tab: Connections -->
-        <div id="social-tab-connections" class="social-tab-content space-y-6 hidden">
-          <!-- Header with gradient + live count -->
-          <div class="rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm">
-            <div class="p-6 sm:p-7 text-white"
-              style="background: linear-gradient(135deg, var(--faith-accent,#0d9488), color-mix(in srgb, var(--faith-accent,#0d9488) 55%, #111827));">
-              <div class="flex items-center justify-between gap-4 flex-wrap">
-                <div>
-                  <h3 class="text-2xl font-bold" style="font-family:'DM Serif Display'">Pet Community Connections</h3>
-                  <p class="text-sm text-white/80 mt-1">Reach out to coordinators, trustees and rescues across the
-                    samaj.</p>
-                </div>
-                <div class="text-right">
-                  <p class="text-3xl font-extrabold leading-none" id="connections-count">0</p>
-                  <p class="text-xs uppercase tracking-wider text-white/70 mt-1">connections</p>
-                </div>
-              </div>
-            </div>
-            <div class="bg-white dark:bg-gray-900 p-4 sm:p-5 space-y-4">
-              <div class="flex flex-col sm:flex-row gap-3">
-                <div class="relative flex-1">
-                  <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                  <input type="text" id="connections-search" oninput="renderConnections()"
-                    placeholder="Search by name, place or role..."
-                    class="w-full pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 dark:text-gray-200">
-                </div>
-                <input type="text" id="connections-place-filter" oninput="renderConnections()"
-                  placeholder="Filter by place..."
-                  class="w-full sm:w-48 px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 dark:text-gray-200">
-                <div class="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1 shrink-0">
-                  <button id="connections-view-grid" onclick="setConnectionsView('grid')"
-                    class="px-3 py-1.5 rounded-lg text-gray-500 dark:text-gray-400 transition-colors" title="Grid view">
-                    <i data-lucide="layout-grid" class="w-4 h-4"></i>
-                  </button>
-                  <button id="connections-view-list" onclick="setConnectionsView('list')"
-                    class="px-3 py-1.5 rounded-lg text-gray-500 dark:text-gray-400 transition-colors" title="List view">
-                    <i data-lucide="list" class="w-4 h-4"></i>
-                  </button>
-                </div>
-              </div>
-              <!-- Quick place chips -->
-              <div id="connections-chips" class="flex flex-wrap gap-2"></div>
-            </div>
-          </div>
-
-          <div id="connections-results"></div>
-        </div>
-
-        <!-- Tab: Groups (Official Packs + dynamic groups all rendered by renderGroups) -->
-        <div id="social-tab-groups" class="social-tab-content space-y-6 hidden"></div>
-
-        <!-- Tab: Live Events -->
-        <!-- Tab: Rescue Marketplace -->
-        <div id="social-tab-rescue" class="social-tab-content space-y-6 hidden"></div>
-
-        <!-- Tab: Events -->
-        <div id="social-tab-events" class="social-tab-content space-y-6 hidden">
-          <!-- Sub-tab switch: Events list / Analytics -->
-          <div class="flex items-center gap-2 border-b border-gray-100 dark:border-gray-800">
-            <button id="events-subtab-btn-list" onclick="setEventsSubTab('list')"
-              class="events-subtab-btn px-4 py-3 text-base font-bold shadow-md border-b-2 border-transparent text-gray-500 dark:text-gray-400 transition-colors">
-              <i data-lucide="calendar-heart" class="w-4 h-4 inline-block -mt-0.5"></i> Events
-            </button>
-            <button id="events-subtab-btn-analytics" onclick="setEventsSubTab('analytics')"
-              class="events-subtab-btn px-4 py-3 text-base font-bold shadow-md border-b-2 border-transparent text-gray-500 dark:text-gray-400 transition-colors">
-              <i data-lucide="bar-chart-3" class="w-4 h-4 inline-block -mt-0.5"></i> Analytics
-            </button>
-          </div>
-
-          <!-- Sub-panel: Events list -->
-          <div id="events-subtab-list" class="space-y-6">
-            <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200"
-                  style="font-family: &quot;DM Serif Display&quot;">
-                  Upcoming Events
-                </h3>
-                <p class="text-sm text-gray-500 mt-1">
-                  Discover religious and social events near you.
-                </p>
-              </div>
-              <button onclick="openAddEventModal(new Date().toISOString().split('T')[0])"
-                class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-base font-bold shadow-md flex items-center gap-2 shadow-lg shadow-brand-500/30 transition-colors w-full sm:w-auto justify-center">
-                <i data-lucide="plus" class="w-4 h-4"></i> Create Event
-              </button>
-            </div>
-
-            <div class="space-y-4" id="upcoming-events-container">
-            </div>
-
-            <div id="past-events-section" class="hidden space-y-4 pt-2">
-              <div class="flex items-center gap-3">
-                <h3 class="text-lg font-bold text-gray-700 dark:text-gray-300">Past events</h3>
-                <span class="h-px flex-1 bg-gray-100 dark:bg-gray-800"></span>
-              </div>
-              <div class="space-y-4" id="past-events-container"></div>
-            </div>
-
-            <div class="pt-2">
-              <button onclick="openAllEventsPanel()"
-                class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-base font-bold shadow-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                <i data-lucide="calendar-search" class="w-4 h-4"></i> View all events
-              </button>
-            </div>
-          </div>
-
-          <!-- Sub-panel: Analytics -->
-          <div id="events-subtab-analytics" class="hidden space-y-6">
-            <div>
-              <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200"
-                style="font-family: &quot;DM Serif Display&quot;">
-                Event Analytics
-              </h3>
-              <p class="text-sm text-gray-500 mt-1">Attendance trends and audience make-up, computed from your
-                community's real events.</p>
-            </div>
-            <div id="events-analytics-stats" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div
-                class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6">
-                <h4 class="text-base font-bold text-gray-800 dark:text-white mb-4">Attendance Over Time</h4>
-                <canvas id="chart-attendance" height="220"></canvas>
-              </div>
-              <div
-                class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6">
-                <h4 class="text-base font-bold text-gray-800 dark:text-white mb-4">Audience by Religion</h4>
-                <canvas id="chart-demographics" height="220"></canvas>
-              </div>
-            </div>
-            <p id="events-analytics-source" class="text-xs text-gray-400"></p>
-          </div>
-        </div>
-
-        <!-- Tab: All events (button-access only; not in the nav bar) -->
-        <div id="social-tab-all-events" class="social-tab-content space-y-6 hidden"></div>
-
-        <!-- Tab: Galleries -->
-        <div id="social-tab-galleries" class="social-tab-content space-y-6 hidden"></div>
-
-        <!-- Tab: Festivals -->
-        <div id="social-tab-festivals" class="social-tab-content space-y-6 hidden">
-          <div
-            class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-8 text-center">
-            <i data-lucide="party-popper" class="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4"></i>
-            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-              Festivals
-            </h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm">
-              Plan and celebrate upcoming festivals together.
-            </p>
-          </div>
-        </div>
-
-        <!-- Tab: Playdate -->
-        <div id="social-tab-playdate" class="social-tab-content space-y-4 hidden">
-          <!-- Rendered dynamically by renderPlaydate() -->
-        </div>
-
-        <!-- Playdate Profile Detail Modal -->
-        <div id="mm-detail-modal"
-          class="mm-detail-overlay fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4">
-          <div
-            class="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-[fadeSlideIn_0.3s_ease]">
-            <div id="mm-detail-content" class="flex-1 overflow-y-auto modal-scroll"></div>
-          </div>
-        </div>
-
-        <!-- Playdate Forward Modal -->
-        <div id="mm-forward-modal"
-          class="mm-detail-overlay fixed inset-0 z-[10000] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4">
-          <div
-            class="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-sm flex flex-col overflow-hidden animate-[fadeSlideIn_0.3s_ease]">
-            <div id="mm-forward-content"></div>
-          </div>
-        </div>
-
-        <!-- Tab: Obituaries -->
-        <div id="social-tab-obituaries" class="social-tab-content space-y-6 hidden"></div>
-
-        <!-- Tab: Dharmic Granth (pet service library) -->
-        <div id="social-tab-granth" class="social-tab-content space-y-6 hidden"></div>
-
-        <!-- Tab: Account Settings -->
-        <div id="social-tab-settings" class="social-tab-content space-y-6 hidden"></div>
-
-        <!-- Tab: Posts -->
-        <div id="social-tab-my-posts" class="social-tab-content space-y-6 hidden">
-          <div
-            class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-4 sm:p-6 mb-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-              <div>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Posts</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">View and manage all the posts you have shared
-                  with the community.</p>
-              </div>
-              <div class="flex items-center gap-3">
-                <button id="toggle-archived-posts-btn" onclick="toggleArchivedPosts()"
-                  class="px-4 py-2 text-base font-semibold border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors dark:text-gray-200 whitespace-nowrap">View
-                  Archived</button>
+            
               </div>
             </div>
 
@@ -8076,7 +7596,11 @@
               try {
                 populateMemberDashboard(demoUser);
                 initializeSocialFeed();
-                switchView("view-social-feed");
+                if (currentUserObj && currentUserObj.membership_applied) {
+                  switchView("view-social-feed");
+                } else {
+                  switchView("view-member-dashboard");
+                }
                 showToast("Offline demo mode. Backend calls are disabled.", "info");
                 btn.classList.remove("!bg-green-500", "!border-green-500");
                 btn.disabled = false;
@@ -8100,7 +7624,11 @@
                 try {
                   populateMemberDashboard(authData.user);
                   initializeSocialFeed();
+                if (currentUserObj && currentUserObj.membership_applied) {
                   switchView("view-social-feed");
+                } else {
+                  switchView("view-member-dashboard");
+                }
                   btn.classList.remove("!bg-green-500", "!border-green-500");
                   btn.disabled = false;
                   btn.innerText = "Sign in";
@@ -8135,7 +7663,11 @@
                 // Always land on the feed; the profile form is only opened on demand
                 // (via the bell notification or the dashboard's "Apply" prompt).
                 initializeSocialFeed();
-                switchView("view-social-feed");
+                if (currentUserObj && currentUserObj.membership_applied) {
+                  switchView("view-social-feed");
+                } else {
+                  switchView("view-member-dashboard");
+                }
                 btn.classList.remove("!bg-green-500", "!border-green-500");
                 btn.disabled = false;
                 btn.innerText = "Sign in";
@@ -8256,6 +7788,7 @@
           } else if (data.status === "success") {
             populateMemberDashboard(data.user, { openMembershipForm: true });
             initializeSocialFeed();
+            switchView("view-member-dashboard");
             document.getElementById("signup-step-1").reset();
           } else {
             showError(
@@ -8425,6 +7958,7 @@
             pendingVerifyPassword = "";
             populateMemberDashboard(finalUser, { openMembershipForm: true });
             initializeSocialFeed();
+            switchView("view-member-dashboard");
           } else {
             showError(
               "verify",
@@ -8714,7 +8248,7 @@
         const relEl = document.getElementById("s2-religion");
         if (relEl && user.religion) {
           relEl.value = user.religion;
-          updateCommunityOptions("s2-religion", "s2-community");
+          
           const commEl = document.getElementById("s2-community");
           const desired = (user.socialProfile && user.socialProfile.community) || user.community || "";
           if (commEl && desired) {
@@ -8813,7 +8347,7 @@
         const relEl = document.getElementById("s2-religion");
         if (relEl && user.religion) {
           relEl.value = user.religion;
-          updateCommunityOptions("s2-religion", "s2-community");
+          
         }
         const ageEl = document.getElementById("s4-age");
         const ageGroup = getUserAgeGroup(user);
@@ -8868,21 +8402,7 @@
                     <div data-phone-mount="s1-phone" data-phone-placeholder="98765 43210"></div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1.5">Religion <span class="text-red-500">*</span></label>
-                        <select id="s2-religion" onchange="updateCommunityOptions('s2-religion','s2-community')"
-                            class="block w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-300">
-                            <option value="">Select Religion...</option>
-                            <option ${user.religion === "Hindu" ? "selected" : ""}>Hindu</option>
-                            <option ${user.religion === "Muslim" ? "selected" : ""}>Muslim</option>
-                            <option ${user.religion === "Sikh" ? "selected" : ""}>Sikh</option>
-                            <option ${user.religion === "Christian" ? "selected" : ""}>Christian</option>
-                            <option ${user.religion === "Jain" ? "selected" : ""}>Jain</option>
-                            <option ${user.religion === "Buddhist" ? "selected" : ""}>Buddhist</option>
-                            <option ${user.religion === "Parsi" ? "selected" : ""}>Parsi</option>
-                            <option ${user.religion === "Other" ? "selected" : ""}>Other</option>
-                        </select>
-                    </div>
+                    
                     <div>
                         <label class="block text-xs font-semibold text-gray-700 mb-1.5">Pet Community / Caste <span class="text-red-500">*</span></label>
                         <select id="s2-community"
@@ -8998,21 +8518,7 @@
                 </div>
                 <div class="space-y-4">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 mb-1.5">Religion <span class="text-red-500">*</span></label>
-                            <select id="s2-religion" required onchange="updateCommunityOptions('s2-religion','s2-community')"
-                                class="block w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-300">
-                                <option value="">Select Religion...</option>
-                                <option ${user.religion === "Hindu" ? "selected" : ""}>Hindu</option>
-                                <option ${user.religion === "Muslim" ? "selected" : ""}>Muslim</option>
-                                <option ${user.religion === "Sikh" ? "selected" : ""}>Sikh</option>
-                                <option ${user.religion === "Christian" ? "selected" : ""}>Christian</option>
-                                <option ${user.religion === "Jain" ? "selected" : ""}>Jain</option>
-                                <option ${user.religion === "Buddhist" ? "selected" : ""}>Buddhist</option>
-                                <option ${user.religion === "Parsi" ? "selected" : ""}>Parsi</option>
-                                <option ${user.religion === "Other" ? "selected" : ""}>Other</option>
-                            </select>
-                        </div>
+                        
                         <div>
                             <label class="block text-xs font-semibold text-gray-700 mb-1.5">Pet Community / Caste <span class="text-red-500">*</span></label>
                             <select id="s2-community" required
@@ -10132,11 +9638,7 @@
 
       // Pre-fill step 2 community options if we're about to go to step 2
       if (currentStep === 1) {
-        setTimeout(() => {
-          const relEl = document.getElementById("s2-religion");
-          if (relEl && relEl.value)
-            updateCommunityOptions("s2-religion", "s2-community");
-        }, 50);
+        setTimeout(() => {}, 50);
       }
 
       document
@@ -10147,14 +9649,6 @@
         .getElementById(`step-panel-${currentStep}`)
         ?.classList.add("active");
       updateNav();
-
-      // After moving to step 2, set up community dropdown
-      if (currentStep === 2) {
-        const relEl = document.getElementById("s2-religion");
-        if (relEl && relEl.value)
-          updateCommunityOptions("s2-religion", "s2-community");
-      }
-
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
@@ -10304,7 +9798,7 @@
 
       // Show success state
       document.getElementById("membership-form-container").innerHTML = `
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
                     <div class="p-8 text-center">
                         <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
                             <i data-lucide="check-circle-2" class="w-8 h-8 text-green-500"></i>
@@ -10368,6 +9862,7 @@
       skillTags = [];
       consentChecks = { terms: false, privacy: false, accuracy: false };
       initializeSocialFeed();
+      switchView("view-member-dashboard");
       renderMembershipForm(currentUserObj);
       const container = document.getElementById("membership-form-container");
       if (container) container.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -10893,9 +10388,9 @@
       consentChecks = { terms: false, privacy: false, accuracy: false };
 
       const dashName = document.getElementById("dash-name");
-      if (dashName) dashName.innerText = user.name || "Member";
+      if (dashName) dashName.innerText = user.full_name || user.pet_name || user.parent_name || user.name || "Member";
       const dashNameTopbar = document.getElementById("dash-name-topbar");
-      if (dashNameTopbar) dashNameTopbar.innerText = user.name || "Member";
+      if (dashNameTopbar) dashNameTopbar.innerText = user.full_name || user.pet_name || user.parent_name || user.name || "Member";
 
       const greetings = {
         Hindu: "नमस्ते",
@@ -10935,11 +10430,11 @@
           ? getCircledLogo(logos[user.religion], user.religion)
           : "";
 
-      updateThemeBackgrounds(user.religion);
+      
 
       const dashBanner = document.getElementById("dash-banner");
       if (dashBanner) {
-        dashBanner.className = `bg-gradient-to-r ${getGradientClass(user.religion)} rounded-2xl p-6 mb-6 text-white shadow-lg relative overflow-hidden transition-all duration-500 hover:shadow-xl hover:scale-[1.01]`;
+        dashBanner.className = "bg-brand-500 dark:bg-brand-600 rounded-2xl p-6 mb-6 text-white shadow-lg relative overflow-hidden transition-all duration-500 hover:shadow-xl hover:scale-[1.01]";
       }
 
       // Expose faith accent for buttons that use var(--faith-accent) (e.g. Enter Pet Community Feed)
@@ -10953,7 +10448,7 @@
       if (user.membership_applied) {
         const membershipContainer = document.getElementById("membership-form-container");
         if (membershipContainer) membershipContainer.innerHTML = `
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
+                <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 text-center">
                     <div class="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3">
                         <i data-lucide="check-circle-2" class="w-7 h-7 text-green-500"></i>
                     </div>
@@ -10973,7 +10468,7 @@
           const s2rel = document.getElementById("s2-religion");
           if (s2rel && user.religion) {
             s2rel.value = user.religion;
-            updateCommunityOptions("s2-religion", "s2-community");
+            
             const s2Community = document.getElementById("s2-community");
             if (user.community && s2Community)
               s2Community.value = user.community;
@@ -11149,8 +10644,7 @@
       const cp = document.getElementById("cover-photo-pattern");
       if (!ci || !cp) return;
 
-      const hasSource =
-        src && src !== "null" && src !== "undefined" && String(src).trim();
+      const hasSource = src && src !== "null" && src !== "undefined" && String(src).trim();
       if (hasSource) {
         ci.src = src;
         ci.classList.remove("hidden");
@@ -11162,6 +10656,27 @@
         ci.classList.add("hidden");
         ci.style.display = "none";
         cp.classList.remove("hidden");
+        
+        let pType = "dog";
+        if (typeof currentUserObj !== 'undefined' && currentUserObj && currentUserObj.pet_type) {
+            pType = String(currentUserObj.pet_type).toLowerCase();
+        } else if (typeof authData !== 'undefined' && authData && authData.user && authData.user.pet_type) {
+            pType = String(authData.user.pet_type).toLowerCase();
+        }
+
+        let grad = 'repeating-linear-gradient(135deg, #f3f4f6, #f3f4f6 30px, #e5e7eb 30px, #e5e7eb 60px)';
+        if (pType.includes('dog')) {
+            grad = 'repeating-linear-gradient(135deg, #dbeafe, #dbeafe 30px, #bfdbfe 30px, #bfdbfe 60px)';
+        } else if (pType.includes('cat')) {
+            grad = 'repeating-linear-gradient(135deg, #fce7f3, #fce7f3 30px, #fbcfe8 30px, #fbcfe8 60px)';
+        } else if (pType.includes('bird')) {
+            grad = 'repeating-linear-gradient(135deg, #fef9c3, #fef9c3 30px, #fef08a 30px, #fef08a 60px)';
+        } else if (pType.includes('fish')) {
+            grad = 'repeating-linear-gradient(135deg, #ccfbf1, #ccfbf1 30px, #99f6e4 30px, #99f6e4 60px)';
+        } else if (pType.includes('rabbit') || pType.includes('bunny')) {
+            grad = 'repeating-linear-gradient(135deg, #ffedd5, #ffedd5 30px, #fed7aa 30px, #fed7aa 60px)';
+        }
+        cp.style.backgroundImage = grad;
       }
     }
 
@@ -11658,7 +11173,7 @@
       applyCoverPhoto(currentUserObj.cover_photo_url || null);
 
       // Setup styling
-      updateThemeBackgrounds(currentUserObj.religion);
+      
 
       renderUpcomingEvents();
 
@@ -17230,9 +16745,7 @@
 
         persistCurrentSession(currentUserObj);
 
-        if (typeof updateThemeBackgrounds === 'function') {
-          updateThemeBackgrounds(currentUserObj.religion || currentUserObj.socialProfile?.religion);
-        }
+        
 
         closeProfileModal();
       } finally {
@@ -26641,9 +26154,7 @@
 
       applyDarkModePreference(false);
 
-      if (typeof updateThemeBackgrounds === 'function') {
-        updateThemeBackgrounds(null);
-      }
+      
 
       // Clear dynamically set CSS variables for brand colors
       const style = document.documentElement.style;
@@ -35535,262 +35046,14 @@
     const chThumb = (color, text) => `https://placehold.co/400x225/${color}/ffffff?text=${encodeURIComponent(text)}`;
 
     // Each entry is tagged with a religion so the hub can show only the user's faith.
-    const CH_ALL_CONTENT = [
-      // Hindu
-      { id: 'h-v1', religion: 'Hindu', type: 'video', title: 'Bhagavad Gita Chapter 2 Discourse', speaker: 'Swami Sarvapriyananda', thumb: chThumb('f97316', 'Gita Ch.2'), src: CH_V + 'BigBuckBunny.mp4' },
-      { id: 'h-v2', religion: 'Hindu', type: 'video', trending: true, title: 'Ramayana Katha Sunderkand', speaker: 'Morari Bapu', thumb: chThumb('ea580c', 'Ram Katha'), src: CH_V + 'ElephantsDream.mp4' },
-      { id: 'h-a1', religion: 'Hindu', type: 'audio', title: 'Hanuman Chalisa', speaker: 'Hari Om Sharan', thumb: chThumb('f97316', 'Chalisa'), src: CH_A + '1.mp3' },
-      { id: 'h-a2', religion: 'Hindu', type: 'audio', trending: true, title: 'Om Namah Shivaya Dhun', speaker: 'Anuradha Paudwal', thumb: chThumb('ea580c', 'Shiv Dhun'), src: CH_A + '2.mp3' },
-
-      // Muslim
-      { id: 'm-v1', religion: 'Muslim', type: 'video', title: 'Juma Khutbah on Inner Peace', speaker: 'Sheikh Omar Suleiman', thumb: chThumb('10b981', 'Khutbah'), src: CH_V + 'ForBiggerBlazes.mp4' },
-      { id: 'm-v2', religion: 'Muslim', type: 'video', trending: true, title: 'Seerah of the Prophet', speaker: 'Mufti Menk', thumb: chThumb('059669', 'Seerah'), src: CH_V + 'ForBiggerEscapes.mp4' },
-      { id: 'm-a1', religion: 'Muslim', type: 'audio', title: 'Surah Al-Rahman Recitation', speaker: 'Sheikh Mishary Rashid', thumb: chThumb('10b981', 'Tilawat'), src: CH_A + '3.mp3' },
-      { id: 'm-a2', religion: 'Muslim', type: 'audio', trending: true, title: 'Surah Yaseen', speaker: 'Sheikh Sudais', thumb: chThumb('059669', 'Yaseen'), src: CH_A + '4.mp3' },
-
-      // Sikh
-      { id: 's-v1', religion: 'Sikh', type: 'video', title: 'Guru Granth Sahib Katha', speaker: 'Giani Pinderpal Singh', thumb: chThumb('3b82f6', 'Katha'), src: CH_V + 'ForBiggerFun.mp4' },
-      { id: 's-v2', religion: 'Sikh', type: 'video', trending: true, title: 'Sakhi of Guru Nanak Dev Ji', speaker: 'Bhai Sahib', thumb: chThumb('2563eb', 'Sakhi'), src: CH_V + 'ForBiggerJoyrides.mp4' },
-      { id: 's-a1', religion: 'Sikh', type: 'audio', title: 'Waheguru Simran', speaker: 'Bhai Harjinder Singh', thumb: chThumb('3b82f6', 'Simran'), src: CH_A + '5.mp3' },
-      { id: 's-a2', religion: 'Sikh', type: 'audio', trending: true, title: 'Japji Sahib Path', speaker: 'Bhai Gurpreet Singh', thumb: chThumb('2563eb', 'Japji'), src: CH_A + '6.mp3' },
-
-      // Christian
-      { id: 'c-v1', religion: 'Christian', type: 'video', title: 'Sunday Homily on Love and Forgiveness', speaker: 'Fr. Mike Schmitz', thumb: chThumb('8b5cf6', 'Homily'), src: CH_V + 'ForBiggerMeltdowns.mp4' },
-      { id: 'c-v2', religion: 'Christian', type: 'video', trending: true, title: 'The Sermon on the Mount', speaker: 'Pastor John', thumb: chThumb('7c3aed', 'Sermon'), src: CH_V + 'SubaruOutbackOnStreetAndDirt.mp4' },
-      { id: 'c-a1', religion: 'Christian', type: 'audio', title: 'Amazing Grace Choir', speaker: 'Brooklyn Tabernacle Choir', thumb: chThumb('8b5cf6', 'Hymn'), src: CH_A + '7.mp3' },
-      { id: 'c-a2', religion: 'Christian', type: 'audio', trending: true, title: 'How Great Thou Art', speaker: 'Pet Community Choir', thumb: chThumb('7c3aed', 'Worship'), src: CH_A + '8.mp3' },
-
-      // Buddhist
-      { id: 'b-v1', religion: 'Buddhist', type: 'video', title: 'Buddha Dhamma Talk', speaker: 'Ajahn Brahm', thumb: chThumb('f59e0b', 'Dhamma'), src: CH_V + 'TearsOfSteel.mp4' },
-      { id: 'b-v2', religion: 'Buddhist', type: 'video', trending: true, title: 'Mindfulness and the Four Noble Truths', speaker: 'Thich Nhat Hanh', thumb: chThumb('d97706', 'Mindfulness'), src: CH_V + 'VolkswagenGTIReview.mp4' },
-      { id: 'b-a1', religion: 'Buddhist', type: 'audio', title: 'Metta Meditation Chant', speaker: 'Imee Ooi', thumb: chThumb('f59e0b', 'Metta'), src: CH_A + '9.mp3' },
-      { id: 'b-a2', religion: 'Buddhist', type: 'audio', trending: true, title: 'Heart Sutra Recitation', speaker: 'Sangha', thumb: chThumb('d97706', 'Sutra'), src: CH_A + '10.mp3' },
-
-      // Jain
-      { id: 'j-v1', religion: 'Jain', type: 'video', title: 'Mahavir Jayanti Pravachan', speaker: 'Muni Tarun Sagar Ji', thumb: chThumb('ef4444', 'Mahavir'), src: CH_V + 'WeAreGoingOnBullrun.mp4' },
-      { id: 'j-v2', religion: 'Jain', type: 'video', trending: true, title: 'Paryushana and the Path of Ahimsa', speaker: 'Acharya Vidyasagar', thumb: chThumb('dc2626', 'Paryushana'), src: CH_V + 'WhatCarCanYouGetForAGrand.mp4' },
-      { id: 'j-a1', religion: 'Jain', type: 'audio', title: 'Navkar Mantra', speaker: 'Stavan Pack', thumb: chThumb('ef4444', 'Navkar'), src: CH_A + '11.mp3' },
-      { id: 'j-a2', religion: 'Jain', type: 'audio', trending: true, title: 'Bhaktamar Stotra', speaker: 'Pandit Ji', thumb: chThumb('dc2626', 'Stotra'), src: CH_A + '12.mp3' },
-
-      // Parsi
-      { id: 'p-v1', religion: 'Parsi', type: 'video', title: 'Zarathushtra and the Gathas Explained', speaker: 'Ervad Dr. Ramiyar', thumb: chThumb('e04848', 'Gathas'), src: CH_V + 'BigBuckBunny.mp4' },
-      { id: 'p-a1', religion: 'Parsi', type: 'audio', title: 'Ashem Vohu Prayer', speaker: 'Mobed', thumb: chThumb('e04848', 'Prayer'), src: CH_A + '13.mp3' },
-      { id: 'p-a2', religion: 'Parsi', type: 'audio', trending: true, title: 'Yatha Ahu Vairyo', speaker: 'Mobed', thumb: chThumb('b91c1c', 'Yatha'), src: CH_A + '14.mp3' },
-    ];
+    
 
     // Curated devotional YouTube channels that run live broadcasts. We embed each
     // channel's *current* live stream via YouTube's keyless endpoint:
     //   https://www.youtube.com/embed/live_stream?channel=<CHANNEL_ID>
     // YouTube automatically surfaces whatever that channel is streaming live right
     // now (and shows an offline state otherwise) — no API key or quota required.
-    const CH_LIVE_CHANNELS = [
-      { religion: 'Hindu', name: 'Aastha TV', desc: 'Bhajans, aarti & live pawcircle', channelId: 'UCRUAdVm9ZOF4JheOd8qIQHA', accent: '#f97316' },
-      { religion: 'Hindu', name: 'Sanskar TV', desc: 'Devotional & satsang, 24/7', channelId: 'UCT_QwW7Tbew5qrYNb2auqAQ', accent: '#ea580c' },
-      { religion: 'Hindu', name: 'Satsang', desc: 'Spiritual discourses', channelId: 'UCJeQx6mAyNdPUc9sJA866Xw', accent: '#d97706' },
-      { religion: 'Sikh', name: 'SGPC Sri Amritsar', desc: 'Live Gurbani Kirtan — Sri Harmandir Sahib', channelId: 'UCYn6UEtQ771a_OWSiNBoG8w', accent: '#2563eb' },
-      { religion: 'Muslim', name: 'Makkah Live TV', desc: 'Quran recitation from Makkah', channelId: 'UC04RHDai67rTJ-MX8Dq2CqA', accent: '#10b981' },
-      { religion: 'Christian', name: 'EWTN', desc: 'Live Catholic Mass & devotions', channelId: 'UCijDos-LUTh9RQvSCMQqN6Q', accent: '#8b5cf6' },
-      { religion: 'Christian', name: 'Daily TV Mass', desc: 'Daily Catholic Mass', channelId: 'UCi6JtCVy4XKu4BSG-AE2chg', accent: '#7c3aed' },
-      { religion: 'Buddhist', name: 'Plum Village', desc: 'Dharma talks & guided meditation', channelId: 'UCcv7KJIAsiddB2YRegvrF7g', accent: '#f59e0b' },
-      { religion: 'Jain', name: 'Paras Channel', desc: 'Jain bhakti, stavan & pawcircle', channelId: 'UC_CSVqktYBaCMSLrmDNyGxA', accent: '#ef4444' },
-    ];
-
-    // Resolve the religion whose content we should show.
-    function chUserReligion() {
-      const r = currentUserObj?.religion || currentUserObj?.socialProfile?.religion || '';
-      const known = ['Hindu', 'Muslim', 'Sikh', 'Christian', 'Buddhist', 'Jain', 'Parsi'];
-      return known.includes(r) ? r : '';
-    }
-
-    // The active, religion-filtered content list (falls back to all when religion unknown).
-    function chVisibleContent() {
-      const rel = chUserReligion();
-      return rel ? CH_ALL_CONTENT.filter(i => i.religion === rel) : CH_ALL_CONTENT;
-    }
-
-    function renderContentHub() {
-      // Mirror the user's faith accent onto the hub.
-      if (typeof getFaithAccentColor === 'function') {
-        document.documentElement.style.setProperty('--faith-accent', getFaithAccentColor(currentUserObj?.religion));
-      }
-      const rel = chUserReligion();
-      const subtitle = document.getElementById('ch-subtitle');
-      if (subtitle) subtitle.textContent = rel
-        ? `Live darshan, kirtan & pawcircle for the ${rel} community`
-        : 'Live darshan, kirtan & pawcircle from across faiths';
-
-      // The user's-faith channels are featured; the rest are offered to explore.
-      const mine = rel ? CH_LIVE_CHANNELS.filter(c => c.religion === rel) : [];
-      const featured = mine.length ? mine : CH_LIVE_CHANNELS.slice();
-      const explore = CH_LIVE_CHANNELS.filter(c => !featured.includes(c));
-
-      // Hero wiring
-      const heroRel = document.getElementById('ch-hero-rel');
-      if (heroRel) heroRel.textContent = rel ? `for the ${rel} community` : 'every day';
-      const heroCount = document.getElementById('ch-hero-count');
-      if (heroCount) heroCount.textContent = String(CH_LIVE_CHANNELS.length);
-      const hero = document.getElementById('ch-hero');
-      if (hero) hero.classList.remove('hidden');
-
-      chFeaturedChannelId = featured[0]?.channelId || null;
-      renderCHFeatured('ch-featured-slot', featured);
-      renderCHRow('ch-row-video', explore);
-
-      // Toggle section visibility / empty state
-      const toggle = (secId, has) => { const el = document.getElementById(secId); if (el) el.classList.toggle('hidden', !has); };
-      toggle('ch-section-featured', featured.length);
-      toggle('ch-section-video', explore.length);
-      toggle('ch-section-audio', false);   // audio/trending replaced by live channels
-      toggle('ch-section-trending', false);
-      const empty = document.getElementById('ch-empty-state');
-      if (empty) empty.classList.toggle('hidden', CH_LIVE_CHANNELS.length > 0);
-
-      if (window.lucide) lucide.createIcons();
-    }
-
-    let chFeaturedChannelId = null;
-    function chPlayFeatured() {
-      const ch = CH_LIVE_CHANNELS.find(c => c.channelId === chFeaturedChannelId) || CH_LIVE_CHANNELS[0];
-      if (ch) chPlayChannel(ch.channelId, ch.name, ch.desc);
-    }
-
-    // Keyless gradient art for a live channel card (no external thumbnail needed).
-    function chChannelArt(ch) {
-      const a = ch.accent || 'var(--faith-accent,#e04848)';
-      return `<div class="ch-thumb-media" style="background:linear-gradient(135deg, ${a} 0%, color-mix(in srgb, ${a} 55%, #1a1a1a) 100%); display:flex; align-items:center; justify-content:center;">
-          <span class="ch-thumb-tag">${escapeHtml(ch.religion)}</span>
-          <span class="ch-type-pill" style="background:#dc2626;"><span style="width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block"></span> LIVE</span>
-          <i data-lucide="radio-tower" style="width:38px;height:38px;color:rgba(255,255,255,.92)"></i>
-          <div class="ch-play-overlay"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-        </div>`;
-    }
-
-    // Builds a safe onclick string (single-quoted JS args inside a double-quoted attribute).
-    function chChannelOnclick(ch) {
-      const esc = (s) => String(s).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-      return `chPlayChannel('${esc(ch.channelId)}', '${esc(ch.name)}', '${esc(ch.desc)}')`;
-    }
-
-    function renderCHRow(containerId, channels) {
-      const el = document.getElementById(containerId);
-      if (!el) return;
-      el.innerHTML = channels.map(ch => `
-        <div class="ch-thumb" onclick="${chChannelOnclick(ch)}">
-          ${chChannelArt(ch)}
-          <div class="ch-thumb-label">
-            <div class="truncate">${escapeHtml(ch.name)}</div>
-            <div class="ch-thumb-sub truncate"><i data-lucide="radio" class="w-3 h-3"></i> ${escapeHtml(ch.desc)}</div>
-          </div>
-        </div>`).join('');
-    }
-
-    function renderCHFeatured(containerId, channels) {
-      const el = document.getElementById(containerId);
-      if (!el) return;
-      el.innerHTML = channels.map(ch => {
-        const a = ch.accent || 'var(--faith-accent,#e04848)';
-        return `<div class="ch-featured" onclick="${chChannelOnclick(ch)}" style="background:linear-gradient(135deg, ${a} 0%, color-mix(in srgb, ${a} 50%, #111) 100%);">
-          <div class="ch-featured-scrim">
-            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-black uppercase mb-2"><span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> Live</span>
-            <h4 class="font-bold text-lg leading-snug">${escapeHtml(ch.name)}</h4>
-            <p class="text-sm mt-1" style="color: rgba(255,255,255,.85)">${escapeHtml(ch.desc)}</p>
-            <span class="mt-3 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white text-gray-900 text-xs font-bold">
-              <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i> Watch live
-            </span>
-          </div>
-        </div>`;
-      }).join('');
-    }
-
-    // Embeds a channel's current live broadcast via YouTube's keyless live_stream endpoint.
-    function chPlayChannel(channelId, name, desc) {
-      const section = document.getElementById('ch-player-section');
-      const ytWrap = document.getElementById('ch-yt-wrap');
-      const yt = document.getElementById('ch-yt-player');
-      const video = document.getElementById('ch-video-player');
-      const audio = document.getElementById('ch-audio-player');
-      const controls = document.getElementById('ch-custom-controls');
-      const liveBadge = document.getElementById('ch-live-badge');
-      if (!section) return;
-
-      // Stop any native sample players, swap in the YouTube live embed.
-      if (video) { try { video.pause(); } catch (e) { } video.style.display = 'none'; video.removeAttribute('src'); }
-      if (audio) { try { audio.pause(); } catch (e) { } audio.style.display = 'none'; audio.removeAttribute('src'); }
-      if (controls) controls.style.display = 'none';
-      if (ytWrap) ytWrap.style.display = 'block';
-      if (yt) yt.src = `https://www.youtube.com/embed/live_stream?channel=${encodeURIComponent(channelId)}&autoplay=1&rel=0`;
-
-      const titleEl = document.getElementById('ch-now-playing-title');
-      const subEl = document.getElementById('ch-now-playing-sub');
-      if (titleEl) titleEl.textContent = name || 'Live stream';
-      if (subEl) subEl.textContent = desc || '';
-      if (liveBadge) { liveBadge.classList.remove('hidden'); liveBadge.classList.add('inline-flex'); }
-
-      section.classList.remove('hidden');
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    function chPlay(id) {
-      const item = CH_ALL_CONTENT.find(i => i.id === id);
-      if (!item) return;
-      const rowId = item.type === 'audio' ? 'ch-row-audio' : 'ch-row-video';
-
-      const isAudio = rowId === 'ch-row-audio' || !!item.isAudio;
-      const section = document.getElementById('ch-player-section');
-      const video = document.getElementById('ch-video-player');
-      const audio = document.getElementById('ch-audio-player');
-      const controls = document.getElementById('ch-custom-controls');
-
-      document.getElementById('ch-now-playing-title').textContent = item.title;
-      document.getElementById('ch-now-playing-sub').textContent = item.speaker;
-
-      if (isAudio) {
-        video.style.display = 'none'; controls.style.display = 'none';
-        audio.style.display = 'block';
-        audio.src = item.src || '';
-        audio.play().catch(() => { });
-      } else {
-        audio.style.display = 'none';
-        video.style.display = 'block'; controls.style.display = 'flex';
-        video.src = item.src || '';
-        video.play().catch(() => { });
-        chBindVideoEvents();
-      }
-
-      section.classList.remove('hidden');
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    function chBindVideoEvents() {
-      const video = document.getElementById('ch-video-player');
-      const fill = document.getElementById('ch-progress-fill');
-      const time = document.getElementById('ch-time-display');
-      if (!video) return;
-
-      video.ontimeupdate = () => {
-        if (!video.duration) return;
-        fill.style.width = (video.currentTime / video.duration * 100) + '%';
-        time.textContent = chFmtTime(video.currentTime) + ' / ' + chFmtTime(video.duration);
-      };
-    }
-
-    function chFmtTime(s) {
-      const m = Math.floor(s / 60), sec = Math.floor(s % 60);
-      return `${m}:${String(sec).padStart(2, '0')}`;
-    }
-
-    function chTogglePlay() {
-      const video = document.getElementById('ch-video-player');
-      const btn = document.getElementById('ch-play-btn');
-      if (!video) return;
-      if (video.paused) {
-        video.play();
-        btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-      } else {
-        video.pause();
-        btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor"><path d="M8 5v14l11-7z"/></svg>';
-      }
-    }
+    
 
     function chSeek(e) {
       const video = document.getElementById('ch-video-player');
@@ -35820,52 +35083,7 @@
   </script>
 
   <!-- ==================== CONTENT HUB ==================== -->
-  <div id="view-content-hub" class="view-section min-h-screen flex-col w-full">
-    <!-- Header bar (theme-aware, faith-accented) -->
-    <div class="px-6 py-4 flex items-center justify-between sticky top-0 z-50 backdrop-blur-sm"
-      style="background: color-mix(in srgb, var(--faith-accent,#e04848) 12%, var(--ch-bg)); border-bottom: 1px solid var(--ch-border);">
-      <div class="flex items-center gap-3">
-        <span class="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0"
-          style="background: var(--faith-accent,#e04848)">
-          <i data-lucide="tv-2" class="w-5 h-5"></i>
-        </span>
-        <div>
-          <h2 class="font-bold text-lg leading-tight" style="font-family:'Poppins',sans-serif; color: var(--ch-text)">
-            PawCircle</h2>
-          <p class="text-xs" id="ch-subtitle" style="color: var(--ch-subtext)">Discourses, kirtans &amp; spiritual
-            content</p>
-        </div>
-      </div>
-      <button onclick="switchView('view-social-feed')"
-        class="no-faith-hover flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-        style="background: var(--faith-accent,#e04848); color:#fff;">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
-      </button>
-    </div>
-
-    <div class="px-6 py-6 space-y-10 min-h-screen" style="background: var(--ch-bg)">
-
-      <!-- Hero banner -->
-      <div id="ch-hero" class="ch-hero">
-        <span class="ch-hero-eyebrow"><i data-lucide="sparkles" class="w-3 h-3"></i> Spiritual Streaming</span>
-        <h2 class="mt-4 text-3xl sm:text-4xl font-black leading-tight" style="font-family:'DM Serif Display', serif;">
-          Nourish your soul, <span id="ch-hero-rel">every day</span>.
-        </h2>
-        <p class="mt-2 text-sm sm:text-base max-w-xl" style="color: rgba(255,255,255,.85)">
-          Stream discourses, kirtans, bhajans and sacred recitations curated for your community — anytime, anywhere.
-        </p>
-        <div class="mt-5 flex flex-wrap items-center gap-3">
-          <button id="ch-hero-cta" onclick="chPlayFeatured()"
-            class="no-faith-hover inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-gray-900 text-base font-bold shadow-md shadow-lg hover:scale-[1.03] transition-transform">
-            <i data-lucide="play" class="w-4 h-4 fill-current"></i> Start watching
-          </button>
-          <span class="inline-flex items-center gap-2 text-xs font-semibold" style="color: rgba(255,255,255,.85)">
-            <i data-lucide="library" class="w-4 h-4"></i> <span id="ch-hero-count">0</span> pieces of content
-          </span>
-        </div>
-      </div>
-
-      <!-- Active player -->
+  <!-- Active player -->
       <div id="ch-player-section" class="max-w-3xl mx-auto hidden">
         <div class="ch-player-wrap mb-3">
           <!-- YouTube live embed -->

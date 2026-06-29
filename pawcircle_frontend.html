@@ -5908,7 +5908,7 @@
         <div class="mb-8 text-center">
           <div
             class="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-sm mb-4 transition-colors duration-500"
-            style="background: var(--login-accent);">
+            style="background-color: var(--login-accent);">
             <i data-lucide="users" class="w-7 h-7 text-white"></i>
           </div>
           <h3 class="text-3xl font-bold text-gray-900" style="font-family: 'DM Serif Display'">Welcome back</h3>
@@ -5984,8 +5984,8 @@
           </div>
 
           <button type="submit" id="public-submit-btn"
-            class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-base font-bold shadow-md text-white transition-all hover:-translate-y-0.5"
-            style="background: var(--login-accent); box-shadow: 0 4px 14px 0 rgba(0,0,0,0.1);">
+            class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-base font-bold shadow-md text-white transition-all hover:-translate-y-0.5 duration-500"
+            style="background-color: var(--login-accent); box-shadow: 0 4px 14px 0 rgba(0,0,0,0.1);">
             Sign in
           </button>
         </form>
@@ -36294,19 +36294,33 @@ function mountMascot(containerId, passwordId, toggleId, nameId, petType) {
     return;
   }
 
-  // Inject SVG
-  container.innerHTML = mascotData.svg;
-
-  // Build config
-  var config = Object.assign({
-    mascotId: containerId,
-    passwordId: passwordId,
-    eyeToggleId: toggleId,
-    nameId: nameId
-  }, mascotData.config);
-
-  // Initialize and store
-  currentMascotInstances[containerId] = initPetMascot(config);
+  // Inject SVG with a smooth transition if already mounted
+  if (container.innerHTML.trim() !== '') {
+    container.style.transition = 'opacity 0.25s ease-out';
+    container.style.opacity = '0';
+    setTimeout(function() {
+      container.innerHTML = mascotData.svg;
+      var config = Object.assign({
+        mascotId: containerId,
+        passwordId: passwordId,
+        eyeToggleId: toggleId,
+        nameId: nameId
+      }, mascotData.config);
+      currentMascotInstances[containerId] = initPetMascot(config);
+      
+      container.style.transition = 'opacity 0.25s ease-in';
+      container.style.opacity = '1';
+    }, 250);
+  } else {
+    container.innerHTML = mascotData.svg;
+    var config = Object.assign({
+      mascotId: containerId,
+      passwordId: passwordId,
+      eyeToggleId: toggleId,
+      nameId: nameId
+    }, mascotData.config);
+    currentMascotInstances[containerId] = initPetMascot(config);
+  }
 }
 
     // Setup default mascots

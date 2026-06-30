@@ -5814,16 +5814,17 @@
   <!-- ==================== PUBLIC LOGIN ==================== -->
 
   <div id="view-public-login"
-    class="view-section active h-[100dvh] max-h-[100dvh] overflow-hidden flex flex-col lg:flex-row items-stretch w-full">
+    class="view-section active h-[100dvh] max-h-[100dvh] overflow-hidden flex flex-col lg:flex-row items-stretch w-full"
+    style="--login-accent: #f97316;">
 
     <!-- ── LEFT PANE: Feature Showcase & Feed ────────────────────────────── -->
     <div id="lp-left-pane"
       class="w-full lg:w-1/2 h-full max-h-[100dvh] flex flex-col p-4 sm:p-5 lg:p-6 overflow-hidden overflow-x-hidden no-scrollbar relative"
-      style="background:linear-gradient(135deg,#fffbeb 0%,#f0fdf4 55%,#ecfeff 100%); transition:background 0.8s ease">
+      style="background:linear-gradient(160deg, color-mix(in srgb, var(--login-accent) 32%, #ffffff) 0%, color-mix(in srgb, var(--login-accent) 22%, #f8fafc) 100%); transition:background 0.5s ease, --login-accent 0.5s ease">
 
       <!-- Trailing Paws Background (from signup) -->
       <section class="den" id="login-den" aria-hidden="true"
-        style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; opacity: 0.7; z-index: 0;">
+        style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; opacity: 0; z-index: 0;">
         <svg class="trail" viewBox="0 0 480 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"
           xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 100%; height: 100%;">
           <path id="loginTrailPath"
@@ -5864,7 +5865,7 @@
           <i data-lucide="paw-print" class="w-2.5 h-2.5 text-violet-700 absolute right-1.5 top-1.5"></i>
         </div>
         <div>
-          <div class="text-2xl font-bold tracking-tight text-gray-900 leading-tight"
+          <div class="text-2xl font-bold tracking-tight text-black leading-tight"
             style="font-family: 'DM Serif Display'">PawCircle</div>
           <div class="text-[11px] font-black text-amber-500 tracking-[0.2em] uppercase">Pet Breed</div>
         </div>
@@ -5884,10 +5885,10 @@
       <div id="public-theme-showcase" class="hidden"></div>
 <div class="mt-auto pt-2 relative z-10 w-full flex flex-col items-start"><!-- Pet Type Selector -->
           <div>
-            <label class="block text-sm font-semibold text-white font-medium mb-1 text-xs text-white/80">Your Pet Type</label>
+            <label class="block text-sm font-semibold text-black font-medium mb-1 text-xs text-gray-700">Your Pet Type</label>
             <div class="relative">
               <select id="login-pet-type"
-                class="block w-full max-w-[200px] pl-4 pr-10 py-1.5 text-xs border border-white/20 rounded-xl focus:outline-none focus:border-transparent text-sm bg-white/10 text-white appearance-none transition-all focus-ring-dynamic"
+                class="block w-full max-w-[200px] pl-4 pr-10 py-1.5 text-xs border border-gray-300 rounded-xl focus:outline-none focus:border-transparent text-sm bg-white/90 text-gray-900 appearance-none transition-all focus-ring-dynamic"
                 onchange="handleLoginPetTypeChange(this.value)">
                 <option class="text-gray-900" value="">I don't have a pet / Just exploring</option>
                 <option class="text-gray-900" value="Dog">Dog</option>
@@ -5900,7 +5901,7 @@
                 <option class="text-gray-900" value="Other">Other</option>
               </select>
               <i data-lucide="chevron-down"
-                class="absolute right-3 top-3.5 w-4 h-4 text-white/60 pointer-events-none"></i>
+                class="absolute right-3 top-3.5 w-4 h-4 text-gray-500 pointer-events-none"></i>
             </div>
             <style>
               .focus-ring-dynamic:focus {
@@ -5913,16 +5914,16 @@
     <!-- ── RIGHT PANE: Login Form ────────────────────────────────────────── -->
     <div id="lp-right-pane"
       class="w-full lg:w-1/2 h-full flex flex-col items-center justify-start pt-10 sm:pt-16 pb-8 bg-white border-t lg:border-t-0 lg:border-l border-gray-100 p-6 sm:px-8 overflow-y-auto overflow-x-hidden"
-      style="--login-accent: #f97316; transition: --login-accent 0.5s ease;">
+      style="transition: --login-accent 0.5s ease;">
 
-      <div class="w-full max-w-sm">
+      <div class="w-full max-w-sm bg-white/96 backdrop-blur-sm rounded-3xl border border-white/75 shadow-lg p-6 sm:p-7">
 
         <!-- Welcome Header -->
         <div class="mb-8 text-center">
           <div
-            class="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-sm mb-4 transition-colors duration-500"
+            class="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-sm mb-4 border border-white/70 overflow-hidden transition-colors duration-500"
             style="background-color: var(--login-accent);">
-            <i data-lucide="users" class="w-7 h-7 text-white"></i>
+            <img src="assets/mascots/pawcircle-logo.svg" alt="PawCircle logo" class="w-11 h-11 object-contain" loading="eager" decoding="async" />
           </div>
           <h3 class="text-3xl font-bold text-gray-900" style="font-family: 'DM Serif Display'">Welcome back</h3>
           <p class="mt-2 text-sm text-gray-500">Let the tail-wagging fun begin!</p>
@@ -5950,42 +5951,10 @@
             <div class="relative flex flex-col">
 
               <div class="relative w-full">
-                <!-- Mascot integrated into input wrapper -->
-                <div class="absolute mascot-container pointer-events-none"
-                  style="width: 65px; height: 65px; right: 35px; top: 8px; z-index: 10;">
-                  <div class="mascot" id="login-mascot"
-                    style="position: relative; width: 100%; height: 100%; transform: scale(0.9); transform-origin: bottom right;">
-                    <svg viewBox="0 0 120 120" width="100%" height="100%">
-                      <ellipse class="tail" cx="92" cy="92" rx="10" ry="5" fill="#F2A93B" transform="rotate(20 88 86)" />
-                      <ellipse cx="60" cy="86" rx="33" ry="26" fill="#F2A93B" />
-                      <ellipse cx="60" cy="93" rx="18" ry="14" fill="#FFF8EC" />
-                      <ellipse class="ear-l" cx="35" cy="27" rx="11" ry="17" fill="#F2A93B"
-                        transform="rotate(-18 35 27)" />
-                      <ellipse class="ear-r" cx="76" cy="28" rx="11" ry="17" fill="#F2A93B"
-                        transform="rotate(22 76 28)" />
-                      <ellipse class="ear-l" cx="35" cy="29" rx="5" ry="9" fill="#FF7A5C" transform="rotate(-18 35 29)" />
-                      <ellipse class="ear-r" cx="76" cy="30" rx="5" ry="9" fill="#FF7A5C" transform="rotate(22 76 30)" />
-                      <circle cx="60" cy="49" r="29" fill="#F2A93B" />
-                      <circle cx="49" cy="47" r="9" fill="#FFF8EC" />
-                      <circle cx="71" cy="47" r="9" fill="#FFF8EC" />
-                      <circle class="pupil pupil-l" cx="49" cy="47" r="4" fill="#2B2420" />
-                      <circle class="pupil pupil-r" cx="71" cy="47" r="4" fill="#2B2420" />
-                      <rect class="lids" x="40" y="42" width="40" height="11" fill="#F2A93B" />
-                      <ellipse cx="60" cy="63" rx="14" ry="10" fill="#FFF8EC" />
-                      <ellipse cx="60" cy="58" rx="5" ry="3.5" fill="#2B2420" />
-                      <path d="M 60 61.5 V 66 M 53 65 Q 56.5 69 60 66 M 60 66 Q 63.5 69 67 65" stroke="#2B2420" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-                      <ellipse class="paw-l" cx="47" cy="104" rx="13" ry="9" fill="#FFF8EC"
-                        style="transition: all 0.3s ease; transform-origin: 47px 104px;" />
-                      <ellipse class="paw-r" cx="73" cy="104" rx="13" ry="9" fill="#FFF8EC"
-                        style="transition: all 0.3s ease; transform-origin: 73px 104px;" />
-                    </svg>
-                  </div>
-                </div>
-
                 <i data-lucide="lock" class="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400 pointer-events-none"></i>
                 <input type="password" id="public-password" required
                   style="color: #111827 !important;"
-                  class="block w-full pl-10 pr-20 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-transparent text-sm bg-gray-50 text-gray-900 transition-all focus-ring-dynamic"
+                  class="block w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-transparent text-sm bg-gray-50 text-gray-900 transition-all focus-ring-dynamic"
                   placeholder="••••••••" data-pw-toggle="1" />
 
                 <button type="button" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
@@ -36347,16 +36316,7 @@ function mountMascot(containerId, passwordId, toggleId, nameId, petType) {
 }
 
     // Setup default mascots
-    mountMascot('login-mascot', 'public-password', 'loginEyeToggle', null, 'dog');
     mountMascot('mascot', 'reg-password', 'eyeToggle', 'reg-name', '');
-
-    // Hook up login dropdown
-    var loginPetTypeSelect = document.getElementById('login-pet-type');
-    if (loginPetTypeSelect) {
-      loginPetTypeSelect.addEventListener('change', function(e) {
-        mountMascot('login-mascot', 'public-password', 'loginEyeToggle', null, e.target.value);
-      });
-    }
 
     // Hook up signup dropdown
     var signupPetTypeSelect = document.getElementById('reg-pet_type');
@@ -36903,7 +36863,7 @@ function mountMascot(containerId, passwordId, toggleId, nameId, petType) {
         }
 
         var f = loginFeedFeeds[loginFeedCurrentIdx];
-        if (pane) pane.style.background = f.grad;
+        var theme = getPetTheme(f.petTheme);
         if (onlineEl) onlineEl.textContent = (f.online + Math.floor(Math.random() * 14) - 7) + ' online';
 
         var tipsHtml = f.tips.map(function (t) {
@@ -36958,17 +36918,19 @@ function mountMascot(containerId, passwordId, toggleId, nameId, petType) {
         if (!forceTheme) {
           // Sync accent color
           var rightPane = document.getElementById('lp-right-pane');
-          var theme = getPetTheme(f.petTheme);
-          if (rightPane && theme) {
+          var loginView = document.getElementById('view-public-login');
+          if (theme && loginView) {
+            loginView.style.setProperty('--login-accent', theme.accent);
+          }
+          if (theme && rightPane) {
             rightPane.style.setProperty('--login-accent', theme.accent);
           }
           
-          // Sync dropdown and mount new mascot
+          // Sync dropdown selection
           var loginPetTypeSelect = document.getElementById('login-pet-type');
           if (loginPetTypeSelect) {
             loginPetTypeSelect.value = f.petTheme;
           }
-          mountMascot('login-mascot', 'public-password', 'loginEyeToggle', null, f.petTheme);
           
           loginFeedCurrentIdx = (loginFeedCurrentIdx + 1) % loginFeedFeeds.length;
         }
@@ -36999,9 +36961,11 @@ function mountMascot(containerId, passwordId, toggleId, nameId, petType) {
 
     function handleLoginPetTypeChange(type) {
       var rightPane = document.getElementById('lp-right-pane');
+      var loginView = document.getElementById('view-public-login');
       if (!type) {
         if (loginFeedRotateTimer) clearInterval(loginFeedRotateTimer);
         loginFeedRotateTimer = setInterval(loginFeedRenderFn, 7000);
+        if (loginView) loginView.style.setProperty('--login-accent', '#f97316'); // Default brand
         if (rightPane) rightPane.style.setProperty('--login-accent', '#f97316'); // Default brand
         return;
       }
@@ -37014,6 +36978,9 @@ function mountMascot(containerId, passwordId, toggleId, nameId, petType) {
 
       // Update accent color
       var theme = getPetTheme(type);
+      if (loginView && theme) {
+        loginView.style.setProperty('--login-accent', theme.accent);
+      }
       if (rightPane && theme) {
         rightPane.style.setProperty('--login-accent', theme.accent);
       }

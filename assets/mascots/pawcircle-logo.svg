@@ -1,17 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="PawCircle logo">
-  <rect x="24" y="24" width="208" height="208" rx="52" fill="#ffffff" stroke="#f59e0b" stroke-width="8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="PawCircle pet paw logo">
+  <rect x="24" y="24" width="208" height="208" rx="52" fill="#ffffff" stroke="#f59e0b" stroke-width="8" />
 
-  <g fill="#312e81">
-    <ellipse cx="112" cy="104" rx="18" ry="23"/>
-    <ellipse cx="88" cy="120" rx="15" ry="20"/>
-    <ellipse cx="136" cy="120" rx="15" ry="20"/>
-    <path d="M112 173c-26 0-45-14-45-34 0-16 12-30 30-34 10-2 19 5 21 15l1 5c2 9-4 17-13 18-7 1-11 4-11 7 0 4 8 8 17 8s17-4 17-8c0-3-4-6-11-7-9-1-15-9-13-18l1-5c2-10 11-17 21-15 18 4 30 18 30 34 0 20-19 34-45 34z"/>
+  <g fill="#3730a3">
+    <ellipse cx="96" cy="102" rx="14" ry="18" />
+    <ellipse cx="124" cy="90" rx="13" ry="17" />
+    <ellipse cx="152" cy="102" rx="14" ry="18" />
+    <ellipse cx="80" cy="126" rx="12" ry="16" />
+    <ellipse cx="168" cy="126" rx="12" ry="16" />
+    <path d="M128 186c-31 0-56-17-56-39 0-18 14-33 34-37 10-2 19 5 21 14l2 8c2 9-4 17-13 18-9 2-16 6-16 12 0 8 12 14 28 14s28-6 28-14c0-6-7-10-16-12-9-1-15-9-13-18l2-8c2-9 11-16 21-14 20 4 34 19 34 37 0 22-25 39-56 39z" />
   </g>
 
-  <g fill="#4338ca" opacity="0.9" transform="translate(150 56) scale(0.48)">
-    <ellipse cx="40" cy="26" rx="10" ry="13"/>
-    <ellipse cx="26" cy="38" rx="9" ry="12"/>
-    <ellipse cx="54" cy="38" rx="9" ry="12"/>
-    <path d="M40 70c-14 0-24-8-24-18 0-9 6-16 16-18 5-1 9 2 10 7l1 2c1 4-2 8-6 8-3 1-5 2-5 4 0 2 4 3 8 3s8-1 8-3c0-2-2-3-5-4-4 0-7-4-6-8l1-2c1-5 5-8 10-7 10 2 16 9 16 18 0 10-10 18-24 18z"/>
+  <g fill="#6366f1" opacity="0.95">
+    <circle cx="182" cy="74" r="9" />
+    <circle cx="198" cy="58" r="5.5" />
   </g>
 </svg>

@@ -10759,10 +10759,17 @@
       skillTags = [];
       consentChecks = { terms: false, privacy: false, accuracy: false };
 
+      const petParentDisplayName =
+        user.parent_name ||
+        user?.socialProfile?.parent_name ||
+        user.full_name ||
+        user.email ||
+        user.name ||
+        "Member";
       const dashName = document.getElementById("dash-name");
-      if (dashName) dashName.innerText = user.name || "Member";
+      if (dashName) dashName.innerText = petParentDisplayName;
       const dashNameTopbar = document.getElementById("dash-name-topbar");
-      if (dashNameTopbar) dashNameTopbar.innerText = user.name || "Member";
+      if (dashNameTopbar) dashNameTopbar.innerText = petParentDisplayName;
 
       const greetings = {
         Hindu: "नमस्ते",
@@ -11467,8 +11474,14 @@
           greetings[currentUserObj.pet_type] || "Welcome";
       }
       if (headerGreetingEn) {
-        headerGreetingEn.innerText =
-          greetingEn[currentUserObj.pet_type] || "Welcome to your breed";
+        const petParentName =
+          currentUserObj?.parent_name ||
+          currentUserObj?.socialProfile?.parent_name ||
+          currentUserObj?.full_name ||
+          currentUserObj?.email ||
+          currentUserObj?.name ||
+          "Pet Parent";
+        headerGreetingEn.innerText = petParentName;
       }
 
       // Reset breed-themed background from top header
@@ -16906,6 +16919,8 @@
     }
 
     function openProfileModal() {
+      pendingProfileAvatarFile = null;
+      pendingProfileAvatarPreview = null;
       currentUserObj.socialProfile = currentUserObj.socialProfile || {};
       const prof = getEditableProfileSnapshot(currentUserObj);
 
@@ -16978,13 +16993,18 @@
       document.getElementById("profile-modal").classList.remove("flex");
     }
 
+    let pendingProfileAvatarFile = null;
+    let pendingProfileAvatarPreview = null;
+
     async function handleAvatarUpload(input) {
       if (!input.files || !input.files[0]) return;
       const file = input.files[0];
+      pendingProfileAvatarFile = file;
 
       // Show local preview immediately
       const reader = new FileReader();
       reader.onload = (e) => {
+        pendingProfileAvatarPreview = e.target.result;
         const img = document.getElementById("profile-modal-avatar-img");
         const text = document.getElementById("profile-modal-avatar-text");
         img.src = e.target.result;
@@ -16993,44 +17013,7 @@
       };
       reader.readAsDataURL(file);
 
-      // Upload to Supabase Storage
-      if (!currentUserObj?.id) return;
-      const photoUrl = await uploadPhotoToSupabase(file, {
-        bucket: 'profile-photos',
-        prefix: 'profile',
-        userId: currentUserObj.id,
-        imageMaxWidth: 768,
-        imageMaxHeight: 768,
-        maxBytes: 900 * 1024,
-      });
-      if (!photoUrl) {
-        console.warn("Avatar upload failed");
-        showToast("Profile picture upload failed. Try a smaller image.");
-        return;
-      }
-
-      // Save URL to profile
-      try {
-        const response = await fetch("pawcircle_api.php", {
-          method: "POST",
-          credentials: "include",
-          headers: secureJsonHeaders(),
-          body: JSON.stringify({
-            action: "update_profile",
-            user_id: currentUserObj.id,
-            profile_photo_url: photoUrl,
-          }),
-        });
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok || result.status !== "success") {
-          throw new Error(result.message || "Could not save profile picture.");
-        }
-        syncCurrentProfileMedia({ profilePhotoUrl: photoUrl });
-        showToast("Profile picture updated.");
-      } catch (err) {
-        console.warn("Could not save avatar URL to backend.", err);
-        showToast(err.message || "Could not save profile picture.");
-      }
+      showToast("Profile picture selected. Click Save Changes to apply.");
     }
 
     async function saveProfile() {
@@ -17082,27 +17065,58 @@
         currentUserObj.system_tags = getSystemProfileTags(currentUserObj);
         currentUserObj.tags = getDisplayProfileTags(currentUserObj);
 
+        let uploadedProfilePhotoUrl = null;
+
+        // If a new avatar was selected in the modal, upload and apply it on Save.
+        if (pendingProfileAvatarFile && currentUserObj?.id) {
+            uploadedProfilePhotoUrl = await uploadPhotoToSupabase(pendingProfileAvatarFile, {
+              bucket: 'profile-photos',
+              prefix: 'profile',
+              userId: currentUserObj.id,
+              imageMaxWidth: 768,
+              imageMaxHeight: 768,
+              maxBytes: 900 * 1024,
+            });
+
+            if (uploadedProfilePhotoUrl) {
+              currentUserObj.profile_photo_url = uploadedProfilePhotoUrl;
+              currentUserObj.socialProfile.profile_photo_url = uploadedProfilePhotoUrl;
+              currentUserObj.socialProfile.profilePhoto = uploadedProfilePhotoUrl;
+            } else if (pendingProfileAvatarPreview) {
+              // Keep UX smooth: show selected image immediately even if backend upload fails.
+              currentUserObj.profile_photo_url = pendingProfileAvatarPreview;
+              currentUserObj.socialProfile.profile_photo_url = pendingProfileAvatarPreview;
+              currentUserObj.socialProfile.profilePhoto = pendingProfileAvatarPreview;
+              showToast("Profile picture applied locally. It will sync once upload succeeds.");
+            }
+        }
+
         // Persist to Supabase
         if (currentUserObj?.id) {
           try {
+            const updatePayload = {
+              action: "update_profile",
+              user_id: currentUserObj.id,
+              full_name: name,
+              breed,
+              gender,
+              age_group: age,
+              occupation,
+              bio,
+              mobile_number: contactNo,
+              is_public: isPublic,
+              primary_interests: tags,
+              tags,
+            };
+            if (uploadedProfilePhotoUrl) {
+              updatePayload.profile_photo_url = uploadedProfilePhotoUrl;
+            }
+
             const profileRes = await fetch("pawcircle_api.php", {
               method: "POST",
               credentials: "include",
               headers: secureJsonHeaders(),
-              body: JSON.stringify({
-                action: "update_profile",
-                user_id: currentUserObj.id,
-                full_name: name,
-                breed,
-                gender,
-                age_group: age,
-                occupation,
-                bio,
-                mobile_number: contactNo,
-                is_public: isPublic,
-                primary_interests: tags,
-                tags,
-              }),
+              body: JSON.stringify(updatePayload),
             });
             const profileData = await profileRes.json().catch(() => ({}));
             if (!profileRes.ok || profileData.status === "error") {
@@ -17125,6 +17139,11 @@
           profileModalTitleNameUpdate.innerText = name;
         }
         renderCoverProfileTags();
+
+        pendingProfileAvatarFile = null;
+        pendingProfileAvatarPreview = null;
+        const avatarInput = document.getElementById("avatar-upload-input");
+        if (avatarInput) avatarInput.value = "";
 
         persistCurrentSession(currentUserObj);
 

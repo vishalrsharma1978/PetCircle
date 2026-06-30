@@ -37,8 +37,12 @@ if (file_exists($envFile)) {
 function resolveCaBundlePath()
 {
     $fromEnv = trim((string) (getenv('CA_BUNDLE_PATH') ?: ($_ENV['CA_BUNDLE_PATH'] ?? '')));
-    if ($fromEnv !== '' && is_file($fromEnv)) {
-        return $fromEnv;
+    if ($fromEnv !== '') {
+        if (is_file($fromEnv)) {
+            return $fromEnv;
+        }
+
+        error_log('[PAWCIRCLE][TLS][' . requestId() . '] CA_BUNDLE_PATH is set but file was not found: ' . $fromEnv);
     }
 
     $localBundle = __DIR__ . '/cacert.pem';
@@ -61,9 +65,24 @@ function resolveCaBundlePath()
 
 function applyCurlTlsOptions($ch)
 {
+    // Always enforce certificate and host verification for outbound HTTPS calls.
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+
     $caPath = resolveCaBundlePath();
     if ($caPath !== '') {
         curl_setopt($ch, CURLOPT_CAINFO, $caPath);
+        return;
+    }
+
+    // On Windows, missing CA bundles are a common cause of
+    // "unable to get local issuer certificate" TLS failures.
+    if (PHP_OS_FAMILY === 'Windows') {
+        static $warned = false;
+        if (!$warned) {
+            $warned = true;
+            error_log('[PAWCIRCLE][TLS][' . requestId() . '] No usable CA bundle found. Set CA_BUNDLE_PATH in .env to a valid cacert.pem file.');
+        }
     }
 }
 

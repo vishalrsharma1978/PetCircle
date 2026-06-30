@@ -10881,14 +10881,14 @@
     function getPetTypeSolidColor(pet_type) {
       const type = String(pet_type || "").toLowerCase();
       const colors = {
-        dog: "#3b82f6",     // blue-500
-        cat: "#8b5cf6",     // violet-500
-        bird: "#f59e0b",    // amber-500
-        rabbit: "#10b981",  // emerald-500
-        fish: "#06b6d4",    // cyan-500
-        reptile: "#84cc16", // lime-500
-        "small pets": "#ec4899", // pink-500
-        other: "#64748b"    // slate-500
+        dog: "#f97316",         // orange-500
+        cat: "#059669",         // emerald-600
+        bird: "#2563eb",        // blue-600
+        rabbit: "#7c3aed",      // violet-600
+        fish: "#d97706",        // amber-600
+        reptile: "#dc2626",     // red-600
+        "small pets": "#b91c1c",// red-700
+        other: "#64748b"        // slate-500
       };
       return colors[type] || "#e04848"; // brand-500 fallback
     }

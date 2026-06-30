@@ -278,9 +278,25 @@
       flex: 0 0 auto;
     }
 
+    .pet-breed-strip-item.pet-breed-strip-item--login {
+      width: 118px;
+    }
+
+    .pet-breed-strip-item.pet-breed-strip-item--login .pet-thumb {
+      height: 76px;
+    }
+
     @media (max-width: 640px) {
       .pet-breed-strip-item {
         width: 142px;
+      }
+
+      .pet-breed-strip-item.pet-breed-strip-item--login {
+        width: 102px;
+      }
+
+      .pet-breed-strip-item.pet-breed-strip-item--login .pet-thumb {
+        height: 66px;
       }
     }
 
@@ -5798,11 +5814,11 @@
   <!-- ==================== PUBLIC LOGIN ==================== -->
 
   <div id="view-public-login"
-    class="view-section active h-screen overflow-hidden flex flex-col lg:flex-row items-stretch w-full">
+    class="view-section active h-[100dvh] max-h-[100dvh] overflow-hidden flex flex-col lg:flex-row items-stretch w-full">
 
     <!-- ── LEFT PANE: Feature Showcase & Feed ────────────────────────────── -->
     <div id="lp-left-pane"
-      class="w-full lg:w-1/2 h-full flex flex-col p-6 sm:p-8 lg:p-10 overflow-y-auto overflow-x-hidden no-scrollbar relative"
+      class="w-full lg:w-1/2 h-full max-h-[100dvh] flex flex-col p-4 sm:p-5 lg:p-6 overflow-hidden overflow-x-hidden no-scrollbar relative"
       style="background:linear-gradient(135deg,#fffbeb 0%,#f0fdf4 55%,#ecfeff 100%); transition:background 0.8s ease">
 
       <!-- Trailing Paws Background (from signup) -->
@@ -5861,15 +5877,12 @@
 
       <!-- Live rotating feed card -->
       <div id="lp-feed-card"
-        class="flex-1 min-h-[420px] lg:min-h-[520px] rounded-2xl bg-white/85 border border-white/90 shadow-md p-5 mb-3 backdrop-blur-sm relative z-10 transition-all duration-500">
+        class="flex-1 min-h-0 rounded-2xl bg-white/85 border border-white/90 shadow-md p-4 mb-2 backdrop-blur-sm relative z-10 transition-all duration-500">
       </div>
-
-      <!-- Activity ticker -->
-      <div id="lp-activity-ticker" class="flex-shrink-0 flex items-center gap-2 flex-wrap mb-3 relative z-10"></div>
 
       <!-- Hidden showcase -->
       <div id="public-theme-showcase" class="hidden"></div>
-<div class="mt-auto pt-4 relative z-10 w-full flex flex-col items-start"><!-- Pet Type Selector -->
+<div class="mt-auto pt-2 relative z-10 w-full flex flex-col items-start"><!-- Pet Type Selector -->
           <div>
             <label class="block text-sm font-semibold text-white font-medium mb-1 text-xs text-white/80">Your Pet Type</label>
             <div class="relative">
@@ -36785,7 +36798,6 @@ function mountMascot(containerId, passwordId, toggleId, nameId, petType) {
     function initLoginFeed() {
       var pane = document.getElementById('lp-left-pane');
       var card = document.getElementById('lp-feed-card');
-      var ticker = document.getElementById('lp-activity-ticker');
       var onlineEl = document.getElementById('lp-online-count');
       if (!card) return;
 
@@ -36895,9 +36907,9 @@ function mountMascot(containerId, passwordId, toggleId, nameId, petType) {
         if (onlineEl) onlineEl.textContent = (f.online + Math.floor(Math.random() * 14) - 7) + ' online';
 
         var tipsHtml = f.tips.map(function (t) {
-          return '<div class="rounded-xl border px-2.5 py-2.5 text-center min-h-[92px] flex flex-col items-center justify-center ' + t.cls + '">' +
-            '<div class="text-base mb-0.5">' + t.icon + '</div>' +
-            '<div class="text-xs font-semibold leading-tight">' + t.label + '<br>' + t.sub + '</div></div>';
+          return '<div class="rounded-xl border px-2 py-2 text-center min-h-[78px] flex flex-col items-center justify-center ' + t.cls + '">' +
+            '<div class="text-sm mb-0.5">' + t.icon + '</div>' +
+            '<div class="text-[11px] font-semibold leading-tight">' + t.label + '<br>' + t.sub + '</div></div>';
         }).join('');
 
         var tagsHtml = f.tags.map(function (tag) {
@@ -36909,37 +36921,31 @@ function mountMascot(containerId, passwordId, toggleId, nameId, petType) {
         var breedGalleryHtml = galleryThemes.concat(galleryThemes).map(function (themeName) {
           var theme = getPetTheme(themeName);
           var art = PET_REAL_PHOTOS[themeName] || getPetIllustrationDataUrl(theme, 'badge');
-          return '<div class="pet-breed-strip-item rounded-xl border border-white/85 bg-white/76 p-2.5 shadow-sm">' +
-            '<div class="h-28 rounded-lg" style="background-image:linear-gradient(135deg, color-mix(in srgb, ' + theme.accent + ' 18%, white), transparent 70%), url(\'' + art + '\');background-size:cover;background-position:center;"></div>' +
-            '<div class="mt-1.5 text-[11px] font-bold text-gray-700 text-center leading-tight">' + theme.label + '</div>' +
+          return '<div class="pet-breed-strip-item pet-breed-strip-item--login rounded-xl border border-white/85 bg-white/76 p-1.5 shadow-sm">' +
+            '<div class="pet-thumb rounded-lg" style="background-image:linear-gradient(135deg, color-mix(in srgb, ' + theme.accent + ' 18%, white), transparent 70%), url(\'' + art + '\');background-size:cover;background-position:center;"></div>' +
+            '<div class="mt-1 text-[10px] font-bold text-gray-700 text-center leading-tight">' + theme.label + '</div>' +
             '</div>';
         }).join('');
 
         card.innerHTML =
           '<div class="h-full flex flex-col">' +
-          '<div class="flex items-center justify-between mb-2">' +
+          '<div class="flex items-center justify-between mb-1.5">' +
           '<span class="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-0.5 rounded-full bg-white border uppercase tracking-wide ' + f.chipCls + '">' +
           f.icon + ' ' + f.chipText +
           '</span>' +
           '<span class="text-xs text-gray-400">5 min read</span>' +
           '</div>' +
-          '<h3 class="text-base font-bold text-gray-800 leading-snug mb-1.5" style="font-family:\'DM Serif Display\';">' + f.headline + '</h3>' +
-          '<p class="text-sm text-gray-600 leading-relaxed mb-3">' + f.excerpt + '</p>' +
-          '<div class="grid grid-cols-3 gap-2.5 mb-3 auto-rows-fr">' + tipsHtml + '</div>' +
-          '<div class="mt-auto flex items-center gap-2 flex-wrap">' + tagsHtml + '</div>' +
-          '<div class="mt-3 pt-3 border-t border-white/80">' +
-          '<div class="text-[11px] font-black uppercase tracking-[0.16em] text-gray-500 mb-2">Explore Pet Communities</div>' +
-          '<div class="pet-breed-strip">' +
+          '<h3 class="text-[15px] font-bold text-gray-800 leading-snug mb-1" style="font-family:\'DM Serif Display\';">' + f.headline + '</h3>' +
+          '<p class="text-[13px] text-gray-600 leading-relaxed mb-2" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">' + f.excerpt + '</p>' +
+          '<div class="grid grid-cols-3 gap-2 mb-2 auto-rows-fr">' + tipsHtml + '</div>' +
+          '<div class="mt-auto pt-2 border-t border-white/80">' +
+          '<div class="text-[10px] font-black uppercase tracking-[0.16em] text-gray-500 mb-1.5">Pet Breeds Near You</div>' +
+          '<div class="pet-breed-strip rounded-xl">' +
           '<div class="pet-breed-strip-track">' + breedGalleryHtml + '</div>' +
           '</div>' +
           '</div>' +
+          '<div class="mt-2 flex items-center gap-2 flex-wrap">' + tagsHtml + '</div>' +
           '</div>';
-
-        if (ticker) {
-          ticker.innerHTML = f.activity.map(function (a) {
-            return '<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-white/80 border border-gray-200/60 text-xs text-gray-600 shadow-sm">' + a + '</span>';
-          }).join('');
-        }
 
         card.style.opacity = '0';
         card.style.transform = 'translateY(8px)';

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="PawCircle logo">
+  <rect x="24" y="24" width="208" height="208" rx="52" fill="#ffffff" stroke="#f59e0b" stroke-width="8"/>
+
+  <g fill="#312e81">
+    <ellipse cx="112" cy="104" rx="18" ry="23"/>
+    <ellipse cx="88" cy="120" rx="15" ry="20"/>
+    <ellipse cx="136" cy="120" rx="15" ry="20"/>
+    <path d="M112 173c-26 0-45-14-45-34 0-16 12-30 30-34 10-2 19 5 21 15l1 5c2 9-4 17-13 18-7 1-11 4-11 7 0 4 8 8 17 8s17-4 17-8c0-3-4-6-11-7-9-1-15-9-13-18l1-5c2-10 11-17 21-15 18 4 30 18 30 34 0 20-19 34-45 34z"/>
+  </g>
+
+  <g fill="#4338ca" opacity="0.9" transform="translate(150 56) scale(0.48)">
+    <ellipse cx="40" cy="26" rx="10" ry="13"/>
+    <ellipse cx="26" cy="38" rx="9" ry="12"/>
+    <ellipse cx="54" cy="38" rx="9" ry="12"/>
+    <path d="M40 70c-14 0-24-8-24-18 0-9 6-16 16-18 5-1 9 2 10 7l1 2c1 4-2 8-6 8-3 1-5 2-5 4 0 2 4 3 8 3s8-1 8-3c0-2-2-3-5-4-4 0-7-4-6-8l1-2c1-5 5-8 10-7 10 2 16 9 16 18 0 10-10 18-24 18z"/>
+  </g>
+</svg>

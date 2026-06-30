@@ -7931,7 +7931,7 @@
     }
 
     // ── Public Login ──────────────────────────────────────────────────────
-    document
+      document
       .getElementById("public-login-form")
       .addEventListener("submit", async function (e) {
         e.preventDefault();
@@ -8002,8 +8002,6 @@
               return;
             }
           } catch (authErr) {
-            // Existing accounts that have not yet been moved into Supabase Auth
-            // can still use the legacy PawCircle password flow during migration.
             console.warn("Supabase Auth login failed; trying legacy login:", authErr);
           }
 
@@ -8021,8 +8019,6 @@
             playPortalTransition(() => {
               try {
                 populateMemberDashboard(data.user);
-                // Always land on the feed; the profile form is only opened on demand
-                // (via the bell notification or the dashboard's "Apply" prompt).
                 initializeSocialFeed();
                 switchView("view-social-feed");
                 btn.classList.remove("!bg-green-500", "!border-green-500");
@@ -10882,6 +10878,21 @@
       return name ? name.charAt(0).toUpperCase() : "U";
     }
 
+    function getPetTypeSolidColor(pet_type) {
+      const type = String(pet_type || "").toLowerCase();
+      const colors = {
+        dog: "#3b82f6",     // blue-500
+        cat: "#8b5cf6",     // violet-500
+        bird: "#f59e0b",    // amber-500
+        rabbit: "#10b981",  // emerald-500
+        fish: "#06b6d4",    // cyan-500
+        reptile: "#84cc16", // lime-500
+        "small pets": "#ec4899", // pink-500
+        other: "#64748b"    // slate-500
+      };
+      return colors[type] || "#e04848"; // brand-500 fallback
+    }
+
     function getFaithFrameClass(pet_type) {
       const r = (pet_type || "").toLowerCase();
       if (r === "hindu") return "faith-frame-park";
@@ -11036,6 +11047,7 @@
     function applyCoverPhoto(src) {
       const ci = document.getElementById("cover-photo-img");
       const cp = document.getElementById("cover-photo-pattern");
+      const cc = document.getElementById("cover-photo-container");
       if (!ci || !cp) return;
 
       const hasSource =
@@ -11045,12 +11057,17 @@
         ci.classList.remove("hidden");
         ci.style.display = "";
         cp.classList.add("hidden");
+        if (cc) cc.style.backgroundColor = "";
         fitCoverPhotoToImage(src);
       } else {
         ci.src = "";
         ci.classList.add("hidden");
         ci.style.display = "none";
         cp.classList.remove("hidden");
+        if (cc) {
+          const type = (currentUserObj && currentUserObj.pet_type) || "other";
+          cc.style.backgroundColor = getPetTypeSolidColor(type);
+        }
       }
     }
 
@@ -27772,9 +27789,10 @@
       const profileInitial = getSocialAvatar(profileName || "M");
       const profilePhotoUrl = p.profile_photo_url || "";
       const coverPhotoUrl = p.cover_photo_url || "";
+      const petColor = getPetTypeSolidColor(p.pet_type);
       const coverStyle = coverPhotoUrl
         ? `background-image: linear-gradient(180deg, rgba(15,23,42,0.20), rgba(15,23,42,0.88)), url('${escapeHtml(coverPhotoUrl)}');`
-        : "background-image: linear-gradient(135deg, rgba(88,28,135,0.45), rgba(15,23,42,0.96) 46%, rgba(2,6,23,0.98));";
+        : `background-color: ${petColor};`;
       const profileAvatarHtml = profilePhotoUrl
         ? `<img src="${escapeHtml(profilePhotoUrl)}" alt="${escapeHtml(profileName)}" class="h-full w-full object-cover">`
         : `<div class="relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-br from-violet-500/35 via-slate-800 to-slate-950">
@@ -34487,20 +34505,12 @@
       modal.classList.add("flex");
       document.body.style.overflow = "hidden";
 
-      // Apply pet_type-aware gradient to the header cover
+      // Apply pet_type-aware solid color to the header cover
       const headerCover = document.getElementById("upm-header-cover");
       if (headerCover) {
-        const pet_type = currentUserObj ? currentUserObj.pet_type : null;
-        const gradients = {
-          Hindu: "linear-gradient(to right, #f97316, #fb923c)",
-          Muslim: "linear-gradient(to right, #059669, #34d399)",
-          Sikh: "linear-gradient(to right, #2563eb, #60a5fa)",
-          Christian: "linear-gradient(to right, #7c3aed, #a78bfa)",
-          Buddhist: "linear-gradient(to right, #d97706, #fbbf24)",
-          Jain: "linear-gradient(to right, #dc2626, #f87171)",
-          Parsi: "linear-gradient(to right, #b91c1c, #f87171)",
-        };
-        headerCover.style.background = gradients[pet_type] || "linear-gradient(to right, #e04848, #f97316)";
+        // Without fetching the profile, we don't know the remote user's pet type here.
+        // We will just use the fallback solid color instead of the buggy gradient.
+        headerCover.style.background = getPetTypeSolidColor("other");
       }
       if (typeof lucide !== 'undefined') lucide.createIcons();
     }

@@ -142,6 +142,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
  */
 function supabaseRequest($method, $path, $query = [], $body = null, $extraHeaders = [])
 {
+    static $ch = null;
+
     $url = rtrim(getenv('SUPABASE_URL') ?: ($_ENV['SUPABASE_URL'] ?? ''), '/');
     $secretKey = getenv('SUPABASE_SECRET_KEY') ?: ($_ENV['SUPABASE_SECRET_KEY'] ?? '');
 
@@ -156,7 +158,13 @@ function supabaseRequest($method, $path, $query = [], $body = null, $extraHeader
         $endpoint .= '?' . http_build_query($query);
     }
 
-    $ch = curl_init($endpoint);
+    if ($ch === null) {
+        $ch = curl_init();
+    } else {
+        curl_reset($ch);
+    }
+
+    curl_setopt($ch, CURLOPT_URL, $endpoint);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
     applyCurlTlsOptions($ch);
@@ -864,6 +872,7 @@ function createSupabaseAuthUserForSignup($email, $password, $metadata = [])
 
 function getSupabaseAuthUserFromToken($accessToken)
 {
+    static $ch = null;
     $accessToken = trim((string) $accessToken);
     if ($accessToken === '') {
         return null;
@@ -876,8 +885,14 @@ function getSupabaseAuthUserFromToken($accessToken)
         return null;
     }
 
-    $ch = curl_init($url . '/auth/v1/user');
+    if ($ch === null) {
+        $ch = curl_init();
+    } else {
+        curl_reset($ch);
+    }
+
     curl_setopt_array($ch, [
+        CURLOPT_URL => $url . '/auth/v1/user',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => [
             'apikey: ' . $anonKey,
@@ -970,10 +985,10 @@ function fetchAppUserWithProfileByAuthUserId($authUserId)
     return (($res['code'] ?? 500) < 400 && !empty($res['data'])) ? $res['data'][0] : null;
 }
 
-function ensureProfileForAppUser($appUserId, $authUser, $data = [])
+function ensureProfileForAppUser($appUserId, $authUser, $data = [], $existingProfile = null)
 {
     if (!isValidUuid($appUserId)) {
-        return;
+        return false;
     }
 
     $displayName = trim((string) ($data['name'] ?? authMetadataValue($authUser, ['full_name', 'name'], '')));
@@ -983,6 +998,25 @@ function ensureProfileForAppUser($appUserId, $authUser, $data = [])
 
     $pet_type = trim((string) ($data['pet_type'] ?? authMetadataValue($authUser, ['pet_type'], '')));
     $breed = trim((string) ($data['breed'] ?? authMetadataValue($authUser, ['breed'], '')));
+    $avatarUrl = trim((string) authMetadataValue($authUser, ['avatar_url', 'picture'], ''));
+
+    if ($existingProfile !== null) {
+        $patch = [];
+        if ($displayName !== '' && empty($existingProfile['full_name']) && empty($existingProfile['pet_name']))
+            $patch['full_name'] = $displayName;
+        if ($avatarUrl !== '' && empty($existingProfile['profile_photo_url']))
+            $patch['profile_photo_url'] = $avatarUrl;
+        if ($pet_type !== '' && empty($existingProfile['pet_type']))
+            $patch['pet_type'] = $pet_type;
+        if ($breed !== '' && empty($existingProfile['breed']))
+            $patch['breed'] = $breed;
+        
+        if (!empty($patch)) {
+            supabaseRequest('PATCH', '/rest/v1/profiles', ['user_id' => 'eq.' . strtolower($appUserId)], $patch, ['Prefer: return=minimal']);
+            return true;
+        }
+        return false;
+    }
 
     $insert = [
         'user_id' => $appUserId,
@@ -991,31 +1025,12 @@ function ensureProfileForAppUser($appUserId, $authUser, $data = [])
         'privacy_accepted' => false,
         'accuracy_certified' => false,
     ];
-    if ($pet_type !== '')
-        $insert['pet_type'] = $pet_type;
-    if ($breed !== '')
-        $insert['breed'] = $breed;
+    if ($pet_type !== '') $insert['pet_type'] = $pet_type;
+    if ($breed !== '') $insert['breed'] = $breed;
+    if ($avatarUrl !== '') $insert['profile_photo_url'] = $avatarUrl;
 
     supabaseRequest('POST', '/rest/v1/profiles', [], $insert, ['Prefer: resolution=ignore-duplicates,return=minimal']);
-
-    $patch = [];
-    if ($displayName !== '')
-        $patch['full_name'] = $displayName;
-        
-    $avatarUrl = trim((string) authMetadataValue($authUser, ['avatar_url', 'picture'], ''));
-    if ($avatarUrl !== '') {
-        $patch['profile_photo_url'] = $avatarUrl;
-    }
-    if ($pet_type !== '')
-        $patch['pet_type'] = $pet_type;
-    if ($breed !== '')
-        $patch['breed'] = $breed;
-
-    if (!empty($patch)) {
-        supabaseRequest('PATCH', '/rest/v1/profiles', [
-            'user_id' => 'eq.' . strtolower($appUserId),
-        ], $patch, ['Prefer: return=minimal']);
-    }
+    return true;
 }
 
 function getMigrationStatusForAppUser($appUserId)
@@ -1066,8 +1081,13 @@ function linkOrCreateAppUserForSupabaseAuth($authUser, $data = [])
 
     $existing = fetchAppUserWithProfileByAuthUserId($authUserId);
     if ($existing) {
-        ensureProfileForAppUser($existing['id'], $authUser, $data);
-        return fetchAppUserWithProfileById($existing['id']) ?: $existing;
+        $profileList = $existing['profiles'] ?? [];
+        $existingProfile = is_array($profileList) && isset($profileList[0]) ? $profileList[0] : (is_array($profileList) && !empty($profileList) ? $profileList : []);
+        $patched = ensureProfileForAppUser($existing['id'], $authUser, $data, $existingProfile);
+        if ($patched) {
+            return fetchAppUserWithProfileById($existing['id']) ?: $existing;
+        }
+        return $existing;
     }
 
     $emailMatches = findAppUsersByEmail($email);
@@ -1103,8 +1123,14 @@ function linkOrCreateAppUserForSupabaseAuth($authUser, $data = [])
             return null;
         }
 
-        ensureProfileForAppUser($row['id'], $authUser, $data);
-        return fetchAppUserWithProfileById($row['id']);
+        $fullUser = fetchAppUserWithProfileById($row['id']);
+        $profileList = $fullUser['profiles'] ?? [];
+        $existingProfile = is_array($profileList) && isset($profileList[0]) ? $profileList[0] : (is_array($profileList) && !empty($profileList) ? $profileList : []);
+        $patched = ensureProfileForAppUser($row['id'], $authUser, $data, $existingProfile);
+        if ($patched) {
+            return fetchAppUserWithProfileById($row['id']) ?: $fullUser;
+        }
+        return $fullUser;
     }
 
     if (!empty($emailMatches)) {
@@ -1173,11 +1199,9 @@ function handleSupabaseAuthExchange($data)
         return;
     }
 
-    $loginAt = markSuccessfulLogin($user['id'], $user['email'] ?? ($authUser['email'] ?? ''), 'supabase_auth');
-    clearLoginRateLimit($user['email'] ?? ($authUser['email'] ?? ''), 'member');
     $session = createUserSession($user['id'], 'member');
-    $freshUser = fetchAppUserWithProfileById($user['id']) ?: $user;
-    $payload = buildUserPayload($freshUser, $loginAt);
+    $loginAt = nowIsoUtc();
+    $payload = buildUserPayload($user, $loginAt);
     $payload['auth_user_id'] = $authUser['id'];
 
     jsonSuccess([
@@ -1185,6 +1209,11 @@ function handleSupabaseAuthExchange($data)
         'session' => $session,
         'user' => $payload,
     ]);
+
+    finishResponseEarly();
+
+    markSuccessfulLogin($user['id'], $user['email'] ?? ($authUser['email'] ?? ''), 'supabase_auth');
+    clearLoginRateLimit($user['email'] ?? ($authUser['email'] ?? ''), 'member');
 }
 
 // Flush the HTTP response to the client so slow best-effort work (e.g. outbound

@@ -6993,11 +6993,35 @@
                 U
               </div>
               <div class="flex-1 min-w-0 space-y-3">
-                <textarea id="feed-post-input" rows="1" placeholder="What's happening in your breed?"
+                <textarea id="feed-post-input" rows="1" placeholder="How is your furry today!!"
+                  onfocus="if (document.getElementById('feed-post-expanded-fields')?.classList.contains('hidden')) setPostComposerExpanded(true);"
                   class="w-full resize-none rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-800 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400 dark:placeholder-gray-500"></textarea>
                 <div id="feed-post-expanded-fields" class="hidden space-y-3">
                   <input type="text" id="feed-post-title" placeholder="Post title"
                     class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm font-semibold text-gray-900 dark:text-gray-100 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
+                  <div class="space-y-2">
+                    <input type="text" id="feed-post-tags-input" list="feed-post-tags-options"
+                      placeholder="Tag PawPals (type name and press Enter)"
+                      onfocus="refreshPawPalsTagOptions()"
+                      onkeydown="handlePostTaggedPawPalsKeydown(event)"
+                      class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
+                    <datalist id="feed-post-tags-options"></datalist>
+                    <div id="feed-post-tags-chips" class="flex flex-wrap gap-2"></div>
+                  </div>
+                  <div class="grid gap-2 sm:grid-cols-2">
+                    <select id="feed-post-feeling"
+                      class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400">
+                      <option value="">Feeling/Activity</option>
+                      <option value="happy">Feeling happy</option>
+                      <option value="excited">Feeling excited</option>
+                      <option value="grateful">Feeling grateful</option>
+                      <option value="proud">Feeling proud</option>
+                      <option value="loved">Feeling loved</option>
+                      <option value="blessed">Feeling blessed</option>
+                    </select>
+                    <input type="text" id="feed-post-activity" maxlength="60" placeholder="What are you doing?"
+                      class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
+                  </div>
                   <div class="space-y-2">
                     <input type="text" id="feed-post-hashtags" placeholder="Type a hashtag and press Enter"
                       onkeydown="handlePostHashtagKeydown(event, 'feed-post-hashtags', 'feed-post-hashtags-chips')"
@@ -7044,14 +7068,29 @@
               class="hidden mt-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/60 overflow-hidden">
             </div>
             <div id="feed-post-status" class="hidden mt-2 text-xs font-semibold text-gray-500 dark:text-gray-400"></div>
-            <div id="feed-post-expanded-actions"
-              class="hidden flex items-center justify-between mt-3 pt-3 border-t border-gray-50 dark:border-gray-800 px-2">
-              <div class="flex items-center gap-4">
+            <div id="feed-post-quick-actions"
+              class="flex flex-wrap items-center gap-3 mt-3 pt-3 border-t border-gray-50 dark:border-gray-800 px-2">
+              <div class="flex flex-wrap items-center gap-4">
                 <button type="button" onclick="openPostMediaPicker()"
                   class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
                   <i data-lucide="image" class="w-4 h-4 text-green-500"></i>
                   Photo/Video
                 </button>
+                <button type="button" onclick="setPostComposerExpanded(true); refreshPawPalsTagOptions(); document.getElementById('feed-post-tags-input')?.focus();"
+                  class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
+                  <i data-lucide="at-sign" class="w-4 h-4 text-sky-500"></i>
+                  Tag PawPals
+                </button>
+                <button type="button" onclick="setPostComposerExpanded(true); document.getElementById('feed-post-feeling')?.focus();"
+                  class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
+                  <i data-lucide="smile-plus" class="w-4 h-4 text-amber-500"></i>
+                  Feeling
+                </button>
+              </div>
+            </div>
+            <div id="feed-post-expanded-actions"
+              class="hidden flex flex-wrap items-center gap-4 mt-2 px-2">
+              <div class="flex flex-wrap items-center gap-4">
                 <button type="button" onclick="togglePostMediaUrlInput()"
                   class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
                   <i data-lucide="link" class="w-4 h-4 text-violet-500"></i>
@@ -13604,6 +13643,12 @@
         title: p.title || "",
         content: p.content || p.description || "",
         description: p.description || p.content || "",
+        tagged_pawpals: Array.isArray(p.tagged_pawpals)
+          ? p.tagged_pawpals.map((name) => String(name || "").trim()).filter(Boolean)
+          : parseTaggedPawPals(p.tagged_pawpals),
+        feeling: p.feeling || "",
+        feeling_activity: p.feeling_activity || "",
+        feeling_text: p.feeling_text || buildPostFeelingText(p.feeling, p.feeling_activity),
         hashtags: normalizeHashtags(p.hashtags),
         media_url: (() => {
           if (typeof p.media_url === "string" && p.media_url.trim().startsWith("[")) {
@@ -14292,6 +14337,12 @@
           post.currentSlideIndex = currentSlideIndex;
           const mediaHtml = renderPostMediaFrame(postId, mediaItems, currentSlideIndex);
           const descriptionText = post.description || post.content || "";
+          const feelingLine = post.feeling_text
+            ? `<p class="mt-2 text-sm font-semibold text-gray-700 dark:text-gray-300"><i data-lucide="smile-plus" class="inline-block h-4 w-4 mr-1 align-[-2px]"></i>${escapeHtml(post.feeling_text)}</p>`
+            : "";
+          const taggedPawPalsHtml = Array.isArray(post.tagged_pawpals) && post.tagged_pawpals.length
+            ? `<p class="mt-2 text-sm text-sky-700 dark:text-sky-300">with ${post.tagged_pawpals.map((name) => `<span class="font-bold">@${escapeHtml(name)}</span>`).join(", ")}</p>`
+            : "";
           const descriptionHtml = descriptionText
             ? `<p class="mt-3 text-sm text-gray-800 dark:text-gray-300 whitespace-pre-wrap break-words">${escapeHtml(descriptionText)}</p>`
             : "";
@@ -14353,6 +14404,8 @@
                     <div class="p-4">
                         ${titleHtml}
                         ${mediaHtml}
+                        ${feelingLine}
+                        ${taggedPawPalsHtml}
                         ${descriptionHtml}
                         ${hashtagsHtml}
                         ${linkedEventHtml}
@@ -15121,6 +15174,97 @@
       return getHashtagChipValues(chipsId);
     }
 
+    function getTaggablePawPals() {
+      const names = new Set();
+      const selfName = String(currentUserObj?.socialProfile?.name || currentUserObj?.name || "").trim().toLowerCase();
+      const collect = (value) => {
+        const name = String(value || "").trim();
+        if (!name) return;
+        if (name.toLowerCase() === selfName) return;
+        names.add(name);
+      };
+      (Array.isArray(globalConnections) ? globalConnections : []).forEach((member) => {
+        collect(member?.name || member?.full_name || member?.author);
+      });
+      (Array.isArray(feedPosts) ? feedPosts : []).forEach((post) => collect(post?.author));
+      return Array.from(names).sort((a, b) => a.localeCompare(b)).slice(0, 100);
+    }
+
+    function refreshPawPalsTagOptions() {
+      const datalist = document.getElementById("feed-post-tags-options");
+      if (!datalist) return;
+      datalist.innerHTML = getTaggablePawPals().map((name) => `<option value="${escapeHtml(name)}"></option>`).join("");
+    }
+
+    function parseTaggedPawPals(rawValue) {
+      const seen = new Set();
+      return String(rawValue || "")
+        .split(/[\n,]+/)
+        .map((name) => name.trim().replace(/^@+/, ""))
+        .filter(Boolean)
+        .map((name) => name.slice(0, 40))
+        .filter((name) => {
+          const key = name.toLowerCase();
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        })
+        .slice(0, 8);
+    }
+
+    function getTaggedPawPalsChipValues() {
+      const container = document.getElementById("feed-post-tags-chips");
+      if (!container) return [];
+      return Array.from(container.querySelectorAll("[data-tagged-pawpal]"))
+        .map((chip) => chip.dataset.taggedPawpal || "")
+        .filter(Boolean);
+    }
+
+    function setTaggedPawPalsChips(values = []) {
+      const container = document.getElementById("feed-post-tags-chips");
+      if (!container) return;
+      const normalized = parseTaggedPawPals(Array.isArray(values) ? values.join(",") : values);
+      container.innerHTML = normalized.map((name) => `
+        <span data-tagged-pawpal="${escapeHtml(name)}" class="inline-flex items-center gap-1 rounded-full border border-sky-100 bg-sky-50 px-3 py-1 text-xs font-bold text-sky-700 dark:border-sky-900/50 dark:bg-sky-950/30 dark:text-sky-200">
+          @${escapeHtml(name)}
+          <button type="button" onclick="removeTaggedPawPalChip('${escapeHtml(name)}')" class="no-faith-hover text-sky-500 hover:text-sky-700 dark:text-sky-300" aria-label="Remove ${escapeHtml(name)}">
+            <i data-lucide="x" class="h-3 w-3"></i>
+          </button>
+        </span>`).join("");
+      if (typeof lucide !== "undefined") lucide.createIcons();
+    }
+
+    function removeTaggedPawPalChip(name) {
+      setTaggedPawPalsChips(getTaggedPawPalsChipValues().filter((value) => value !== name));
+    }
+
+    function addTaggedPawPalsFromInput() {
+      const input = document.getElementById("feed-post-tags-input");
+      if (!input) return;
+      const merged = [...getTaggedPawPalsChipValues(), ...parseTaggedPawPals(input.value)];
+      setTaggedPawPalsChips(merged);
+      input.value = "";
+    }
+
+    function handlePostTaggedPawPalsKeydown(event) {
+      if (event.key !== "Enter" && event.key !== ",") return;
+      event.preventDefault();
+      addTaggedPawPalsFromInput();
+    }
+
+    function collectTaggedPawPals() {
+      addTaggedPawPalsFromInput();
+      return getTaggedPawPalsChipValues();
+    }
+
+    function buildPostFeelingText(feeling, activity) {
+      const safeFeeling = String(feeling || "").trim();
+      const safeActivity = String(activity || "").trim();
+      if (!safeFeeling && !safeActivity) return "";
+      if (safeFeeling && safeActivity) return `${safeFeeling} - ${safeActivity}`;
+      return safeFeeling || safeActivity;
+    }
+
     function getPostEventChoices() {
       const sourceEvents = [
         ...(Array.isArray(accountSettingsState?.events) ? accountSettingsState.events : []),
@@ -15222,14 +15366,21 @@
       const titleInput = document.getElementById("feed-post-title");
       const textInput = document.getElementById("feed-post-input");
       const hashtagInput = document.getElementById("feed-post-hashtags");
+      const tagInput = document.getElementById("feed-post-tags-input");
+      const feelingInput = document.getElementById("feed-post-feeling");
+      const activityInput = document.getElementById("feed-post-activity");
       const eventInput = document.getElementById("feed-post-event-input");
       const eventIdInput = document.getElementById("feed-post-event-id");
       if (titleInput) titleInput.value = "";
       if (textInput) textInput.value = "";
       if (hashtagInput) hashtagInput.value = "";
+      if (tagInput) tagInput.value = "";
+      if (feelingInput) feelingInput.value = "";
+      if (activityInput) activityInput.value = "";
       if (eventInput) eventInput.value = "";
       if (eventIdInput) eventIdInput.value = "";
       setHashtagChips("feed-post-hashtags-chips", []);
+      setTaggedPawPalsChips([]);
       clearPostMedia();
       setPostComposerExpanded(false);
     }
@@ -15266,11 +15417,15 @@
       const input = document.getElementById("feed-post-input");
       const title = titleInput?.value?.trim() || "";
       const content = input.value.trim();
+      const taggedPawPals = collectTaggedPawPals();
+      const selectedFeeling = document.getElementById("feed-post-feeling")?.value || "";
+      const feelingActivity = (document.getElementById("feed-post-activity")?.value || "").trim();
+      const feelingText = buildPostFeelingText(selectedFeeling, feelingActivity);
       const hashtags = collectPostHashtags("feed-post-hashtags", "feed-post-hashtags-chips");
       const linkedEvent = getSelectedPostEvent("feed-post-event-input", "feed-post-event-id");
       if (document.getElementById("feed-post-event-input")?.value?.trim() && !linkedEvent) return;
       const media = Array.isArray(selectedPostMedia) ? [...selectedPostMedia] : [];
-      if (!title && !content && !media.length) return;
+      if (!title && !content && !media.length && !taggedPawPals.length && !feelingText) return;
       const audience = getPostAudienceConfig();
 
       if (audience.value === "breed" && !audience.breed) {
@@ -15291,6 +15446,10 @@
         title,
         content,
         description: content,
+        tagged_pawpals: taggedPawPals,
+        feeling: selectedFeeling,
+        feeling_activity: feelingActivity,
+        feeling_text: feelingText,
         hashtags,
         media_url: media[0]?.previewUrl || null,
         media_urls: media.map((item) => item.previewUrl),
@@ -15350,6 +15509,10 @@
           title,
           content,
           description: content,
+          tagged_pawpals: taggedPawPals,
+          feeling: selectedFeeling,
+          feeling_activity: feelingActivity,
+          feeling_text: feelingText,
           hashtags,
           post_type: postType,
           media_url: mediaUrl,
@@ -15368,6 +15531,10 @@
         if (idx >= 0) {
           const savedPost = normalizePostFromApi(data.post);
           savedPost.title = savedPost.title || title;
+          savedPost.tagged_pawpals = Array.isArray(savedPost.tagged_pawpals) && savedPost.tagged_pawpals.length ? savedPost.tagged_pawpals : taggedPawPals;
+          savedPost.feeling = savedPost.feeling || selectedFeeling;
+          savedPost.feeling_activity = savedPost.feeling_activity || feelingActivity;
+          savedPost.feeling_text = savedPost.feeling_text || feelingText;
           savedPost.hashtags = savedPost.hashtags?.length ? savedPost.hashtags : hashtags;
           savedPost.linkedEvent = savedPost.linkedEvent || optimisticPost.linkedEvent;
           savedPost.linkedEvents = savedPost.linkedEvents?.length ? savedPost.linkedEvents : optimisticPost.linkedEvents;

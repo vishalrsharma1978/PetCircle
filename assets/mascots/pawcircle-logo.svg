@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="PawCircle pet paw logo">
+  <rect x="24" y="24" width="208" height="208" rx="52" fill="#ffffff" stroke="#f59e0b" stroke-width="8" />
+
+  <g fill="#3730a3">
+    <ellipse cx="96" cy="102" rx="14" ry="18" />
+    <ellipse cx="124" cy="90" rx="13" ry="17" />
+    <ellipse cx="152" cy="102" rx="14" ry="18" />
+    <ellipse cx="80" cy="126" rx="12" ry="16" />
+    <ellipse cx="168" cy="126" rx="12" ry="16" />
+    <path d="M128 186c-31 0-56-17-56-39 0-18 14-33 34-37 10-2 19 5 21 14l2 8c2 9-4 17-13 18-9 2-16 6-16 12 0 8 12 14 28 14s28-6 28-14c0-6-7-10-16-12-9-1-15-9-13-18l2-8c2-9 11-16 21-14 20 4 34 19 34 37 0 22-25 39-56 39z" />
+  </g>
+
+  <g fill="#6366f1" opacity="0.95">
+    <circle cx="182" cy="74" r="9" />
+    <circle cx="198" cy="58" r="5.5" />
+  </g>
+</svg>

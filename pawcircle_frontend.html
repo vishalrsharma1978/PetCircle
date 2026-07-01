@@ -278,9 +278,25 @@
       flex: 0 0 auto;
     }
 
+    .pet-breed-strip-item.pet-breed-strip-item--login {
+      width: 118px;
+    }
+
+    .pet-breed-strip-item.pet-breed-strip-item--login .pet-thumb {
+      height: 76px;
+    }
+
     @media (max-width: 640px) {
       .pet-breed-strip-item {
         width: 142px;
+      }
+
+      .pet-breed-strip-item.pet-breed-strip-item--login {
+        width: 102px;
+      }
+
+      .pet-breed-strip-item.pet-breed-strip-item--login .pet-thumb {
+        height: 66px;
       }
     }
 
@@ -5798,16 +5814,17 @@
   <!-- ==================== PUBLIC LOGIN ==================== -->
 
   <div id="view-public-login"
-    class="view-section active h-screen overflow-hidden flex flex-col lg:flex-row items-stretch w-full">
+    class="view-section active h-[100dvh] max-h-[100dvh] overflow-hidden flex flex-col lg:flex-row items-stretch w-full"
+    style="--login-accent: #f97316;">
 
     <!-- ── LEFT PANE: Feature Showcase & Feed ────────────────────────────── -->
     <div id="lp-left-pane"
-      class="w-full lg:w-1/2 h-full flex flex-col p-6 sm:p-8 lg:p-10 overflow-y-auto overflow-x-hidden no-scrollbar relative"
-      style="background:linear-gradient(135deg,#fffbeb 0%,#f0fdf4 55%,#ecfeff 100%); transition:background 0.8s ease">
+      class="w-full lg:w-1/2 h-full max-h-[100dvh] flex flex-col p-4 sm:p-5 lg:p-6 overflow-hidden overflow-x-hidden no-scrollbar relative"
+      style="background:linear-gradient(160deg, color-mix(in srgb, var(--login-accent) 32%, #ffffff) 0%, color-mix(in srgb, var(--login-accent) 22%, #f8fafc) 100%); transition:background 0.5s ease, --login-accent 0.5s ease">
 
       <!-- Trailing Paws Background (from signup) -->
       <section class="den" id="login-den" aria-hidden="true"
-        style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; opacity: 0.7; z-index: 0;">
+        style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; opacity: 0; z-index: 0;">
         <svg class="trail" viewBox="0 0 480 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"
           xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 100%; height: 100%;">
           <path id="loginTrailPath"
@@ -5848,7 +5865,7 @@
           <i data-lucide="paw-print" class="w-2.5 h-2.5 text-violet-700 absolute right-1.5 top-1.5"></i>
         </div>
         <div>
-          <div class="text-2xl font-bold tracking-tight text-gray-900 leading-tight"
+          <div class="text-2xl font-bold tracking-tight text-black leading-tight"
             style="font-family: 'DM Serif Display'">PawCircle</div>
           <div class="text-[11px] font-black text-amber-500 tracking-[0.2em] uppercase">Pet Breed</div>
         </div>
@@ -5861,20 +5878,17 @@
 
       <!-- Live rotating feed card -->
       <div id="lp-feed-card"
-        class="flex-1 min-h-[420px] lg:min-h-[520px] rounded-2xl bg-white/85 border border-white/90 shadow-md p-5 mb-3 backdrop-blur-sm relative z-10 transition-all duration-500">
+        class="flex-1 min-h-0 rounded-2xl bg-white/85 border border-white/90 shadow-md p-4 mb-2 backdrop-blur-sm relative z-10 transition-all duration-500">
       </div>
-
-      <!-- Activity ticker -->
-      <div id="lp-activity-ticker" class="flex-shrink-0 flex items-center gap-2 flex-wrap mb-3 relative z-10"></div>
 
       <!-- Hidden showcase -->
       <div id="public-theme-showcase" class="hidden"></div>
-<div class="mt-auto pt-4 relative z-10 w-full flex flex-col items-start"><!-- Pet Type Selector -->
+<div class="mt-auto pt-2 relative z-10 w-full flex flex-col items-start"><!-- Pet Type Selector -->
           <div>
-            <label class="block text-sm font-semibold text-white font-medium mb-1 text-xs text-white/80">Your Pet Type</label>
+            <label class="block text-sm font-semibold text-black font-medium mb-1 text-xs text-gray-700">Your Pet Type</label>
             <div class="relative">
               <select id="login-pet-type"
-                class="block w-full max-w-[200px] pl-4 pr-10 py-1.5 text-xs border border-white/20 rounded-xl focus:outline-none focus:border-transparent text-sm bg-white/10 text-white appearance-none transition-all focus-ring-dynamic"
+                class="block w-full max-w-[200px] pl-4 pr-10 py-1.5 text-xs border border-gray-300 rounded-xl focus:outline-none focus:border-transparent text-sm bg-white/90 text-gray-900 appearance-none transition-all focus-ring-dynamic"
                 onchange="handleLoginPetTypeChange(this.value)">
                 <option class="text-gray-900" value="">I don't have a pet / Just exploring</option>
                 <option class="text-gray-900" value="Dog">Dog</option>
@@ -5887,7 +5901,7 @@
                 <option class="text-gray-900" value="Other">Other</option>
               </select>
               <i data-lucide="chevron-down"
-                class="absolute right-3 top-3.5 w-4 h-4 text-white/60 pointer-events-none"></i>
+                class="absolute right-3 top-3.5 w-4 h-4 text-gray-500 pointer-events-none"></i>
             </div>
             <style>
               .focus-ring-dynamic:focus {
@@ -5900,16 +5914,16 @@
     <!-- ── RIGHT PANE: Login Form ────────────────────────────────────────── -->
     <div id="lp-right-pane"
       class="w-full lg:w-1/2 h-full flex flex-col items-center justify-start pt-10 sm:pt-16 pb-8 bg-white border-t lg:border-t-0 lg:border-l border-gray-100 p-6 sm:px-8 overflow-y-auto overflow-x-hidden"
-      style="--login-accent: #f97316; transition: --login-accent 0.5s ease;">
+      style="transition: --login-accent 0.5s ease;">
 
-      <div class="w-full max-w-sm">
+      <div class="w-full max-w-sm bg-white/96 backdrop-blur-sm rounded-3xl border border-white/75 shadow-lg p-6 sm:p-7">
 
         <!-- Welcome Header -->
         <div class="mb-8 text-center">
           <div
-            class="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-sm mb-4 transition-colors duration-500"
+            class="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-sm mb-4 border border-white/70 overflow-hidden transition-colors duration-500"
             style="background-color: var(--login-accent);">
-            <i data-lucide="users" class="w-7 h-7 text-white"></i>
+            <img src="assets/mascots/pawcircle-logo.svg" alt="PawCircle logo" class="w-11 h-11 object-contain" loading="eager" decoding="async" />
           </div>
           <h3 class="text-3xl font-bold text-gray-900" style="font-family: 'DM Serif Display'">Welcome back</h3>
           <p class="mt-2 text-sm text-gray-500">Let the tail-wagging fun begin!</p>
@@ -5918,14 +5932,14 @@
         <div id="public-error"
           class="hidden mb-6 bg-red-50 border-l-4 border-red-400 p-3 rounded-lg text-sm text-red-700"></div>
 
-        <form id="public-login-form" novalidate class="space-y-10">
+        <form id="public-login-form" novalidate autocomplete="off" class="space-y-10">
           
 
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email address</label>
             <div class="relative">
               <i data-lucide="mail" class="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400 pointer-events-none"></i>
-              <input type="email" id="public-email" required
+              <input type="email" id="public-email" name="public_email" required autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
                 style="color: #111827 !important;"
                 class="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-transparent text-sm bg-gray-50 text-gray-900 transition-all focus-ring-dynamic"
                 placeholder="you@example.com" />
@@ -5937,42 +5951,10 @@
             <div class="relative flex flex-col">
 
               <div class="relative w-full">
-                <!-- Mascot integrated into input wrapper -->
-                <div class="absolute mascot-container pointer-events-none"
-                  style="width: 65px; height: 65px; right: 35px; top: 8px; z-index: 10;">
-                  <div class="mascot" id="login-mascot"
-                    style="position: relative; width: 100%; height: 100%; transform: scale(0.9); transform-origin: bottom right;">
-                    <svg viewBox="0 0 120 120" width="100%" height="100%">
-                      <ellipse class="tail" cx="92" cy="92" rx="10" ry="5" fill="#F2A93B" transform="rotate(20 88 86)" />
-                      <ellipse cx="60" cy="86" rx="33" ry="26" fill="#F2A93B" />
-                      <ellipse cx="60" cy="93" rx="18" ry="14" fill="#FFF8EC" />
-                      <ellipse class="ear-l" cx="35" cy="27" rx="11" ry="17" fill="#F2A93B"
-                        transform="rotate(-18 35 27)" />
-                      <ellipse class="ear-r" cx="76" cy="28" rx="11" ry="17" fill="#F2A93B"
-                        transform="rotate(22 76 28)" />
-                      <ellipse class="ear-l" cx="35" cy="29" rx="5" ry="9" fill="#FF7A5C" transform="rotate(-18 35 29)" />
-                      <ellipse class="ear-r" cx="76" cy="30" rx="5" ry="9" fill="#FF7A5C" transform="rotate(22 76 30)" />
-                      <circle cx="60" cy="49" r="29" fill="#F2A93B" />
-                      <circle cx="49" cy="47" r="9" fill="#FFF8EC" />
-                      <circle cx="71" cy="47" r="9" fill="#FFF8EC" />
-                      <circle class="pupil pupil-l" cx="49" cy="47" r="4" fill="#2B2420" />
-                      <circle class="pupil pupil-r" cx="71" cy="47" r="4" fill="#2B2420" />
-                      <rect class="lids" x="40" y="42" width="40" height="11" fill="#F2A93B" />
-                      <ellipse cx="60" cy="63" rx="14" ry="10" fill="#FFF8EC" />
-                      <ellipse cx="60" cy="58" rx="5" ry="3.5" fill="#2B2420" />
-                      <path d="M 60 61.5 V 66 M 53 65 Q 56.5 69 60 66 M 60 66 Q 63.5 69 67 65" stroke="#2B2420" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-                      <ellipse class="paw-l" cx="47" cy="104" rx="13" ry="9" fill="#FFF8EC"
-                        style="transition: all 0.3s ease; transform-origin: 47px 104px;" />
-                      <ellipse class="paw-r" cx="73" cy="104" rx="13" ry="9" fill="#FFF8EC"
-                        style="transition: all 0.3s ease; transform-origin: 73px 104px;" />
-                    </svg>
-                  </div>
-                </div>
-
                 <i data-lucide="lock" class="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400 pointer-events-none"></i>
-                <input type="password" id="public-password" required
+                <input type="password" id="public-password" name="public_password" required autocomplete="new-password"
                   style="color: #111827 !important;"
-                  class="block w-full pl-10 pr-20 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-transparent text-sm bg-gray-50 text-gray-900 transition-all focus-ring-dynamic"
+                  class="block w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-transparent text-sm bg-gray-50 text-gray-900 transition-all focus-ring-dynamic"
                   placeholder="••••••••" data-pw-toggle="1" />
 
                 <button type="button" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
@@ -6031,12 +6013,12 @@
       <div class="bg-gray-800 py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-700">
         <div id="admin-error"
           class="hidden mb-4 bg-red-900/50 border-l-4 border-red-500 p-3 rounded text-sm text-red-200"></div>
-        <form id="admin-login-form" class="space-y-6">
+        <form id="admin-login-form" autocomplete="off" class="space-y-6">
           <div>
             <label class="block text-base font-semibold text-gray-300">Admin Email</label>
             <div class="mt-1 input-icon-wrap">
               <i data-lucide="mail" class="icon h-4 w-4 text-gray-500" style="color: #6b7280"></i>
-              <input type="email" id="admin-email" required
+              <input type="email" id="admin-email" name="admin_email" required autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
                 class="block w-full pl-10 pr-3 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-100 text-sm" />
             </div>
           </div>
@@ -6044,7 +6026,7 @@
             <label class="block text-base font-semibold text-gray-300">Password</label>
             <div class="mt-1 input-icon-wrap">
               <i data-lucide="lock" class="icon h-4 w-4" style="color: #6b7280"></i>
-              <input type="password" id="admin-password" required
+              <input type="password" id="admin-password" name="admin_password" required autocomplete="new-password"
                 class="block w-full pl-10 pr-3 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-100 text-sm" />
             </div>
           </div>
@@ -6781,19 +6763,19 @@
           class="nav-scroll relative border-t border-gray-200 dark:border-gray-700 flex items-center gap-1 overflow-x-auto no-scrollbar pt-1">
           <button data-tab="feed" onclick="switchSocialTab('feed')"
             class="social-tab-item px-4 py-3 text-sm font-semibold text-brand-500 whitespace-nowrap">
-            Feed
+            PawFeed
           </button>
           <button data-tab="friends" onclick="switchSocialTab('friends')"
             class="social-tab-item px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
-            Friends
+            PawPals
           </button>
           <button data-tab="connections" onclick="switchSocialTab('connections')"
             class="social-tab-item px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
-            Connections
+            <i data-lucide="phone" class="w-3.5 h-3.5 inline-block align-[-2px] mr-1"></i>PawParents
           </button>
           <button data-tab="groups" onclick="switchSocialTab('groups')"
             class="social-tab-item px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
-            Groups
+            PetGroups
           </button>
           <!-- Posts tab removed from navbar — your posts are shown when you open your own profile. -->
           <button data-tab="my-posts" onclick="switchSocialTab('my-posts')"
@@ -6808,16 +6790,19 @@
           </button>
           <button data-tab="events" onclick="switchSocialTab('events')"
             class="social-tab-item px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
-            Pet Breed Events
+            PetEvents
           </button>
           <button data-tab="galleries" onclick="switchSocialTab('galleries')"
             class="social-tab-item px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
-            Galleries
+            PawSmiles
           </button>
 
           <button data-tab="playdate" onclick="switchSocialTab('playdate')"
             class="social-tab-item px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
-            Playdate
+            <span class="inline-flex items-center gap-1">
+              <i data-lucide="heart-handshake" class="w-4 h-4"></i>
+              <span>PawMatches</span>
+            </span>
           </button>
           <!-- Obituaries hidden for now (code retained). -->
           <button data-tab="obituaries" onclick="switchSocialTab('obituaries')"
@@ -6839,7 +6824,7 @@
 
     <div id="main-content-area" class="max-w-7xl mx-auto w-full px-4 py-6 flex flex-col lg:flex-row gap-6 relative">
       <!-- Left Sidebar -->
-      <aside id="social-left-sidebar" class="hidden lg:flex flex-col w-64 flex-shrink-0 self-start">
+      <aside id="social-left-sidebar" class="hidden lg:flex flex-col w-56 flex-shrink-0 self-start">
         <div class="flex-1 min-h-0 space-y-1 pr-2">
           <!-- Hidden compatibility nodes for legacy JS that reference sidebar profile -->
           <span id="sidebar-profile-avatar" class="hidden"><span id="sidebar-profile-avatar-letter"></span><img
@@ -6854,28 +6839,28 @@
               <div class="bg-amber-50 dark:bg-amber-900/30 text-amber-500 p-1.5 rounded-lg">
                 <i data-lucide="layout-list" class="w-5 h-5"></i>
               </div>
-              Feed
+              PawFeed
             </button>
             <button id="tab-btn-friends" onclick="switchSocialTab('friends')"
               class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
               <div class="bg-blue-50 dark:bg-blue-900/30 text-blue-500 p-1.5 rounded-lg">
                 <i data-lucide="users" class="w-5 h-5"></i>
               </div>
-              Friends
+              PawPals
             </button>
             <button id="tab-btn-connections" onclick="switchSocialTab('connections')"
               class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
               <div class="bg-teal-50 dark:bg-teal-900/30 text-teal-500 p-1.5 rounded-lg">
-                <i data-lucide="link" class="w-5 h-5"></i>
+                <i data-lucide="phone" class="w-5 h-5"></i>
               </div>
-              Connections
+              PawParents
             </button>
             <button id="tab-btn-groups" onclick="switchSocialTab('groups')"
               class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
               <div class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 p-1.5 rounded-lg">
                 <i data-lucide="landmark" class="w-5 h-5"></i>
               </div>
-              Groups
+              PetGroups
             </button>
             
             <button id="tab-btn-rescue" onclick="switchSocialTab('rescue')"
@@ -6890,14 +6875,14 @@
               <div class="bg-purple-50 dark:bg-purple-900/30 text-purple-500 p-1.5 rounded-lg">
                 <i data-lucide="calendar-heart" class="w-5 h-5"></i>
               </div>
-              Pet Breed Events
+              PetEvents
             </button>
             <button id="tab-btn-galleries" onclick="switchSocialTab('galleries')"
               class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
               <div class="bg-violet-50 dark:bg-violet-900/30 text-violet-500 p-1.5 rounded-lg">
                 <i data-lucide="images" class="w-5 h-5"></i>
               </div>
-              Galleries
+              PawSmiles
             </button>
 
 
@@ -6906,7 +6891,7 @@
               <div class="bg-pink-50 dark:bg-pink-900/30 text-pink-500 p-1.5 rounded-lg">
                 <i data-lucide="heart-handshake" class="w-5 h-5"></i>
               </div>
-              Playdate
+              PawMatches
             </button>
             <button id="tab-btn-obituaries" onclick="switchSocialTab('obituaries')"
               class="social-tab-btn hidden w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
@@ -7008,11 +6993,35 @@
                 U
               </div>
               <div class="flex-1 min-w-0 space-y-3">
-                <textarea id="feed-post-input" rows="1" placeholder="What's happening in your breed?"
+                <textarea id="feed-post-input" rows="1" placeholder="How is your furry today!!"
+                  onfocus="if (document.getElementById('feed-post-expanded-fields')?.classList.contains('hidden')) setPostComposerExpanded(true);"
                   class="w-full resize-none rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-800 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400 dark:placeholder-gray-500"></textarea>
                 <div id="feed-post-expanded-fields" class="hidden space-y-3">
                   <input type="text" id="feed-post-title" placeholder="Post title"
                     class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm font-semibold text-gray-900 dark:text-gray-100 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
+                  <div class="space-y-2">
+                    <input type="text" id="feed-post-tags-input" list="feed-post-tags-options"
+                      placeholder="Tag PawPals (type name and press Enter)"
+                      onfocus="refreshPawPalsTagOptions()"
+                      onkeydown="handlePostTaggedPawPalsKeydown(event)"
+                      class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
+                    <datalist id="feed-post-tags-options"></datalist>
+                    <div id="feed-post-tags-chips" class="flex flex-wrap gap-2"></div>
+                  </div>
+                  <div class="grid gap-2 sm:grid-cols-2">
+                    <select id="feed-post-feeling"
+                      class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400">
+                      <option value="">Feeling/Activity</option>
+                      <option value="happy">Feeling happy</option>
+                      <option value="excited">Feeling excited</option>
+                      <option value="grateful">Feeling grateful</option>
+                      <option value="proud">Feeling proud</option>
+                      <option value="loved">Feeling loved</option>
+                      <option value="blessed">Feeling blessed</option>
+                    </select>
+                    <input type="text" id="feed-post-activity" maxlength="60" placeholder="What are you doing?"
+                      class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
+                  </div>
                   <div class="space-y-2">
                     <input type="text" id="feed-post-hashtags" placeholder="Type a hashtag and press Enter"
                       onkeydown="handlePostHashtagKeydown(event, 'feed-post-hashtags', 'feed-post-hashtags-chips')"
@@ -7059,14 +7068,29 @@
               class="hidden mt-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/60 overflow-hidden">
             </div>
             <div id="feed-post-status" class="hidden mt-2 text-xs font-semibold text-gray-500 dark:text-gray-400"></div>
-            <div id="feed-post-expanded-actions"
-              class="hidden flex items-center justify-between mt-3 pt-3 border-t border-gray-50 dark:border-gray-800 px-2">
-              <div class="flex items-center gap-4">
+            <div id="feed-post-quick-actions"
+              class="flex flex-wrap items-center gap-3 mt-3 pt-3 border-t border-gray-50 dark:border-gray-800 px-2">
+              <div class="flex flex-wrap items-center gap-4">
                 <button type="button" onclick="openPostMediaPicker()"
                   class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
                   <i data-lucide="image" class="w-4 h-4 text-green-500"></i>
                   Photo/Video
                 </button>
+                <button type="button" onclick="setPostComposerExpanded(true); refreshPawPalsTagOptions(); document.getElementById('feed-post-tags-input')?.focus();"
+                  class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
+                  <i data-lucide="at-sign" class="w-4 h-4 text-sky-500"></i>
+                  Tag PawPals
+                </button>
+                <button type="button" onclick="setPostComposerExpanded(true); document.getElementById('feed-post-feeling')?.focus();"
+                  class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
+                  <i data-lucide="smile-plus" class="w-4 h-4 text-amber-500"></i>
+                  Feeling
+                </button>
+              </div>
+            </div>
+            <div id="feed-post-expanded-actions"
+              class="hidden flex flex-wrap items-center gap-4 mt-2 px-2">
+              <div class="flex flex-wrap items-center gap-4">
                 <button type="button" onclick="togglePostMediaUrlInput()"
                   class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
                   <i data-lucide="link" class="w-4 h-4 text-violet-500"></i>
@@ -7329,7 +7353,7 @@
       </div>
 
       <!-- Right Sidebar -->
-      <div id="social-right-sidebar" class="block lg:hidden xl:block w-full xl:w-80 flex-shrink-0 self-start space-y-6">
+      <div id="social-right-sidebar" class="block lg:hidden xl:block w-full xl:w-72 xl:mr-3 flex-shrink-0 self-start space-y-6">
         <!-- Today's Highlight: Festival / Daily Inspiration -->
         <div id="sidebar-highlight-card"
           class="w-full rounded-xl bg-white dark:bg-gray-900 shadow-sm border border-gray-200 dark:border-gray-700 mb-4 overflow-hidden">
@@ -7961,21 +7985,19 @@
             burstConfetti(btn);
             btn.classList.add("!bg-green-500", "!border-green-500");
             btn.innerText = "Welcome back!";
-            playPortalTransition(() => {
-              try {
-                populateMemberDashboard(demoUser);
-                initializeSocialFeed();
-                switchView("view-social-feed");
-                showToast("Offline demo mode. Backend calls are disabled.", "info");
-                btn.classList.remove("!bg-green-500", "!border-green-500");
-                btn.disabled = false;
-                btn.innerText = "Sign in";
-                document.getElementById("public-login-form").reset();
-              } catch (e) {
-                alert(e.stack || e.message || e);
-                console.error(e);
-              }
-            });
+            try {
+              populateMemberDashboard(demoUser);
+              initializeSocialFeed();
+              switchView("view-social-feed");
+              showToast("Offline demo mode. Backend calls are disabled.", "info");
+              btn.classList.remove("!bg-green-500", "!border-green-500");
+              btn.disabled = false;
+              btn.innerText = "Sign in";
+              document.getElementById("public-login-form").reset();
+            } catch (e) {
+              alert(e.stack || e.message || e);
+              console.error(e);
+            }
             return;
           }
 
@@ -7985,20 +8007,18 @@
               burstConfetti(btn);
               btn.classList.add("!bg-green-500", "!border-green-500");
               btn.innerText = "Welcome back!";
-              playPortalTransition(() => {
-                try {
-                  populateMemberDashboard(authData.user);
-                  initializeSocialFeed();
-                  switchView("view-social-feed");
-                  btn.classList.remove("!bg-green-500", "!border-green-500");
-                  btn.disabled = false;
-                  btn.innerText = "Sign in";
-                  document.getElementById("public-login-form").reset();
-                } catch (e) {
-                  alert(e.stack || e.message || e);
-                  console.error(e);
-                }
-              });
+              try {
+                populateMemberDashboard(authData.user);
+                initializeSocialFeed();
+                switchView("view-social-feed");
+                btn.classList.remove("!bg-green-500", "!border-green-500");
+                btn.disabled = false;
+                btn.innerText = "Sign in";
+                document.getElementById("public-login-form").reset();
+              } catch (e) {
+                alert(e.stack || e.message || e);
+                console.error(e);
+              }
               return;
             }
           } catch (authErr) {
@@ -8016,20 +8036,18 @@
             burstConfetti(btn);
             btn.classList.add("!bg-green-500", "!border-green-500");
             btn.innerText = "Welcome back!";
-            playPortalTransition(() => {
-              try {
-                populateMemberDashboard(data.user);
-                initializeSocialFeed();
-                switchView("view-social-feed");
-                btn.classList.remove("!bg-green-500", "!border-green-500");
-                btn.disabled = false;
-                btn.innerText = "Sign in";
-                document.getElementById("public-login-form").reset();
-              } catch (e) {
-                alert(e.stack || e.message || e);
-                console.error(e);
-              }
-            });
+            try {
+              populateMemberDashboard(data.user);
+              initializeSocialFeed();
+              switchView("view-social-feed");
+              btn.classList.remove("!bg-green-500", "!border-green-500");
+              btn.disabled = false;
+              btn.innerText = "Sign in";
+              document.getElementById("public-login-form").reset();
+            } catch (e) {
+              alert(e.stack || e.message || e);
+              console.error(e);
+            }
           } else {
             showError("public", data.message || "Invalid email or password.");
             btn.disabled = false;
@@ -10208,7 +10226,7 @@
                         </div>
                         <div class="mt-6 pt-6 border-t border-gray-100">
                             <button onclick="initializeSocialFeed()" class="text-base font-bold shadow-md text-white px-8 py-3 rounded-xl transition-colors w-full sm:w-auto shadow-md flex items-center justify-center mx-auto" style="background: linear-gradient(135deg, color-mix(in srgb, var(--faith-accent, #f59e0b) 80%, white) 0%, color-mix(in srgb, var(--faith-accent, #f59e0b) 55%, white) 55%, color-mix(in srgb, var(--faith-accent, #f59e0b) 35%, white) 100%);">
-                                Enter Pet Breed Feed <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                              Enter PawFeed <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
                             </button>
                         </div>
                     </div>
@@ -10230,7 +10248,7 @@
                 </button>
                 <div class="pt-4 border-t border-gray-100 mt-2">
                     <button onclick="initializeSocialFeed()" class="text-base font-bold shadow-md text-white bg-gray-800 hover:bg-gray-900 px-6 py-2.5 rounded-xl transition-colors w-full sm:w-auto flex items-center justify-center mx-auto">
-                        Continue to Feed <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                      Continue to PawFeed <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
                     </button>
                 </div>
             </div>`;
@@ -10777,10 +10795,17 @@
       skillTags = [];
       consentChecks = { terms: false, privacy: false, accuracy: false };
 
+      const petParentDisplayName =
+        user.parent_name ||
+        user?.socialProfile?.parent_name ||
+        user.full_name ||
+        user.email ||
+        user.name ||
+        "Member";
       const dashName = document.getElementById("dash-name");
-      if (dashName) dashName.innerText = user.name || "Member";
+      if (dashName) dashName.innerText = petParentDisplayName;
       const dashNameTopbar = document.getElementById("dash-name-topbar");
-      if (dashNameTopbar) dashNameTopbar.innerText = user.name || "Member";
+      if (dashNameTopbar) dashNameTopbar.innerText = petParentDisplayName;
 
       const greetings = {
         Hindu: "नमस्ते",
@@ -10926,6 +10951,14 @@
         Buddhist: "#f59e0b",
         Jain: "#ef4444",
         Parsi: "#e04848",
+        Dog: "#3b82f6",
+        Cat: "#8b5cf6",
+        Bird: "#f59e0b",
+        Rabbit: "#10b981",
+        Fish: "#06b6d4",
+        Reptile: "#84cc16",
+        "Small Pets": "#ec4899",
+        Other: "#64748b",
       };
       return colors[pet_type] || "#e04848";
     }
@@ -11485,8 +11518,14 @@
           greetings[currentUserObj.pet_type] || "Welcome";
       }
       if (headerGreetingEn) {
-        headerGreetingEn.innerText =
-          greetingEn[currentUserObj.pet_type] || "Welcome to your breed";
+        const petParentName =
+          currentUserObj?.parent_name ||
+          currentUserObj?.socialProfile?.parent_name ||
+          currentUserObj?.full_name ||
+          currentUserObj?.email ||
+          currentUserObj?.name ||
+          "Pet Parent";
+        headerGreetingEn.innerText = petParentName;
       }
 
       // Reset breed-themed background from top header
@@ -13604,6 +13643,12 @@
         title: p.title || "",
         content: p.content || p.description || "",
         description: p.description || p.content || "",
+        tagged_pawpals: Array.isArray(p.tagged_pawpals)
+          ? p.tagged_pawpals.map((name) => String(name || "").trim()).filter(Boolean)
+          : parseTaggedPawPals(p.tagged_pawpals),
+        feeling: p.feeling || "",
+        feeling_activity: p.feeling_activity || "",
+        feeling_text: p.feeling_text || buildPostFeelingText(p.feeling, p.feeling_activity),
         hashtags: normalizeHashtags(p.hashtags),
         media_url: (() => {
           if (typeof p.media_url === "string" && p.media_url.trim().startsWith("[")) {
@@ -14292,6 +14337,12 @@
           post.currentSlideIndex = currentSlideIndex;
           const mediaHtml = renderPostMediaFrame(postId, mediaItems, currentSlideIndex);
           const descriptionText = post.description || post.content || "";
+          const feelingLine = post.feeling_text
+            ? `<p class="mt-2 text-sm font-semibold text-gray-700 dark:text-gray-300"><i data-lucide="smile-plus" class="inline-block h-4 w-4 mr-1 align-[-2px]"></i>${escapeHtml(post.feeling_text)}</p>`
+            : "";
+          const taggedPawPalsHtml = Array.isArray(post.tagged_pawpals) && post.tagged_pawpals.length
+            ? `<p class="mt-2 text-sm text-sky-700 dark:text-sky-300">with ${post.tagged_pawpals.map((name) => `<span class="font-bold">@${escapeHtml(name)}</span>`).join(", ")}</p>`
+            : "";
           const descriptionHtml = descriptionText
             ? `<p class="mt-3 text-sm text-gray-800 dark:text-gray-300 whitespace-pre-wrap break-words">${escapeHtml(descriptionText)}</p>`
             : "";
@@ -14353,6 +14404,8 @@
                     <div class="p-4">
                         ${titleHtml}
                         ${mediaHtml}
+                        ${feelingLine}
+                        ${taggedPawPalsHtml}
                         ${descriptionHtml}
                         ${hashtagsHtml}
                         ${linkedEventHtml}
@@ -15121,6 +15174,97 @@
       return getHashtagChipValues(chipsId);
     }
 
+    function getTaggablePawPals() {
+      const names = new Set();
+      const selfName = String(currentUserObj?.socialProfile?.name || currentUserObj?.name || "").trim().toLowerCase();
+      const collect = (value) => {
+        const name = String(value || "").trim();
+        if (!name) return;
+        if (name.toLowerCase() === selfName) return;
+        names.add(name);
+      };
+      (Array.isArray(globalConnections) ? globalConnections : []).forEach((member) => {
+        collect(member?.name || member?.full_name || member?.author);
+      });
+      (Array.isArray(feedPosts) ? feedPosts : []).forEach((post) => collect(post?.author));
+      return Array.from(names).sort((a, b) => a.localeCompare(b)).slice(0, 100);
+    }
+
+    function refreshPawPalsTagOptions() {
+      const datalist = document.getElementById("feed-post-tags-options");
+      if (!datalist) return;
+      datalist.innerHTML = getTaggablePawPals().map((name) => `<option value="${escapeHtml(name)}"></option>`).join("");
+    }
+
+    function parseTaggedPawPals(rawValue) {
+      const seen = new Set();
+      return String(rawValue || "")
+        .split(/[\n,]+/)
+        .map((name) => name.trim().replace(/^@+/, ""))
+        .filter(Boolean)
+        .map((name) => name.slice(0, 40))
+        .filter((name) => {
+          const key = name.toLowerCase();
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        })
+        .slice(0, 8);
+    }
+
+    function getTaggedPawPalsChipValues() {
+      const container = document.getElementById("feed-post-tags-chips");
+      if (!container) return [];
+      return Array.from(container.querySelectorAll("[data-tagged-pawpal]"))
+        .map((chip) => chip.dataset.taggedPawpal || "")
+        .filter(Boolean);
+    }
+
+    function setTaggedPawPalsChips(values = []) {
+      const container = document.getElementById("feed-post-tags-chips");
+      if (!container) return;
+      const normalized = parseTaggedPawPals(Array.isArray(values) ? values.join(",") : values);
+      container.innerHTML = normalized.map((name) => `
+        <span data-tagged-pawpal="${escapeHtml(name)}" class="inline-flex items-center gap-1 rounded-full border border-sky-100 bg-sky-50 px-3 py-1 text-xs font-bold text-sky-700 dark:border-sky-900/50 dark:bg-sky-950/30 dark:text-sky-200">
+          @${escapeHtml(name)}
+          <button type="button" onclick="removeTaggedPawPalChip('${escapeHtml(name)}')" class="no-faith-hover text-sky-500 hover:text-sky-700 dark:text-sky-300" aria-label="Remove ${escapeHtml(name)}">
+            <i data-lucide="x" class="h-3 w-3"></i>
+          </button>
+        </span>`).join("");
+      if (typeof lucide !== "undefined") lucide.createIcons();
+    }
+
+    function removeTaggedPawPalChip(name) {
+      setTaggedPawPalsChips(getTaggedPawPalsChipValues().filter((value) => value !== name));
+    }
+
+    function addTaggedPawPalsFromInput() {
+      const input = document.getElementById("feed-post-tags-input");
+      if (!input) return;
+      const merged = [...getTaggedPawPalsChipValues(), ...parseTaggedPawPals(input.value)];
+      setTaggedPawPalsChips(merged);
+      input.value = "";
+    }
+
+    function handlePostTaggedPawPalsKeydown(event) {
+      if (event.key !== "Enter" && event.key !== ",") return;
+      event.preventDefault();
+      addTaggedPawPalsFromInput();
+    }
+
+    function collectTaggedPawPals() {
+      addTaggedPawPalsFromInput();
+      return getTaggedPawPalsChipValues();
+    }
+
+    function buildPostFeelingText(feeling, activity) {
+      const safeFeeling = String(feeling || "").trim();
+      const safeActivity = String(activity || "").trim();
+      if (!safeFeeling && !safeActivity) return "";
+      if (safeFeeling && safeActivity) return `${safeFeeling} - ${safeActivity}`;
+      return safeFeeling || safeActivity;
+    }
+
     function getPostEventChoices() {
       const sourceEvents = [
         ...(Array.isArray(accountSettingsState?.events) ? accountSettingsState.events : []),
@@ -15222,14 +15366,21 @@
       const titleInput = document.getElementById("feed-post-title");
       const textInput = document.getElementById("feed-post-input");
       const hashtagInput = document.getElementById("feed-post-hashtags");
+      const tagInput = document.getElementById("feed-post-tags-input");
+      const feelingInput = document.getElementById("feed-post-feeling");
+      const activityInput = document.getElementById("feed-post-activity");
       const eventInput = document.getElementById("feed-post-event-input");
       const eventIdInput = document.getElementById("feed-post-event-id");
       if (titleInput) titleInput.value = "";
       if (textInput) textInput.value = "";
       if (hashtagInput) hashtagInput.value = "";
+      if (tagInput) tagInput.value = "";
+      if (feelingInput) feelingInput.value = "";
+      if (activityInput) activityInput.value = "";
       if (eventInput) eventInput.value = "";
       if (eventIdInput) eventIdInput.value = "";
       setHashtagChips("feed-post-hashtags-chips", []);
+      setTaggedPawPalsChips([]);
       clearPostMedia();
       setPostComposerExpanded(false);
     }
@@ -15266,11 +15417,15 @@
       const input = document.getElementById("feed-post-input");
       const title = titleInput?.value?.trim() || "";
       const content = input.value.trim();
+      const taggedPawPals = collectTaggedPawPals();
+      const selectedFeeling = document.getElementById("feed-post-feeling")?.value || "";
+      const feelingActivity = (document.getElementById("feed-post-activity")?.value || "").trim();
+      const feelingText = buildPostFeelingText(selectedFeeling, feelingActivity);
       const hashtags = collectPostHashtags("feed-post-hashtags", "feed-post-hashtags-chips");
       const linkedEvent = getSelectedPostEvent("feed-post-event-input", "feed-post-event-id");
       if (document.getElementById("feed-post-event-input")?.value?.trim() && !linkedEvent) return;
       const media = Array.isArray(selectedPostMedia) ? [...selectedPostMedia] : [];
-      if (!title && !content && !media.length) return;
+      if (!title && !content && !media.length && !taggedPawPals.length && !feelingText) return;
       const audience = getPostAudienceConfig();
 
       if (audience.value === "breed" && !audience.breed) {
@@ -15291,6 +15446,10 @@
         title,
         content,
         description: content,
+        tagged_pawpals: taggedPawPals,
+        feeling: selectedFeeling,
+        feeling_activity: feelingActivity,
+        feeling_text: feelingText,
         hashtags,
         media_url: media[0]?.previewUrl || null,
         media_urls: media.map((item) => item.previewUrl),
@@ -15350,6 +15509,10 @@
           title,
           content,
           description: content,
+          tagged_pawpals: taggedPawPals,
+          feeling: selectedFeeling,
+          feeling_activity: feelingActivity,
+          feeling_text: feelingText,
           hashtags,
           post_type: postType,
           media_url: mediaUrl,
@@ -15368,6 +15531,10 @@
         if (idx >= 0) {
           const savedPost = normalizePostFromApi(data.post);
           savedPost.title = savedPost.title || title;
+          savedPost.tagged_pawpals = Array.isArray(savedPost.tagged_pawpals) && savedPost.tagged_pawpals.length ? savedPost.tagged_pawpals : taggedPawPals;
+          savedPost.feeling = savedPost.feeling || selectedFeeling;
+          savedPost.feeling_activity = savedPost.feeling_activity || feelingActivity;
+          savedPost.feeling_text = savedPost.feeling_text || feelingText;
           savedPost.hashtags = savedPost.hashtags?.length ? savedPost.hashtags : hashtags;
           savedPost.linkedEvent = savedPost.linkedEvent || optimisticPost.linkedEvent;
           savedPost.linkedEvents = savedPost.linkedEvents?.length ? savedPost.linkedEvents : optimisticPost.linkedEvents;
@@ -16924,6 +17091,8 @@
     }
 
     function openProfileModal() {
+      pendingProfileAvatarFile = null;
+      pendingProfileAvatarPreview = null;
       currentUserObj.socialProfile = currentUserObj.socialProfile || {};
       const prof = getEditableProfileSnapshot(currentUserObj);
 
@@ -16996,13 +17165,18 @@
       document.getElementById("profile-modal").classList.remove("flex");
     }
 
+    let pendingProfileAvatarFile = null;
+    let pendingProfileAvatarPreview = null;
+
     async function handleAvatarUpload(input) {
       if (!input.files || !input.files[0]) return;
       const file = input.files[0];
+      pendingProfileAvatarFile = file;
 
       // Show local preview immediately
       const reader = new FileReader();
       reader.onload = (e) => {
+        pendingProfileAvatarPreview = e.target.result;
         const img = document.getElementById("profile-modal-avatar-img");
         const text = document.getElementById("profile-modal-avatar-text");
         img.src = e.target.result;
@@ -17011,44 +17185,7 @@
       };
       reader.readAsDataURL(file);
 
-      // Upload to Supabase Storage
-      if (!currentUserObj?.id) return;
-      const photoUrl = await uploadPhotoToSupabase(file, {
-        bucket: 'profile-photos',
-        prefix: 'profile',
-        userId: currentUserObj.id,
-        imageMaxWidth: 768,
-        imageMaxHeight: 768,
-        maxBytes: 900 * 1024,
-      });
-      if (!photoUrl) {
-        console.warn("Avatar upload failed");
-        showToast("Profile picture upload failed. Try a smaller image.");
-        return;
-      }
-
-      // Save URL to profile
-      try {
-        const response = await fetch("pawcircle_api.php", {
-          method: "POST",
-          credentials: "include",
-          headers: secureJsonHeaders(),
-          body: JSON.stringify({
-            action: "update_profile",
-            user_id: currentUserObj.id,
-            profile_photo_url: photoUrl,
-          }),
-        });
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok || result.status !== "success") {
-          throw new Error(result.message || "Could not save profile picture.");
-        }
-        syncCurrentProfileMedia({ profilePhotoUrl: photoUrl });
-        showToast("Profile picture updated.");
-      } catch (err) {
-        console.warn("Could not save avatar URL to backend.", err);
-        showToast(err.message || "Could not save profile picture.");
-      }
+      showToast("Profile picture selected. Click Save Changes to apply.");
     }
 
     async function saveProfile() {
@@ -17100,27 +17237,58 @@
         currentUserObj.system_tags = getSystemProfileTags(currentUserObj);
         currentUserObj.tags = getDisplayProfileTags(currentUserObj);
 
+        let uploadedProfilePhotoUrl = null;
+
+        // If a new avatar was selected in the modal, upload and apply it on Save.
+        if (pendingProfileAvatarFile && currentUserObj?.id) {
+            uploadedProfilePhotoUrl = await uploadPhotoToSupabase(pendingProfileAvatarFile, {
+              bucket: 'profile-photos',
+              prefix: 'profile',
+              userId: currentUserObj.id,
+              imageMaxWidth: 768,
+              imageMaxHeight: 768,
+              maxBytes: 900 * 1024,
+            });
+
+            if (uploadedProfilePhotoUrl) {
+              currentUserObj.profile_photo_url = uploadedProfilePhotoUrl;
+              currentUserObj.socialProfile.profile_photo_url = uploadedProfilePhotoUrl;
+              currentUserObj.socialProfile.profilePhoto = uploadedProfilePhotoUrl;
+            } else if (pendingProfileAvatarPreview) {
+              // Keep UX smooth: show selected image immediately even if backend upload fails.
+              currentUserObj.profile_photo_url = pendingProfileAvatarPreview;
+              currentUserObj.socialProfile.profile_photo_url = pendingProfileAvatarPreview;
+              currentUserObj.socialProfile.profilePhoto = pendingProfileAvatarPreview;
+              showToast("Profile picture applied locally. It will sync once upload succeeds.");
+            }
+        }
+
         // Persist to Supabase
         if (currentUserObj?.id) {
           try {
+            const updatePayload = {
+              action: "update_profile",
+              user_id: currentUserObj.id,
+              full_name: name,
+              breed,
+              gender,
+              age_group: age,
+              occupation,
+              bio,
+              mobile_number: contactNo,
+              is_public: isPublic,
+              primary_interests: tags,
+              tags,
+            };
+            if (uploadedProfilePhotoUrl) {
+              updatePayload.profile_photo_url = uploadedProfilePhotoUrl;
+            }
+
             const profileRes = await fetch("pawcircle_api.php", {
               method: "POST",
               credentials: "include",
               headers: secureJsonHeaders(),
-              body: JSON.stringify({
-                action: "update_profile",
-                user_id: currentUserObj.id,
-                full_name: name,
-                breed,
-                gender,
-                age_group: age,
-                occupation,
-                bio,
-                mobile_number: contactNo,
-                is_public: isPublic,
-                primary_interests: tags,
-                tags,
-              }),
+              body: JSON.stringify(updatePayload),
             });
             const profileData = await profileRes.json().catch(() => ({}));
             if (!profileRes.ok || profileData.status === "error") {
@@ -17143,6 +17311,11 @@
           profileModalTitleNameUpdate.innerText = name;
         }
         renderCoverProfileTags();
+
+        pendingProfileAvatarFile = null;
+        pendingProfileAvatarPreview = null;
+        const avatarInput = document.getElementById("avatar-upload-input");
+        if (avatarInput) avatarInput.value = "";
 
         persistCurrentSession(currentUserObj);
 
@@ -17815,18 +17988,18 @@
 
     // Right-hand frame quick links (mirror the left navigation)
     const RIGHT_QUICK_LINKS = [
-      { tab: "feed", label: "Feed", icon: "layout-list", color: "amber" },
-      { tab: "friends", label: "Friends", icon: "users", color: "blue" },
-      { tab: "connections", label: "Connections", icon: "link", color: "teal" },
-      { tab: "groups", label: "Groups", icon: "landmark", color: "emerald" },
+      { tab: "feed", label: "PawFeed", icon: "layout-list", color: "amber" },
+      { tab: "friends", label: "PawPals", icon: "users", color: "blue" },
+      { tab: "connections", label: "PawParents", icon: "phone", color: "teal" },
+      { tab: "groups", label: "PetGroups", icon: "landmark", color: "emerald" },
       { tab: "live-events", label: "Park", icon: "play-circle", color: "indigo" },
       // Rescue Marketplace hidden for now (code retained).
       // { tab: "rescue", label: "Rescue", icon: "hand-heart", color: "rose" },
-      { tab: "events", label: "Events", icon: "calendar-heart", color: "purple" },
-      { tab: "galleries", label: "Galleries", icon: "images", color: "violet" },
+      { tab: "events", label: "PetEvents", icon: "calendar-heart", color: "purple" },
+      { tab: "galleries", label: "PawSmiles", icon: "images", color: "violet" },
       { tab: "granth", label: "Dharmic Granth", icon: "book-open-text", color: "amber" },
       { tab: "festivals", label: "Festivals", icon: "party-popper", color: "orange" },
-      { tab: "playdate", label: "Playdate", icon: "heart-handshake", color: "pink" },
+      { tab: "playdate", label: "PawMatches", icon: "heart-handshake", color: "pink" },
       // Obituaries & PawCircle hidden for now (code retained).
       // { tab: "obituaries", label: "Obituaries", icon: "flower", color: "gray" },
       // { view: "view-content-hub", label: "PawCircle", icon: "tv-2", color: "red" },
@@ -17838,8 +18011,11 @@
       box.innerHTML = RIGHT_QUICK_LINKS.map((l) => {
         const isActive = l.tab && l.tab === activeTab;
         const onClick = l.tab ? `switchSocialTab('${l.tab}')` : `switchView('${l.view}')`;
+        const iconMarkup = l.iconDouble
+          ? `<span class="inline-flex items-center gap-0.5"><i data-lucide="${l.icon}" class="w-3.5 h-3.5"></i><i data-lucide="${l.icon}" class="w-3.5 h-3.5"></i></span>`
+          : `<i data-lucide="${l.icon}" class="w-4 h-4"></i>`;
         return `<button onclick="${onClick}" class="no-faith-hover flex flex-col items-center justify-center gap-1.5 px-2 py-3 rounded-xl border transition-colors text-center ${isActive ? "border-brand-400 bg-brand-50 dark:bg-brand-900/20" : "border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/60"}">
-          <span class="bg-${l.color}-50 dark:bg-${l.color}-900/30 text-${l.color}-500 p-1.5 rounded-lg"><i data-lucide="${l.icon}" class="w-4 h-4"></i></span>
+          <span class="bg-${l.color}-50 dark:bg-${l.color}-900/30 text-${l.color}-500 p-1.5 rounded-lg">${iconMarkup}</span>
           <span class="text-[11px] font-semibold text-gray-700 dark:text-gray-300 leading-tight">${l.label}</span>
         </button>`;
       }).join("");
@@ -18842,6 +19018,14 @@
         Buddhist: "#ca8a04",
         Jain: "#e11d48",
         Parsi: "#e04848",
+        Dog: "#3b82f6",
+        Cat: "#8b5cf6",
+        Bird: "#f59e0b",
+        Rabbit: "#10b981",
+        Fish: "#06b6d4",
+        Reptile: "#84cc16",
+        "Small Pets": "#ec4899",
+        Other: "#64748b",
       };
       return accents[pet_type] || "var(--faith-accent, #f97316)";
     }
@@ -36347,16 +36531,7 @@ function mountMascot(containerId, passwordId, toggleId, nameId, petType) {
 }
 
     // Setup default mascots
-    mountMascot('login-mascot', 'public-password', 'loginEyeToggle', null, 'dog');
     mountMascot('mascot', 'reg-password', 'eyeToggle', 'reg-name', '');
-
-    // Hook up login dropdown
-    var loginPetTypeSelect = document.getElementById('login-pet-type');
-    if (loginPetTypeSelect) {
-      loginPetTypeSelect.addEventListener('change', function(e) {
-        mountMascot('login-mascot', 'public-password', 'loginEyeToggle', null, e.target.value);
-      });
-    }
 
     // Hook up signup dropdown
     var signupPetTypeSelect = document.getElementById('reg-pet_type');
@@ -36798,7 +36973,6 @@ function mountMascot(containerId, passwordId, toggleId, nameId, petType) {
     function initLoginFeed() {
       var pane = document.getElementById('lp-left-pane');
       var card = document.getElementById('lp-feed-card');
-      var ticker = document.getElementById('lp-activity-ticker');
       var onlineEl = document.getElementById('lp-online-count');
       if (!card) return;
 
@@ -36904,13 +37078,13 @@ function mountMascot(containerId, passwordId, toggleId, nameId, petType) {
         }
 
         var f = loginFeedFeeds[loginFeedCurrentIdx];
-        if (pane) pane.style.background = f.grad;
+        var theme = getPetTheme(f.petTheme);
         if (onlineEl) onlineEl.textContent = (f.online + Math.floor(Math.random() * 14) - 7) + ' online';
 
         var tipsHtml = f.tips.map(function (t) {
-          return '<div class="rounded-xl border px-2.5 py-2.5 text-center min-h-[92px] flex flex-col items-center justify-center ' + t.cls + '">' +
-            '<div class="text-base mb-0.5">' + t.icon + '</div>' +
-            '<div class="text-xs font-semibold leading-tight">' + t.label + '<br>' + t.sub + '</div></div>';
+          return '<div class="rounded-xl border px-2 py-2 text-center min-h-[78px] flex flex-col items-center justify-center ' + t.cls + '">' +
+            '<div class="text-sm mb-0.5">' + t.icon + '</div>' +
+            '<div class="text-[11px] font-semibold leading-tight">' + t.label + '<br>' + t.sub + '</div></div>';
         }).join('');
 
         var tagsHtml = f.tags.map(function (tag) {
@@ -36922,37 +37096,31 @@ function mountMascot(containerId, passwordId, toggleId, nameId, petType) {
         var breedGalleryHtml = galleryThemes.concat(galleryThemes).map(function (themeName) {
           var theme = getPetTheme(themeName);
           var art = PET_REAL_PHOTOS[themeName] || getPetIllustrationDataUrl(theme, 'badge');
-          return '<div class="pet-breed-strip-item rounded-xl border border-white/85 bg-white/76 p-2.5 shadow-sm">' +
-            '<div class="h-28 rounded-lg" style="background-image:linear-gradient(135deg, color-mix(in srgb, ' + theme.accent + ' 18%, white), transparent 70%), url(\'' + art + '\');background-size:cover;background-position:center;"></div>' +
-            '<div class="mt-1.5 text-[11px] font-bold text-gray-700 text-center leading-tight">' + theme.label + '</div>' +
+          return '<div class="pet-breed-strip-item pet-breed-strip-item--login rounded-xl border border-white/85 bg-white/76 p-1.5 shadow-sm">' +
+            '<div class="pet-thumb rounded-lg" style="background-image:linear-gradient(135deg, color-mix(in srgb, ' + theme.accent + ' 18%, white), transparent 70%), url(\'' + art + '\');background-size:cover;background-position:center;"></div>' +
+            '<div class="mt-1 text-[10px] font-bold text-gray-700 text-center leading-tight">' + theme.label + '</div>' +
             '</div>';
         }).join('');
 
         card.innerHTML =
           '<div class="h-full flex flex-col">' +
-          '<div class="flex items-center justify-between mb-2">' +
+          '<div class="flex items-center justify-between mb-1.5">' +
           '<span class="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-0.5 rounded-full bg-white border uppercase tracking-wide ' + f.chipCls + '">' +
           f.icon + ' ' + f.chipText +
           '</span>' +
           '<span class="text-xs text-gray-400">5 min read</span>' +
           '</div>' +
-          '<h3 class="text-base font-bold text-gray-800 leading-snug mb-1.5" style="font-family:\'DM Serif Display\';">' + f.headline + '</h3>' +
-          '<p class="text-sm text-gray-600 leading-relaxed mb-3">' + f.excerpt + '</p>' +
-          '<div class="grid grid-cols-3 gap-2.5 mb-3 auto-rows-fr">' + tipsHtml + '</div>' +
-          '<div class="mt-auto flex items-center gap-2 flex-wrap">' + tagsHtml + '</div>' +
-          '<div class="mt-3 pt-3 border-t border-white/80">' +
-          '<div class="text-[11px] font-black uppercase tracking-[0.16em] text-gray-500 mb-2">Explore Pet Communities</div>' +
-          '<div class="pet-breed-strip">' +
+          '<h3 class="text-[15px] font-bold text-gray-800 leading-snug mb-1" style="font-family:\'DM Serif Display\';">' + f.headline + '</h3>' +
+          '<p class="text-[13px] text-gray-600 leading-relaxed mb-2" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">' + f.excerpt + '</p>' +
+          '<div class="grid grid-cols-3 gap-2 mb-2 auto-rows-fr">' + tipsHtml + '</div>' +
+          '<div class="mt-auto pt-2 border-t border-white/80">' +
+          '<div class="text-[10px] font-black uppercase tracking-[0.16em] text-gray-500 mb-1.5">Pet Breeds Near You</div>' +
+          '<div class="pet-breed-strip rounded-xl">' +
           '<div class="pet-breed-strip-track">' + breedGalleryHtml + '</div>' +
           '</div>' +
           '</div>' +
+          '<div class="mt-2 flex items-center gap-2 flex-wrap">' + tagsHtml + '</div>' +
           '</div>';
-
-        if (ticker) {
-          ticker.innerHTML = f.activity.map(function (a) {
-            return '<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-white/80 border border-gray-200/60 text-xs text-gray-600 shadow-sm">' + a + '</span>';
-          }).join('');
-        }
 
         card.style.opacity = '0';
         card.style.transform = 'translateY(8px)';
@@ -36965,17 +37133,19 @@ function mountMascot(containerId, passwordId, toggleId, nameId, petType) {
         if (!forceTheme) {
           // Sync accent color
           var rightPane = document.getElementById('lp-right-pane');
-          var theme = getPetTheme(f.petTheme);
-          if (rightPane && theme) {
+          var loginView = document.getElementById('view-public-login');
+          if (theme && loginView) {
+            loginView.style.setProperty('--login-accent', theme.accent);
+          }
+          if (theme && rightPane) {
             rightPane.style.setProperty('--login-accent', theme.accent);
           }
           
-          // Sync dropdown and mount new mascot
+          // Sync dropdown selection
           var loginPetTypeSelect = document.getElementById('login-pet-type');
           if (loginPetTypeSelect) {
             loginPetTypeSelect.value = f.petTheme;
           }
-          mountMascot('login-mascot', 'public-password', 'loginEyeToggle', null, f.petTheme);
           
           loginFeedCurrentIdx = (loginFeedCurrentIdx + 1) % loginFeedFeeds.length;
         }
@@ -37006,9 +37176,11 @@ function mountMascot(containerId, passwordId, toggleId, nameId, petType) {
 
     function handleLoginPetTypeChange(type) {
       var rightPane = document.getElementById('lp-right-pane');
+      var loginView = document.getElementById('view-public-login');
       if (!type) {
         if (loginFeedRotateTimer) clearInterval(loginFeedRotateTimer);
         loginFeedRotateTimer = setInterval(loginFeedRenderFn, 7000);
+        if (loginView) loginView.style.setProperty('--login-accent', '#f97316'); // Default brand
         if (rightPane) rightPane.style.setProperty('--login-accent', '#f97316'); // Default brand
         return;
       }
@@ -37021,6 +37193,9 @@ function mountMascot(containerId, passwordId, toggleId, nameId, petType) {
 
       // Update accent color
       var theme = getPetTheme(type);
+      if (loginView && theme) {
+        loginView.style.setProperty('--login-accent', theme.accent);
+      }
       if (rightPane && theme) {
         rightPane.style.setProperty('--login-accent', theme.accent);
       }

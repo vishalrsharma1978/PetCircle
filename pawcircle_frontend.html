@@ -6768,7 +6768,7 @@
                   class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-2"><i
                     data-lucide="link" class="w-4 h-4"></i> Copy Link</button>
                 <button
-                  onclick="switchSocialTab('settings'); document.getElementById('profile-more-menu').classList.add('hidden');"
+                  onclick="switchSocialTab('settings'); switchAccountSettingsSection('overview'); document.getElementById('profile-more-menu').classList.add('hidden');"
                   class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-2"><i
                     data-lucide="settings" class="w-4 h-4"></i> Settings</button>
               </div>
@@ -17608,6 +17608,19 @@
 
       if (tabId === "my-posts" && typeof renderMyPosts === "function") {
         renderMyPosts();
+      }
+      if (tabId === "events" && typeof renderAllEventsPanel === "function") {
+        renderAllEventsPanel();
+      }
+      if (tabId === "galleries" && typeof renderMainGalleriesTab === "function") {
+        renderMainGalleriesTab();
+      }
+      if (tabId === "settings" && typeof switchAccountSettingsSection === "function") {
+        if (!accountSettingsState.activeSection) {
+          switchAccountSettingsSection("overview");
+        } else {
+          switchAccountSettingsSection(accountSettingsState.activeSection);
+        }
       }
 
       if (!options.skipScroll) {

@@ -6983,141 +6983,27 @@
             </button>
           </div>
 
-          <!-- Create Post -->
-          <div id="feed-post-composer"
-            class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-3 sm:p-4">
+          <!-- Simplified Post Composer: Title, Content, Hashtags -->
+          <div id="feed-post-composer" class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-3 sm:p-4">
             <div class="flex gap-3 items-start">
-              <div
-                class="w-10 h-10 bg-brand-100 dark:bg-brand-900/50 rounded-full flex items-center justify-center text-brand-900 dark:text-brand-100 font-bold flex-shrink-0"
-                id="feed-create-avatar">
-                U
-              </div>
+              <div id="feed-create-avatar" class="w-10 h-10 bg-brand-100 dark:bg-brand-900/50 rounded-full flex items-center justify-center text-brand-900 dark:text-brand-100 font-bold flex-shrink-0">U</div>
               <div class="flex-1 min-w-0 space-y-3">
-                <textarea id="feed-post-input" rows="1" placeholder="How is your furry today!!"
-                  onfocus="if (document.getElementById('feed-post-expanded-fields')?.classList.contains('hidden')) setPostComposerExpanded(true);"
-                  class="w-full resize-none rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-800 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400 dark:placeholder-gray-500"></textarea>
-                <div id="feed-post-expanded-fields" class="hidden space-y-3">
-                  <input type="text" id="feed-post-title" placeholder="Post title"
-                    class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm font-semibold text-gray-900 dark:text-gray-100 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
+                <textarea id="feed-post-input" rows="3" placeholder="Share an update..." onfocus="setPostComposerExpanded(true);" class="w-full resize-y rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-800 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400"></textarea>
+                <div id="feed-post-expanded-fields" class="space-y-3 hidden">
+                  <input type="text" id="feed-post-title" placeholder="Title (optional)" class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm font-semibold text-gray-900 dark:text-gray-100 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
                   <div class="space-y-2">
-                    <input type="text" id="feed-post-tags-input" list="feed-post-tags-options"
-                      placeholder="Tag PawPals (type name and press Enter)"
-                      onfocus="refreshPawPalsTagOptions()"
-                      onkeydown="handlePostTaggedPawPalsKeydown(event)"
-                      class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
-                    <datalist id="feed-post-tags-options"></datalist>
-                    <div id="feed-post-tags-chips" class="flex flex-wrap gap-2"></div>
-                  </div>
-                  <div class="grid gap-2 sm:grid-cols-2">
-                    <select id="feed-post-feeling"
-                      class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400">
-                      <option value="">Feeling/Activity</option>
-                      <option value="happy">Feeling happy</option>
-                      <option value="excited">Feeling excited</option>
-                      <option value="grateful">Feeling grateful</option>
-                      <option value="proud">Feeling proud</option>
-                      <option value="loved">Feeling loved</option>
-                      <option value="blessed">Feeling blessed</option>
-                    </select>
-                    <input type="text" id="feed-post-activity" maxlength="60" placeholder="What are you doing?"
-                      class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
-                  </div>
-                  <div class="space-y-2">
-                    <input type="text" id="feed-post-hashtags" placeholder="Type a hashtag and press Enter"
-                      onkeydown="handlePostHashtagKeydown(event, 'feed-post-hashtags', 'feed-post-hashtags-chips')"
-                      class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
+                    <input type="text" id="feed-post-hashtags" placeholder="Add hashtags (press Enter)" onkeydown="handlePostHashtagKeydown(event, 'feed-post-hashtags', 'feed-post-hashtags-chips')" class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
                     <div id="feed-post-hashtags-chips" class="flex flex-wrap gap-2"></div>
-                  </div>
-                  <div class="space-y-2">
-                    <input type="text" id="feed-post-event-input" list="feed-post-event-options"
-                      placeholder="Link an event"
-                      oninput="syncPostEventChoice('feed-post-event-input', 'feed-post-event-id')"
-                      onchange="syncPostEventChoice('feed-post-event-input', 'feed-post-event-id')"
-                      class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
-                    <input type="hidden" id="feed-post-event-id" />
-                    <datalist id="feed-post-event-options"></datalist>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="mt-3 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
-              <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                <span class="font-semibold">Post to</span>
-                <select id="feed-post-audience" onchange="updatePostAudienceHint()"
-                  class="min-w-0 flex-1 sm:w-52 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 dark:text-gray-100">
-                  <option value="breed">My breed/caste</option>
-                  <option value="pet_type">My pet_type (all sects)</option>
-                  <option value="global">Everyone (Public)</option>
-                  <option value="hide_extended">Hide from extended pack</option>
-                  <option value="outside_breed">Outside Breed only</option>
-                </select>
-              </label>
-              <div class="flex items-center justify-between gap-3 sm:justify-end">
-                <div id="feed-post-audience-hint" class="text-xs text-gray-500 dark:text-gray-400 sm:text-right"></div>
-                <button id="feed-post-expand-btn" type="button" onclick="togglePostComposerExpanded()"
-                  class="no-faith-hover inline-flex items-center gap-1.5 rounded-full border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
-                  <i data-lucide="sliders-horizontal" class="h-3.5 w-3.5"></i>
-                  More
-                </button>
+            <div class="mt-3 flex items-center justify-between gap-3">
+              <div class="text-xs text-gray-500 dark:text-gray-400">Keep it simple — title, content, and hashtags.</div>
+              <div class="flex items-center gap-2">
+                <button id="feed-post-cancel-btn" type="button" onclick="resetPostComposer()" class="px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Cancel</button>
+                <button id="feed-post-submit-btn" type="button" onclick="submitPost()" class="px-4 py-2 rounded-full bg-[#f97316] text-white text-sm font-bold shadow-sm">Post</button>
               </div>
-            </div>
-            <input type="file" id="feed-post-media-input" multiple
-              accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm" class="hidden"
-              onchange="handlePostMediaSelected(event)" />
-            <div id="feed-post-media-preview"
-              class="hidden mt-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/60 overflow-hidden">
-            </div>
-            <div id="feed-post-status" class="hidden mt-2 text-xs font-semibold text-gray-500 dark:text-gray-400"></div>
-            <div id="feed-post-quick-actions"
-              class="flex flex-wrap items-center gap-3 mt-3 pt-3 border-t border-gray-50 dark:border-gray-800 px-2">
-              <div class="flex flex-wrap items-center gap-4">
-                <button type="button" onclick="openPostMediaPicker()"
-                  class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
-                  <i data-lucide="image" class="w-4 h-4 text-green-500"></i>
-                  Photo/Video
-                </button>
-                <button type="button" onclick="setPostComposerExpanded(true); refreshPawPalsTagOptions(); document.getElementById('feed-post-tags-input')?.focus();"
-                  class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
-                  <i data-lucide="at-sign" class="w-4 h-4 text-sky-500"></i>
-                  Tag PawPals
-                </button>
-                <button type="button" onclick="setPostComposerExpanded(true); document.getElementById('feed-post-feeling')?.focus();"
-                  class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
-                  <i data-lucide="smile-plus" class="w-4 h-4 text-amber-500"></i>
-                  Feeling
-                </button>
-              </div>
-            </div>
-            <div id="feed-post-expanded-actions"
-              class="hidden flex flex-wrap items-center gap-4 mt-2 px-2">
-              <div class="flex flex-wrap items-center gap-4">
-                <button type="button" onclick="togglePostMediaUrlInput()"
-                  class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
-                  <i data-lucide="link" class="w-4 h-4 text-violet-500"></i>
-                  Media URL
-                </button>
-                <button onclick="
-                      openAddEventModal(new Date().toISOString().split('T')[0])
-                    "
-                  class="flex items-center gap-2 text-base font-semibold text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400">
-                  <i data-lucide="calendar" class="w-4 h-4 text-blue-500"></i>
-                  Event
-                </button>
-              </div>
-            </div>
-            <div id="feed-post-media-url-row" class="hidden mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
-              <input id="feed-post-media-url" type="url" inputmode="url" placeholder="https://example.com/image.jpg"
-                class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400">
-              <button type="button" onclick="addPostMediaUrl()"
-                class="no-faith-hover rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-2.5 text-base font-bold shadow-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">Add
-                URL</button>
-            </div>
-            <div class="mt-3 flex items-center justify-end gap-2">
-              <button id="feed-post-submit-btn" onclick="submitPost()"
-                class="faith-accent-btn text-white px-4 py-1.5 rounded-full text-base font-bold shadow-md shadow-sm transition-colors"
-                style="background: var(--faith-accent, #f59e0b)">
-                Post
-              </button>
             </div>
           </div>
 

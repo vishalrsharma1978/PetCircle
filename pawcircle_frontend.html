@@ -6998,6 +6998,29 @@
                 </div>
               </div>
             </div>
+            <!-- Quick action icons under composer -->
+            <div id="feed-post-quick-actions" class="mt-3 flex items-center gap-4 text-sm">
+              <button id="feed-post-open-media" type="button" onclick="openPostMediaPicker()" class="flex flex-col items-center gap-1 text-gray-600 hover:text-brand-500">
+                <i data-lucide="image" class="w-5 h-5"></i>
+                <span class="text-xs">Photo</span>
+              </button>
+              <button id="feed-post-tag" type="button" onclick="setPostComposerExpanded(true); refreshPawPalsTagOptions(); document.getElementById('feed-post-tags-input')?.focus();" class="flex flex-col items-center gap-1 text-gray-600 hover:text-sky-500">
+                <i data-lucide="at-sign" class="w-5 h-5"></i>
+                <span class="text-xs">Tag</span>
+              </button>
+              <button id="feed-post-feeling" type="button" onclick="setPostComposerExpanded(true); document.getElementById('feed-post-feeling')?.focus();" class="flex flex-col items-center gap-1 text-gray-600 hover:text-amber-500">
+                <i data-lucide="smile-plus" class="w-5 h-5"></i>
+                <span class="text-xs">Feeling</span>
+              </button>
+              <button id="feed-post-event" type="button" onclick="openAddEventModal(new Date().toISOString().split('T')[0])" class="flex flex-col items-center gap-1 text-gray-600 hover:text-blue-500">
+                <i data-lucide="calendar" class="w-5 h-5"></i>
+                <span class="text-xs">Event</span>
+              </button>
+              <button id="feed-post-media-url" type="button" onclick="togglePostMediaUrlInput()" class="flex flex-col items-center gap-1 text-gray-600 hover:text-violet-500">
+                <i data-lucide="link" class="w-5 h-5"></i>
+                <span class="text-xs">Media URL</span>
+              </button>
+            </div>
             <div class="mt-3 flex items-center justify-between gap-3">
               <div class="text-xs text-gray-500 dark:text-gray-400">Keep it simple — title, content, and hashtags.</div>
               <div class="flex items-center gap-2">
@@ -7006,6 +7029,35 @@
               </div>
             </div>
           </div>
+          <script>
+            (function(){
+              const map = {
+                'feed-post-open-media': 'openPostMediaPicker',
+                'feed-post-tag': function(){ setPostComposerExpanded(true); refreshPawPalsTagOptions(); document.getElementById('feed-post-tags-input')?.focus(); },
+                'feed-post-feeling': function(){ setPostComposerExpanded(true); document.getElementById('feed-post-feeling')?.focus(); },
+                'feed-post-event': 'openAddEventModal',
+                'feed-post-media-url': 'togglePostMediaUrlInput'
+              };
+              Object.keys(map).forEach((id) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.addEventListener('click', function(e){
+                  try {
+                    const handler = map[id];
+                    console.log('Composer quick-action clicked:', id);
+                    if (typeof handler === 'string') {
+                      const fn = window[handler];
+                      if (typeof fn === 'function') {
+                        if (handler === 'openAddEventModal') fn(new Date().toISOString().split('T')[0]); else fn();
+                      } else console.warn('Handler not found:', handler);
+                    } else if (typeof handler === 'function') {
+                      handler();
+                    }
+                  } catch (err) { console.error('Quick action error for', id, err); }
+                });
+              });
+            })();
+          </script>
 
           <!-- Feed Highlights Container -->
           <div id="social-feed-posts" class="space-y-6">

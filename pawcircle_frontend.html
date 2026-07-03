@@ -6983,14 +6983,13 @@
             </button>
           </div>
 
-          <!-- Simplified Post Composer: Title, Content, Hashtags -->
+          <!-- Simplified Post Composer -->
           <div id="feed-post-composer" class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-3 sm:p-4">
             <div class="flex gap-3 items-start">
               <div id="feed-create-avatar" class="w-10 h-10 bg-brand-100 dark:bg-brand-900/50 rounded-full flex items-center justify-center text-brand-900 dark:text-brand-100 font-bold flex-shrink-0">U</div>
               <div class="flex-1 min-w-0 space-y-3">
-                <textarea id="feed-post-input" rows="3" placeholder="Share an update..." onfocus="setPostComposerExpanded(true);" class="w-full resize-y rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-800 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400"></textarea>
+                <textarea id="feed-post-input" rows="3" placeholder="Share a moment from your pet's world..." onfocus="setPostComposerExpanded(true);" class="w-full resize-y rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-800 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400"></textarea>
                 <div id="feed-post-expanded-fields" class="space-y-3 hidden">
-                  <input type="text" id="feed-post-title" placeholder="Title (optional)" class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm font-semibold text-gray-900 dark:text-gray-100 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
                   <div class="space-y-2">
                     <input type="text" id="feed-post-hashtags" placeholder="Add hashtags (press Enter)" onkeydown="handlePostHashtagKeydown(event, 'feed-post-hashtags', 'feed-post-hashtags-chips')" class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
                     <div id="feed-post-hashtags-chips" class="flex flex-wrap gap-2"></div>
@@ -6999,30 +6998,30 @@
               </div>
             </div>
             <!-- Quick action icons under composer -->
-            <div id="feed-post-quick-actions" class="mt-3 flex items-center gap-4 text-sm">
-              <button id="feed-post-open-media" type="button" onclick="openPostMediaPicker()" class="flex flex-col items-center gap-1 text-gray-600 hover:text-brand-500">
+            <div id="feed-post-quick-actions" class="mt-3 hidden items-center gap-4 text-sm">
+              <button id="feed-post-open-media" type="button" onclick="openPostMediaPicker()" class="flex flex-row items-center gap-2 text-gray-600 hover:text-brand-500">
                 <i data-lucide="image" class="w-5 h-5"></i>
-                <span class="text-xs">Photo</span>
+                <span class="text-xs">Media</span>
               </button>
-              <button id="feed-post-tag" type="button" onclick="setPostComposerExpanded(true); refreshPawPalsTagOptions(); document.getElementById('feed-post-tags-input')?.focus();" class="flex flex-col items-center gap-1 text-gray-600 hover:text-sky-500">
+              <button id="feed-post-tag" type="button" onclick="setPostComposerExpanded(true); refreshPawPalsTagOptions(); document.getElementById('feed-post-tags-input')?.focus();" class="flex flex-row items-center gap-2 text-gray-600 hover:text-sky-500">
                 <i data-lucide="at-sign" class="w-5 h-5"></i>
                 <span class="text-xs">Tag</span>
               </button>
-              <button id="feed-post-feeling" type="button" onclick="setPostComposerExpanded(true); document.getElementById('feed-post-feeling')?.focus();" class="flex flex-col items-center gap-1 text-gray-600 hover:text-amber-500">
+              <button id="feed-post-feeling" type="button" onclick="setPostComposerExpanded(true); document.getElementById('feed-post-feeling')?.focus();" class="flex flex-row items-center gap-2 text-gray-600 hover:text-amber-500">
                 <i data-lucide="smile-plus" class="w-5 h-5"></i>
                 <span class="text-xs">Feeling</span>
               </button>
-              <button id="feed-post-event" type="button" onclick="openAddEventModal(new Date().toISOString().split('T')[0])" class="flex flex-col items-center gap-1 text-gray-600 hover:text-blue-500">
+              <button id="feed-post-event" type="button" onclick="openAddEventModal(new Date().toISOString().split('T')[0])" class="flex flex-row items-center gap-2 text-gray-600 hover:text-blue-500">
                 <i data-lucide="calendar" class="w-5 h-5"></i>
                 <span class="text-xs">Event</span>
               </button>
-              <button id="feed-post-media-url" type="button" onclick="togglePostMediaUrlInput()" class="flex flex-col items-center gap-1 text-gray-600 hover:text-violet-500">
+              <button id="feed-post-media-url" type="button" onclick="togglePostMediaUrlInput()" class="flex flex-row items-center gap-2 text-gray-600 hover:text-violet-500">
                 <i data-lucide="link" class="w-5 h-5"></i>
                 <span class="text-xs">Media URL</span>
               </button>
             </div>
             <div class="mt-3 flex items-center justify-between gap-3">
-              <div class="text-xs text-gray-500 dark:text-gray-400">Keep it simple — title, content, and hashtags.</div>
+              <div></div>
               <div class="flex items-center gap-2">
                 <button id="feed-post-cancel-btn" type="button" onclick="resetPostComposer()" class="px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Cancel</button>
                 <button id="feed-post-submit-btn" type="button" onclick="submitPost()" class="px-4 py-2 rounded-full bg-[#f97316] text-white text-sm font-bold shadow-sm">Post</button>
@@ -14911,8 +14910,7 @@
 
     function setPostComposerExpanded(isExpanded) {
       const fields = document.getElementById("feed-post-expanded-fields");
-      const actions = document.getElementById("feed-post-expanded-actions");
-      const button = document.getElementById("feed-post-expand-btn");
+      const actions = document.getElementById("feed-post-quick-actions");
       const input = document.getElementById("feed-post-input");
       if (fields) fields.classList.toggle("hidden", !isExpanded);
       if (actions) actions.classList.toggle("hidden", !isExpanded);
@@ -14920,9 +14918,6 @@
         input.rows = isExpanded ? 3 : 1;
         input.classList.toggle("resize-y", isExpanded);
         input.classList.toggle("resize-none", !isExpanded);
-      }
-      if (button) {
-        button.innerHTML = `<i data-lucide="${isExpanded ? "chevron-up" : "sliders-horizontal"}" class="h-3.5 w-3.5"></i>${isExpanded ? "Less" : "More"}`;
       }
       if (isExpanded) refreshPostEventOptions("feed-post-event-options");
       if (typeof lucide !== "undefined") lucide.createIcons();

@@ -6988,12 +6988,35 @@
             <div class="flex gap-3 items-start">
               <div id="feed-create-avatar" class="w-10 h-10 bg-brand-100 dark:bg-brand-900/50 rounded-full flex items-center justify-center text-brand-900 dark:text-brand-100 font-bold flex-shrink-0">U</div>
               <div class="flex-1 min-w-0 space-y-3">
-                <textarea id="feed-post-input" rows="3" placeholder="Share a moment from your pet's world..." onfocus="setPostComposerExpanded(true);" class="w-full resize-y rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-800 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400"></textarea>
+                <textarea id="feed-post-input" rows="1" placeholder="Share a moment from your pet's world..." onfocus="setPostComposerExpanded(true);" oninput="autoResizePostComposerTextarea();" class="w-full resize-none overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-800 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400"></textarea>
                 <div id="feed-post-expanded-fields" class="space-y-3 hidden">
-                  <div class="space-y-2">
-                    <input type="text" id="feed-post-hashtags" placeholder="Add hashtags (press Enter)" onkeydown="handlePostHashtagKeydown(event, 'feed-post-hashtags', 'feed-post-hashtags-chips')" class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
-                    <div id="feed-post-hashtags-chips" class="flex flex-wrap gap-2"></div>
+                  <input type="file" id="feed-post-media-input" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime,video/x-m4v" multiple class="hidden" onchange="handlePostMediaSelected(event)" />
+                  <div id="feed-post-feeling-row" class="hidden space-y-2 rounded-2xl border border-amber-100 bg-amber-50/60 p-2 dark:border-amber-900/50 dark:bg-amber-950/20">
+                    <div class="flex items-center justify-between gap-2">
+                      <p class="text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-200">How is your pet feeling?</p>
+                      <button type="button" onclick="clearPostFeeling()" class="text-xs font-bold text-amber-700 hover:text-amber-900 dark:text-amber-300 dark:hover:text-amber-100">Clear</button>
+                    </div>
+                    <input type="hidden" id="feed-post-feeling" value="" />
+                    <input type="hidden" id="feed-post-activity" value="" />
+                    <div id="feed-post-feeling-selected" class="hidden rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm font-semibold text-amber-800 dark:border-amber-900/50 dark:bg-gray-900 dark:text-amber-200"></div>
+                    <div id="feed-post-feeling-options" class="grid grid-cols-2 gap-2 sm:grid-cols-3"></div>
                   </div>
+                  <div id="feed-post-tag-row" class="hidden space-y-2 rounded-2xl border border-sky-100 bg-sky-50/50 p-2 dark:border-sky-900/50 dark:bg-sky-950/20">
+                    <div class="flex items-center gap-2">
+                      <i data-lucide="users" class="h-4 w-4 text-sky-500"></i>
+                      <input type="text" id="feed-post-tags-input" list="feed-post-tags-options" placeholder="Tag friends (type a name and press Enter)" onkeydown="handlePostTaggedPawPalsKeydown(event)" onblur="addTaggedPawPalsFromInput()" class="w-full rounded-xl border border-sky-100 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition-colors focus:border-sky-400 dark:border-sky-900/40 dark:bg-gray-900 dark:text-gray-200" />
+                      <button type="button" onclick="addTaggedPawPalsFromInput()" class="rounded-xl bg-sky-500 px-3 py-2 text-xs font-bold text-white hover:bg-sky-600">Add</button>
+                    </div>
+                    <datalist id="feed-post-tags-options"></datalist>
+                    <div id="feed-post-tags-chips" class="flex flex-wrap gap-2"></div>
+                  </div>
+                  <div id="feed-post-media-url-row" class="hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-2">
+                    <div class="flex items-center gap-2">
+                      <input type="url" id="feed-post-media-url" placeholder="Paste a secure media URL" class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
+                      <button type="button" onclick="addPostMediaUrl()" class="px-3 py-2 rounded-xl bg-[#f97316] text-white text-xs font-bold hover:bg-[#ea580c]">Add</button>
+                    </div>
+                  </div>
+                  <div id="feed-post-media-preview" class="hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50"></div>
                 </div>
               </div>
             </div>
@@ -7003,12 +7026,12 @@
                 <i data-lucide="image" class="w-5 h-5"></i>
                 <span class="text-xs">Media</span>
               </button>
-              <button id="feed-post-tag" type="button" onclick="setPostComposerExpanded(true); refreshPawPalsTagOptions(); document.getElementById('feed-post-tags-input')?.focus();" class="flex flex-row items-center gap-2 text-gray-600 hover:text-sky-500">
+              <button id="feed-post-tag" type="button" onclick="openPostTagInput()" class="flex flex-row items-center gap-2 text-gray-600 hover:text-sky-500">
                 <i data-lucide="at-sign" class="w-5 h-5"></i>
                 <span class="text-xs">Tag</span>
               </button>
-              <button id="feed-post-feeling" type="button" onclick="setPostComposerExpanded(true); document.getElementById('feed-post-feeling')?.focus();" class="flex flex-row items-center gap-2 text-gray-600 hover:text-amber-500">
-                <i data-lucide="smile-plus" class="w-5 h-5"></i>
+              <button id="feed-post-open-feeling" type="button" onclick="openPostFeelingPicker()" class="flex flex-row items-center gap-2 text-gray-600 hover:text-amber-500">
+                <i id="feed-post-feeling-icon" data-lucide="smile-plus" class="w-5 h-5"></i>
                 <span class="text-xs">Feeling</span>
               </button>
               <button id="feed-post-event" type="button" onclick="openAddEventModal(new Date().toISOString().split('T')[0])" class="flex flex-row items-center gap-2 text-gray-600 hover:text-blue-500">
@@ -7021,7 +7044,7 @@
               </button>
             </div>
             <div class="mt-3 flex items-center justify-between gap-3">
-              <div></div>
+              <p id="feed-post-status" class="hidden text-xs font-medium text-gray-500 dark:text-gray-400"></p>
               <div class="flex items-center gap-2">
                 <button id="feed-post-cancel-btn" type="button" onclick="resetPostComposer()" class="px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Cancel</button>
                 <button id="feed-post-submit-btn" type="button" onclick="submitPost()" class="px-4 py-2 rounded-full bg-[#f97316] text-white text-sm font-bold shadow-sm">Post</button>
@@ -7030,10 +7053,33 @@
           </div>
           <script>
             (function(){
+              const composer = document.getElementById('feed-post-composer');
+              const input = document.getElementById('feed-post-input');
+
+              if (input) {
+                autoResizePostComposerTextarea();
+                input.addEventListener('input', autoResizePostComposerTextarea);
+              }
+
+              updateFeedFeelingIcon();
+
+              if (composer) {
+                composer.addEventListener('focusin', function(){
+                  setPostComposerExpanded(true);
+                });
+                composer.addEventListener('focusout', function(){
+                  setTimeout(function(){
+                    if (!composer.contains(document.activeElement)) {
+                      setPostComposerExpanded(false);
+                    }
+                  }, 0);
+                });
+              }
+
               const map = {
                 'feed-post-open-media': 'openPostMediaPicker',
-                'feed-post-tag': function(){ setPostComposerExpanded(true); refreshPawPalsTagOptions(); document.getElementById('feed-post-tags-input')?.focus(); },
-                'feed-post-feeling': function(){ setPostComposerExpanded(true); document.getElementById('feed-post-feeling')?.focus(); },
+                'feed-post-tag': 'openPostTagInput',
+                'feed-post-open-feeling': 'openPostFeelingPicker',
                 'feed-post-event': 'openAddEventModal',
                 'feed-post-media-url': 'togglePostMediaUrlInput'
               };
@@ -12995,6 +13041,41 @@
       return formatDateTime(updatedAt);
     }
 
+    function buildPostContextHeading(post) {
+      const parts = [];
+      const feelingText = String(post?.feeling_text || "").trim();
+      if (feelingText) parts.push(`is feeling ${feelingText}`);
+
+      const tagged = Array.isArray(post?.tagged_pawpals)
+        ? post.tagged_pawpals.map((name) => String(name || "").trim()).filter(Boolean)
+        : [];
+      if (tagged.length) {
+        const names = tagged.slice(0, 2).map((name) => `@${name}`);
+        const extra = tagged.length - names.length;
+        const taggedText = extra > 0 ? `${names.join(", ")} +${extra}` : names.join(", ");
+        parts.push(`with ${taggedText}`);
+      }
+
+      const linkedEventTitle = String(post?.linkedEvent?.title || (Array.isArray(post?.linkedEvents) ? post.linkedEvents[0] : "") || "").trim();
+      if (linkedEventTitle) parts.push(`at ${linkedEventTitle}`);
+
+      const mediaItems = Array.isArray(post?.media_urls) && post.media_urls.length
+        ? post.media_urls.filter(Boolean)
+        : (post?.media_url ? [post.media_url] : []);
+      if (mediaItems.length) {
+        const videoCount = mediaItems.filter((url) => isPostMediaVideo(url)).length;
+        const imageCount = mediaItems.length - videoCount;
+        let mediaLabel = `${mediaItems.length} media item${mediaItems.length > 1 ? "s" : ""}`;
+        if (videoCount && imageCount) mediaLabel = `${imageCount} photo${imageCount > 1 ? "s" : ""} and ${videoCount} video${videoCount > 1 ? "s" : ""}`;
+        else if (videoCount) mediaLabel = `${videoCount} video${videoCount > 1 ? "s" : ""}`;
+        else if (imageCount) mediaLabel = `${imageCount} photo${imageCount > 1 ? "s" : ""}`;
+        parts.push(`shared ${mediaLabel}`);
+      }
+
+      if (post?.has_external_media_url) parts.push("via link");
+      return parts.join(" · ");
+    }
+
     /* ============================================================
        INTERNATIONAL PHONE INPUT  (country-code picker)
        - scrollable dropdown of countries with flags
@@ -13602,6 +13683,7 @@
         })(),
         linkedEvent: p.linkedEvent || (p.linked_event_title ? { id: p.linked_event_id || p.linked_event_title, title: p.linked_event_title } : null),
         linkedEvents: Array.isArray(p.linkedEvents) ? p.linkedEvents : (p.linked_event_title ? [p.linked_event_title] : []),
+        has_external_media_url: Boolean(p.has_external_media_url || p.media_source === "url"),
         post_type: p.post_type || "text",
         breed: p.breed || null,
         pet_type: p.pet_type || null,
@@ -14274,6 +14356,10 @@
           post.currentSlideIndex = currentSlideIndex;
           const mediaHtml = renderPostMediaFrame(postId, mediaItems, currentSlideIndex);
           const descriptionText = post.description || post.content || "";
+          const postContextHeading = buildPostContextHeading(post);
+          const postContextHtml = postContextHeading
+            ? `<div class="mt-1 text-xs font-semibold text-gray-600 dark:text-gray-300 break-words">${escapeHtml(postContextHeading)}</div>`
+            : "";
           const feelingLine = post.feeling_text
             ? `<p class="mt-2 text-sm font-semibold text-gray-700 dark:text-gray-300"><i data-lucide="smile-plus" class="inline-block h-4 w-4 mr-1 align-[-2px]"></i>${escapeHtml(post.feeling_text)}</p>`
             : "";
@@ -14333,6 +14419,7 @@
                                     ${post.relationship ? `<span class="bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800 text-[10px] px-1.5 py-0.5 rounded-full font-medium italic">${escapeHtml(post.relationship)}</span>` : ""}
                                 </div>
                                 ${postTagPills}
+                                ${postContextHtml}
                                 <div class="text-xs text-gray-500 dark:text-gray-400">${escapeHtml(post.time)}${post.updatedTime ? ` &middot; Last updated ${escapeHtml(post.updatedTime)}` : ""}${post.audience ? ` &middot; ${escapeHtml(post.audience)}` : ""}</div>
                             </div>
                         </div>
@@ -14915,11 +15002,44 @@
       if (fields) fields.classList.toggle("hidden", !isExpanded);
       if (actions) actions.classList.toggle("hidden", !isExpanded);
       if (input) {
-        input.rows = isExpanded ? 3 : 1;
-        input.classList.toggle("resize-y", isExpanded);
-        input.classList.toggle("resize-none", !isExpanded);
+        input.classList.add("resize-none");
+        input.classList.remove("resize-y");
+        if (!input.value.trim()) input.style.height = "";
       }
       if (isExpanded) refreshPostEventOptions("feed-post-event-options");
+      if (typeof autoResizePostComposerTextarea === "function") autoResizePostComposerTextarea();
+      updateFeedFeelingIcon();
+      if (typeof lucide !== "undefined") lucide.createIcons();
+    }
+
+    function autoResizePostComposerTextarea() {
+      const input = document.getElementById("feed-post-input");
+      if (!input) return;
+      input.style.height = "auto";
+      const computed = window.getComputedStyle(input);
+      const lineHeight = parseFloat(computed.lineHeight) || 20;
+      const minHeight = lineHeight + 24;
+      input.style.height = `${Math.max(input.scrollHeight, minHeight)}px`;
+    }
+
+    function getPetTypeFeelingIconName(petType) {
+      const value = String(petType || "").trim().toLowerCase();
+      if (!value) return "smile-plus";
+      if (value.includes("dog")) return "dog";
+      if (value.includes("cat")) return "cat";
+      if (value.includes("bird")) return "bird";
+      if (value.includes("rabbit")) return "rabbit";
+      if (value.includes("fish")) return "fish";
+      if (value.includes("reptile")) return "bug";
+      if (value.includes("small")) return "paw-print";
+      return "smile-plus";
+    }
+
+    function updateFeedFeelingIcon() {
+      const icon = document.getElementById("feed-post-feeling-icon");
+      if (!icon) return;
+      const petType = currentUserObj?.pet_type || currentUserObj?.socialProfile?.pet_type || "";
+      icon.setAttribute("data-lucide", getPetTypeFeelingIconName(petType));
       if (typeof lucide !== "undefined") lucide.createIcons();
     }
 
@@ -14946,6 +15066,150 @@
     function openPostMediaPicker() {
       setPostComposerExpanded(true);
       document.getElementById("feed-post-media-input")?.click();
+    }
+
+    function openPostTagInput() {
+      setPostComposerExpanded(true);
+      refreshPawPalsTagOptions();
+      const row = document.getElementById("feed-post-tag-row");
+      if (row) row.classList.remove("hidden");
+      document.getElementById("feed-post-tags-input")?.focus();
+    }
+
+    function getPostFeelingOptions() {
+      const petType = String(currentUserObj?.pet_type || currentUserObj?.socialProfile?.pet_type || "").trim().toLowerCase();
+      if (petType.includes("dog")) {
+        return [
+          { emoji: "🐶✨", feeling: "Happy", activity: "Tail wagging", label: "Happy" },
+          { emoji: "🐕⚡", feeling: "Playful", activity: "Zoomies", label: "Playful" },
+          { emoji: "🐶👃", feeling: "Curious", activity: "Sniffing around", label: "Curious" },
+          { emoji: "🐕🛡️", feeling: "Protective", activity: "On guard", label: "Protective" },
+          { emoji: "🐶💤", feeling: "Sleepy", activity: "Nap mode", label: "Sleepy" },
+          { emoji: "🐶❤️", feeling: "Affectionate", activity: "Wants cuddles", label: "Affectionate" },
+        ];
+      }
+      if (petType.includes("cat")) {
+        return [
+          { emoji: "🐱😊", feeling: "Content", activity: "Purring", label: "Content" },
+          { emoji: "🐱🧶", feeling: "Playful", activity: "Chasing toys", label: "Playful" },
+          { emoji: "🐱👀", feeling: "Curious", activity: "Watching everything", label: "Curious" },
+          { emoji: "🐱😼", feeling: "Sassy", activity: "Cat attitude", label: "Sassy" },
+          { emoji: "🐱💤", feeling: "Sleepy", activity: "Cat nap", label: "Sleepy" },
+          { emoji: "🐱🎭", feeling: "Mischievous", activity: "Tiny chaos", label: "Mischievous" },
+        ];
+      }
+      if (petType.includes("bird")) {
+        return [
+          { emoji: "🐦🎵", feeling: "Cheerful", activity: "Singing", label: "Cheerful" },
+          { emoji: "🐦⚡", feeling: "Energetic", activity: "Flapping around", label: "Energetic" },
+          { emoji: "🕊️😌", feeling: "Calm", activity: "Perched peacefully", label: "Calm" },
+          { emoji: "🐦👀", feeling: "Alert", activity: "Looking around", label: "Alert" },
+          { emoji: "🐦❤️", feeling: "Affectionate", activity: "Bonding time", label: "Affectionate" },
+          { emoji: "🐦💤", feeling: "Sleepy", activity: "Feather rest", label: "Sleepy" },
+        ];
+      }
+      if (petType.includes("rabbit")) {
+        return [
+          { emoji: "🐰✨", feeling: "Happy", activity: "Binkying", label: "Happy" },
+          { emoji: "🐰🥕", feeling: "Hungry", activity: "Snack time", label: "Hungry" },
+          { emoji: "🐰👂", feeling: "Alert", activity: "Ears up", label: "Alert" },
+          { emoji: "🐰😌", feeling: "Calm", activity: "Loaf mode", label: "Calm" },
+          { emoji: "🐰💤", feeling: "Sleepy", activity: "Cozy rest", label: "Sleepy" },
+          { emoji: "🐰❤️", feeling: "Affectionate", activity: "Nose boops", label: "Affectionate" },
+        ];
+      }
+      if (petType.includes("fish")) {
+        return [
+          { emoji: "🐟✨", feeling: "Happy", activity: "Gliding around", label: "Happy" },
+          { emoji: "🐠⚡", feeling: "Energetic", activity: "Fast swimming", label: "Energetic" },
+          { emoji: "🐟🫧", feeling: "Curious", activity: "Bubble chasing", label: "Curious" },
+          { emoji: "🐠😌", feeling: "Calm", activity: "Drifting", label: "Calm" },
+          { emoji: "🐟💤", feeling: "Sleepy", activity: "Resting low", label: "Sleepy" },
+          { emoji: "🐠❤️", feeling: "Affectionate", activity: "Tank greeting", label: "Affectionate" },
+        ];
+      }
+      if (petType.includes("reptile")) {
+        return [
+          { emoji: "🦎✨", feeling: "Happy", activity: "Basking", label: "Happy" },
+          { emoji: "🦎⚡", feeling: "Active", activity: "Exploring", label: "Active" },
+          { emoji: "🐍👀", feeling: "Alert", activity: "Watching quietly", label: "Alert" },
+          { emoji: "🦎😌", feeling: "Calm", activity: "Still and relaxed", label: "Calm" },
+          { emoji: "🐢💤", feeling: "Sleepy", activity: "Hide and rest", label: "Sleepy" },
+          { emoji: "🦎❤️", feeling: "Affectionate", activity: "Trusting vibes", label: "Affectionate" },
+        ];
+      }
+      if (petType.includes("small")) {
+        return [
+          { emoji: "🐹✨", feeling: "Happy", activity: "Tiny zooms", label: "Happy" },
+          { emoji: "🐹⚡", feeling: "Playful", activity: "Wheel time", label: "Playful" },
+          { emoji: "🐹👀", feeling: "Curious", activity: "Nose twitch", label: "Curious" },
+          { emoji: "🐹😌", feeling: "Calm", activity: "Nestling", label: "Calm" },
+          { emoji: "🐹💤", feeling: "Sleepy", activity: "Cage nap", label: "Sleepy" },
+          { emoji: "🐹❤️", feeling: "Affectionate", activity: "Hand cuddle", label: "Affectionate" },
+        ];
+      }
+      return [
+        { emoji: "🐾✨", feeling: "Happy", activity: "Feeling great", label: "Happy" },
+        { emoji: "🐾⚡", feeling: "Energetic", activity: "Full of energy", label: "Energetic" },
+        { emoji: "🐾👀", feeling: "Curious", activity: "Exploring", label: "Curious" },
+        { emoji: "🐾😌", feeling: "Calm", activity: "Relaxing", label: "Calm" },
+        { emoji: "🐾❤️", feeling: "Affectionate", activity: "Needs love", label: "Affectionate" },
+        { emoji: "🐾💤", feeling: "Sleepy", activity: "Ready for rest", label: "Sleepy" },
+      ];
+    }
+
+    function renderPostFeelingOptions() {
+      const panel = document.getElementById("feed-post-feeling-options");
+      if (!panel) return;
+      const selectedFeeling = document.getElementById("feed-post-feeling")?.value || "";
+      const selectedActivity = document.getElementById("feed-post-activity")?.value || "";
+      panel.innerHTML = getPostFeelingOptions().map((option) => {
+        const isActive = option.feeling === selectedFeeling && option.activity === selectedActivity;
+        const activeClass = isActive
+          ? "border-amber-400 bg-amber-100 text-amber-900 dark:border-amber-500 dark:bg-amber-900/40 dark:text-amber-100"
+          : "border-amber-200 bg-white text-gray-700 hover:border-amber-300 hover:bg-amber-50 dark:border-amber-900/50 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-amber-950/40";
+        return `
+          <button
+            type="button"
+            onclick="selectPostFeeling('${escapeHtml(option.feeling)}', '${escapeHtml(option.activity)}', '${escapeHtml(option.label)}', '${escapeHtml(option.emoji)}')"
+            class="flex items-center gap-2 rounded-xl border px-3 py-2 text-left text-sm font-semibold transition-colors ${activeClass}">
+            <span class="text-base leading-none">${option.emoji}</span>
+            <span class="truncate">${escapeHtml(option.label)}</span>
+          </button>`;
+      }).join("");
+    }
+
+    function selectPostFeeling(feeling, activity, label, emoji) {
+      const feelingInput = document.getElementById("feed-post-feeling");
+      const activityInput = document.getElementById("feed-post-activity");
+      const selected = document.getElementById("feed-post-feeling-selected");
+      if (feelingInput) feelingInput.value = String(feeling || "").trim();
+      if (activityInput) activityInput.value = String(activity || "").trim();
+      if (selected) {
+        selected.classList.remove("hidden");
+        selected.innerHTML = `<span class="mr-2">${emoji || "😄"}</span><span>${escapeHtml(label || feeling || "Feeling")}</span>`;
+      }
+      renderPostFeelingOptions();
+    }
+
+    function clearPostFeeling() {
+      const feelingInput = document.getElementById("feed-post-feeling");
+      const activityInput = document.getElementById("feed-post-activity");
+      const selected = document.getElementById("feed-post-feeling-selected");
+      if (feelingInput) feelingInput.value = "";
+      if (activityInput) activityInput.value = "";
+      if (selected) {
+        selected.innerHTML = "";
+        selected.classList.add("hidden");
+      }
+      renderPostFeelingOptions();
+    }
+
+    function openPostFeelingPicker() {
+      setPostComposerExpanded(true);
+      const row = document.getElementById("feed-post-feeling-row");
+      if (row) row.classList.remove("hidden");
+      renderPostFeelingOptions();
     }
 
     function clearPostMedia() {
@@ -15298,21 +15562,27 @@
     function resetPostComposer() {
       const titleInput = document.getElementById("feed-post-title");
       const textInput = document.getElementById("feed-post-input");
-      const hashtagInput = document.getElementById("feed-post-hashtags");
       const tagInput = document.getElementById("feed-post-tags-input");
       const feelingInput = document.getElementById("feed-post-feeling");
       const activityInput = document.getElementById("feed-post-activity");
       const eventInput = document.getElementById("feed-post-event-input");
       const eventIdInput = document.getElementById("feed-post-event-id");
+      const tagRow = document.getElementById("feed-post-tag-row");
+      const feelingRow = document.getElementById("feed-post-feeling-row");
+      const feelingSelected = document.getElementById("feed-post-feeling-selected");
       if (titleInput) titleInput.value = "";
       if (textInput) textInput.value = "";
-      if (hashtagInput) hashtagInput.value = "";
       if (tagInput) tagInput.value = "";
       if (feelingInput) feelingInput.value = "";
       if (activityInput) activityInput.value = "";
       if (eventInput) eventInput.value = "";
       if (eventIdInput) eventIdInput.value = "";
-      setHashtagChips("feed-post-hashtags-chips", []);
+      if (tagRow) tagRow.classList.add("hidden");
+      if (feelingRow) feelingRow.classList.add("hidden");
+      if (feelingSelected) {
+        feelingSelected.innerHTML = "";
+        feelingSelected.classList.add("hidden");
+      }
       setTaggedPawPalsChips([]);
       clearPostMedia();
       setPostComposerExpanded(false);
@@ -15354,10 +15624,11 @@
       const selectedFeeling = document.getElementById("feed-post-feeling")?.value || "";
       const feelingActivity = (document.getElementById("feed-post-activity")?.value || "").trim();
       const feelingText = buildPostFeelingText(selectedFeeling, feelingActivity);
-      const hashtags = collectPostHashtags("feed-post-hashtags", "feed-post-hashtags-chips");
+      const hashtags = [];
       const linkedEvent = getSelectedPostEvent("feed-post-event-input", "feed-post-event-id");
       if (document.getElementById("feed-post-event-input")?.value?.trim() && !linkedEvent) return;
       const media = Array.isArray(selectedPostMedia) ? [...selectedPostMedia] : [];
+      const hasExternalMediaUrl = media.some((item) => Boolean(item?.url));
       if (!title && !content && !media.length && !taggedPawPals.length && !feelingText) return;
       const audience = getPostAudienceConfig();
 
@@ -15386,6 +15657,7 @@
         hashtags,
         media_url: media[0]?.previewUrl || null,
         media_urls: media.map((item) => item.previewUrl),
+        has_external_media_url: hasExternalMediaUrl,
         linkedEvent: linkedEvent ? { id: linkedEvent.id, title: linkedEvent.title } : null,
         linkedEvents: linkedEvent ? [linkedEvent.title] : [],
         post_type: media.some((item) => item.postType === "video") ? "video" : media.length ? "image" : "text",
@@ -15450,6 +15722,7 @@
           post_type: postType,
           media_url: mediaUrl,
           media_urls: mediaUrls,
+          has_external_media_url: hasExternalMediaUrl,
           linked_event_id: linkedEvent?.id || null,
           linked_event_title: linkedEvent?.title || null,
           breed: audience.breed,
@@ -15469,6 +15742,7 @@
           savedPost.feeling_activity = savedPost.feeling_activity || feelingActivity;
           savedPost.feeling_text = savedPost.feeling_text || feelingText;
           savedPost.hashtags = savedPost.hashtags?.length ? savedPost.hashtags : hashtags;
+          savedPost.has_external_media_url = savedPost.has_external_media_url || hasExternalMediaUrl;
           savedPost.linkedEvent = savedPost.linkedEvent || optimisticPost.linkedEvent;
           savedPost.linkedEvents = savedPost.linkedEvents?.length ? savedPost.linkedEvents : optimisticPost.linkedEvents;
           feedPosts[idx] = savedPost;

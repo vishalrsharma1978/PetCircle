@@ -1,0 +1,720 @@
+
+    /* --- FIGMA DESIGN SYSTEM OVERRIDES --- */
+    body {
+      font-family: 'Inter', sans-serif !important;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .heading-font {
+      font-family: 'Poppins', sans-serif !important;
+    }
+
+    h1 {
+      font-size: 24px !important;
+    }
+
+    h2 {
+      font-size: 20px !important;
+    }
+
+    /* Buttons */
+    button,
+    .btn {
+      border-radius: 8px !important;
+    }
+
+    button.rounded-full,
+    .rounded-full {
+      border-radius: 50px !important;
+    }
+
+    /* Cards */
+    .bg-white.shadow,
+    .bg-white.shadow-sm,
+    .bg-white.shadow-md,
+    .bg-white.shadow-xl,
+    .bg-gray-800 {
+      border-radius: 12px !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+      border: 1px solid #e5e7eb !important;
+    }
+
+    .dark .bg-gray-800 {
+      border: 1px solid #374151 !important;
+    }
+
+    /* ------------------------------------- */
+
+    /* CSS Pack Tree Variables and Structure */
+    .css-pack-tree ul {
+      padding-top: 20px;
+      position: relative;
+      transition: all 0.5s;
+      display: flex;
+      justify-content: center;
+    }
+
+    .css-pack-tree li {
+      float: left;
+      text-align: center;
+      list-style-type: none;
+      position: relative;
+      padding: 20px 5px 0 5px;
+      transition: all 0.5s;
+    }
+
+    /* Connecting lines */
+    .css-pack-tree li::before,
+    .css-pack-tree li::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 50%;
+      border-top: 2px solid var(--faith-primary, #9ca3af);
+      width: 50%;
+      height: 20px;
+      z-index: 1;
+    }
+
+    .css-pack-tree li::after {
+      right: auto;
+      left: 50%;
+      border-left: 2px solid var(--faith-primary, #9ca3af);
+    }
+
+    /* Remove lines for only child or first/last child */
+    .css-pack-tree li:only-child::after,
+    .css-pack-tree li:only-child::before {
+      display: none;
+    }
+
+    .css-pack-tree li:only-child {
+      padding-top: 0;
+    }
+
+    .css-pack-tree li:first-child::before,
+    .css-pack-tree li:last-child::after {
+      border: 0 none;
+    }
+
+    /* Connect first/last child to the top line */
+    .css-pack-tree li:last-child::before {
+      border-right: 2px solid var(--faith-primary, #9ca3af);
+      border-radius: 0 5px 0 0;
+    }
+
+    .css-pack-tree li:first-child::after {
+      border-radius: 5px 0 0 0;
+    }
+
+    /* Downward connectors from parents */
+    .css-pack-tree ul ul::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      border-left: 2px solid var(--faith-primary, #9ca3af);
+      width: 0;
+      height: 20px;
+      z-index: 1;
+    }
+
+    /* Node Card */
+    .css-pack-tree .node-card {
+      text-decoration: none;
+      color: #666;
+      display: inline-block;
+      border-radius: 12px;
+      transition: all 0.5s;
+      position: relative;
+      z-index: 2;
+      width: 140px;
+      max-width: 140px;
+      min-height: 132px;
+      word-wrap: break-word;
+    }
+
+    /* Photo styles */
+    .css-pack-tree .node-photo {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 4px solid var(--faith-primary, #4b5563);
+      margin: 0 auto;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      background: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.5rem;
+      color: var(--faith-primary, #4b5563);
+    }
+
+    .css-pack-tree .node-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Text styles */
+    .css-pack-tree .node-name {
+      font-weight: 700;
+      margin-top: 8px;
+      color: #1f2937;
+      font-size: 0.95rem;
+    }
+
+    .dark .css-pack-tree .node-name {
+      color: #f3f4f6;
+    }
+
+    .css-pack-tree .node-details {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+
+    .dark .css-pack-tree .node-details {
+      color: #9ca3af;
+    }
+
+    .css-pack-tree .node-self-badge {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.625rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #fff;
+      padding: 1px 8px;
+      border-radius: 9999px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      z-index: 3;
+    }
+
+    /* Keep the self photo the same size as other nodes so the cards match;
+       the self node stays distinct via its accent ring + "You" badge. */
+    .css-pack-tree .node-self .node-photo {
+      width: 72px;
+      height: 72px;
+      font-size: 1.5rem;
+    }
+
+    .css-pack-tree .node-card:hover {
+      transform: translateY(-3px);
+    }
+
+    /* Spouse specific styling */
+    .css-pack-tree .spouse-container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 20px;
+      position: relative;
+    }
+
+    .css-pack-tree .spouse-link {
+      position: absolute;
+      top: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 2px;
+      background-color: var(--faith-primary, #9ca3af);
+      z-index: 0;
+    }
+
+    .css-pack-tree .spouse-heart {
+      position: absolute;
+      top: 36px;
+      left: 50%;
+      transform: translate(50%, -50%);
+      color: var(--faith-primary, #9ca3af);
+      background: white;
+      padding: 0 4px;
+      z-index: 1;
+    }
+
+    .dark .css-pack-tree .spouse-heart {
+      background: #111827;
+    }
+
+    /* Fix for spouse container vertical line */
+    .css-pack-tree li.has-spouse::before {
+      right: calc(50% + 80px);
+      width: calc(50% - 80px);
+    }
+
+    .css-pack-tree li.has-spouse::after {
+      left: calc(50% - 80px);
+      width: calc(50% + 80px);
+    }
+
+    .css-pack-tree li.has-spouse:only-child {
+      padding-top: 20px;
+    }
+
+    .css-pack-tree li.has-spouse:only-child::after {
+      display: block;
+      width: 80px;
+      left: calc(50% - 80px);
+      border-top: 2px solid var(--faith-primary, #9ca3af);
+      border-left: 2px solid var(--faith-primary, #9ca3af);
+    }
+
+    .css-pack-tree li.has-spouse:only-child::before {
+      display: none;
+    }
+
+    .css-pack-tree ul.tree-root>li.has-spouse:only-child::after {
+      display: none !important;
+    }
+
+    /* Fix for downward stem floating */
+    .css-pack-tree ul ul {
+      padding-top: 50px;
+    }
+
+    .css-pack-tree ul ul::before {
+      display: none !important;
+    }
+
+    .css-pack-tree li.has-children>.spouse-container::after {
+      content: '';
+      position: absolute;
+      top: 36px;
+      left: 50%;
+      border-left: 2px solid var(--faith-primary, #9ca3af);
+      height: calc(100% - 36px + 50px);
+      z-index: 0;
+    }
+
+
+    /* ==================== CHAT CALL TIMELINE + ZOOM FIT OVERRIDES ==================== */
+    .group-call-timeline-card {
+      width: min(100%, 720px);
+    }
+
+    /* Client View behaves like a full Zoom app. Give it a full virtual canvas,
+       and scale compact mode instead of shrinking/cropping the canvas. */
+    body.zoom-call-active #zmmtg-root {
+      position: fixed !important;
+      z-index: 9999 !important;
+      top: 64px !important;
+      left: 50% !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: min(1280px, calc(100vw - 32px)) !important;
+      height: calc(100vh - 88px) !important;
+      min-width: 0 !important;
+      min-height: 620px !important;
+      transform: translateX(-50%) !important;
+      transform-origin: center center !important;
+      border-radius: 24px !important;
+      overflow: hidden !important;
+      resize: none !important;
+      background: #fff !important;
+      box-shadow:
+        0 30px 90px rgba(0, 0, 0, 0.45),
+        0 0 0 1px rgba(255, 255, 255, 0.16) !important;
+    }
+
+    body.zoom-call-active.zoom-call-prejoin #zmmtg-root {
+      overflow: auto !important;
+    }
+
+    body.zoom-call-active #zmmtg-root>div,
+    body.zoom-call-active #zmmtg-root .meeting-client,
+    body.zoom-call-active #zmmtg-root .meeting-client-inner {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: none !important;
+      max-height: none !important;
+    }
+
+    body.zoom-call-active.zoom-call-large #zmmtg-root {
+      top: 64px !important;
+      left: 50% !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: min(1280px, calc(100vw - 32px)) !important;
+      height: calc(100vh - 88px) !important;
+      min-width: 0 !important;
+      min-height: 620px !important;
+      transform: translateX(-50%) !important;
+      transform-origin: center center !important;
+      border-radius: 24px !important;
+    }
+
+    body.zoom-call-active.zoom-call-compact:not(.zoom-call-prejoin) #zmmtg-root {
+      top: auto !important;
+      left: auto !important;
+      right: 20px !important;
+      bottom: 20px !important;
+      width: 1280px !important;
+      height: 720px !important;
+      min-width: 1280px !important;
+      min-height: 720px !important;
+      transform: scale(0.55) !important;
+      transform-origin: bottom right !important;
+      border-radius: 28px !important;
+      overflow: hidden !important;
+    }
+
+    body.zoom-call-active.zoom-call-fullscreen #zmmtg-root {
+      top: 0 !important;
+      left: 0 !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      transform: none !important;
+      transform-origin: center center !important;
+      border-radius: 0 !important;
+      overflow: hidden !important;
+    }
+
+    @media (max-width: 768px) {
+
+      body.zoom-call-active #zmmtg-root,
+      body.zoom-call-active.zoom-call-large #zmmtg-root {
+        top: 56px !important;
+        left: 8px !important;
+        right: auto !important;
+        width: calc(100vw - 16px) !important;
+        height: calc(100vh - 70px) !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        transform: none !important;
+        border-radius: 18px !important;
+      }
+
+      body.zoom-call-active.zoom-call-compact:not(.zoom-call-prejoin) #zmmtg-root {
+        top: auto !important;
+        left: auto !important;
+        right: 10px !important;
+        bottom: 10px !important;
+        width: 980px !important;
+        height: 620px !important;
+        min-width: 980px !important;
+        min-height: 620px !important;
+        transform: scale(0.38) !important;
+        transform-origin: bottom right !important;
+      }
+    }
+
+    /* ============================================================
+       International phone input (country-code picker)
+    ============================================================ */
+    .intl-phone {
+      position: relative;
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      width: 100%;
+    }
+
+    .intl-phone-trigger {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 10px;
+      border: 1px solid #d1d5db;
+      border-right: 0;
+      border-radius: 12px 0 0 12px;
+      background: #f9fafb;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #374151;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .15s ease;
+    }
+
+    .intl-phone-trigger:hover {
+      background: #f3f4f6;
+    }
+
+    .dark .intl-phone-trigger {
+      background: #1f2937;
+      border-color: #374151;
+      color: #e5e7eb;
+    }
+
+    .intl-phone-trigger .intl-flag {
+      font-size: 1.15rem;
+      line-height: 1;
+    }
+
+    .intl-phone-trigger .intl-chevron {
+      transition: transform .2s ease;
+    }
+
+    .intl-phone.open .intl-phone-trigger .intl-chevron {
+      transform: rotate(180deg);
+    }
+
+    .intl-phone input.intl-phone-number {
+      flex: 1 1 auto;
+      min-width: 0;
+      border-radius: 0 12px 12px 0 !important;
+      border-left: 0 !important;
+      padding-left: 12px !important;
+    }
+
+    .intl-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      z-index: 60;
+      width: 290px;
+      max-width: 88vw;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      box-shadow: 0 20px 45px -12px rgba(0, 0, 0, .28);
+      overflow: hidden;
+      transform-origin: top left;
+      animation: intlPop .16s ease-out;
+    }
+
+    .dark .intl-dropdown {
+      background: #111827;
+      border-color: #374151;
+    }
+
+    @keyframes intlPop {
+      from {
+        opacity: 0;
+        transform: translateY(-6px) scale(.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .intl-dropdown-search {
+      padding: 10px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .dark .intl-dropdown-search {
+      border-color: #1f2937;
+    }
+
+    .intl-dropdown-search input {
+      width: 100%;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.85rem;
+      outline: none;
+      background: #f9fafb;
+      color: #111827;
+    }
+
+    .dark .intl-dropdown-search input {
+      background: #1f2937;
+      border-color: #374151;
+      color: #f9fafb;
+    }
+
+    .intl-dropdown-search input:focus {
+      border-color: #f59e0b;
+      background: #fff;
+    }
+
+    .dark .intl-dropdown-search input:focus {
+      background: #111827;
+    }
+
+    .intl-dropdown-list {
+      max-height: 240px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .intl-dropdown-list::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .intl-dropdown-list::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 8px;
+    }
+
+    .dark .intl-dropdown-list::-webkit-scrollbar-thumb {
+      background: #374151;
+    }
+
+    .intl-country-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 0.85rem;
+      color: #374151;
+      cursor: pointer;
+      border: 0;
+      background: transparent;
+      text-align: left;
+    }
+
+    .intl-country-item:hover,
+    .intl-country-item.active {
+      background: #fff7ed;
+    }
+
+    .dark .intl-country-item {
+      color: #e5e7eb;
+    }
+
+    .dark .intl-country-item:hover,
+    .dark .intl-country-item.active {
+      background: rgba(245, 158, 11, .12);
+    }
+
+    .intl-country-item .intl-flag {
+      font-size: 1.25rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .intl-country-item .intl-name {
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .intl-country-item .intl-dial {
+      color: #9ca3af;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .intl-dropdown-empty {
+      padding: 18px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    /* ============================================================
+       Park Donate button animations
+    ============================================================ */
+    .donate-btn {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(110deg, #f43f5e, #f97316, #f43f5e);
+      background-size: 220% 100%;
+      animation: donateShimmer 4s linear infinite;
+    }
+
+    @keyframes donateShimmer {
+      0% {
+        background-position: 0% 0;
+      }
+
+      100% {
+        background-position: 220% 0;
+      }
+    }
+
+    .donate-btn:hover {
+      animation-duration: 1.4s;
+    }
+
+    .donate-btn .donate-heart {
+      display: inline-block;
+      animation: donateBeat 1.3s ease-in-out infinite;
+    }
+
+    @keyframes donateBeat {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      15% {
+        transform: scale(1.3);
+      }
+
+      30% {
+        transform: scale(1);
+      }
+
+      45% {
+        transform: scale(1.2);
+      }
+    }
+
+    .donate-btn::after {
+      content: "";
+      position: absolute;
+      top: -120%;
+      left: -60%;
+      width: 40%;
+      height: 340%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55), transparent);
+      transform: rotate(25deg);
+      transition: left .1s;
+      animation: donateSweep 3.2s ease-in-out infinite;
+    }
+
+    @keyframes donateSweep {
+      0% {
+        left: -60%;
+      }
+
+      55% {
+        left: 130%;
+      }
+
+      100% {
+        left: 130%;
+      }
+    }
+
+    /* floating coin that rises on click (anchored with position:fixed so it
+       is not clipped by the button's overflow:hidden) */
+    @keyframes donateCoinRise {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, 0) scale(.6);
+      }
+
+      20% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -70px) scale(1.2);
+      }
+    }
+
+    .donate-coin {
+      position: fixed;
+      font-size: 1.5rem;
+      pointer-events: none;
+      animation: donateCoinRise 1s ease-out forwards;
+      z-index: 130;
+    }
+  

@@ -1,0 +1,5 @@
+
+              .focus-ring-dynamic:focus {
+                box-shadow: 0 0 0 2px var(--login-accent);
+              }
+            

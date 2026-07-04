@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-<?php include 'components/head.php'; ?>
+<?php include '../components/head.php'; ?>
 </head>
 
 <body class="bg-gray-50 min-h-screen text-gray-800">
@@ -18,47 +18,47 @@
 
   <!-- ==================== PUBLIC LOGIN ==================== -->
 
-  <?php include 'views/view-public-login.php'; ?>
+  <?php include '../views/view-public-login.php'; ?>
 
   <!-- ==================== ADMIN LOGIN ==================== -->
-  <?php include 'views/view-admin-login.php'; ?>
+  <?php include '../views/view-admin-login.php'; ?>
 
   <!-- ==================== SIGNUP ==================== -->
-  <?php include 'views/view-signup.php'; ?>
+  <?php include '../views/view-signup.php'; ?>
 
   <!-- ==================== MEMBER DASHBOARD ==================== -->
-  <?php include 'views/view-member-dashboard.php'; ?>
+  <?php include '../views/view-member-dashboard.php'; ?>
 
   <!-- ==================== SOCIAL FEED ==================== -->
-  <?php include 'views/view-social-feed.php'; ?>
+  <?php include '../views/view-social-feed.php'; ?>
 
   <!-- Gotcha Day Modal -->
-  <?php include 'modals/birth-details-modal.php'; ?>
+  <?php include '../modals/birth-details-modal.php'; ?>
 
   <!-- Profile Customization Modal -->
-  <?php include 'modals/profile-modal.php'; ?>
+  <?php include '../modals/profile-modal.php'; ?>
 
   <!-- ==================== ADMIN DASHBOARD ==================== -->
-  <?php include 'views/view-admin-dashboard.php'; ?>
+  <?php include '../views/view-admin-dashboard.php'; ?>
 
   <script src="js/core.js"></script>
 
   <!-- Add Pet Modal -->
-  <?php include 'modals/add-member-modal.php'; ?>
+  <?php include '../modals/add-member-modal.php'; ?>
 
   <!-- Broadcast Message Modal -->
-  <?php include 'modals/broadcast-modal.php'; ?>
+  <?php include '../modals/broadcast-modal.php'; ?>
 
   <!-- Create Group Modal -->
-  <?php include 'modals/create-group-modal.php'; ?>
+  <?php include '../modals/create-group-modal.php'; ?>
 
   <!-- Add Event Modal -->
-  <?php include 'modals/add-event-modal.php'; ?>
+  <?php include '../modals/add-event-modal.php'; ?>
   <!-- ===== EVENT QR MODAL ===== -->
-  <?php include 'modals/event-qr-modal.php'; ?>
+  <?php include '../modals/event-qr-modal.php'; ?>
 
-  <?php include 'modals/link-gallery-choice-modal.php'; ?>
-  <?php include 'modals/create-gallery-modal.php'; ?>
+  <?php include '../modals/link-gallery-choice-modal.php'; ?>
+  <?php include '../modals/create-gallery-modal.php'; ?>
   <div id="gallery-lightbox"
     class="gallery-lightbox fixed inset-0 z-[80] bg-white/95 dark:bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center">
     <img id="gallery-lightbox-post-bg" class="gallery-lightbox-post-bg" alt="" aria-hidden="true">
@@ -91,13 +91,13 @@
       class="mt-4 flex max-w-[92vw] items-center justify-center gap-2 overflow-x-auto no-scrollbar"></div>
   </div>
   <!-- Enlarged Calendar Modal -->
-  <?php include 'modals/enlarged-calendar-modal.php'; ?>
+  <?php include '../modals/enlarged-calendar-modal.php'; ?>
 
   <!-- Announcement Modal -->
-  <?php include 'modals/announcement-modal.php'; ?>
+  <?php include '../modals/announcement-modal.php'; ?>
 
   <!-- Condolence Modal -->
-  <?php include 'modals/condolence-modal.php'; ?>
+  <?php include '../modals/condolence-modal.php'; ?>
 
   <script src="js/main.js"></script>
 
@@ -134,16 +134,16 @@
     <button type="button" onclick="leaveZoomCallShell()">Leave</button>
   </div>
   <!-- Pack Pets Customization Modal -->
-  <?php include 'modals/pack-members-modal.php'; ?>
+  <?php include '../modals/pack-members-modal.php'; ?>
 
   <!-- View Member Profile Modal -->
-  <?php include 'modals/pack-member-profile-modal.php'; ?>
+  <?php include '../modals/pack-member-profile-modal.php'; ?>
 
   <!-- ==================== FAMILY TREE VIEW ==================== -->
-  <?php include 'views/view-pack-tree.php'; ?>
+  <?php include '../views/view-pack-tree.php'; ?>
 
   <!-- ==================== HOROSCOPE VIEW ==================== -->
-  <?php include 'views/view-pet_profile.php'; ?>
+  <?php include '../views/view-pet_profile.php'; ?>
 
   <link rel="stylesheet" href="css/style_4.css">
 
@@ -156,22 +156,22 @@
 
   <!-- User Profile Modal -->
   <!-- Forward Profile Modal -->
-  <?php include 'modals/forward-profile-modal.php'; ?>
+  <?php include '../modals/forward-profile-modal.php'; ?>
 
-  <?php include 'modals/user-profile-modal.php'; ?>
+  <?php include '../modals/user-profile-modal.php'; ?>
 
   <!-- Edit Post Modal -->
-  <?php include 'modals/edit-post-modal.php'; ?>
+  <?php include '../modals/edit-post-modal.php'; ?>
 
   <!-- Share Post Modal -->
-  <?php include 'modals/share-post-modal.php'; ?>
+  <?php include '../modals/share-post-modal.php'; ?>
 
   <script src="js/admin.js"></script>
 
   <!-- ==================== CONTENT HUB ==================== -->
-  <?php include 'views/view-content-hub.php'; ?>
+  <?php include '../views/view-content-hub.php'; ?>
 
-  <?php include 'modals/remove-friend-confirm-modal.php'; ?>
+  <?php include '../modals/remove-friend-confirm-modal.php'; ?>
   <script src="js/script_9.js"></script>
 </body>
 

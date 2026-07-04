@@ -55,5 +55,4 @@ graphify-out/
 *.patch
 
 *.md
-sql_scripts/scratch/
-
+scratch/

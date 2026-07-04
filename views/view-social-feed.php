@@ -530,12 +530,35 @@
             <div class="flex gap-3 items-start">
               <div id="feed-create-avatar" class="w-10 h-10 bg-brand-100 dark:bg-brand-900/50 rounded-full flex items-center justify-center text-brand-900 dark:text-brand-100 font-bold flex-shrink-0">U</div>
               <div class="flex-1 min-w-0 space-y-3">
-                <textarea id="feed-post-input" rows="3" placeholder="Share a moment from your pet's world..." onfocus="setPostComposerExpanded(true);" class="w-full resize-y rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-800 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400"></textarea>
+                <textarea id="feed-post-input" rows="1" placeholder="Share a moment from your pet's world..." onfocus="setPostComposerExpanded(true);" oninput="autoResizePostComposerTextarea();" class="w-full resize-none overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-800 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400"></textarea>
                 <div id="feed-post-expanded-fields" class="space-y-3 hidden">
-                  <div class="space-y-2">
-                    <input type="text" id="feed-post-hashtags" placeholder="Add hashtags (press Enter)" onkeydown="handlePostHashtagKeydown(event, 'feed-post-hashtags', 'feed-post-hashtags-chips')" class="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
-                    <div id="feed-post-hashtags-chips" class="flex flex-wrap gap-2"></div>
+                  <input type="file" id="feed-post-media-input" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime,video/x-m4v" multiple class="hidden" onchange="handlePostMediaSelected(event)" />
+                  <div id="feed-post-feeling-row" class="hidden space-y-2 rounded-2xl border border-amber-100 bg-amber-50/60 p-2 dark:border-amber-900/50 dark:bg-amber-950/20">
+                    <div class="flex items-center justify-between gap-2">
+                      <p class="text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-200">How is your pet feeling?</p>
+                      <button type="button" onclick="clearPostFeeling()" class="text-xs font-bold text-amber-700 hover:text-amber-900 dark:text-amber-300 dark:hover:text-amber-100">Clear</button>
+                    </div>
+                    <input type="hidden" id="feed-post-feeling" value="" />
+                    <input type="hidden" id="feed-post-activity" value="" />
+                    <div id="feed-post-feeling-selected" class="hidden rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm font-semibold text-amber-800 dark:border-amber-900/50 dark:bg-gray-900 dark:text-amber-200"></div>
+                    <div id="feed-post-feeling-options" class="grid grid-cols-2 gap-2 sm:grid-cols-3"></div>
                   </div>
+                  <div id="feed-post-tag-row" class="hidden space-y-2 rounded-2xl border border-sky-100 bg-sky-50/50 p-2 dark:border-sky-900/50 dark:bg-sky-950/20">
+                    <div class="flex items-center gap-2">
+                      <i data-lucide="users" class="h-4 w-4 text-sky-500"></i>
+                      <input type="text" id="feed-post-tags-input" list="feed-post-tags-options" placeholder="Tag friends (type a name and press Enter)" onkeydown="handlePostTaggedPawPalsKeydown(event)" onblur="addTaggedPawPalsFromInput()" class="w-full rounded-xl border border-sky-100 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition-colors focus:border-sky-400 dark:border-sky-900/40 dark:bg-gray-900 dark:text-gray-200" />
+                      <button type="button" onclick="addTaggedPawPalsFromInput()" class="rounded-xl bg-sky-500 px-3 py-2 text-xs font-bold text-white hover:bg-sky-600">Add</button>
+                    </div>
+                    <datalist id="feed-post-tags-options"></datalist>
+                    <div id="feed-post-tags-chips" class="flex flex-wrap gap-2"></div>
+                  </div>
+                  <div id="feed-post-media-url-row" class="hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-2">
+                    <div class="flex items-center gap-2">
+                      <input type="url" id="feed-post-media-url" placeholder="Paste a secure media URL" class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
+                      <button type="button" onclick="addPostMediaUrl()" class="px-3 py-2 rounded-xl bg-[#f97316] text-white text-xs font-bold hover:bg-[#ea580c]">Add</button>
+                    </div>
+                  </div>
+                  <div id="feed-post-media-preview" class="hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50"></div>
                 </div>
               </div>
             </div>
@@ -545,12 +568,12 @@
                 <i data-lucide="image" class="w-5 h-5"></i>
                 <span class="text-xs">Media</span>
               </button>
-              <button id="feed-post-tag" type="button" onclick="setPostComposerExpanded(true); refreshPawPalsTagOptions(); document.getElementById('feed-post-tags-input')?.focus();" class="flex flex-row items-center gap-2 text-gray-600 hover:text-sky-500">
+              <button id="feed-post-tag" type="button" onclick="openPostTagInput()" class="flex flex-row items-center gap-2 text-gray-600 hover:text-sky-500">
                 <i data-lucide="at-sign" class="w-5 h-5"></i>
                 <span class="text-xs">Tag</span>
               </button>
-              <button id="feed-post-feeling" type="button" onclick="setPostComposerExpanded(true); document.getElementById('feed-post-feeling')?.focus();" class="flex flex-row items-center gap-2 text-gray-600 hover:text-amber-500">
-                <i data-lucide="smile-plus" class="w-5 h-5"></i>
+              <button id="feed-post-open-feeling" type="button" onclick="openPostFeelingPicker()" class="flex flex-row items-center gap-2 text-gray-600 hover:text-amber-500">
+                <i id="feed-post-feeling-icon" data-lucide="smile-plus" class="w-5 h-5"></i>
                 <span class="text-xs">Feeling</span>
               </button>
               <button id="feed-post-event" type="button" onclick="openAddEventModal(new Date().toISOString().split('T')[0])" class="flex flex-row items-center gap-2 text-gray-600 hover:text-blue-500">
@@ -563,7 +586,7 @@
               </button>
             </div>
             <div class="mt-3 flex items-center justify-between gap-3">
-              <div></div>
+              <p id="feed-post-status" class="hidden text-xs font-medium text-gray-500 dark:text-gray-400"></p>
               <div class="flex items-center gap-2">
                 <button id="feed-post-cancel-btn" type="button" onclick="resetPostComposer()" class="px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Cancel</button>
                 <button id="feed-post-submit-btn" type="button" onclick="submitPost()" class="px-4 py-2 rounded-full bg-[#f97316] text-white text-sm font-bold shadow-sm">Post</button>
@@ -572,10 +595,35 @@
           </div>
           <script>
             (function(){
+              const composer = document.getElementById('feed-post-composer');
+              const input = document.getElementById('feed-post-input');
+
+              if (input) {
+                if (typeof autoResizePostComposerTextarea === 'function') autoResizePostComposerTextarea();
+                input.addEventListener('input', function() {
+                  if (typeof autoResizePostComposerTextarea === 'function') autoResizePostComposerTextarea();
+                });
+              }
+
+              if (typeof updateFeedFeelingIcon === 'function') updateFeedFeelingIcon();
+
+              if (composer) {
+                composer.addEventListener('focusin', function(){
+                  setPostComposerExpanded(true);
+                });
+                composer.addEventListener('focusout', function(){
+                  setTimeout(function(){
+                    if (!composer.contains(document.activeElement)) {
+                      setPostComposerExpanded(false);
+                    }
+                  }, 0);
+                });
+              }
+
               const map = {
                 'feed-post-open-media': 'openPostMediaPicker',
-                'feed-post-tag': function(){ setPostComposerExpanded(true); refreshPawPalsTagOptions(); document.getElementById('feed-post-tags-input')?.focus(); },
-                'feed-post-feeling': function(){ setPostComposerExpanded(true); document.getElementById('feed-post-feeling')?.focus(); },
+                'feed-post-tag': 'openPostTagInput',
+                'feed-post-open-feeling': 'openPostFeelingPicker',
                 'feed-post-event': 'openAddEventModal',
                 'feed-post-media-url': 'togglePostMediaUrlInput'
               };

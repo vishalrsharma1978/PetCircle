@@ -487,6 +487,38 @@ function usersAreAcceptedFriends($userId, $friendId)
     return !supabaseFailed($res) && !empty($res['data']);
 }
 
+function getAcceptedFriendIds($userId)
+{
+    if (!$userId) {
+        return [];
+    }
+
+    $res = supabaseRequest('GET', '/rest/v1/friendships', [
+        'or' => '(requester.eq.' . $userId . ',addressee.eq.' . $userId . ')',
+        'status' => 'eq.accepted',
+        'select' => 'requester,addressee',
+        'limit' => '500',
+    ]);
+
+    if (supabaseFailed($res) || empty($res['data'])) {
+        return [];
+    }
+
+    $ids = [];
+    foreach (($res['data'] ?? []) as $row) {
+        $requester = strtolower(trim((string) ($row['requester'] ?? '')));
+        $addressee = strtolower(trim((string) ($row['addressee'] ?? '')));
+        if ($requester !== '' && $requester !== strtolower(trim((string) $userId))) {
+            $ids[] = $requester;
+        }
+        if ($addressee !== '' && $addressee !== strtolower(trim((string) $userId))) {
+            $ids[] = $addressee;
+        }
+    }
+
+    return normalizeUuidList($ids);
+}
+
 function handleCreatePost($data)
 {
     if (empty($data['user_id'])) {
@@ -565,6 +597,7 @@ function handleGetPosts($data)
     if (empty($data['post_id'])) {
         $breed = cleanPlainValue($data['breed'] ?? '', 120);
         $pet_type = cleanPlainValue($data['pet_type'] ?? '', 80);
+        $orFilters = [];
         $visibilityFilters = ['and(breed.is.null,pet_type.is.null)'];
 
         if ($pet_type !== '') {
@@ -579,7 +612,21 @@ function handleGetPosts($data)
             $visibilityFilters[] = 'and(' . $filter . ')';
         }
 
-        $query['or'] = '(' . implode(',', $visibilityFilters) . ')';
+        $orFilters = array_merge($orFilters, $visibilityFilters);
+
+        $currentUserId = strtolower(trim((string) ($data['user_id'] ?? '')));
+        $socialAuthorIds = [];
+        if (isValidUuid($currentUserId)) {
+            $socialAuthorIds[] = $currentUserId;
+            $socialAuthorIds = array_merge($socialAuthorIds, getAcceptedFriendIds($currentUserId));
+            $socialAuthorIds = normalizeUuidList(array_values(array_unique($socialAuthorIds)));
+        }
+
+        if (!empty($socialAuthorIds)) {
+            $orFilters[] = 'user_id.in.(' . implode(',', $socialAuthorIds) . ')';
+        }
+
+        $query['or'] = '(' . implode(',', array_values(array_unique($orFilters))) . ')';
     }
 
     $res = supabaseRequest('GET', '/rest/v1/posts', $query);

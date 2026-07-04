@@ -12996,6 +12996,12 @@
 
           const mediaHtml = renderPostMediaFrame(postId, mediaItems, currentSlideIndex);
 
+          let postContextHtml = "";
+          if (post.linkedEvent) {
+            const eventTitle = post.linkedEvent.title || post.linkedEvent.name || "an event";
+            postContextHtml = `<p class="text-sm font-semibold text-gray-500 dark:text-gray-400 mt-1"><i data-lucide="calendar-days" class="w-4 h-4 inline-block mr-1"></i>Going to <span class="text-gray-900 dark:text-gray-100">${escapeHtml(eventTitle)}</span></p>`;
+          }
+
           const descriptionText = post.description || post.content || "";
 
           const feelingLine = post.feeling_text
@@ -14346,6 +14352,133 @@
 
 
 
+    function openPostTagInput() {
+      setPostComposerExpanded(true);
+      const row = document.getElementById("feed-post-tag-row");
+      if (row) row.classList.remove("hidden");
+      refreshPawPalsTagOptions();
+      document.getElementById("feed-post-tags-input")?.focus();
+    }
+
+    function autoResizePostComposerTextarea() {
+      const input = document.getElementById("feed-post-input");
+      if (!input) return;
+      input.style.height = "auto";
+      input.style.height = (input.scrollHeight) + "px";
+    }
+
+    function updateFeedFeelingIcon() {
+      const icon = document.getElementById("feed-post-feeling-icon");
+      if (icon && typeof lucide !== "undefined") {
+        lucide.createIcons();
+      }
+    }
+
+    function getPetTypeFeelingIconName(feeling) {
+      if (!feeling) return "smile-plus";
+      const petType = (currentUserObj?.pet_type || currentUserObj?.socialProfile?.petType || "").toLowerCase();
+      if (petType === "cat") return "cat";
+      if (petType === "bird") return "bird";
+      if (petType === "fish") return "fish";
+      return "dog";
+    }
+
+    function getPostFeelingOptions() {
+      const petType = (currentUserObj?.pet_type || currentUserObj?.socialProfile?.petType || "").toLowerCase();
+      if (petType === "cat") {
+        return [
+          { emoji: "🐱✨", feeling: "Happy", activity: "Purring", label: "Happy" },
+          { emoji: "🐱⚡", feeling: "Energetic", activity: "Zoomies", label: "Energetic" },
+          { emoji: "🐱👀", feeling: "Curious", activity: "Watching", label: "Curious" },
+          { emoji: "🐱😌", feeling: "Calm", activity: "Lounging", label: "Calm" },
+          { emoji: "🐱💤", feeling: "Sleepy", activity: "Cat nap", label: "Sleepy" },
+          { emoji: "🐱❤️", feeling: "Affectionate", activity: "Cuddling", label: "Affectionate" },
+        ];
+      }
+      if (petType === "bird") {
+        return [
+          { emoji: "🐦✨", feeling: "Happy", activity: "Chirping", label: "Happy" },
+          { emoji: "🐦⚡", feeling: "Energetic", activity: "Flying", label: "Energetic" },
+          { emoji: "🐦👀", feeling: "Curious", activity: "Observing", label: "Curious" },
+          { emoji: "🐦😌", feeling: "Calm", activity: "Perched", label: "Calm" },
+          { emoji: "🐦💤", feeling: "Sleepy", activity: "Resting", label: "Sleepy" },
+          { emoji: "🐦❤️", feeling: "Affectionate", activity: "Preening", label: "Affectionate" },
+        ];
+      }
+      if (petType === "hamster" || petType === "guinea_pig") {
+        return [
+          { emoji: "🐹✨", feeling: "Happy", activity: "Squeaking", label: "Happy" },
+          { emoji: "🐹⚡", feeling: "Energetic", activity: "Running wheel", label: "Energetic" },
+          { emoji: "🐹👀", feeling: "Curious", activity: "Sniffing", label: "Curious" },
+          { emoji: "🐹😌", feeling: "Calm", activity: "Nestling", label: "Calm" },
+          { emoji: "🐹💤", feeling: "Sleepy", activity: "Cage nap", label: "Sleepy" },
+          { emoji: "🐹❤️", feeling: "Affectionate", activity: "Hand cuddle", label: "Affectionate" },
+        ];
+      }
+      return [
+        { emoji: "🐾✨", feeling: "Happy", activity: "Feeling great", label: "Happy" },
+        { emoji: "🐾⚡", feeling: "Energetic", activity: "Full of energy", label: "Energetic" },
+        { emoji: "🐾👀", feeling: "Curious", activity: "Exploring", label: "Curious" },
+        { emoji: "🐾😌", feeling: "Calm", activity: "Relaxing", label: "Calm" },
+        { emoji: "🐾❤️", feeling: "Affectionate", activity: "Needs love", label: "Affectionate" },
+        { emoji: "🐾💤", feeling: "Sleepy", activity: "Ready for rest", label: "Sleepy" },
+      ];
+    }
+
+    function renderPostFeelingOptions() {
+      const panel = document.getElementById("feed-post-feeling-options");
+      if (!panel) return;
+      const selectedFeeling = document.getElementById("feed-post-feeling")?.value || "";
+      const selectedActivity = document.getElementById("feed-post-activity")?.value || "";
+      panel.innerHTML = getPostFeelingOptions().map((option) => {
+        const isActive = option.feeling === selectedFeeling && option.activity === selectedActivity;
+        const activeClass = isActive
+          ? "border-amber-400 bg-amber-100 text-amber-900 dark:border-amber-500 dark:bg-amber-900/40 dark:text-amber-100"
+          : "border-amber-200 bg-white text-gray-700 hover:border-amber-300 hover:bg-amber-50 dark:border-amber-900/50 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-amber-950/40";
+        return `
+          <button
+            type="button"
+            onclick="selectPostFeeling('${escapeHtml(option.feeling)}', '${escapeHtml(option.activity)}', '${escapeHtml(option.label)}', '${escapeHtml(option.emoji)}')"
+            class="flex items-center gap-2 rounded-xl border px-3 py-2 text-left text-sm font-semibold transition-colors ${activeClass}">
+            <span class="text-base leading-none">${option.emoji}</span>
+            <span class="truncate">${escapeHtml(option.label)}</span>
+          </button>`;
+      }).join("");
+    }
+
+    function selectPostFeeling(feeling, activity, label, emoji) {
+      const feelingInput = document.getElementById("feed-post-feeling");
+      const activityInput = document.getElementById("feed-post-activity");
+      const selected = document.getElementById("feed-post-feeling-selected");
+      if (feelingInput) feelingInput.value = String(feeling || "").trim();
+      if (activityInput) activityInput.value = String(activity || "").trim();
+      if (selected) {
+        selected.classList.remove("hidden");
+        selected.innerHTML = `<span class="mr-2">${emoji || "😄"}</span><span>${escapeHtml(label || feeling || "Feeling")}</span>`;
+      }
+      renderPostFeelingOptions();
+    }
+
+    function clearPostFeeling() {
+      const feelingInput = document.getElementById("feed-post-feeling");
+      const activityInput = document.getElementById("feed-post-activity");
+      const selected = document.getElementById("feed-post-feeling-selected");
+      if (feelingInput) feelingInput.value = "";
+      if (activityInput) activityInput.value = "";
+      if (selected) {
+        selected.innerHTML = "";
+        selected.classList.add("hidden");
+      }
+      renderPostFeelingOptions();
+    }
+
+    function openPostFeelingPicker() {
+      setPostComposerExpanded(true);
+      const row = document.getElementById("feed-post-feeling-row");
+      if (row) row.classList.remove("hidden");
+      renderPostFeelingOptions();
+    }
+
     function clearPostMedia() {
 
       (selectedPostMedia || []).forEach((item) => {
@@ -15041,47 +15174,32 @@
 
 
     function resetPostComposer() {
-
       const titleInput = document.getElementById("feed-post-title");
-
       const textInput = document.getElementById("feed-post-input");
-
-      const hashtagInput = document.getElementById("feed-post-hashtags");
-
       const tagInput = document.getElementById("feed-post-tags-input");
-
       const feelingInput = document.getElementById("feed-post-feeling");
-
       const activityInput = document.getElementById("feed-post-activity");
-
       const eventInput = document.getElementById("feed-post-event-input");
-
       const eventIdInput = document.getElementById("feed-post-event-id");
-
+      const tagRow = document.getElementById("feed-post-tag-row");
+      const feelingRow = document.getElementById("feed-post-feeling-row");
+      const feelingSelected = document.getElementById("feed-post-feeling-selected");
       if (titleInput) titleInput.value = "";
-
       if (textInput) textInput.value = "";
-
-      if (hashtagInput) hashtagInput.value = "";
-
       if (tagInput) tagInput.value = "";
-
       if (feelingInput) feelingInput.value = "";
-
       if (activityInput) activityInput.value = "";
-
       if (eventInput) eventInput.value = "";
-
       if (eventIdInput) eventIdInput.value = "";
-
-      setHashtagChips("feed-post-hashtags-chips", []);
-
+      if (tagRow) tagRow.classList.add("hidden");
+      if (feelingRow) feelingRow.classList.add("hidden");
+      if (feelingSelected) {
+        feelingSelected.innerHTML = "";
+        feelingSelected.classList.add("hidden");
+      }
       setTaggedPawPalsChips([]);
-
       clearPostMedia();
-
       setPostComposerExpanded(false);
-
     }
 
 
@@ -15153,21 +15271,14 @@
       const taggedPawPals = collectTaggedPawPals();
 
       const selectedFeeling = document.getElementById("feed-post-feeling")?.value || "";
-
       const feelingActivity = (document.getElementById("feed-post-activity")?.value || "").trim();
-
       const feelingText = buildPostFeelingText(selectedFeeling, feelingActivity);
-
-      const hashtags = collectPostHashtags("feed-post-hashtags", "feed-post-hashtags-chips");
-
+      const hashtags = [];
       const linkedEvent = getSelectedPostEvent("feed-post-event-input", "feed-post-event-id");
-
       if (document.getElementById("feed-post-event-input")?.value?.trim() && !linkedEvent) return;
-
       const media = Array.isArray(selectedPostMedia) ? [...selectedPostMedia] : [];
-
+      const hasExternalMediaUrl = media.some((item) => Boolean(item?.url));
       if (!title && !content && !media.length && !taggedPawPals.length && !feelingText) return;
-
       const audience = getPostAudienceConfig();
 
 
@@ -15217,11 +15328,9 @@
         feeling_text: feelingText,
 
         hashtags,
-
         media_url: media[0]?.previewUrl || null,
-
         media_urls: media.map((item) => item.previewUrl),
-
+        has_external_media_url: hasExternalMediaUrl,
         linkedEvent: linkedEvent ? { id: linkedEvent.id, title: linkedEvent.title } : null,
 
         linkedEvents: linkedEvent ? [linkedEvent.title] : [],
@@ -15345,11 +15454,9 @@
           hashtags,
 
           post_type: postType,
-
           media_url: mediaUrl,
-
           media_urls: mediaUrls,
-
+          has_external_media_url: hasExternalMediaUrl,
           linked_event_id: linkedEvent?.id || null,
 
           linked_event_title: linkedEvent?.title || null,
@@ -15383,11 +15490,9 @@
           savedPost.feeling = savedPost.feeling || selectedFeeling;
 
           savedPost.feeling_activity = savedPost.feeling_activity || feelingActivity;
-
           savedPost.feeling_text = savedPost.feeling_text || feelingText;
-
           savedPost.hashtags = savedPost.hashtags?.length ? savedPost.hashtags : hashtags;
-
+          savedPost.has_external_media_url = savedPost.has_external_media_url || hasExternalMediaUrl;
           savedPost.linkedEvent = savedPost.linkedEvent || optimisticPost.linkedEvent;
 
           savedPost.linkedEvents = savedPost.linkedEvents?.length ? savedPost.linkedEvents : optimisticPost.linkedEvents;

@@ -794,10 +794,10 @@
         </div>
 
         <!-- Playdate Profile Detail Modal -->
-        <?php include 'modals/mm-detail-modal.php'; ?>
+        <?php include __DIR__ . '/../modals/mm-detail-modal.php'; ?>
 
         <!-- Playdate Forward Modal -->
-        <?php include 'modals/mm-forward-modal.php'; ?>
+        <?php include __DIR__ . '/../modals/mm-forward-modal.php'; ?>
 
         <!-- Tab: Obituaries -->
         <div id="social-tab-obituaries" class="social-tab-content space-y-6 hidden"></div>

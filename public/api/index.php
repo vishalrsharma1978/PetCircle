@@ -17,7 +17,7 @@ if (!function_exists('mb_substr')) {
     
 }
 // Load .env first so PAWCIRCLE_DEBUG / ALLOWED_ORIGINS / Supabase keys are all available below.
-$envFile = __DIR__ . '/.env';
+$envFile = dirname(__DIR__, 2) . '/.env';
 if (file_exists($envFile)) {
     $parsed = parse_ini_file($envFile);
     if ($parsed) {
@@ -92,8 +92,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 
-require_once __DIR__ . '/api/utils/response_helpers.php';
-require_once __DIR__ . '/api/utils/supabase_client.php';
+require_once __DIR__ . '/utils/response_helpers.php';
+require_once __DIR__ . '/utils/supabase_client.php';
+
+require_once __DIR__ . '/routes/core.php';
+require_once __DIR__ . '/routes/auth.php';
+require_once __DIR__ . '/routes/social.php';
+require_once __DIR__ . '/routes/admin.php';
+require_once __DIR__ . '/routes/integrations.php';
+require_once __DIR__ . '/routes/notifications.php';
+require_once __DIR__ . '/routes/rescue.php';
 
 // Read action
 // Do NOT read php://input for multipart requests (file uploads) —

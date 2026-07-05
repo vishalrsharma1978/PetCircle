@@ -526,21 +526,21 @@
           </div>
 
           <!-- Simplified Post Composer -->
-          <div id="feed-post-composer" class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-3 sm:p-4">
-            <div class="flex gap-3 items-start">
-              <div id="feed-create-avatar" class="w-10 h-10 bg-brand-100 dark:bg-brand-900/50 rounded-full flex items-center justify-center text-brand-900 dark:text-brand-100 font-bold flex-shrink-0">U</div>
-              <div class="flex-1 min-w-0 space-y-3">
-                <textarea id="feed-post-input" rows="1" placeholder="Share a moment from your pet's world..." onfocus="setPostComposerExpanded(true);" oninput="autoResizePostComposerTextarea();" class="w-full resize-none overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-800 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400"></textarea>
-                <div id="feed-post-expanded-fields" class="space-y-3 hidden">
+          <div id="feed-post-composer" class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/20 border border-gray-100/80 dark:border-gray-800/80 p-4 sm:p-5 transition-all duration-300 hover:shadow-xl">
+            <div class="flex gap-4 items-start">
+              <div id="feed-create-avatar" class="w-12 h-12 bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-900/60 dark:to-brand-800/40 rounded-full flex items-center justify-center text-brand-700 dark:text-brand-200 font-bold flex-shrink-0 shadow-inner">U</div>
+              <div class="flex-1 min-w-0 space-y-4">
+                <textarea id="feed-post-input" rows="1" placeholder="Share a moment from your pet's world..." onfocus="setPostComposerExpanded(true);" oninput="autoResizePostComposerTextarea();" class="w-full resize-none overflow-hidden rounded-2xl border border-transparent bg-gray-50/80 dark:bg-gray-800/50 px-4 py-3.5 text-base text-gray-800 dark:text-gray-100 outline-none transition-all duration-300 focus:border-brand-400/50 focus:bg-white dark:focus:bg-gray-900 focus:shadow-md dark:focus:shadow-brand-900/20"></textarea>
+                <div id="feed-post-expanded-fields" class="space-y-4 hidden">
                   <input type="file" id="feed-post-media-input" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime,video/x-m4v" multiple class="hidden" onchange="handlePostMediaSelected(event)" />
-                  <div id="feed-post-feeling-row" class="hidden space-y-2 rounded-2xl border border-amber-100 bg-amber-50/60 p-2 dark:border-amber-900/50 dark:bg-amber-950/20">
-                    <div class="flex items-center justify-between gap-2">
-                      <p class="text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-200">How is your pet feeling?</p>
-                      <button type="button" onclick="clearPostFeeling()" class="text-xs font-bold text-amber-700 hover:text-amber-900 dark:text-amber-300 dark:hover:text-amber-100">Clear</button>
+                  <div id="feed-post-feeling-row" class="hidden space-y-3 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 p-3.5">
+                    <div class="flex items-center justify-between gap-2 px-1">
+                      <p class="text-[13px] font-semibold text-gray-700 dark:text-gray-300">How is your pet feeling?</p>
+                      <button type="button" onclick="clearPostFeeling()" class="text-xs font-medium text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">Clear</button>
                     </div>
                     <input type="hidden" id="feed-post-feeling" value="" />
                     <input type="hidden" id="feed-post-activity" value="" />
-                    <div id="feed-post-feeling-selected" class="hidden rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm font-semibold text-amber-800 dark:border-amber-900/50 dark:bg-gray-900 dark:text-amber-200"></div>
+                    <div id="feed-post-feeling-selected" class="hidden flex items-center justify-center gap-2 rounded-xl border border-brand-200 bg-brand-50/50 px-4 py-2.5 text-sm font-medium text-brand-700 dark:border-brand-900/50 dark:bg-brand-900/20 dark:text-brand-300"></div>
                     <div id="feed-post-feeling-options" class="grid grid-cols-2 gap-2 sm:grid-cols-3"></div>
                   </div>
                   <div id="feed-post-tag-row" class="hidden space-y-2 rounded-2xl border border-sky-100 bg-sky-50/50 p-2 dark:border-sky-900/50 dark:bg-sky-950/20">
@@ -563,33 +563,33 @@
               </div>
             </div>
             <!-- Quick action icons under composer -->
-            <div id="feed-post-quick-actions" class="mt-3 hidden p-4 text-sm flex flex-row items-center gap-4">
-              <button id="feed-post-open-media" type="button" onclick="openPostMediaPicker()" class="flex flex-row items-center gap-2 text-gray-600 hover:text-brand-500">
-                <i data-lucide="image" class="w-5 h-5"></i>
-                <span class="text-xs">Media</span>
+            <div id="feed-post-quick-actions" class="mt-4 hidden p-2.5 bg-gray-50/50 dark:bg-gray-800/30 rounded-2xl border border-gray-100 dark:border-gray-800/60 text-sm flex flex-row items-center gap-2 overflow-x-auto hide-scrollbar">
+              <button id="feed-post-open-media" type="button" onclick="openPostMediaPicker()" class="flex flex-row items-center gap-2 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-900/30 dark:hover:text-brand-400 transition-colors">
+                <i data-lucide="image" class="w-4 h-4"></i>
+                <span class="text-xs font-semibold">Media</span>
               </button>
-              <button id="feed-post-tag" type="button" onclick="openPostTagInput()" class="flex flex-row items-center gap-2 text-gray-600 hover:text-sky-500">
-                <i data-lucide="at-sign" class="w-5 h-5"></i>
-                <span class="text-xs">Tag</span>
+              <button id="feed-post-tag" type="button" onclick="openPostTagInput()" class="flex flex-row items-center gap-2 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-sky-50 hover:text-sky-600 dark:hover:bg-sky-900/30 dark:hover:text-sky-400 transition-colors">
+                <i data-lucide="at-sign" class="w-4 h-4"></i>
+                <span class="text-xs font-semibold">Tag</span>
               </button>
-              <button id="feed-post-open-feeling" type="button" onclick="openPostFeelingPicker()" class="flex flex-row items-center gap-2 text-gray-600 hover:text-amber-500">
-                <i id="feed-post-feeling-icon" data-lucide="smile-plus" class="w-5 h-5"></i>
-                <span class="text-xs">Feeling</span>
+              <button id="feed-post-open-feeling" type="button" onclick="openPostFeelingPicker()" class="flex flex-row items-center gap-2 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-900/30 dark:hover:text-amber-400 transition-colors">
+                <i id="feed-post-feeling-icon" data-lucide="smile-plus" class="w-4 h-4"></i>
+                <span class="text-xs font-semibold">Feeling</span>
               </button>
-              <button id="feed-post-event" type="button" onclick="openAddEventModal(new Date().toISOString().split('T')[0])" class="flex flex-row items-center gap-2 text-gray-600 hover:text-blue-500">
-                <i data-lucide="calendar" class="w-5 h-5"></i>
-                <span class="text-xs">Event</span>
+              <button id="feed-post-event" type="button" onclick="openAddEventModal(new Date().toISOString().split('T')[0])" class="flex flex-row items-center gap-2 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400 transition-colors">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+                <span class="text-xs font-semibold">Event</span>
               </button>
-              <button id="feed-post-media-url" type="button" onclick="togglePostMediaUrlInput()" class="flex flex-row items-center gap-2 text-gray-600 hover:text-violet-500">
-                <i data-lucide="link" class="w-5 h-5"></i>
-                <span class="text-xs">Media URL</span>
+              <button id="feed-post-media-url" type="button" onclick="togglePostMediaUrlInput()" class="flex flex-row items-center gap-2 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-violet-50 hover:text-violet-600 dark:hover:bg-violet-900/30 dark:hover:text-violet-400 transition-colors">
+                <i data-lucide="link" class="w-4 h-4"></i>
+                <span class="text-xs font-semibold">Link</span>
               </button>
             </div>
-            <div class="mt-3 flex items-center justify-between gap-3">
+            <div class="mt-4 flex items-center justify-between gap-3 pt-2">
               <p id="feed-post-status" class="hidden text-xs font-medium text-gray-500 dark:text-gray-400"></p>
-              <div class="flex items-center gap-2">
-                <button id="feed-post-cancel-btn" type="button" onclick="resetPostComposer()" class="px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Cancel</button>
-                <button id="feed-post-submit-btn" type="button" onclick="submitPost()" class="px-4 py-2 rounded-full bg-[#f97316] text-white text-sm font-bold shadow-sm">Post</button>
+              <div class="flex items-center gap-3 ml-auto">
+                <button id="feed-post-cancel-btn" type="button" onclick="resetPostComposer()" class="px-5 py-2.5 rounded-full text-sm font-semibold text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200">Cancel</button>
+                <button id="feed-post-submit-btn" type="button" onclick="submitPost()" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 active:scale-95">Post</button>
               </div>
             </div>
           </div>
@@ -620,31 +620,6 @@
                 });
               }
 
-              const map = {
-                'feed-post-open-media': 'openPostMediaPicker',
-                'feed-post-tag': 'openPostTagInput',
-                'feed-post-open-feeling': 'openPostFeelingPicker',
-                'feed-post-event': 'openAddEventModal',
-                'feed-post-media-url': 'togglePostMediaUrlInput'
-              };
-              Object.keys(map).forEach((id) => {
-                const el = document.getElementById(id);
-                if (!el) return;
-                el.addEventListener('click', function(e){
-                  try {
-                    const handler = map[id];
-                    console.log('Composer quick-action clicked:', id);
-                    if (typeof handler === 'string') {
-                      const fn = window[handler];
-                      if (typeof fn === 'function') {
-                        if (handler === 'openAddEventModal') fn(new Date().toISOString().split('T')[0]); else fn();
-                      } else console.warn('Handler not found:', handler);
-                    } else if (typeof handler === 'function') {
-                      handler();
-                    }
-                  } catch (err) { console.error('Quick action error for', id, err); }
-                });
-              });
             })();
           </script>
 

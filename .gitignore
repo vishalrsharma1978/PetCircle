@@ -56,3 +56,4 @@ graphify-out/
 
 *.md
 scratch/
+test_*

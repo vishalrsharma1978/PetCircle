@@ -14443,14 +14443,14 @@
       panel.innerHTML = getPostFeelingOptions().map((option) => {
         const isActive = option.feeling === selectedFeeling && option.activity === selectedActivity;
         const activeClass = isActive
-          ? "border-amber-400 bg-amber-100 text-amber-900 dark:border-amber-500 dark:bg-amber-900/40 dark:text-amber-100"
-          : "border-amber-200 bg-white text-gray-700 hover:border-amber-300 hover:bg-amber-50 dark:border-amber-900/50 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-amber-950/40";
+          ? "border-brand-300 bg-brand-50 text-brand-800 dark:border-brand-700/50 dark:bg-brand-900/30 dark:text-brand-200 ring-2 ring-brand-100 dark:ring-brand-900/20 shadow-sm scale-[0.98]"
+          : "border-gray-200 bg-white text-gray-700 hover:border-brand-200 hover:bg-gray-50/80 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-750 dark:hover:border-gray-600 shadow-sm hover:shadow";
         return `
           <button
             type="button"
             onclick="selectPostFeeling('${escapeHtml(option.feeling)}', '${escapeHtml(option.activity)}', '${escapeHtml(option.label)}', '${escapeHtml(option.emoji)}')"
-            class="flex items-center gap-2 rounded-xl border px-3 py-2 text-left text-sm font-semibold transition-colors ${activeClass}">
-            <span class="text-base leading-none">${option.emoji}</span>
+            class="group flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left text-[13px] font-medium transition-all duration-200 ${activeClass}">
+            <span class="text-base leading-none transition-transform duration-300 group-hover:scale-110">${option.emoji}</span>
             <span class="truncate">${escapeHtml(option.label)}</span>
           </button>`;
       }).join("");
@@ -14470,6 +14470,9 @@
     }
 
     function clearPostFeeling() {
+      const composer = document.getElementById('feed-post-composer');
+      if (composer && !composer.hasAttribute('tabindex')) composer.setAttribute('tabindex', '-1');
+      if (composer) composer.focus({preventScroll: true});
       const feelingInput = document.getElementById("feed-post-feeling");
       const activityInput = document.getElementById("feed-post-activity");
       const selected = document.getElementById("feed-post-feeling-selected");

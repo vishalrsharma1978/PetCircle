@@ -570,9 +570,9 @@ function handleCreatePost($data)
         'pet_type' => $pet_type === '' ? null : $pet_type,
         'title' => cleanNullableText($data['title'] ?? null, 240),
         'description' => cleanNullableText($data['description'] ?? null, 5000),
-        'feeling' => $feeling === '' ? null : $feeling,
-        'feeling_activity' => $feelingActivity === '' ? null : $feelingActivity,
-        'feeling_text' => $feelingText === '' ? null : $feelingText,
+        // 'feeling' => $feeling === '' ? null : $feeling,
+        // 'feeling_activity' => $feelingActivity === '' ? null : $feelingActivity,
+        // 'feeling_text' => $feelingText === '' ? null : $feelingText,
     ];
 
     if (isset($data['hashtags']) && is_array($data['hashtags'])) {

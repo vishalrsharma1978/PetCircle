@@ -185,29 +185,17 @@
 
 
     async function loginWithSupabaseAuth(email, password, hints = {}) {
-
-      const client = await loadSupabaseAuthClient();
-
-      const { data, error } = await client.auth.signInWithPassword({
-
-        email,
-
-        password,
-
+      const res = await fetch("api/index.php", {
+        method: "POST",
+        credentials: "include",
+        headers: secureJsonHeaders(),
+        body: JSON.stringify({ action: "supabase_auth_login", email, password, ...hints }),
       });
-
-
-
-      if (error) {
-
-        throw new Error(error.message || "Supabase Auth sign-in failed.");
-
+      const data = await res.json();
+      if (!res.ok || data.status !== "success") {
+        throw new Error(data.message || "Supabase Auth sign-in failed.");
       }
-
-
-
-      return exchangeSupabaseAuthSession(data.session, hints);
-
+      return data;
     }
 
 

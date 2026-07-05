@@ -533,6 +533,15 @@ function handleCreatePost($data)
         $mediaUrl = json_encode($mediaUrls);
     }
 
+    $feeling = cleanPlainValue($data['feeling'] ?? '', 120);
+    $feelingActivity = cleanPlainValue($data['feeling_activity'] ?? '', 120);
+    $feelingText = cleanPlainValue($data['feeling_text'] ?? '', 240);
+
+    // Use feeling text as the message if no content was provided
+    if ($content === '' && $feelingText !== '') {
+        $content = $feelingText;
+    }
+
     if ($content === '' && $mediaUrl === '') {
         jsonError("Post content or media_url required.", 400);
         return;
@@ -561,6 +570,9 @@ function handleCreatePost($data)
         'pet_type' => $pet_type === '' ? null : $pet_type,
         'title' => cleanNullableText($data['title'] ?? null, 240),
         'description' => cleanNullableText($data['description'] ?? null, 5000),
+        'feeling' => $feeling === '' ? null : $feeling,
+        'feeling_activity' => $feelingActivity === '' ? null : $feelingActivity,
+        'feeling_text' => $feelingText === '' ? null : $feelingText,
     ];
 
     if (isset($data['hashtags']) && is_array($data['hashtags'])) {

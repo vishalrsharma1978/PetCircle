@@ -14384,7 +14384,17 @@
     }
 
     function getPostFeelingOptions() {
-      const petType = (currentUserObj?.pet_type || currentUserObj?.socialProfile?.petType || "").toLowerCase();
+      const petType = String(currentUserObj?.pet_type || currentUserObj?.socialProfile?.pet_type || "").trim().toLowerCase();
+      if (petType.includes("dog")) {
+        return [
+          { emoji: "🐶✨", feeling: "Happy", activity: "Tail wagging", label: "Happy" },
+          { emoji: "🐶⚡", feeling: "Energetic", activity: "Zoomies", label: "Energetic" },
+          { emoji: "🐶👀", feeling: "Curious", activity: "Sniffing around", label: "Curious" },
+          { emoji: "🐶😌", feeling: "Calm", activity: "Chilling", label: "Calm" },
+          { emoji: "🐶❤️", feeling: "Affectionate", activity: "Cuddling", label: "Affectionate" },
+          { emoji: "🐶💤", feeling: "Sleepy", activity: "Ready for bed", label: "Sleepy" },
+        ];
+      }
       if (petType === "cat") {
         return [
           { emoji: "🐱✨", feeling: "Happy", activity: "Purring", label: "Happy" },
@@ -14405,7 +14415,7 @@
           { emoji: "🐦❤️", feeling: "Affectionate", activity: "Preening", label: "Affectionate" },
         ];
       }
-      if (petType === "hamster" || petType === "guinea_pig") {
+      if (petType === "hamster" || petType === "guinea_pig" || petType === "rabbit") {
         return [
           { emoji: "🐹✨", feeling: "Happy", activity: "Squeaking", label: "Happy" },
           { emoji: "🐹⚡", feeling: "Energetic", activity: "Running wheel", label: "Energetic" },

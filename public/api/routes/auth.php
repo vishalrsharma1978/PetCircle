@@ -419,6 +419,72 @@ function handleSupabaseAuthExchange($data)
     clearLoginRateLimit($user['email'] ?? ($authUser['email'] ?? ''), 'member');
 }
 
+function handleSupabaseAuthLogin($data)
+{
+    $email = filter_var($data['email'] ?? '', FILTER_SANITIZE_EMAIL);
+    $password = $data['password'] ?? '';
+    
+    if (!$email || !$password) {
+        jsonError("Credentials cannot be empty.", 400);
+        return;
+    }
+
+    $authRes = supabaseRequest('POST', '/auth/v1/token?grant_type=password', [], [
+        'email' => $email,
+        'password' => $password,
+    ]);
+
+    if (($authRes['code'] ?? 500) !== 200 || empty($authRes['data']['access_token'])) {
+        http_response_code(401);
+        echo json_encode(["status" => "error", "message" => $authRes['data']['error_description'] ?? "Invalid email or password."]);
+        return;
+    }
+
+    $authUser = $authRes['data']['user'];
+    if (!$authUser || empty($authUser['id'])) {
+        jsonError('Invalid Supabase Auth session. Please sign in again.', 401);
+        return;
+    }
+
+    $user = linkOrCreateAppUserForSupabaseAuth($authUser, $data);
+    if (!$user) {
+        return;
+    }
+
+    if (!empty($user['deactivated_at'])) {
+        jsonError('This account is deactivated. Contact support if you believe this is incorrect.', 403);
+        return;
+    }
+
+    $loginPunishments = getActiveUserPunishments($user['id'] ?? '');
+    $ban = activePunishmentOfType($loginPunishments, ['ban']);
+    if ($ban) {
+        jsonError('This account has been banned. Contact support if you believe this is incorrect.', 403);
+        return;
+    }
+    $suspension = activePunishmentOfType($loginPunishments, ['suspension']);
+    if ($suspension) {
+        jsonError('This account is currently suspended.', 403);
+        return;
+    }
+
+    $session = createUserSession($user['id'], 'member');
+    $loginAt = nowIsoUtc();
+    $payload = buildUserPayload($user, $loginAt);
+    $payload['auth_user_id'] = $authUser['id'];
+
+    jsonSuccess([
+        'message' => 'Supabase Auth login successful.',
+        'session' => $session,
+        'user' => $payload,
+    ]);
+
+    finishResponseEarly();
+
+    markSuccessfulLogin($user['id'], $user['email'] ?? ($authUser['email'] ?? ''), 'supabase_auth');
+    clearLoginRateLimit($user['email'] ?? ($authUser['email'] ?? ''), 'member');
+}
+
 function sessionSecret()
 {
     $secret = envValue('APP_SESSION_SECRET', '');

@@ -135,6 +135,7 @@ if ($action === 'check_tables') {
 $publicActions = [
     'auth_config',
     'supabase_auth_exchange',
+    'supabase_auth_login',
     'public_signup',
     'signup',
     'verify_signup',
@@ -179,6 +180,9 @@ switch ($action) {
         break;
     case 'supabase_auth_exchange':
         handleSupabaseAuthExchange($inputData);
+        break;
+    case 'supabase_auth_login':
+        handleSupabaseAuthLogin($inputData);
         break;
     case 'public_signup':
     case 'signup':

@@ -611,12 +611,14 @@
                 composer.addEventListener('focusin', function(){
                   setPostComposerExpanded(true);
                 });
-                composer.addEventListener('focusout', function(){
-                  setTimeout(function(){
-                    if (!composer.contains(document.activeElement)) {
+                document.addEventListener('mousedown', function(e){
+                  if (!composer.contains(e.target)) {
+                    // Only auto-collapse if they haven't typed anything
+                    const input = document.getElementById('feed-post-input');
+                    if (input && !input.value.trim()) {
                       setPostComposerExpanded(false);
                     }
-                  }, 0);
+                  }
                 });
               }
 

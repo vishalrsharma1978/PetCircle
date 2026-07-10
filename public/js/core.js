@@ -7221,9 +7221,9 @@
 
           ` : `
 
-            <div class="flex items-center justify-center w-full h-full rounded-full bg-white text-3xl font-black uppercase" style="color:${darkColor};">
+            <div class="flex items-center justify-center w-full h-full rounded-full bg-white overflow-hidden p-1">
 
-              ES
+              <img src="assets/mascots/pawcircle-logo.svg" alt="PawCircle" class="w-full h-full object-contain" />
 
             </div>
 
@@ -7663,7 +7663,7 @@
 
           link: "https://meet.google.com/",
 
-          desc: "Connect with young professionals and students from our samaj. Share opportunities and mentorship.",
+          desc: "Connect with young pet enthusiasts from our community. Share pet care tips, opportunities and mentorship.",
 
           audience: "Pet Breed",
 
@@ -7677,7 +7677,7 @@
 
           date: dateIn(20),
 
-          location: "Samaj Trust Clinic",
+          location: "Community Vet Clinic",
 
           desc: "Free check-ups, blood donation drive and wellness counselling organised by breed rescues.",
 
@@ -9819,6 +9819,14 @@
 
       try {
 
+        // --- spinner on ---
+        const _evtBtn = document.getElementById('event-modal-submit-btn');
+        const _evtSpinner = document.getElementById('event-modal-submit-spinner');
+        const _evtLabel = document.getElementById('event-modal-submit-label');
+        if (_evtBtn) _evtBtn.disabled = true;
+        if (_evtSpinner) _evtSpinner.classList.remove('hidden');
+        if (_evtLabel) _evtLabel.textContent = 'Saving…';
+
         let savedEvent = null;
 
         let saveEventResponse = null;
@@ -10040,6 +10048,16 @@
         console.error(err);
 
         showToast(err.message || "Could not save event.", "error");
+
+      } finally {
+
+        // --- spinner off ---
+        const _evtBtn = document.getElementById('event-modal-submit-btn');
+        const _evtSpinner = document.getElementById('event-modal-submit-spinner');
+        const _evtLabel = document.getElementById('event-modal-submit-label');
+        if (_evtBtn) _evtBtn.disabled = false;
+        if (_evtSpinner) _evtSpinner.classList.add('hidden');
+        if (_evtLabel) _evtLabel.textContent = 'Save Event';
 
       }
 
@@ -20425,7 +20443,7 @@
 
       
 
-      { icon: "landmark", tag: "Spotlight", title: "Discover samaj groups", text: "Connect with trending breed groups and networks.", cta: "Explore Groups", action: "switchSocialTab('groups')" },
+      { icon: "landmark", tag: "Spotlight", title: "Discover Pet Groups", text: "Connect with trending breed groups and pet communities near you.", cta: "Explore Groups", action: "switchSocialTab('groups')" },
 
     ];
 
@@ -24529,6 +24547,15 @@
 
 
 
+      // --- spinner on ---
+      const _galBtn = document.getElementById('gallery-modal-submit');
+      const _galSpinner = document.getElementById('gallery-modal-submit-spinner');
+      const _galLabel = document.getElementById('gallery-modal-submit-label');
+      const _galLabelOrig = _galLabel ? _galLabel.textContent : '';
+      if (_galBtn) _galBtn.disabled = true;
+      if (_galSpinner) _galSpinner.classList.remove('hidden');
+      if (_galLabel) _galLabel.textContent = 'Saving…';
+
       try {
 
         let data;
@@ -24632,6 +24659,13 @@
         console.error(err);
 
         showToast(err.message || "Could not save gallery.");
+
+      } finally {
+
+        // --- spinner off ---
+        if (_galBtn) _galBtn.disabled = false;
+        if (_galSpinner) _galSpinner.classList.add('hidden');
+        if (_galLabel) _galLabel.textContent = _galLabelOrig || 'Create gallery';
 
       }
 
@@ -42586,7 +42620,9 @@
 
       if (emailEl) emailEl.textContent = email;
 
-      if (letterEl) letterEl.textContent = getSocialAvatar(name);
+      if (letterEl) letterEl.innerHTML = url
+        ? ""
+        : `<svg viewBox="0 0 24 24" fill="currentColor" style="width:1.2em;height:1.2em;"><path d="M12 2.5c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zM7.5 5c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 0c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zM5 9.5c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm14 0c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zM12 12c2.5 0 6 2 6 5v1H6v-1c0-3 3.5-5 6-5z"/></svg>`;
 
       if (imgEl && letterEl) {
 

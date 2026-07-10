@@ -72,7 +72,13 @@
         <button type="button" onclick="closeCreateGalleryModal()"
           class="no-faith-hover px-4 py-2 rounded-xl text-base font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">Cancel</button>
         <button id="gallery-modal-submit" type="button" onclick="createGalleryFromModal()"
-          class="px-4 py-2 rounded-xl bg-brand-500 text-white text-base font-bold">Create gallery</button>
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-500 text-white text-base font-bold disabled:opacity-60 disabled:cursor-not-allowed">
+          <svg id="gallery-modal-submit-spinner" class="hidden animate-spin w-4 h-4 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <span id="gallery-modal-submit-label">Create gallery</span>
+        </button>
       </div>
     </div>
   </div>

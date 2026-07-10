@@ -557,6 +557,9 @@
 
         try {
 
+          const phoneEl = document.getElementById("reg-phone");
+          const mobileNumber = phoneEl ? phoneEl.value.trim() : "";
+
           const res = await fetch("api/index.php", {
 
             method: "POST",
@@ -579,7 +582,9 @@
 
               pet_type: petType,
 
-              breed: breed
+              breed: breed,
+
+              mobile_number: mobileNumber || undefined,
 
             }),
 

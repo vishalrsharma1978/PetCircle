@@ -777,7 +777,7 @@ function normaliseProfileTagsInput($raw, $limit = 15)
 
 function profileCustomTags($profile)
 {
-    return normaliseProfileTagsInput($profile['tags'] ?? []);
+    return normaliseProfileTagsInput($profile['primary_interests'] ?? $profile['tags'] ?? []);
 }
 
 function profileDisplayTags($customTags, $systemTags)
@@ -1201,21 +1201,40 @@ function handleSignup($data)
     }
 
     $userId = $appUser['id'];
-    $session = createUserSession($userId, 'member');
 
-    echo json_encode([
-        "status" => "success",
-        "message" => "Account created successfully.",
-        "session" => $session,
-        "user" => [
-            "id" => $userId,
-            "pet_name" => $petName,
-            "parent_name" => $parentName,
-            "email" => $email,
-            "role" => "member",
-            "pet_type" => $petType,
-            "breed" => $breed
-        ],
+    // Explicitly upsert the profile with all signup fields.
+    // ensureProfileForAppUser() only knows about generic fields (name, pet_type, breed),
+    // so we do a dedicated POST here to also capture pet_name and parent_name.
+    $profileInsert = [
+        'user_id'      => $userId,
+        'full_name'    => $petName,  // full_name is NOT NULL — use pet name as display name
+        'pet_type'     => $petType,
+        'breed'        => $breed ?: null,
+        'mobile_number' => $phone ?: null,
+    ];
+    if ($parentName !== '')
+        $profileInsert['parent_name'] = $parentName;
+    if ($petName !== '')
+        $profileInsert['pet_name'] = $petName;
+
+    $profileRes = supabaseRequest('POST', '/rest/v1/profiles', [], $profileInsert, ['Prefer: resolution=merge-duplicates,return=minimal']);
+
+    if (($profileRes['code'] ?? 500) >= 400) {
+        error_log('[pawcircle][' . requestId() . '] signup profile upsert failed | http=' . ($profileRes['code'] ?? 'n/a') . ' | ' . json_encode($profileRes['data'] ?? null));
+        sendSupabaseError('Account was created but profile could not be saved.', $profileRes);
+        return;
+    }
+
+    $loginAt = markSuccessfulLogin($userId, $email, 'signup');
+    $session = createUserSession($userId, 'member');
+    $freshUser = fetchAppUserWithProfileById($userId) ?: $appUser;
+    $payloadUser = buildUserPayload($freshUser, $loginAt);
+    $payloadUser['auth_user_id'] = $authUser['id'] ?? null;
+
+    jsonSuccess([
+        'message' => 'Account created successfully.',
+        'session' => $session,
+        'user'    => $payloadUser,
     ]);
 }
 
@@ -1880,9 +1899,10 @@ function profileSummary($profile, $fallbackName = 'Member')
 
 function getAccountProfile($userId)
 {
+    // FIX: Added primary_interests, skills, and privacy_settings to the select list
     $res = supabaseRequest('GET', '/rest/v1/profiles', [
         'user_id' => 'eq.' . $userId,
-        'select' => 'user_id,full_name,breed,pet_type,current_city,mobile_number,date_of_birth,gender,occupation,bio,profile_photo_url,cover_photo_url,is_public,visibility,online_status,social_links,membership_applied,status',
+        'select' => 'user_id,full_name,pet_name,parent_name,breed,pet_type,current_city,mobile_number,date_of_birth,gender,occupation,bio,profile_photo_url,cover_photo_url,is_public,visibility,online_status,social_links,membership_applied,status,primary_interests,skills,privacy_settings',
         'limit' => '1',
     ]);
 
@@ -1893,20 +1913,7 @@ function getAccountProfile($userId)
         return $profile;
     }
 
-    $fallback = supabaseRequest('GET', '/rest/v1/profiles', [
-        'user_id' => 'eq.' . $userId,
-        'select' => 'user_id,full_name,breed,pet_type,current_city,mobile_number,date_of_birth,gender,occupation,bio,profile_photo_url,cover_photo_url,is_public,membership_applied,status,primary_interests',
-        'limit' => '1',
-    ]);
-
-    if (supabaseFailed($fallback) || empty($fallback['data'])) {
-        return [];
-    }
-
-    $profile = $fallback['data'][0];
-    $profile['breed'] = $profile['breed'] ?? '';
-    $profile['pet_type'] = $profile['pet_type'] ?? '';
-    return $profile;
+    return [];
 }
 
 function cleanupStaleCallSessions()

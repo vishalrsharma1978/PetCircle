@@ -1105,7 +1105,17 @@ function resolveTaxonomyValues($data)
 
 function buildUserPayload($user, $loginAt = null)
 {
-    $profile = normaliseProfileEmbed($user['profiles'] ?? []);
+    // FIX: Force independent fetch to avoid missing data from failed SQL joins during login
+    $profile = getAccountProfile($user['id'] ?? '');
+
+    if (empty($profile)) {
+        $profile = [
+            'full_name' => explode('@', $user['email'] ?? 'User')[0],
+            'pet_type' => '',
+            'breed' => ''
+        ];
+    }
+
     $customTags = profileCustomTags($profile);
     $adminCaps = fetchAdminCapabilities($user['id'] ?? '');
     $systemTags = adminCapabilityTags($adminCaps);
@@ -1128,6 +1138,7 @@ function buildUserPayload($user, $loginAt = null)
         "mobile_number" => $profile['mobile_number'] ?? null,
         "gender" => $profile['gender'] ?? null,
         "date_of_birth" => $profile['date_of_birth'] ?? null,
+        "age_group" => profileAgeGroup($profile), // FIX: Added age_group calculation
         "occupation" => $profile['occupation'] ?? null,
         "bio" => $profile['bio'] ?? '',
         "current_city" => $profile['current_city'] ?? null,

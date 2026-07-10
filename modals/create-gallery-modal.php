@@ -16,17 +16,17 @@
       </div>
       <div class="modal-scroll p-6 space-y-4 overflow-y-auto">
         <input id="gallery-modal-id" type="hidden">
-        <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300">Gallery title
+        <label class="block text-base font-bold text-gray-700 dark:text-gray-300">Gallery title
           <input id="gallery-modal-title" placeholder="e.g. Summer collection"
             class="mt-1 w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:border-brand-500">
         </label>
-        <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300">Link to event (optional)
+        <label class="block text-base font-bold text-gray-700 dark:text-gray-300">Link to event (optional)
           <select id="gallery-modal-event"
             class="mt-1 w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:border-brand-500">
             <option value="">Independent gallery</option>
           </select>
         </label>
-        <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300">Visibility
+        <label class="block text-base font-bold text-gray-700 dark:text-gray-300">Visibility
           <select id="gallery-modal-visibility"
             class="mt-1 w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:border-brand-500">
             <option value="private">Private</option>
@@ -35,12 +35,12 @@
             <option value="public">Public</option>
           </select>
         </label>
-        <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300">Description
+        <label class="block text-base font-bold text-gray-700 dark:text-gray-300">Description
           <textarea id="gallery-modal-desc" rows="2" placeholder="Short context for this collection"
             class="mt-1 w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:border-brand-500"></textarea>
         </label>
         <div>
-          <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-2">Media Upload</label>
+          <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-2">Media Upload</label>
           <div class="flex items-center gap-3">
             <label for="gallery-modal-upload"
               class="cursor-pointer inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold shadow-sm transition-colors">
@@ -56,7 +56,7 @@
             <input id="gallery-modal-url-input" type="url" inputmode="url" placeholder="https://example.com/image.jpg"
               class="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:border-brand-500">
             <button type="button" onclick="addGalleryMediaUrl()"
-              class="no-faith-hover px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-base font-bold shadow-md">Add
+              class="no-faith-hover px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-base font-bold">Add
               URL</button>
           </div>
           <!-- Newly added media show as thumbnails only; the underlying storage URLs are never displayed. -->
@@ -70,9 +70,9 @@
       <div
         class="shrink-0 px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 flex justify-end gap-3">
         <button type="button" onclick="closeCreateGalleryModal()"
-          class="no-faith-hover px-4 py-2 rounded-xl text-base font-bold shadow-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">Cancel</button>
+          class="no-faith-hover px-4 py-2 rounded-xl text-base font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">Cancel</button>
         <button id="gallery-modal-submit" type="button" onclick="createGalleryFromModal()"
-          class="px-4 py-2 rounded-xl bg-brand-500 text-white text-base font-bold shadow-md">Create gallery</button>
+          class="px-4 py-2 rounded-xl bg-brand-500 text-white text-base font-bold">Create gallery</button>
       </div>
     </div>
   </div>

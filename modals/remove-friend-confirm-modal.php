@@ -12,9 +12,9 @@
         updates.</p>
       <div class="flex gap-3 w-full">
         <button onclick="closeRemoveFriendConfirm()"
-          class="flex-1 py-2.5 rounded-xl text-base font-bold shadow-md border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Cancel</button>
+          class="flex-1 py-2.5 rounded-xl text-base font-bold border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Cancel</button>
         <button id="rfc-confirm-btn"
-          class="flex-1 py-2.5 rounded-xl text-base font-bold shadow-md bg-red-600 text-white hover:bg-red-700 transition-colors shadow-lg shadow-red-500/20">Remove</button>
+          class="flex-1 py-2.5 rounded-xl text-base font-bold bg-red-600 text-white hover:bg-red-700 transition-colors shadow-lg shadow-red-500/20">Remove</button>
       </div>
     </div>
   </div>

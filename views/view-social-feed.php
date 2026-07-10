@@ -92,21 +92,21 @@
                 class="hidden absolute -right-5 top-full mt-3 w-72 max-w-[calc(100vw-1.5rem)] rounded-2xl border border-brand-100 dark:border-brand-900/60 bg-white dark:bg-gray-900 shadow-xl"
                 style="z-index: 9998;" role="status" aria-live="polite">
                 <span
-                  class="absolute -top-2 right-9 w-4 h-4 rotate-45 bg-white dark:bg-gray-900 border-l border-t border-brand-100 dark:border-brand-900/60"
+                  class="absolute -top-2 right-7 w-4 h-4 rotate-45 bg-white dark:bg-gray-900 border-l border-t border-brand-100 dark:border-brand-900/60"
                   aria-hidden="true"></span>
                 <div class="flex items-start gap-3 p-4">
                   <div
-                    class="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/40 text-brand-600 dark:text-brand-300 flex items-center justify-center flex-shrink-0">
+                    class="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/40 text-brand-600 dark:text-brand-300 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <i data-lucide="bell-ring" class="w-5 h-5"></i>
                   </div>
                   <div class="min-w-0 flex-1">
-                    <p class="text-base font-bold shadow-md text-gray-900 dark:text-gray-100">You have unread notifications</p>
+                    <p class="text-[15px] font-bold text-gray-900 dark:text-gray-100 leading-tight">You have unread notifications</p>
                     <p id="notifications-unread-popup-count" class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       Open notifications to catch up.
                     </p>
                   </div>
                   <button type="button" onclick="dismissUnreadNotificationsPopup()"
-                    class="no-faith-hover p-1 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex-shrink-0"
+                    class="no-faith-hover p-1 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex-shrink-0 -mt-1 -mr-1"
                     aria-label="Dismiss unread notifications alert">
                     <i data-lucide="x" class="w-4 h-4"></i>
                   </button>
@@ -125,7 +125,7 @@
               <div id="toolbar-profile-menu"
                 class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-50">
                 <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                  <p id="toolbar-menu-name" class="text-base font-bold shadow-md text-gray-900 dark:text-gray-100 truncate">User</p>
+                  <p id="toolbar-menu-name" class="text-base font-bold text-gray-900 dark:text-gray-100 truncate">User</p>
                   <p id="toolbar-menu-email" class="text-xs text-gray-500 dark:text-gray-400 truncate"></p>
                 </div>
                 <button type="button" onclick="openProfileModal(); closeProfileMenu();"
@@ -520,7 +520,7 @@
             </div>
             <button id="send-suvichar-btn" onclick="sendSuvichar()"
               style="--no-faith-hover-bg:#f97316;--no-faith-hover-color:#ffffff;--no-faith-hover-border:#f97316;"
-              class="no-faith-hover bg-orange-500 text-white border border-orange-500 px-4 py-2 rounded-xl text-base font-bold shadow-md flex items-center gap-2 shadow-lg shadow-orange-500/20 transition-all transform hover:scale-105 whitespace-nowrap flex-shrink-0">
+              class="no-faith-hover bg-orange-500 text-white border border-orange-500 px-4 py-2 rounded-xl text-base font-bold flex items-center gap-2 shadow-lg shadow-orange-500/20 transition-all transform hover:scale-105 whitespace-nowrap flex-shrink-0">
               <i data-lucide="sun" class="w-4 h-4"></i> Send Suvichar
             </button>
           </div>
@@ -589,7 +589,7 @@
               <p id="feed-post-status" class="hidden text-xs font-medium text-gray-500 dark:text-gray-400"></p>
               <div class="flex items-center gap-3 ml-auto">
                 <button id="feed-post-cancel-btn" type="button" onclick="resetPostComposer()" class="px-5 py-2.5 rounded-full text-sm font-semibold text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200">Cancel</button>
-                <button id="feed-post-submit-btn" type="button" onclick="submitPost()" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 active:scale-95">Post</button>
+                <button id="feed-post-submit-btn" type="button" onclick="submitPost()" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-bold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 active:scale-95">Post</button>
               </div>
             </div>
           </div>
@@ -710,11 +710,11 @@
           <!-- Sub-tab switch: Events list / Analytics -->
           <div class="flex items-center gap-2 border-b border-gray-100 dark:border-gray-800">
             <button id="events-subtab-btn-list" onclick="setEventsSubTab('list')"
-              class="events-subtab-btn px-4 py-3 text-base font-bold shadow-md border-b-2 border-transparent text-gray-500 dark:text-gray-400 transition-colors">
+              class="events-subtab-btn px-4 py-3 text-base font-bold border-b-2 border-transparent text-gray-500 dark:text-gray-400 transition-colors">
               <i data-lucide="calendar-heart" class="w-4 h-4 inline-block -mt-0.5"></i> Events
             </button>
             <button id="events-subtab-btn-analytics" onclick="setEventsSubTab('analytics')"
-              class="events-subtab-btn px-4 py-3 text-base font-bold shadow-md border-b-2 border-transparent text-gray-500 dark:text-gray-400 transition-colors">
+              class="events-subtab-btn px-4 py-3 text-base font-bold border-b-2 border-transparent text-gray-500 dark:text-gray-400 transition-colors">
               <i data-lucide="bar-chart-3" class="w-4 h-4 inline-block -mt-0.5"></i> Analytics
             </button>
           </div>
@@ -732,7 +732,7 @@
                 </p>
               </div>
               <button onclick="openAddEventModal(new Date().toISOString().split('T')[0])"
-                class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-base font-bold shadow-md flex items-center gap-2 shadow-lg shadow-brand-500/30 transition-colors w-full sm:w-auto justify-center">
+                class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-base font-bold flex items-center gap-2 shadow-lg shadow-brand-500/30 transition-colors w-full sm:w-auto justify-center">
                 <i data-lucide="plus" class="w-4 h-4"></i> Create Event
               </button>
             </div>
@@ -750,7 +750,7 @@
 
             <div class="pt-2">
               <button onclick="openAllEventsPanel()"
-                class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-base font-bold shadow-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-base font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                 <i data-lucide="calendar-search" class="w-4 h-4"></i> View all events
               </button>
             </div>

@@ -1306,10 +1306,12 @@ function handleCreateGroup($data)
 
     $res = supabaseRequest('POST', '/rest/v1/groups', [], $body, ['Prefer: return=representation']);
 
+    // FIX: Added empty($res['data']) check
     if (supabaseFailed($res) || empty($res['data'])) {
         sendSupabaseError("Failed to create group.", $res);
         return;
     }
+
 
     $group = $res['data'][0];
 
@@ -2095,7 +2097,7 @@ function handleSearchMembers($data)
     }
 
     $profilesRes = supabaseRequest('GET', '/rest/v1/profiles', $profileQuery);
-    
+
     // Resilience: Fallback if any columns fail (e.g. is_public not available)
     if (supabaseFailed($profilesRes)) {
         $profileQuery['select'] = 'user_id,full_name,profile_photo_url,pet_type,breed,current_city,date_of_birth,gender';
@@ -2136,7 +2138,7 @@ function handleSearchMembers($data)
         if (isset($relationshipByUser[$otherId]))
             continue;
 
-        $visibility = normalizeVisibility($p['visibility'] ?? (!empty($p['is_public']) ? 'public' : 'private'));
+        $visibility = normalizeVisibility($p['visibility'] ?? null);
         if ($visibility === 'private')
             continue;
         if ($visibility === 'pet_type' && $currentPetType !== '' && ($p['pet_type'] ?? '') !== $currentPetType)

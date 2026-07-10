@@ -299,9 +299,27 @@ function handleApplyRescueOpportunity($data)
         'status' => 'confirmed',
         'created_at' => nowIsoUtc(),
     ], ['Prefer: return=representation']);
+
     if (($res['status'] ?? 500) >= 300) {
         jsonError('Failed to sign up. Please try again.', 502);
         return;
+    }
+
+    if (($res['status'] ?? 500) >= 300 || empty($res['data'])) {
+        jsonError('Failed to sign up. Please try again.', 502);
+        return;
+    }
+
+    // FIX: Notify the opportunity owner of the new application
+    $ownerId = $opp['owner_id'] ?? '';
+    if ($ownerId && $ownerId !== $userId) {
+        createNotification(
+            $ownerId,
+            'rescue_application',
+            'New Rescue Application',
+            $name . ' has applied for your rescue opportunity!',
+            ['opportunity_id' => $oppId, 'applicant_id' => $userId]
+        );
     }
 
     jsonSuccess(['applied' => true, 'application' => $res['data'][0] ?? null, 'filled' => $filled + 1]);

@@ -47,13 +47,13 @@
 
           <div class="mt-4 flex gap-3 w-full">
             <button id="upm-friend-status-btn"
-              class="no-faith-hover flex-1 bg-emerald-600 text-white py-2 rounded-xl text-base font-bold shadow-md border border-emerald-600 shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+              class="no-faith-hover flex-1 bg-emerald-600 text-white py-2 rounded-xl text-base font-bold border border-emerald-600 shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
               <i data-lucide="check-circle-2" class="w-4 h-4"></i> Friends
             </button>
             <button
               onclick="introduceMeTo(document.getElementById('upm-name').textContent, document.getElementById('user-profile-modal').dataset.userId, this)"
               style="--no-faith-hover-bg:#2563eb; --no-faith-hover-color:#ffffff; --no-faith-hover-border:#2563eb;"
-              class="no-faith-hover flex-1 bg-blue-600 text-white hover:bg-blue-700 py-2 rounded-xl text-base font-bold shadow-md border border-blue-600 shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-2">
+              class="no-faith-hover flex-1 bg-blue-600 text-white hover:bg-blue-700 py-2 rounded-xl text-base font-bold border border-blue-600 shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-2">
               <i data-lucide="handshake" class="w-4 h-4"></i> Introduce Me
             </button>
           </div>
@@ -63,7 +63,7 @@
       <!-- Interactive Pack Tree (scrolls independently of the header) -->
       <div
         class="user-profile-modal-body px-6 pb-6 pt-6 mt-4 flex-1 overflow-y-auto modal-scroll max-h-[55vh] rounded-b-3xl border-t border-gray-100 dark:border-gray-800">
-        <h3 class="text-base font-bold shadow-md text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+        <h3 class="text-base font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
           <i data-lucide="network" class="w-4 h-4 text-brand-500"></i> Pack Tree (Interactive)
         </h3>
         <div id="upm-pack-tree-container"

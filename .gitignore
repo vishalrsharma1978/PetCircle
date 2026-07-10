@@ -30,6 +30,7 @@ dist-ssr
 *.pem
 *.key
 service-role*.json
+databaseSecrets.md
 
 # Data and Schema dumps (we keep sql_scripts/schema.sql but ignore others if needed, though they are inside sql_scripts now)
 # We will not globally ignore *.sql so that schema files can be checked in.
@@ -55,5 +56,6 @@ graphify-out/
 *.patch
 
 *.md
+*.py
 scratch/
 test_*

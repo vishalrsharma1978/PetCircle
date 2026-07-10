@@ -326,51 +326,8 @@
 
 
 
-          try {
-
-            const authData = await loginWithSupabaseAuth(email, password);
-
-            if (authData?.status === "success" && authData.user) {
-
-              burstConfetti(btn);
-
-              btn.classList.add("!bg-green-500", "!border-green-500");
-
-              btn.innerText = "Welcome back!";
-
-              try {
-
-                populateMemberDashboard(authData.user);
-
-                initializeSocialFeed();
-
-                switchView("view-social-feed");
-
-                btn.classList.remove("!bg-green-500", "!border-green-500");
-
-                btn.disabled = false;
-
-                btn.innerText = "Sign in";
-
-                document.getElementById("public-login-form").reset();
-
-              } catch (e) {
-
-                alert(e.stack || e.message || e);
-
-                console.error(e);
-
-              }
-
-              return;
-
-            }
-
-          } catch (authErr) {
-
-            console.warn("Supabase Auth login failed; trying legacy login:", authErr);
-
-          }
+          // Supabase Auth and Legacy Auth have been merged into the backend public_login action.
+          // This avoids the frontend making two sequential API calls.
 
 
 
@@ -1702,13 +1659,13 @@
 
                     <div class="mt-8 pt-5 border-t border-gray-100 flex flex-col gap-3">
 
-                        <button id="btn-submit-membership" onclick="submitMembership()" class="flex items-center justify-center gap-2 px-5 py-3 text-base font-bold shadow-md text-white bg-brand-400 hover:bg-brand-300 rounded-xl transition-colors shadow-sm w-full">
+                        <button id="btn-submit-membership" onclick="submitMembership()" class="flex items-center justify-center gap-2 px-5 py-3 text-base font-bold text-white bg-brand-400 hover:bg-brand-300 rounded-xl transition-colors shadow-sm w-full">
 
                             ${primaryLabel}
 
                         </button>
 
-                        <button onclick="skipMembership()" class="flex items-center justify-center gap-2 px-5 py-3 text-base font-bold shadow-md text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-xl transition-colors w-full">
+                        <button onclick="skipMembership()" class="flex items-center justify-center gap-2 px-5 py-3 text-base font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-xl transition-colors w-full">
 
                             <i data-lucide="clock" class="w-4 h-4"></i> Skip for now — I'll finish this later
 
@@ -3567,33 +3524,39 @@
 
 
     async function leaveZoomCallShell() {
-
       if (zoomLeaveInProgress) return;
-
       zoomLeaveInProgress = true;
 
-
-
       try {
-
         await leaveZoomMeetingSdk();
-
         cleanupZoomShellState();
-
         await markCurrentZoomParticipantLeft();
-
       } catch (err) {
-
         console.warn("leaveZoomCallShell error", err);
-
       } finally {
-
         cleanupZoomShellState();
-
         zoomLeaveInProgress = false;
-
       }
+    }
 
+    async function endZoomCallShell() {
+      if (zoomLeaveInProgress) return;
+      if (!currentZoomCallId) return leaveZoomCallShell();
+
+      if (!confirm("Are you sure you want to end this call for everyone?")) return;
+
+      zoomLeaveInProgress = true;
+      try {
+        await leaveZoomMeetingSdk();
+        cleanupZoomShellState();
+        await api("zoom_end_call", { call_id: currentZoomCallId });
+      } catch (err) {
+        console.warn("endZoomCallShell error", err);
+        showToast("Error ending call.", "error");
+      } finally {
+        cleanupZoomShellState();
+        zoomLeaveInProgress = false;
+      }
     }
 
 
@@ -4774,7 +4737,7 @@
 
                         <div class="mt-6 pt-6 border-t border-gray-100">
 
-                            <button onclick="initializeSocialFeed()" class="text-base font-bold shadow-md text-white px-8 py-3 rounded-xl transition-colors w-full sm:w-auto shadow-md flex items-center justify-center mx-auto" style="background: linear-gradient(135deg, color-mix(in srgb, var(--faith-accent, #f59e0b) 80%, white) 0%, color-mix(in srgb, var(--faith-accent, #f59e0b) 55%, white) 55%, color-mix(in srgb, var(--faith-accent, #f59e0b) 35%, white) 100%);">
+                            <button onclick="initializeSocialFeed()" class="text-base font-bold text-white px-8 py-3 rounded-xl transition-colors w-full sm:w-auto shadow-md flex items-center justify-center mx-auto" style="background: linear-gradient(135deg, color-mix(in srgb, var(--faith-accent, #f59e0b) 80%, white) 0%, color-mix(in srgb, var(--faith-accent, #f59e0b) 55%, white) 55%, color-mix(in srgb, var(--faith-accent, #f59e0b) 35%, white) 100%);">
 
                               Enter PawFeed <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
 
@@ -4818,7 +4781,7 @@
 
                 <div class="pt-4 border-t border-gray-100 mt-2">
 
-                    <button onclick="initializeSocialFeed()" class="text-base font-bold shadow-md text-white bg-gray-800 hover:bg-gray-900 px-6 py-2.5 rounded-xl transition-colors w-full sm:w-auto flex items-center justify-center mx-auto">
+                    <button onclick="initializeSocialFeed()" class="text-base font-bold text-white bg-gray-800 hover:bg-gray-900 px-6 py-2.5 rounded-xl transition-colors w-full sm:w-auto flex items-center justify-center mx-auto">
 
                       Continue to PawFeed <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
 
@@ -5158,7 +5121,7 @@
 
       badge.id = "offline-demo-badge";
 
-      badge.className = "fixed bottom-4 right-4 z-[9999] rounded-xl bg-gray-950 text-white border border-orange-400/60 shadow-2xl px-4 py-3 text-base font-bold shadow-md";
+      badge.className = "fixed bottom-4 right-4 z-[9999] rounded-xl bg-gray-950 text-white border border-orange-400/60 shadow-2xl px-4 py-3 text-base font-bold";
 
       badge.innerHTML = '<span class="text-orange-300">Offline demo</span><span class="block text-xs font-medium text-gray-300 mt-0.5">Backend calls are disabled</span>';
 
@@ -6062,7 +6025,7 @@
 
                     <p class="text-xs text-gray-500 mb-4">Your membership is active. Welcome to your breed portal!</p>
 
-                    <button onclick="initializeSocialFeed()" class="text-base font-bold shadow-md text-white px-6 py-2.5 rounded-xl transition-colors w-full sm:w-auto shadow-md" style="background: linear-gradient(135deg, color-mix(in srgb, var(--faith-accent, #f59e0b) 80%, white) 0%, color-mix(in srgb, var(--faith-accent, #f59e0b) 55%, white) 55%, color-mix(in srgb, var(--faith-accent, #f59e0b) 35%, white) 100%);">
+                    <button onclick="initializeSocialFeed()" class="text-base font-bold text-white px-6 py-2.5 rounded-xl transition-colors w-full sm:w-auto shadow-md" style="background: linear-gradient(135deg, color-mix(in srgb, var(--faith-accent, #f59e0b) 80%, white) 0%, color-mix(in srgb, var(--faith-accent, #f59e0b) 55%, white) 55%, color-mix(in srgb, var(--faith-accent, #f59e0b) 35%, white) 100%);">
 
                         Enter Pet Breed Feed
 
@@ -6131,121 +6094,70 @@
 
 
     function getPetTypeSolidColor(pet_type) {
-
       const type = String(pet_type || "").toLowerCase();
-
       const colors = {
-
         dog: "#f97316",         // orange-500
-
         cat: "#059669",         // emerald-600
-
         bird: "#2563eb",        // blue-600
-
-        rabbit: "#7c3aed",      // violet-600
-
-        fish: "#d97706",        // amber-600
-
-        reptile: "#dc2626",     // red-600
-
-        "small pets": "#b91c1c",// red-700
-
+        rabbit: "#ea580c",      // orange-600 (sikh)
+        fish: "#dc2626",        // red-600 (buddhist)
+        reptile: "#4f46e5",     // indigo-600 (jain)
+        "small pets": "#0d9488",// teal-600 (parsi)
         other: "#64748b"        // slate-500
-
       };
-
       return colors[type] || "#e04848"; // brand-500 fallback
-
     }
 
 
 
     function getFaithFrameClass(pet_type) {
-
       const r = (pet_type || "").toLowerCase();
-
-      if (r === "hindu") return "faith-frame-park";
-
-      if (r === "muslim") return "faith-frame-mosque";
-
-      if (r === "christian") return "faith-frame-church";
-
-      if (r === "sikh") return "faith-frame-sikh";
-
-      if (r === "buddhist") return "faith-frame-buddhist";
-
-      if (r === "jain") return "faith-frame-jain";
-
-      if (r === "parsi") return "faith-frame-parsi";
-
+      if (r === "hindu" || r === "dog") return "faith-frame-park";
+      if (r === "muslim" || r === "cat") return "faith-frame-mosque";
+      if (r === "christian" || r === "bird") return "faith-frame-church";
+      if (r === "sikh" || r === "rabbit") return "faith-frame-sikh";
+      if (r === "buddhist" || r === "fish") return "faith-frame-buddhist";
+      if (r === "jain" || r === "reptile") return "faith-frame-jain";
+      if (r === "parsi" || r === "small pets") return "faith-frame-parsi";
       return "faith-frame-generic";
-
     }
 
 
 
     function getFaithFrameBgClass(pet_type) {
-
       const r = (pet_type || "").toLowerCase();
-
-      if (r === "hindu") return "faith-frame-bg-park";
-
-      if (r === "muslim") return "faith-frame-bg-mosque";
-
-      if (r === "christian") return "faith-frame-bg-church";
-
-      if (r === "sikh") return "faith-frame-bg-sikh";
-
-      if (r === "buddhist") return "faith-frame-bg-buddhist";
-
-      if (r === "jain") return "faith-frame-bg-jain";
-
-      if (r === "parsi") return "faith-frame-bg-parsi";
-
+      if (r === "hindu" || r === "dog") return "faith-frame-bg-park";
+      if (r === "muslim" || r === "cat") return "faith-frame-bg-mosque";
+      if (r === "christian" || r === "bird") return "faith-frame-bg-church";
+      if (r === "sikh" || r === "rabbit") return "faith-frame-bg-sikh";
+      if (r === "buddhist" || r === "fish") return "faith-frame-bg-buddhist";
+      if (r === "jain" || r === "reptile") return "faith-frame-bg-jain";
+      if (r === "parsi" || r === "small pets") return "faith-frame-bg-parsi";
       return "faith-frame-bg-generic";
-
     }
 
 
 
     function getFaithAccentColor(pet_type) {
-
+      const type = String(pet_type || "").toLowerCase();
       const colors = {
-
-        Hindu: "#f97316",
-
-        Muslim: "#10b981",
-
-        Sikh: "#3b82f6",
-
-        Christian: "#8b5cf6",
-
-        Buddhist: "#f59e0b",
-
-        Jain: "#ef4444",
-
-        Parsi: "#e04848",
-
-        Dog: "#3b82f6",
-
-        Cat: "#8b5cf6",
-
-        Bird: "#f59e0b",
-
-        Rabbit: "#10b981",
-
-        Fish: "#06b6d4",
-
-        Reptile: "#84cc16",
-
-        "Small Pets": "#ec4899",
-
-        Other: "#64748b",
-
+        hindu: "#f97316",
+        muslim: "#059669",
+        sikh: "#ea580c",
+        christian: "#2563eb",
+        buddhist: "#dc2626",
+        jain: "#4f46e5",
+        parsi: "#0d9488",
+        dog: "#f97316",
+        cat: "#059669",
+        bird: "#2563eb",
+        rabbit: "#ea580c",
+        fish: "#dc2626",
+        reptile: "#4f46e5",
+        "small pets": "#0d9488",
+        other: "#64748b",
       };
-
-      return colors[pet_type] || "#e04848";
-
+      return colors[type] || "var(--faith-accent, #f97316)";
     }
 
 
@@ -7956,7 +7868,7 @@
 
       const cls = active ? c.active : c.inactive;
 
-      return `<button onclick="toggleEventResponse('${eventId}','${type}',this)" data-event-action="${type}" aria-pressed="${active ? "true" : "false"}" class="flex-1 ${cls} py-2 rounded-lg text-base font-bold shadow-md transition-colors shadow-sm flex items-center justify-center gap-1.5"><i data-lucide="${c.icon}" class="w-4 h-4"></i> ${active ? c.activeLabel : c.label}</button>`;
+      return `<button onclick="toggleEventResponse('${eventId}','${type}',this)" data-event-action="${type}" aria-pressed="${active ? "true" : "false"}" class="flex-1 ${cls} py-2 rounded-lg text-base font-bold transition-colors shadow-sm flex items-center justify-center gap-1.5"><i data-lucide="${c.icon}" class="w-4 h-4"></i> ${active ? c.activeLabel : c.label}</button>`;
 
     }
 
@@ -8084,7 +7996,7 @@
 
           if (current[type] && !existing) {
 
-            const btnHtml = `<button id="${groupBtnId}" onclick="openGroupChat('event_group_${safeId}')" class="inline-flex items-center justify-center gap-2 bg-brand-50 text-brand-600 hover:bg-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:hover:bg-brand-900/50 px-3 py-2 rounded-lg text-base font-bold shadow-md transition-colors"><i data-lucide="users" class="w-4 h-4"></i> Go to Group</button>`;
+            const btnHtml = `<button id="${groupBtnId}" onclick="openGroupChat('event_group_${safeId}')" class="inline-flex items-center justify-center gap-2 bg-brand-50 text-brand-600 hover:bg-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:hover:bg-brand-900/50 px-3 py-2 rounded-lg text-base font-bold transition-colors"><i data-lucide="users" class="w-4 h-4"></i> Go to Group</button>`;
 
             const rsvpBtn = actionContainer.querySelector('[data-event-action="rsvp"]');
 
@@ -8222,7 +8134,7 @@
 
       const goToGroupBtn = (!past && eventResp.rsvp) ? `
 
-        <button id="group-btn-${safeEventId}" onclick="openGroupChat('event_group_${safeEventId}')" class="inline-flex items-center justify-center gap-2 bg-brand-50 text-brand-600 hover:bg-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:hover:bg-brand-900/50 px-3 py-2 rounded-lg text-base font-bold shadow-md transition-colors"><i data-lucide="users" class="w-4 h-4"></i> Go to Group</button>` : "";
+        <button id="group-btn-${safeEventId}" onclick="openGroupChat('event_group_${safeEventId}')" class="inline-flex items-center justify-center gap-2 bg-brand-50 text-brand-600 hover:bg-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:hover:bg-brand-900/50 px-3 py-2 rounded-lg text-base font-bold transition-colors"><i data-lucide="users" class="w-4 h-4"></i> Go to Group</button>` : "";
 
 
 
@@ -8238,11 +8150,11 @@
 
           <div class="hidden absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-gray-900 shadow-lg border border-gray-100 dark:border-gray-800 focus:outline-none z-50 p-1">
 
-            <button onclick="openEditEventModal('${safeEventId}'); this.parentElement.classList.add('hidden')" class="w-full text-left px-4 py-2 text-base font-bold shadow-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg flex items-center gap-2"><i data-lucide="edit" class="w-4 h-4"></i> Edit Event</button>
+            <button onclick="openEditEventModal('${safeEventId}'); this.parentElement.classList.add('hidden')" class="w-full text-left px-4 py-2 text-base font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg flex items-center gap-2"><i data-lucide="edit" class="w-4 h-4"></i> Edit Event</button>
 
-            <button onclick="archiveEvent('${safeEventId}'); this.parentElement.classList.add('hidden')" class="w-full text-left px-4 py-2 text-base font-bold shadow-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg flex items-center gap-2"><i data-lucide="archive" class="w-4 h-4"></i> Archive</button>
+            <button onclick="archiveEvent('${safeEventId}'); this.parentElement.classList.add('hidden')" class="w-full text-left px-4 py-2 text-base font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg flex items-center gap-2"><i data-lucide="archive" class="w-4 h-4"></i> Archive</button>
 
-            <button onclick="deleteEvent('${safeEventId}'); this.parentElement.classList.add('hidden')" class="w-full text-left px-4 py-2 text-base font-bold shadow-md text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete</button>
+            <button onclick="deleteEvent('${safeEventId}'); this.parentElement.classList.add('hidden')" class="w-full text-left px-4 py-2 text-base font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete</button>
 
           </div>
 
@@ -8252,9 +8164,9 @@
 
       const actionsHtml = past
 
-        ? `<button onclick="copyEventLink('${safeEventId}')" class="inline-flex items-center justify-center gap-2 bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 px-3 py-2 rounded-lg text-base font-bold shadow-md transition-colors"><i data-lucide="link" class="w-4 h-4"></i> Copy</button>
+        ? `<button onclick="copyEventLink('${safeEventId}')" class="inline-flex items-center justify-center gap-2 bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 px-3 py-2 rounded-lg text-base font-bold transition-colors"><i data-lucide="link" class="w-4 h-4"></i> Copy</button>
 
-           <button onclick="shareCalendarEvent('${safeEventId}')" class="inline-flex items-center justify-center gap-2 bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 px-3 py-2 rounded-lg text-base font-bold shadow-md transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i> Share</button>
+           <button onclick="shareCalendarEvent('${safeEventId}')" class="inline-flex items-center justify-center gap-2 bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 px-3 py-2 rounded-lg text-base font-bold transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i> Share</button>
 
            ${actionMenuHtml}`
 
@@ -8266,9 +8178,9 @@
 
            ${renderEventActionButton(safeEventId, "rescue", eventResp.rescue)}
 
-           <button onclick="copyEventLink('${safeEventId}')" class="inline-flex items-center justify-center gap-2 bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 px-3 py-2 rounded-lg text-base font-bold shadow-md transition-colors"><i data-lucide="link" class="w-4 h-4"></i> Copy</button>
+           <button onclick="copyEventLink('${safeEventId}')" class="inline-flex items-center justify-center gap-2 bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 px-3 py-2 rounded-lg text-base font-bold transition-colors"><i data-lucide="link" class="w-4 h-4"></i> Copy</button>
 
-           <button onclick="shareCalendarEvent('${safeEventId}')" class="inline-flex items-center justify-center gap-2 bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 px-3 py-2 rounded-lg text-base font-bold shadow-md transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i> Share</button>
+           <button onclick="shareCalendarEvent('${safeEventId}')" class="inline-flex items-center justify-center gap-2 bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 px-3 py-2 rounded-lg text-base font-bold transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i> Share</button>
 
            ${linkHtml}
 
@@ -12620,13 +12532,13 @@
 
             ${mediaItems.length > 1 ? `
 
-              <button type="button" onclick="changePostSlide('${safePostId}', -1)" class="no-faith-hover post-media-nav-btn absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-white" aria-label="Previous media">
+              <button type="button" onclick="event.stopPropagation(); event.preventDefault(); changePostSlide('${safePostId}', -1)" class="no-faith-hover post-media-nav-btn outline-none focus:outline-none absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-white" aria-label="Previous media">
 
                 <i data-lucide="chevron-left" class="h-5 w-5"></i>
 
               </button>
 
-              <button type="button" onclick="changePostSlide('${safePostId}', 1)" class="no-faith-hover post-media-nav-btn absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-white" aria-label="Next media">
+              <button type="button" onclick="event.stopPropagation(); event.preventDefault(); changePostSlide('${safePostId}', 1)" class="no-faith-hover post-media-nav-btn outline-none focus:outline-none absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-white" aria-label="Next media">
 
                 <i data-lucide="chevron-right" class="h-5 w-5"></i>
 
@@ -12634,7 +12546,7 @@
 
               <div class="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-white/88 px-3 py-1.5 shadow-lg backdrop-blur-sm">
 
-                ${mediaItems.map((_, idx) => `<button type="button" onclick="jumpToPostSlide('${safePostId}', ${idx})" class="post-media-dot ${idx === currentSlideIndex ? "active" : ""}" aria-label="Go to slide ${idx + 1}"></button>`).join("")}
+                ${mediaItems.map((_, idx) => `<button type="button" onclick="event.stopPropagation(); event.preventDefault(); jumpToPostSlide('${safePostId}', ${idx})" class="post-media-dot outline-none focus:outline-none ${idx === currentSlideIndex ? "active" : ""}" aria-label="Go to slide ${idx + 1}"></button>`).join("")}
 
               </div>` : ""}
 
@@ -15928,7 +15840,7 @@
 
               </button>
 
-              <div class="text-xs sm:text-base font-bold shadow-md min-w-[8rem] text-center">
+              <div class="text-xs sm:text-base font-bold min-w-[8rem] text-center">
 
                 Page <span id="ebook-reader-current-page">—</span>/<span id="ebook-reader-total-pages">—</span>
 
@@ -17632,17 +17544,17 @@
 
         ? `<div class="flex flex-wrap items-center gap-2">
 
-             ${GRANTH_PET_TYPES.map((r) => `<button onclick="setGranthPetType('${r}')" class="px-4 py-1.5 rounded-full text-base font-bold shadow-md border transition-colors ${r === pet_typeKey
+             ${GRANTH_PET_TYPES.map((r) => `<button onclick="setGranthPetType('${r}')" class="px-4 py-1.5 rounded-full text-base font-bold border transition-colors ${r === pet_typeKey
 
           ? "bg-amber-500 text-white border-amber-500 shadow-sm"
 
           : "bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-amber-300"}">${r}</button>`).join("")}
 
-             <button onclick="toggleGranthPetTypes()" class="px-4 py-1.5 rounded-full text-base font-bold shadow-md border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">Show fewer</button>
+             <button onclick="toggleGranthPetTypes()" class="px-4 py-1.5 rounded-full text-base font-bold border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">Show fewer</button>
 
            </div>`
 
-        : `<div><button onclick="toggleGranthPetTypes()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-base font-bold shadow-md bg-amber-500 hover:bg-amber-600 text-white shadow-sm"><i data-lucide="library" class="w-4 h-4"></i> View other pet_types</button></div>`;
+        : `<div><button onclick="toggleGranthPetTypes()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-base font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-sm"><i data-lucide="library" class="w-4 h-4"></i> View other pet_types</button></div>`;
 
 
 
@@ -18832,6 +18744,10 @@
 
         const breed = document.getElementById("prof-breed").value;
 
+        const petTypeEl = document.getElementById("prof-pet_type");
+
+        const pet_type = petTypeEl ? petTypeEl.value : "";
+
         const genderEl = document.getElementById("prof-gender");
 
         const gender = genderEl ? genderEl.value : "Male";
@@ -18854,6 +18770,8 @@
 
         currentUserObj.breed = breed;
 
+        currentUserObj.pet_type = pet_type;
+
         currentUserObj.gender = gender;
 
         currentUserObj.occupation = occupation;
@@ -18865,6 +18783,8 @@
         currentUserObj.socialProfile.name = name;
 
         currentUserObj.socialProfile.breed = breed;
+
+        currentUserObj.socialProfile.pet_type = pet_type;
 
         currentUserObj.socialProfile.gender = gender;
 
@@ -18976,7 +18896,11 @@
 
               breed,
 
+              pet_type,
+
               gender,
+
+              date_of_birth: currentUserObj.date_of_birth,
 
               age_group: age,
 
@@ -21338,7 +21262,7 @@
 
             </div>
 
-            <button type="button" onclick="loadAccountPosts()" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-base font-bold shadow-md">
+            <button type="button" onclick="loadAccountPosts()" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-base font-bold">
 
               <i data-lucide="refresh-cw" class="w-4 h-4"></i> Refresh
 
@@ -21440,7 +21364,7 @@
 
                     <p class="text-xs font-black uppercase tracking-wider text-gray-400">${escapeHtml(post.post_type || "media")}</p>
 
-                    <p class="mt-1 text-base font-bold shadow-md text-gray-900 dark:text-white truncate">${escapeHtml(post.content || "Untitled media post")}</p>
+                    <p class="mt-1 text-base font-bold text-gray-900 dark:text-white truncate">${escapeHtml(post.content || "Untitled media post")}</p>
 
                   </div>
 
@@ -21502,25 +21426,25 @@
 
             <div class="flex flex-wrap gap-2">
 
-              ${shouldShowGalleryLibrary ? `<button type="button" onclick="openGalleryLibraryPage()" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-950 text-base font-bold shadow-md">
+              ${shouldShowGalleryLibrary ? `<button type="button" onclick="openGalleryLibraryPage()" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-950 text-base font-bold">
 
                 <i data-lucide="grid-3x3" class="w-4 h-4"></i> View all galleries
 
               </button>` : ""}
 
-              ${activeEventsCount() > 3 ? `<button type="button" onclick="openAllEventsPanel()" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-950 text-base font-bold shadow-md">
+              ${activeEventsCount() > 3 ? `<button type="button" onclick="openAllEventsPanel()" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-950 text-base font-bold">
 
                 <i data-lucide="calendar-search" class="w-4 h-4"></i> View all events
 
               </button>` : ""}
 
-              <button type="button" onclick="openCreateGalleryModal()" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-brand-500 text-white text-base font-bold shadow-md">
+              <button type="button" onclick="openCreateGalleryModal()" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-brand-500 text-white text-base font-bold">
 
                 <i data-lucide="plus" class="w-4 h-4"></i> Create gallery
 
               </button>
 
-              <button type="button" onclick="loadAccountEvents(); loadAccountGalleries();" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-base font-bold shadow-md">
+              <button type="button" onclick="loadAccountEvents(); loadAccountGalleries();" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-base font-bold">
 
                 <i data-lucide="refresh-cw" class="w-4 h-4"></i> Refresh
 
@@ -21820,7 +21744,7 @@
 
             <div>
 
-              ${isMainPage ? "" : `<button type="button" onclick="closeGalleryLibraryPage()" class="no-faith-hover inline-flex items-center gap-2 text-base font-bold shadow-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+              ${isMainPage ? "" : `<button type="button" onclick="closeGalleryLibraryPage()" class="no-faith-hover inline-flex items-center gap-2 text-base font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
 
                 <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to events & galleries
 
@@ -21890,7 +21814,7 @@
 
             <p id="${prefix}-result-count" class="text-sm text-gray-500 dark:text-gray-400">${visibleGalleries.length} result${visibleGalleries.length === 1 ? "" : "s"}</p>
 
-            <button type="button" onclick="openCreateGalleryModal()" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-brand-500 text-white text-base font-bold shadow-md">
+            <button type="button" onclick="openCreateGalleryModal()" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-brand-500 text-white text-base font-bold">
 
               <i data-lucide="plus" class="w-4 h-4"></i> Create gallery
 
@@ -22210,7 +22134,7 @@
 
             <div>
 
-              <button type="button" onclick="switchSocialTab('events')" class="no-faith-hover inline-flex items-center gap-2 text-base font-bold shadow-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+              <button type="button" onclick="switchSocialTab('events')" class="no-faith-hover inline-flex items-center gap-2 text-base font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
 
                 <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to events
 
@@ -22278,7 +22202,7 @@
 
           <div class="mt-4 flex items-center justify-between gap-3 flex-wrap">
 
-            <label class="inline-flex items-center gap-2 text-base font-bold shadow-md text-gray-700 dark:text-gray-300 cursor-pointer">
+            <label class="inline-flex items-center gap-2 text-base font-bold text-gray-700 dark:text-gray-300 cursor-pointer">
 
               <input type="checkbox" ${filters.showPast ? "checked" : ""} onchange="updateAllEventsFilter('showPast', this.checked)" class="rounded border-gray-300 text-brand-500 focus:ring-brand-500">
 
@@ -22640,7 +22564,7 @@
 
           <div class="mt-5 rounded-2xl bg-gray-50 dark:bg-gray-950 border border-gray-100 dark:border-gray-800 p-4">
 
-            <p class="text-base font-bold shadow-md text-gray-900 dark:text-white">Recent pack members</p>
+            <p class="text-base font-bold text-gray-900 dark:text-white">Recent pack members</p>
 
             ${members.length
 
@@ -22726,7 +22650,7 @@
 
               ${hasLocalPassword ? `<input id="settings-deactivate-password" type="password" placeholder="Current password" class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm dark:text-white">` : ""}
 
-              <button type="button" onclick="deactivateAccount()" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-amber-500 text-white text-base font-bold shadow-md"><i data-lucide="pause-circle" class="w-4 h-4"></i> Deactivate</button>
+              <button type="button" onclick="deactivateAccount()" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-amber-500 text-white text-base font-bold"><i data-lucide="pause-circle" class="w-4 h-4"></i> Deactivate</button>
 
             </div>
 
@@ -22744,7 +22668,7 @@
 
               <input id="settings-delete-confirm" placeholder="Type DELETE" class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm dark:text-white">
 
-              <button type="button" onclick="deleteAccountPermanently()" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-base font-bold shadow-md"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete</button>
+              <button type="button" onclick="deleteAccountPermanently()" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-base font-bold"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete</button>
 
             </div>
 
@@ -22794,7 +22718,7 @@
 
         const active = accountSettingsState.activeSection === section;
 
-        return `<button type="button" onclick="switchAccountSettingsSection('${section}')" class="px-3 py-2 rounded-xl border text-base font-bold shadow-md whitespace-nowrap ${active ? "bg-white dark:bg-gray-900 border-brand-200 dark:border-brand-900/60 text-brand-600 dark:text-brand-300 shadow-sm" : "bg-gray-50 dark:bg-gray-900/60 border-gray-100 dark:border-gray-800 text-gray-600 dark:text-gray-300"}">${label}</button>`;
+        return `<button type="button" onclick="switchAccountSettingsSection('${section}')" class="px-3 py-2 rounded-xl border text-base font-bold whitespace-nowrap ${active ? "bg-white dark:bg-gray-900 border-brand-200 dark:border-brand-900/60 text-brand-600 dark:text-brand-300 shadow-sm" : "bg-gray-50 dark:bg-gray-900/60 border-gray-100 dark:border-gray-800 text-gray-600 dark:text-gray-300"}">${label}</button>`;
 
       }).join("")}
 
@@ -22968,7 +22892,7 @@
 
             </div>
 
-            <button type="button" onclick="saveAccountSettings()" class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-500 text-white text-base font-bold shadow-md"><i data-lucide="save" class="w-4 h-4"></i> Save details</button>
+            <button type="button" onclick="saveAccountSettings()" class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-500 text-white text-base font-bold"><i data-lucide="save" class="w-4 h-4"></i> Save details</button>
 
           </section>
 
@@ -22998,7 +22922,7 @@
 
                   <p class="text-xs font-black uppercase tracking-wider text-gray-400">User ID</p>
 
-                  <p class="mt-2 text-base font-bold shadow-md text-gray-900 dark:text-gray-100 break-all">${escapeHtml(account.id || currentUserObj?.id || "")}</p>
+                  <p class="mt-2 text-base font-bold text-gray-900 dark:text-gray-100 break-all">${escapeHtml(account.id || currentUserObj?.id || "")}</p>
 
                 </div>
 
@@ -23006,7 +22930,7 @@
 
                   <p class="text-xs font-black uppercase tracking-wider text-gray-400">Email linked</p>
 
-                  <p class="mt-2 text-base font-bold shadow-md text-gray-900 dark:text-gray-100 break-all">${escapeHtml(email)}</p>
+                  <p class="mt-2 text-base font-bold text-gray-900 dark:text-gray-100 break-all">${escapeHtml(email)}</p>
 
                 </div>
 
@@ -23014,7 +22938,7 @@
 
                   <p class="text-xs font-black uppercase tracking-wider text-gray-400">Account type</p>
 
-                  <p class="mt-2 text-base font-bold shadow-md text-gray-900 dark:text-gray-100">${escapeHtml(accountType)}</p>
+                  <p class="mt-2 text-base font-bold text-gray-900 dark:text-gray-100">${escapeHtml(accountType)}</p>
 
                 </div>
 
@@ -23022,7 +22946,7 @@
 
                   <p class="text-xs font-black uppercase tracking-wider text-gray-400">Sign-in methods</p>
 
-                  <p class="mt-2 text-base font-bold shadow-md text-gray-900 dark:text-gray-100">${escapeHtml(signInMethodText)}</p>
+                  <p class="mt-2 text-base font-bold text-gray-900 dark:text-gray-100">${escapeHtml(signInMethodText)}</p>
 
                 </div>
 
@@ -23030,7 +22954,7 @@
 
                   <p class="text-xs font-black uppercase tracking-wider text-gray-400">Account status</p>
 
-                  <p class="mt-2 text-base font-bold shadow-md ${accountStatus === "active" ? "text-emerald-600 dark:text-emerald-300" : "text-amber-600 dark:text-amber-300"}">${escapeHtml(accountStatus)}</p>
+                  <p class="mt-2 text-base font-bold ${accountStatus === "active" ? "text-emerald-600 dark:text-emerald-300" : "text-amber-600 dark:text-amber-300"}">${escapeHtml(accountStatus)}</p>
 
                 </div>
 
@@ -23038,7 +22962,7 @@
 
                   <p class="text-xs font-black uppercase tracking-wider text-gray-400">Created</p>
 
-                  <p class="mt-2 text-base font-bold shadow-md text-gray-900 dark:text-gray-100">${escapeHtml(accountCreated)}</p>
+                  <p class="mt-2 text-base font-bold text-gray-900 dark:text-gray-100">${escapeHtml(accountCreated)}</p>
 
                 </div>
 
@@ -23046,7 +22970,7 @@
 
                   <p class="text-xs font-black uppercase tracking-wider text-gray-400">Profile visibility</p>
 
-                  <p class="mt-2 text-base font-bold shadow-md text-gray-900 dark:text-gray-100">${escapeHtml(profileVisibility)}</p>
+                  <p class="mt-2 text-base font-bold text-gray-900 dark:text-gray-100">${escapeHtml(profileVisibility)}</p>
 
                 </div>
 
@@ -23054,7 +22978,7 @@
 
                   <p class="text-xs font-black uppercase tracking-wider text-gray-400">Online status</p>
 
-                  <p class="mt-2 text-base font-bold shadow-md text-gray-900 dark:text-gray-100">${escapeHtml(onlineStatus)}</p>
+                  <p class="mt-2 text-base font-bold text-gray-900 dark:text-gray-100">${escapeHtml(onlineStatus)}</p>
 
                 </div>
 
@@ -23062,7 +22986,7 @@
 
                   <p class="text-xs font-black uppercase tracking-wider text-gray-400">Phone on profile</p>
 
-                  <p class="mt-2 text-base font-bold shadow-md text-gray-900 dark:text-gray-100">${escapeHtml(profile.mobile_number || currentUserObj?.mobile_number || "Not set")}</p>
+                  <p class="mt-2 text-base font-bold text-gray-900 dark:text-gray-100">${escapeHtml(profile.mobile_number || currentUserObj?.mobile_number || "Not set")}</p>
 
                 </div>
 
@@ -23070,7 +22994,7 @@
 
                   <p class="text-xs font-black uppercase tracking-wider text-gray-400">Browser session</p>
 
-                  <p class="mt-2 text-base font-bold shadow-md text-gray-900 dark:text-gray-100">${escapeHtml(lastLocalSave)}</p>
+                  <p class="mt-2 text-base font-bold text-gray-900 dark:text-gray-100">${escapeHtml(lastLocalSave)}</p>
 
                 </div>
 
@@ -23112,7 +23036,7 @@
 
                     <i data-lucide="${hasThirdPartySignIn ? "check-circle-2" : "circle"}" class="w-4 h-4 ${hasThirdPartySignIn ? "text-emerald-500" : "text-gray-400"}"></i>
 
-                    <p class="text-base font-bold shadow-md text-gray-900 dark:text-gray-100">Third-party sign-in</p>
+                    <p class="text-base font-bold text-gray-900 dark:text-gray-100">Third-party sign-in</p>
 
                   </div>
 
@@ -23142,7 +23066,7 @@
 
                     <i data-lucide="${hasLocalPassword ? "check-circle-2" : "key-round"}" class="w-4 h-4 ${hasLocalPassword ? "text-emerald-500" : "text-amber-500"}"></i>
 
-                    <p class="text-base font-bold shadow-md text-gray-900 dark:text-gray-100">PawCircle password</p>
+                    <p class="text-base font-bold text-gray-900 dark:text-gray-100">PawCircle password</p>
 
                   </div>
 
@@ -23194,7 +23118,7 @@
 
                 </label>
 
-                <button type="button" onclick="saveSecurityPreferences()" class="self-end inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-brand-500 text-white text-base font-bold shadow-md">
+                <button type="button" onclick="saveSecurityPreferences()" class="self-end inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-brand-500 text-white text-base font-bold">
 
                   <i data-lucide="save" class="w-4 h-4"></i> Save
 
@@ -23298,7 +23222,7 @@
 
                 <div class="flex items-center gap-3">
 
-                  <button type="button" onclick="submitVerificationRequest()" class="no-faith-hover inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-base font-bold shadow-md text-white shadow" style="background:var(--faith-accent,#e04848)">
+                  <button type="button" onclick="submitVerificationRequest()" class="no-faith-hover inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-base font-bold text-white shadow" style="background:var(--faith-accent,#e04848)">
 
                     <i data-lucide="send" class="w-4 h-4"></i> Submit Application
 
@@ -23382,13 +23306,13 @@
 
                 <div class="mt-4 rounded-xl border border-amber-100 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/20 p-4">
 
-                  <p class="text-base font-bold shadow-md text-amber-800 dark:text-amber-200">Sign out other devices</p>
+                  <p class="text-base font-bold text-amber-800 dark:text-amber-200">Sign out other devices</p>
 
                   <p class="text-xs text-amber-700 dark:text-amber-300 mt-1">Use this if you lost a device or no longer trust another browser session. Your current browser will stay signed in.</p>
 
                   <button type="button" onclick="signOutOtherDevices()"
 
-                    class="mt-3 inline-flex items-center gap-2 rounded-xl border border-amber-300 dark:border-amber-700 px-4 py-2 text-base font-bold shadow-md text-amber-800 dark:text-amber-100 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors">
+                    class="mt-3 inline-flex items-center gap-2 rounded-xl border border-amber-300 dark:border-amber-700 px-4 py-2 text-base font-bold text-amber-800 dark:text-amber-100 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors">
 
                     <i data-lucide="log-out" class="w-4 h-4"></i> Sign out other devices
 
@@ -23424,7 +23348,7 @@
 
                     <div>
 
-                      <p class="text-base font-bold shadow-md text-gray-900 dark:text-gray-100">Email linked</p>
+                      <p class="text-base font-bold text-gray-900 dark:text-gray-100">Email linked</p>
 
                       <p class="text-xs text-gray-500 dark:text-gray-400">${email ? "Your account has a login email." : "Add an email before relying on this account."}</p>
 
@@ -23438,7 +23362,7 @@
 
                     <div>
 
-                      <p class="text-base font-bold shadow-md text-gray-900 dark:text-gray-100">${hasLocalPassword ? "PawCircle password enabled" : "Set an PawCircle password"}</p>
+                      <p class="text-base font-bold text-gray-900 dark:text-gray-100">${hasLocalPassword ? "PawCircle password enabled" : "Set an PawCircle password"}</p>
 
                       <p class="text-xs text-gray-500 dark:text-gray-400">${hasLocalPassword ? "Use the password form below if you think your account has been shared." : "Provider sign-in works now. Set a password below before changing your email here."}</p>
 
@@ -23452,7 +23376,7 @@
 
                     <div>
 
-                      <p class="text-base font-bold shadow-md text-gray-900 dark:text-gray-100">Two-factor authentication</p>
+                      <p class="text-base font-bold text-gray-900 dark:text-gray-100">Two-factor authentication</p>
 
                       <p class="text-xs text-gray-500 dark:text-gray-400">Not implemented yet. Backend support is still required.</p>
 
@@ -23480,7 +23404,7 @@
 
                 <input id="settings-email-password" type="password" placeholder="Current PawCircle password" ${hasLocalPassword ? "" : "disabled"} class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm dark:text-white disabled:opacity-60">
 
-                <button type="button" onclick="changeAccountEmail()" ${hasLocalPassword ? "" : "disabled"} class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-base font-bold shadow-md disabled:opacity-50 disabled:cursor-not-allowed"><i data-lucide="mail-check" class="w-4 h-4"></i> Update email</button>
+                <button type="button" onclick="changeAccountEmail()" ${hasLocalPassword ? "" : "disabled"} class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-base font-bold disabled:opacity-50 disabled:cursor-not-allowed"><i data-lucide="mail-check" class="w-4 h-4"></i> Update email</button>
 
               </div>
 
@@ -23502,7 +23426,7 @@
 
                 <input id="settings-password-confirm" type="password" placeholder="Confirm password" class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm dark:text-white">
 
-                <button type="button" onclick="changeAccountPassword()" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-brand-500 text-white text-base font-bold shadow-md"><i data-lucide="key-round" class="w-4 h-4"></i> ${passwordActionLabel}</button>
+                <button type="button" onclick="changeAccountPassword()" class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-brand-500 text-white text-base font-bold"><i data-lucide="key-round" class="w-4 h-4"></i> ${passwordActionLabel}</button>
 
               </div>
 
@@ -24214,7 +24138,7 @@
 
         <div class="flex items-center justify-between gap-3">
 
-          <p class="text-base font-bold shadow-md text-gray-700 dark:text-gray-300">Current media</p>
+          <p class="text-base font-bold text-gray-700 dark:text-gray-300">Current media</p>
 
           <div class="flex items-center gap-3">
 
@@ -25808,7 +25732,7 @@
 
                         <div class="flex flex-wrap items-center gap-3">
 
-                            <button onclick="payRespects(${o.id}, this)" class="group flex items-center gap-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-xl text-base font-bold shadow-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-all shadow-sm">
+                            <button onclick="payRespects(${o.id}, this)" class="group flex items-center gap-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-xl text-base font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all shadow-sm">
 
                                 <span class="text-xl group-hover:scale-125 transition-transform">🙏</span> 
 
@@ -25816,7 +25740,7 @@
 
                             </button>
 
-                            <button onclick="openCondolenceModal(${o.id}, '${o.name}')" class="flex items-center gap-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-xl text-base font-bold shadow-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-all shadow-sm">
+                            <button onclick="openCondolenceModal(${o.id}, '${o.name}')" class="flex items-center gap-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-xl text-base font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all shadow-sm">
 
                                 ✍️ Send Condolences
 
@@ -27056,17 +26980,17 @@
 
           if (requestState.accepted) {
 
-            requestActionsHtml = `<div class="text-base font-bold shadow-md text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-3 py-1.5 rounded-lg flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Accepted</div>`;
+            requestActionsHtml = `<div class="text-base font-bold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-3 py-1.5 rounded-lg flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Accepted</div>`;
 
           } else if (requestState.declined) {
 
-            requestActionsHtml = `<div class="text-base font-bold shadow-md text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-3 py-1.5 rounded-lg flex items-center gap-2"><i data-lucide="x" class="w-4 h-4"></i> Declined</div>`;
+            requestActionsHtml = `<div class="text-base font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-3 py-1.5 rounded-lg flex items-center gap-2"><i data-lucide="x" class="w-4 h-4"></i> Declined</div>`;
 
           } else if (requestState.status === "loading" && requestState.action === "accept") {
 
             requestActionsHtml = `
 
-                        <button type="button" disabled class="inline-flex items-center gap-2 bg-brand-500/80 text-white px-4 py-1.5 rounded-xl text-base font-bold shadow-md shadow-sm cursor-wait">
+                        <button type="button" disabled class="inline-flex items-center gap-2 bg-brand-500/80 text-white px-4 py-1.5 rounded-xl text-base font-bold shadow-sm cursor-wait">
 
                           <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
 
@@ -27074,7 +26998,7 @@
 
                         </button>
 
-                        <button type="button" disabled class="bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 px-4 py-1.5 rounded-xl text-base font-bold shadow-md cursor-not-allowed">Decline</button>
+                        <button type="button" disabled class="bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 px-4 py-1.5 rounded-xl text-base font-bold cursor-not-allowed">Decline</button>
 
                     `;
 
@@ -27082,9 +27006,9 @@
 
             requestActionsHtml = `
 
-                        <button onclick="acceptFriendRequest('${escapeHtml(requestKey)}')" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-1.5 rounded-xl text-base font-bold shadow-md shadow-sm transition-colors">Accept</button>
+                        <button onclick="acceptFriendRequest('${escapeHtml(requestKey)}')" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-1.5 rounded-xl text-base font-bold shadow-sm transition-colors">Accept</button>
 
-                        <button onclick="declineFriendRequest('${escapeHtml(requestKey)}')" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-1.5 rounded-xl text-base font-bold shadow-md transition-colors">Decline</button>
+                        <button onclick="declineFriendRequest('${escapeHtml(requestKey)}')" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-1.5 rounded-xl text-base font-bold transition-colors">Decline</button>
 
                     `;
 
@@ -27188,13 +27112,13 @@
 
                   ${m.relationship_status === "pending"
 
-              ? `<button disabled class="w-full bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 px-4 py-2 rounded-xl text-base font-bold shadow-md flex items-center justify-center gap-2 cursor-default ${m.friend_request_status === "sending" ? "animate-pulse" : ""}"><i data-lucide="${m.friend_request_status === "sending" ? "loader-2" : "clock-3"}" class="w-4 h-4 ${m.friend_request_status === "sending" ? "animate-spin" : ""}"></i> ${m.friend_request_status === "sending" ? "Pending..." : "Pending"}</button>`
+              ? `<button disabled class="w-full bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 px-4 py-2 rounded-xl text-base font-bold flex items-center justify-center gap-2 cursor-default ${m.friend_request_status === "sending" ? "animate-pulse" : ""}"><i data-lucide="${m.friend_request_status === "sending" ? "loader-2" : "clock-3"}" class="w-4 h-4 ${m.friend_request_status === "sending" ? "animate-spin" : ""}"></i> ${m.friend_request_status === "sending" ? "Pending..." : "Pending"}</button>`
 
               : m.relationship_status === "request_failed"
 
-                ? `<button onclick="sendFriendRequestToMember('${String(m.user_id).replace(/'/g, "\\'")}')" class="w-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-900/50 px-4 py-2 rounded-xl text-base font-bold shadow-md flex items-center justify-center gap-2 transition-colors"><i data-lucide="alert-circle" class="w-4 h-4"></i> Failed - Retry</button>`
+                ? `<button onclick="sendFriendRequestToMember('${String(m.user_id).replace(/'/g, "\\'")}')" class="w-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-900/50 px-4 py-2 rounded-xl text-base font-bold flex items-center justify-center gap-2 transition-colors"><i data-lucide="alert-circle" class="w-4 h-4"></i> Failed - Retry</button>`
 
-                : `<button onclick="sendFriendRequestToMember('${String(m.user_id).replace(/'/g, "\\'")}')" class="w-full bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-xl text-base font-bold shadow-md flex items-center justify-center gap-2 shadow-sm transition-colors"><i data-lucide="user-plus" class="w-4 h-4"></i> Add Friend</button>`}
+                : `<button onclick="sendFriendRequestToMember('${String(m.user_id).replace(/'/g, "\\'")}')" class="w-full bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-xl text-base font-bold flex items-center justify-center gap-2 shadow-sm transition-colors"><i data-lucide="user-plus" class="w-4 h-4"></i> Add Friend</button>`}
 
                 </div>
 
@@ -27218,7 +27142,7 @@
 
             <div class="mt-6 flex justify-center">
 
-              <button onclick="expandFriendResults()" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-brand-600 dark:text-brand-400 px-6 py-2 rounded-xl text-base font-bold shadow-md shadow-sm border border-brand-100 dark:border-brand-900/50 transition-colors flex items-center gap-2">
+              <button onclick="expandFriendResults()" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-brand-600 dark:text-brand-400 px-6 py-2 rounded-xl text-base font-bold shadow-sm border border-brand-100 dark:border-brand-900/50 transition-colors flex items-center gap-2">
 
                 <i data-lucide="chevron-down" class="w-4 h-4"></i> Show more (${hidden})
 
@@ -27234,7 +27158,7 @@
 
             <div class="mt-6 flex justify-center">
 
-              <button onclick="searchMembersForFriends(null, true)" ${globalFriendSearchAppending ? "disabled" : ""} class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-70 disabled:cursor-wait text-brand-600 dark:text-brand-400 px-6 py-2 rounded-xl text-base font-bold shadow-md shadow-sm border border-brand-100 dark:border-brand-900/50 transition-colors flex items-center gap-2">
+              <button onclick="searchMembersForFriends(null, true)" ${globalFriendSearchAppending ? "disabled" : ""} class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-70 disabled:cursor-wait text-brand-600 dark:text-brand-400 px-6 py-2 rounded-xl text-base font-bold shadow-sm border border-brand-100 dark:border-brand-900/50 transition-colors flex items-center gap-2">
 
                 <i data-lucide="${globalFriendSearchAppending ? "loader-2" : "plus"}" class="w-4 h-4 ${globalFriendSearchAppending ? "animate-spin" : ""}"></i> ${globalFriendSearchAppending ? "Loading..." : "Show More"}
 
@@ -27344,9 +27268,9 @@
 
                   <div class="mt-3 flex justify-end gap-2">
 
-                    <button type="button" onclick="clearFriendSearchState(); renderFriends();" class="px-4 py-2 rounded-xl text-base font-bold shadow-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">Clear</button>
+                    <button type="button" onclick="clearFriendSearchState(); renderFriends();" class="px-4 py-2 rounded-xl text-base font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">Clear</button>
 
-                    <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-xl text-base font-bold shadow-md flex items-center gap-2 shadow-sm transition-colors"><i data-lucide="user-search" class="w-4 h-4"></i> Search Members</button>
+                    <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-xl text-base font-bold flex items-center gap-2 shadow-sm transition-colors"><i data-lucide="user-search" class="w-4 h-4"></i> Search Members</button>
 
                   </div>
 
@@ -29672,9 +29596,9 @@
 
                     <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
 
-                      <button onclick="openBroadcastModal()" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-brand-600 dark:text-brand-300 border border-brand-200 dark:border-gray-700 px-5 py-2.5 rounded-xl text-base font-bold shadow-md flex items-center gap-2 shadow-sm transition-colors w-full sm:w-auto justify-center"><i data-lucide="megaphone" class="w-4 h-4"></i> Broadcast</button>
+                      <button onclick="openBroadcastModal()" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-brand-600 dark:text-brand-300 border border-brand-200 dark:border-gray-700 px-5 py-2.5 rounded-xl text-base font-bold flex items-center gap-2 shadow-sm transition-colors w-full sm:w-auto justify-center"><i data-lucide="megaphone" class="w-4 h-4"></i> Broadcast</button>
 
-                      <button onclick="openCreateGroupModal()" class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-base font-bold shadow-md flex items-center gap-2 shadow-lg shadow-brand-500/30 transition-colors w-full sm:w-auto justify-center"><i data-lucide="plus" class="w-4 h-4"></i> Create Group</button>
+                      <button onclick="openCreateGroupModal()" class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-xl text-base font-bold flex items-center gap-2 shadow-lg shadow-brand-500/30 transition-colors w-full sm:w-auto justify-center"><i data-lucide="plus" class="w-4 h-4"></i> Create Group</button>
 
                     </div>
 
@@ -30540,9 +30464,9 @@
 
           <div class="px-5 py-4 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3">
 
-            <button onclick="closeGroupAddMode()" class="px-4 py-2 text-base font-bold shadow-md text-gray-600 dark:text-gray-400">Cancel</button>
+            <button onclick="closeGroupAddMode()" class="px-4 py-2 text-base font-bold text-gray-600 dark:text-gray-400">Cancel</button>
 
-            <button onclick="groupConfirmAddPeople()" class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2 rounded-lg text-base font-bold shadow-md">Add${groupAddSelection.size ? ` (${groupAddSelection.size})` : ""}</button>
+            <button onclick="groupConfirmAddPeople()" class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2 rounded-lg text-base font-bold">Add${groupAddSelection.size ? ` (${groupAddSelection.size})` : ""}</button>
 
           </div>`;
 
@@ -30628,7 +30552,7 @@
 
             <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Members</span>
 
-            <button onclick="openGroupAddMode()" class="inline-flex items-center gap-1.5 text-base font-bold shadow-md text-brand-500 hover:text-brand-600">
+            <button onclick="openGroupAddMode()" class="inline-flex items-center gap-1.5 text-base font-bold text-brand-500 hover:text-brand-600">
 
               <i data-lucide="user-plus" class="w-4 h-4"></i> Add people
 
@@ -31962,7 +31886,7 @@
 
                 </div>
 
-                ${isMember ? `<span class="text-xs text-gray-500 font-semibold px-3 py-1.5">Joined</span>` : `<button onclick="inviteFriendToGroup(this, '${friend.name}', '${groupId}')" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-1.5 rounded-lg text-base font-bold shadow-md transition-colors shadow-sm">Add</button>`}
+                ${isMember ? `<span class="text-xs text-gray-500 font-semibold px-3 py-1.5">Joined</span>` : `<button onclick="inviteFriendToGroup(this, '${friend.name}', '${groupId}')" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-1.5 rounded-lg text-base font-bold transition-colors shadow-sm">Add</button>`}
 
               </div>
 
@@ -32368,7 +32292,7 @@
 
                   <button type="button" onclick="donateToPark(this, '${encodeURIComponent(donateUrl)}', '${String(t.name).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}')"
 
-                    class="donate-btn w-full text-white text-center py-3 rounded-xl text-base font-bold shadow-md shadow-lg shadow-rose-500/30 flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] active:scale-95">
+                    class="donate-btn w-full text-white text-center py-3 rounded-xl text-base font-bold shadow-lg shadow-rose-500/30 flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] active:scale-95">
 
                     <span class="donate-heart">❤️</span>
 
@@ -32870,13 +32794,13 @@
 
               ${applied
 
-            ? `<button type="button" onclick="withdrawRescueApplication('${p.id}')" class="group relative overflow-hidden w-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-800 py-2.5 rounded-xl text-base font-bold shadow-md flex items-center justify-center gap-2 transition-colors duration-200"><i data-lucide="check-circle-2" class="w-4 h-4 group-hover:hidden"></i><i data-lucide="x-circle" class="w-4 h-4 hidden group-hover:block"></i> <span class="group-hover:hidden">You're signed up</span><span class="hidden group-hover:block">Cancel Application</span></button>`
+            ? `<button type="button" onclick="withdrawRescueApplication('${p.id}')" class="group relative overflow-hidden w-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-800 py-2.5 rounded-xl text-base font-bold flex items-center justify-center gap-2 transition-colors duration-200"><i data-lucide="check-circle-2" class="w-4 h-4 group-hover:hidden"></i><i data-lucide="x-circle" class="w-4 h-4 hidden group-hover:block"></i> <span class="group-hover:hidden">You're signed up</span><span class="hidden group-hover:block">Cancel Application</span></button>`
 
             : (remaining <= 0
 
-              ? `<button disabled class="w-full bg-gray-100 dark:bg-gray-800 text-gray-400 py-2.5 rounded-xl text-base font-bold shadow-md">Fully booked</button>`
+              ? `<button disabled class="w-full bg-gray-100 dark:bg-gray-800 text-gray-400 py-2.5 rounded-xl text-base font-bold">Fully booked</button>`
 
-              : `<button type="button" onclick="openRescueSignup('${p.id}')" class="w-full bg-rose-500 hover:bg-rose-600 text-white py-2.5 rounded-xl text-base font-bold shadow-md transition-colors shadow-sm shadow-rose-500/30 flex items-center justify-center gap-2"><i data-lucide="hand-heart" class="w-4 h-4"></i> Rescue now</button>`)}
+              : `<button type="button" onclick="openRescueSignup('${p.id}')" class="w-full bg-rose-500 hover:bg-rose-600 text-white py-2.5 rounded-xl text-base font-bold transition-colors shadow-sm shadow-rose-500/30 flex items-center justify-center gap-2"><i data-lucide="hand-heart" class="w-4 h-4"></i> Rescue now</button>`)}
 
               
 
@@ -34262,66 +34186,73 @@
 
     // ── 3. Data Persistence (localStorage) ───────────────────────────────
 
-    function loadPlaydateBiodata() {
-
-      const key = 'pawcircle_mm_biodata_' + (currentUserObj?.email || 'guest');
-
-      const raw = localStorage.getItem(key);
-
-      playdateState.biodata = raw ? JSON.parse(raw) : null;
-
+    async function loadPlaydateBiodata() {
+      try {
+        const res = await api("get_playdate_profile", { user_id: currentUserObj?.id });
+        if (res && res.profile) {
+          const p = res.profile;
+          playdateState.biodata = {
+            isPublished: p.is_published, height: p.height_cm, weight: p.weight_kg,
+            bloodGroup: p.blood_group, diet: p.diet, complexion: p.complexion, aboutSelf: p.about_self,
+            education: p.highest_education, occupation: p.occupation, income: p.annual_income,
+            city: p.current_city, country: p.current_country, rashi: p.rashi, nakshatra: p.nakshatra,
+            mangalik: p.mangalik, birthTime: p.birth_time, birthPlace: p.birth_place,
+            fatherName: p.father_name, motherName: p.mother_name, siblings: p.siblings,
+            nativePlace: p.native_place, aboutPack: p.about_family, prefAgeMin: p.pref_age_min,
+            prefAgeMax: p.pref_age_max, prefHeightMin: p.pref_height_min, prefHeightMax: p.pref_height_max,
+            prefEducation: p.pref_education, prefWorking: p.pref_working_status, privacy: p.privacy_settings,
+            dob: currentUserObj?.dob || '2000-01-01', name: currentUserObj?.socialProfile?.name || currentUserObj?.name || 'User',
+            gender: currentUserObj?.socialProfile?.gender || currentUserObj?.gender || '',
+          };
+        } else {
+          playdateState.biodata = null;
+        }
+      } catch (err) { console.warn("Failed to load playdate profile", err); playdateState.biodata = null; }
     }
 
-
-
-    function savePlaydateBiodata(data) {
-
-      const key = 'pawcircle_mm_biodata_' + (currentUserObj?.email || 'guest');
-
-      localStorage.setItem(key, JSON.stringify(data));
-
+    async function savePlaydateBiodata(data) {
       playdateState.biodata = data;
-
+      try {
+        await api("save_playdate_profile", {
+          user_id: currentUserObj?.id, is_published: data.isPublished, height_cm: data.height, weight_kg: data.weight,
+          blood_group: data.bloodGroup, diet: data.diet, complexion: data.complexion, about_self: data.aboutSelf,
+          highest_education: data.education, occupation: data.occupation, annual_income: data.income,
+          current_city: data.city, current_country: data.country, rashi: data.rashi, nakshatra: data.nakshatra,
+          mangalik: data.mangalik, birth_time: data.birthTime, birth_place: data.birthPlace,
+          father_name: data.fatherName, mother_name: data.motherName, siblings: data.siblings,
+          native_place: data.nativePlace, about_family: data.aboutPack, pref_age_min: data.prefAgeMin,
+          pref_age_max: data.prefAgeMax, pref_height_min: data.prefHeightMin, pref_height_max: data.prefHeightMax,
+          pref_education: data.prefEducation, pref_working_status: data.prefWorking, privacy_settings: data.privacy
+        });
+      } catch (err) { console.warn("Failed to save playdate profile", err); }
     }
-
-
 
     function loadPlaydateShortlist() {
-
       const key = 'pawcircle_mm_shortlist_' + (currentUserObj?.email || 'guest');
-
       playdateState.shortlist = JSON.parse(localStorage.getItem(key) || '[]');
-
     }
-
-
 
     function savePlaydateShortlist() {
-
       const key = 'pawcircle_mm_shortlist_' + (currentUserObj?.email || 'guest');
-
       localStorage.setItem(key, JSON.stringify(playdateState.shortlist));
-
     }
 
-
-
-    function loadPlaydateInterests() {
-
-      const key = 'pawcircle_mm_interests_' + (currentUserObj?.email || 'guest');
-
-      playdateState.interests = JSON.parse(localStorage.getItem(key) || '{"sent":[],"received":[]}');
-
+    async function loadPlaydateInterests() {
+      try {
+        const res = await api("get_playdate_interests", { user_id: currentUserObj?.id });
+        if (res && res.status === "success") {
+          playdateState.interests = {
+            sent: (res.sent || []).map(i => ({ id: i.id, toId: i.to_user_id, status: i.status, timestamp: i.created_at })),
+            received: (res.received || []).map(i => ({ id: i.id, fromId: i.user_id, status: i.status, timestamp: i.created_at }))
+          };
+        } else {
+          playdateState.interests = { sent: [], received: [] };
+        }
+      } catch (err) { console.warn("Failed to load playdate interests", err); playdateState.interests = { sent: [], received: [] }; }
     }
 
-
-
-    function savePlaydateInterests() {
-
-      const key = 'pawcircle_mm_interests_' + (currentUserObj?.email || 'guest');
-
-      localStorage.setItem(key, JSON.stringify(playdateState.interests));
-
+    async function savePlaydateInterests() {
+      // Intentionally left as a no-op because real interests are saved via `sendMatchConnect` API calls
     }
 
 
@@ -34358,52 +34289,36 @@
 
     // ── 4. Main Render ───────────────────────────────────────────────────
 
-    function renderPlaydate() {
-
+    async function renderPlaydate() {
       const container = document.getElementById('social-tab-playdate');
-
       if (!container) return;
-
       const pet_type = currentUserObj.pet_type || 'General';
 
-      loadPlaydateBiodata();
+      container.innerHTML = `<div class="p-8 text-center text-gray-500 flex flex-col items-center justify-center"><i data-lucide="loader" class="w-8 h-8 animate-spin mb-3"></i> Loading playdate data...</div>`;
+      lucide.createIcons();
 
-      loadPlaydateShortlist();
-
-      loadPlaydateInterests();
+      await Promise.all([
+        loadPlaydateBiodata(),
+        loadPlaydateInterests(),
+        loadPlaydatePool()
+      ]);
+      loadPlaydateShortlist(); // remains sync (localStorage)
 
       if (!Array.isArray(playdateState.profiles) || !playdateState.profiles.length) {
-
         playdateState.profiles = [];
-
       }
-
-      // Pull every signed-up member from the backend (no more placeholder profiles).
-
-      loadPlaydatePool();
 
       if (playdateState.filters.pet_type === '') {
-
         playdateState.filters.pet_type = pet_type;
-
       }
 
-
-
       const tabs = [
-
         { id: 'search', icon: 'search', label: 'Find Matches' },
-
         { id: 'biodata', icon: 'file-text', label: 'My Biodata' },
-
         { id: 'discover', icon: 'heart', label: 'Discover Matches' },
-
         { id: 'swipe', icon: 'scan-face', label: 'Swipe Matches' },
-
         { id: 'preferences', icon: 'sliders', label: 'Preferences' },
-
         { id: 'requests', icon: 'inbox', label: 'Requests' },
-
       ];
 
 
@@ -34650,9 +34565,9 @@
 
             <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
 
-              <button onclick="playdateState._editingBiodata=true; playdateState.biodataStep=0; renderPlaydateTabContent();" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white text-base font-bold shadow-md shadow-lg shadow-pink-500/20 transition-colors"><i data-lucide="pencil" class="w-4 h-4"></i> Edit Biodata</button>
+              <button onclick="playdateState._editingBiodata=true; playdateState.biodataStep=0; renderPlaydateTabContent();" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white text-base font-bold shadow-lg shadow-pink-500/20 transition-colors"><i data-lucide="pencil" class="w-4 h-4"></i> Edit Biodata</button>
 
-              <button onclick="toggleBiodataPublish()" class="flex items-center gap-2 px-5 py-2.5 rounded-xl ${b.isPublished ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200' : 'bg-green-500 text-white'} text-base font-bold shadow-md transition-colors"><i data-lucide="${b.isPublished ? 'eye-off' : 'eye'}" class="w-4 h-4"></i> ${b.isPublished ? 'Unpublish' : 'Publish'}</button>
+              <button onclick="toggleBiodataPublish()" class="flex items-center gap-2 px-5 py-2.5 rounded-xl ${b.isPublished ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200' : 'bg-green-500 text-white'} text-base font-bold transition-colors"><i data-lucide="${b.isPublished ? 'eye-off' : 'eye'}" class="w-4 h-4"></i> ${b.isPublished ? 'Unpublish' : 'Publish'}</button>
 
             </div>
 
@@ -34668,18 +34583,12 @@
 
 
 
-    function toggleBiodataPublish() {
-
+    async function toggleBiodataPublish() {
       if (!playdateState.biodata) return;
-
       playdateState.biodata.isPublished = !playdateState.biodata.isPublished;
-
-      savePlaydateBiodata(playdateState.biodata);
-
+      await savePlaydateBiodata(playdateState.biodata);
       renderPlaydateTabContent();
-
       showToast(playdateState.biodata.isPublished ? 'Biodata published! You are now visible to matches.' : 'Biodata unpublished.');
-
     }
 
 
@@ -34866,9 +34775,9 @@
 
             ${step < steps.length - 1
 
-          ? `<button onclick="nextBiodataStep()" class="no-faith-hover flex items-center gap-2 px-6 py-2.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white text-base font-bold shadow-md shadow-lg shadow-pink-500/20 transition-colors">Next <i data-lucide="arrow-right" class="w-4 h-4"></i></button>`
+          ? `<button onclick="nextBiodataStep()" class="no-faith-hover flex items-center gap-2 px-6 py-2.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white text-base font-bold shadow-lg shadow-pink-500/20 transition-colors">Next <i data-lucide="arrow-right" class="w-4 h-4"></i></button>`
 
-          : `<button onclick="saveBiodataForm()" class="no-faith-hover flex items-center gap-2 px-6 py-2.5 rounded-xl bg-green-500 hover:bg-green-600 text-white text-base font-bold shadow-md shadow-lg shadow-green-500/20 transition-colors"><i data-lucide="check" class="w-4 h-4"></i> Save Biodata</button>`
+          : `<button onclick="saveBiodataForm()" class="no-faith-hover flex items-center gap-2 px-6 py-2.5 rounded-xl bg-green-500 hover:bg-green-600 text-white text-base font-bold shadow-lg shadow-green-500/20 transition-colors"><i data-lucide="check" class="w-4 h-4"></i> Save Biodata</button>`
 
         }
 
@@ -34936,42 +34845,24 @@
 
 
 
-    function saveBiodataForm() {
-
+    async function saveBiodataForm() {
       const partial = collectBiodataStepData();
-
       const biodata = {
-
         ...(playdateState.biodata || {}),
-
         ...partial,
-
         isPublished: playdateState.biodata?.isPublished || false,
-
         dob: currentUserObj.dob || '2000-01-01',
-
         name: currentUserObj.socialProfile?.name || currentUserObj.name || 'User',
-
         gender: currentUserObj.socialProfile?.gender || currentUserObj.gender || '',
-
         privacy: playdateState.biodata?.privacy || { hidePhotos: false, hideContact: true },
-
         createdAt: playdateState.biodata?.createdAt || new Date().toISOString().split('T')[0],
-
         updatedAt: new Date().toISOString().split('T')[0],
-
       };
-
-      savePlaydateBiodata(biodata);
-
+      await savePlaydateBiodata(biodata);
       playdateState._editingBiodata = false;
-
       playdateState.biodataStep = 0;
-
       renderPlaydateTabContent();
-
       showToast('Biodata saved successfully!', 'success');
-
     }
 
 
@@ -35460,7 +35351,7 @@
 
         <div class="flex items-center justify-between mb-3">
 
-          <div class="text-base font-bold shadow-md text-gray-700 dark:text-gray-300"><i data-lucide="sparkles" class="w-4 h-4 inline text-pink-500"></i> ${results.length} recommended match${results.length !== 1 ? 'es' : ''}, best first</div>
+          <div class="text-base font-bold text-gray-700 dark:text-gray-300"><i data-lucide="sparkles" class="w-4 h-4 inline text-pink-500"></i> ${results.length} recommended match${results.length !== 1 ? 'es' : ''}, best first</div>
 
         </div>
 
@@ -35702,7 +35593,7 @@
 
           <div class="flex items-center justify-between mb-3">
 
-            <h4 class="text-base font-bold shadow-md text-gray-800 dark:text-gray-200 flex items-center gap-2"><i data-lucide="filter" class="w-4 h-4 text-pink-500"></i> Filters</h4>
+            <h4 class="text-base font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2"><i data-lucide="filter" class="w-4 h-4 text-pink-500"></i> Filters</h4>
 
             <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-0.5 rounded-lg">
 
@@ -36046,7 +35937,7 @@
 
               <div>
 
-                <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-2">Preferred Gender</label>
+                <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-2">Preferred Gender</label>
 
                 <select id="pref_gender" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-pink-500 transition-colors text-sm dark:text-white font-medium">
 
@@ -36062,7 +35953,7 @@
 
               <div>
 
-                <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-2">Marital Status</label>
+                <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-2">Marital Status</label>
 
                 <select id="pref_marital_status" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-pink-500 transition-colors text-sm dark:text-white font-medium">
 
@@ -36080,7 +35971,7 @@
 
               <div>
 
-                <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-2">Age Range</label>
+                <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-2">Age Range</label>
 
                 <div class="flex items-center gap-3">
 
@@ -36096,7 +35987,7 @@
 
               <div>
 
-                <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-2">Height Range (cm)</label>
+                <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-2">Height Range (cm)</label>
 
                 <div class="flex items-center gap-3">
 
@@ -36112,7 +36003,7 @@
 
               <div>
 
-                <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-2">Pet Breed</label>
+                <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-2">Pet Breed</label>
 
                 <input type="text" id="pref_breed" value="${p.pref_breed || 'Any'}" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-pink-500 transition-colors text-sm dark:text-white font-medium">
 
@@ -36120,7 +36011,7 @@
 
               <div>
 
-                <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-2">Pet Type</label>
+                <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-2">Pet Type</label>
 
                 <input type="text" id="pref_pet_type" value="${p.pref_pet_type || 'Any'}" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-pink-500 transition-colors text-sm dark:text-white font-medium">
 
@@ -36128,7 +36019,7 @@
 
               <div>
 
-                <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-2">Education</label>
+                <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-2">Education</label>
 
                 <input type="text" id="pref_education" value="${p.pref_education || 'Any'}" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-pink-500 transition-colors text-sm dark:text-white font-medium">
 
@@ -36136,7 +36027,7 @@
 
               <div>
 
-                <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-2">Working</label>
+                <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-2">Working</label>
 
                 <select id="pref_working" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-pink-500 transition-colors text-sm dark:text-white font-medium">
 
@@ -36658,7 +36549,7 @@
 
               <div class="flex items-center gap-2 flex-wrap">
 
-                <button onclick="openMatchDetail('${p.id}')" class="no-faith-hover flex items-center gap-1.5 px-4 py-2 rounded-xl bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold shadow-md shadow-pink-500/20 transition-all"><i data-lucide="eye" class="w-3.5 h-3.5"></i> View Profile</button>
+                <button onclick="openMatchDetail('${p.id}')" class="no-faith-hover flex items-center gap-1.5 px-4 py-2 rounded-xl bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold shadow-pink-500/20 transition-all"><i data-lucide="eye" class="w-3.5 h-3.5"></i> View Profile</button>
 
                 <button onclick="expressInterest('${p.id}')" class="no-faith-hover flex items-center gap-1.5 px-4 py-2 rounded-xl ${hasSentInterest ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 cursor-default' : 'bg-rose-100 dark:bg-rose-900/20 hover:bg-rose-200 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400'} text-xs font-bold transition-colors" ${hasSentInterest ? 'disabled' : ''}><i data-lucide="${hasSentInterest ? 'check' : 'heart'}" class="w-3.5 h-3.5"></i> ${hasSentInterest ? 'Interest Sent' : 'Express Interest'}</button>
 
@@ -36826,7 +36717,7 @@
 
           <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
 
-            <h4 class="text-base font-bold shadow-md text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-amber-500 mm-pulse-heart"></i> Ashtakoot Compatibility Report</h4>
+            <h4 class="text-base font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-amber-500 mm-pulse-heart"></i> Ashtakoot Compatibility Report</h4>
 
             <div class="space-y-3">
 
@@ -36876,11 +36767,11 @@
 
           <div class="flex flex-wrap gap-3 pt-2">
 
-            <button onclick="expressInterest('${p.id}')" class="no-faith-hover flex items-center gap-2 px-5 py-2.5 rounded-xl ${hasSentInterest ? 'bg-gray-200 dark:bg-gray-700 text-gray-500' : 'bg-pink-500 hover:bg-pink-600 text-white shadow-lg shadow-pink-500/20'} text-base font-bold shadow-md transition-colors" ${hasSentInterest ? 'disabled' : ''}><i data-lucide="${hasSentInterest ? 'check' : 'heart'}" class="w-4 h-4"></i> ${hasSentInterest ? 'Interest Sent' : 'Express Interest'}</button>
+            <button onclick="expressInterest('${p.id}')" class="no-faith-hover flex items-center gap-2 px-5 py-2.5 rounded-xl ${hasSentInterest ? 'bg-gray-200 dark:bg-gray-700 text-gray-500' : 'bg-pink-500 hover:bg-pink-600 text-white shadow-lg shadow-pink-500/20'} text-base font-bold transition-colors" ${hasSentInterest ? 'disabled' : ''}><i data-lucide="${hasSentInterest ? 'check' : 'heart'}" class="w-4 h-4"></i> ${hasSentInterest ? 'Interest Sent' : 'Express Interest'}</button>
 
-            <button onclick="shortlistProfile('${p.id}')" class="no-faith-hover flex items-center gap-2 px-5 py-2.5 rounded-xl ${isShortlisted ? 'bg-amber-100 dark:bg-amber-900/20 text-amber-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'} text-base font-bold shadow-md transition-colors"><i data-lucide="${isShortlisted ? 'bookmark-check' : 'bookmark'}" class="w-4 h-4"></i> ${isShortlisted ? 'Shortlisted' : 'Shortlist'}</button>
+            <button onclick="shortlistProfile('${p.id}')" class="no-faith-hover flex items-center gap-2 px-5 py-2.5 rounded-xl ${isShortlisted ? 'bg-amber-100 dark:bg-amber-900/20 text-amber-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'} text-base font-bold transition-colors"><i data-lucide="${isShortlisted ? 'bookmark-check' : 'bookmark'}" class="w-4 h-4"></i> ${isShortlisted ? 'Shortlisted' : 'Shortlist'}</button>
 
-            <button onclick="openForwardModal('${p.id}')" class="no-faith-hover flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-base font-bold shadow-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><i data-lucide="forward" class="w-4 h-4"></i> Forward Profile</button>
+            <button onclick="openForwardModal('${p.id}')" class="no-faith-hover flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-base font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><i data-lucide="forward" class="w-4 h-4"></i> Forward Profile</button>
 
           </div>
 
@@ -37156,7 +37047,7 @@
 
               <div class="flex items-center gap-2">
 
-                <h4 class="text-base font-bold shadow-md text-gray-800 dark:text-gray-200 truncate">${name}</h4>
+                <h4 class="text-base font-bold text-gray-800 dark:text-gray-200 truncate">${name}</h4>
 
                 ${statusBadge}
 
@@ -37198,7 +37089,7 @@
 
             <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
 
-              <h4 class="text-base font-bold shadow-md text-gray-800 dark:text-gray-200 flex items-center gap-2"><i data-lucide="inbox" class="w-4 h-4 text-pink-500"></i> Received Interests</h4>
+              <h4 class="text-base font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2"><i data-lucide="inbox" class="w-4 h-4 text-pink-500"></i> Received Interests</h4>
 
               <span class="text-xs font-bold bg-pink-100 dark:bg-pink-900/20 text-pink-600 px-2 py-0.5 rounded-full">${rcv.length}</span>
 
@@ -37218,7 +37109,7 @@
 
             <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
 
-              <h4 class="text-base font-bold shadow-md text-gray-800 dark:text-gray-200 flex items-center gap-2"><i data-lucide="send" class="w-4 h-4 text-blue-500"></i> Sent Interests</h4>
+              <h4 class="text-base font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2"><i data-lucide="send" class="w-4 h-4 text-blue-500"></i> Sent Interests</h4>
 
               <span class="text-xs font-bold bg-blue-100 dark:bg-blue-900/20 text-blue-600 px-2 py-0.5 rounded-full">${sent.length}</span>
 
@@ -37238,7 +37129,7 @@
 
             <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
 
-              <h4 class="text-base font-bold shadow-md text-gray-800 dark:text-gray-200 flex items-center gap-2"><i data-lucide="bookmark" class="w-4 h-4 text-amber-500"></i> Shortlisted Profiles</h4>
+              <h4 class="text-base font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2"><i data-lucide="bookmark" class="w-4 h-4 text-amber-500"></i> Shortlisted Profiles</h4>
 
               <span class="text-xs font-bold bg-amber-100 dark:bg-amber-900/20 text-amber-600 px-2 py-0.5 rounded-full">${shortlistedProfiles.length}</span>
 
@@ -37254,7 +37145,7 @@
 
                   <div class="flex-1 min-w-0">
 
-                    <h4 class="text-base font-bold shadow-md text-gray-800 dark:text-gray-200 truncate">${p.name}</h4>
+                    <h4 class="text-base font-bold text-gray-800 dark:text-gray-200 truncate">${p.name}</h4>
 
                     <p class="text-xs text-gray-500 dark:text-gray-400">${p.age} yrs • ${p.occupation} • ${p.city}</p>
 
@@ -37336,7 +37227,7 @@
 
                 <div>
 
-                  <p class="text-base font-bold shadow-md text-gray-800 dark:text-gray-200">Hide Photos</p>
+                  <p class="text-base font-bold text-gray-800 dark:text-gray-200">Hide Photos</p>
 
                   <p class="text-xs text-gray-500 dark:text-gray-400">Blur your photo for non-connections</p>
 
@@ -37356,7 +37247,7 @@
 
                 <div>
 
-                  <p class="text-base font-bold shadow-md text-gray-800 dark:text-gray-200">Hide Contact Details</p>
+                  <p class="text-base font-bold text-gray-800 dark:text-gray-200">Hide Contact Details</p>
 
                   <p class="text-xs text-gray-500 dark:text-gray-400">Show contact info only after interest is accepted</p>
 
@@ -37372,7 +37263,7 @@
 
           <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
 
-            <button onclick="closeMatchDetail()" class="no-faith-hover w-full py-2.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white text-base font-bold shadow-md transition-colors">Done</button>
+            <button onclick="closeMatchDetail()" class="no-faith-hover w-full py-2.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white text-base font-bold transition-colors">Done</button>
 
           </div>
 
@@ -38362,13 +38253,13 @@
 
             </div>
 
-            <label class="mt-5 block text-base font-bold shadow-md text-gray-300" for="admin-password-input">Password</label>
+            <label class="mt-5 block text-base font-bold text-gray-300" for="admin-password-input">Password</label>
 
             <input id="admin-password-input" type="password" autocomplete="current-password" class="mt-2 w-full rounded-2xl border border-gray-700 bg-gray-950 px-4 py-3 text-white outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20">
 
             <div class="mt-5 flex justify-end gap-3">
 
-              <button id="admin-password-cancel" class="rounded-xl border border-gray-700 px-4 py-2 text-base font-bold shadow-md text-gray-200 hover:bg-gray-800">Cancel</button>
+              <button id="admin-password-cancel" class="rounded-xl border border-gray-700 px-4 py-2 text-base font-bold text-gray-200 hover:bg-gray-800">Cancel</button>
 
               <button id="admin-password-submit" class="rounded-xl bg-orange-500 px-4 py-2 text-sm font-black text-white hover:bg-orange-600">${escapeHtml(submitLabel)}</button>
 
@@ -38895,6 +38786,7 @@
       if (panel === "roles") renderAdminRolesPanel();
 
       if (panel === "servers") renderAdminServersPanel();
+      if (panel === "verifications") renderAdminVerificationsPanel();
 
       if (window.lucide) lucide.createIcons();
 
@@ -39242,7 +39134,7 @@
 
       const active = adminConsoleState.users.sort === value;
 
-      return `<button type="button" onclick="event.stopPropagation(); setAdminUserSort('${escapeHtml(value)}')" class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-base font-bold shadow-md ${active ? "bg-orange-500 text-white" : "text-gray-200 hover:bg-gray-800"}">
+      return `<button type="button" onclick="event.stopPropagation(); setAdminUserSort('${escapeHtml(value)}')" class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-base font-bold ${active ? "bg-orange-500 text-white" : "text-gray-200 hover:bg-gray-800"}">
 
         <span>${escapeHtml(label)}</span>${active ? '<i data-lucide="check" class="h-4 w-4"></i>' : ""}
 
@@ -39544,7 +39436,7 @@
 
           ${adminFilterInput("admin-users-search", "Search name or email", s.search)}
 
-          <button type="button" onclick="adminConsoleState.users={ search: document.getElementById('admin-users-search')?.value?.trim() || '', role:[], pet_type:[], breed:'', status_filter:[], flag_filter:[], sort:'created_desc', offset:0, limit:25 }; loadAdminUsers(true)" class="rounded-xl border border-slate-200 dark:border-gray-700 px-4 py-2 text-base font-bold shadow-md text-slate-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-900">Clear filters</button>
+          <button type="button" onclick="adminConsoleState.users={ search: document.getElementById('admin-users-search')?.value?.trim() || '', role:[], pet_type:[], breed:'', status_filter:[], flag_filter:[], sort:'created_desc', offset:0, limit:25 }; loadAdminUsers(true)" class="rounded-xl border border-slate-200 dark:border-gray-700 px-4 py-2 text-base font-bold text-slate-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-900">Clear filters</button>
 
         </div>
 
@@ -39626,11 +39518,11 @@
 
           <div class="flex items-center justify-between gap-3 p-3 bg-slate-50 dark:bg-gray-950 border-t border-slate-200 dark:border-gray-800">
 
-            <button ${s.offset <= 0 ? "disabled" : ""} onclick="adminConsoleState.users.offset=Math.max(0,adminConsoleState.users.offset-adminConsoleState.users.limit); loadAdminUsers(false)" class="rounded-lg border border-slate-200 dark:border-gray-700 px-3 py-1.5 text-base font-bold shadow-md text-slate-700 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed">Previous</button>
+            <button ${s.offset <= 0 ? "disabled" : ""} onclick="adminConsoleState.users.offset=Math.max(0,adminConsoleState.users.offset-adminConsoleState.users.limit); loadAdminUsers(false)" class="rounded-lg border border-slate-200 dark:border-gray-700 px-3 py-1.5 text-base font-bold text-slate-700 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed">Previous</button>
 
             <span class="text-xs font-semibold text-slate-500 dark:text-gray-400">Showing ${adminConsoleState.userPageStart}-${adminConsoleState.userPageEnd}</span>
 
-            <button ${!adminConsoleState.userHasNext ? "disabled" : ""} onclick="adminConsoleState.users.offset+=adminConsoleState.users.limit; loadAdminUsers(false)" class="rounded-lg border border-slate-200 dark:border-gray-700 px-3 py-1.5 text-base font-bold shadow-md text-slate-700 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed">Next</button>
+            <button ${!adminConsoleState.userHasNext ? "disabled" : ""} onclick="adminConsoleState.users.offset+=adminConsoleState.users.limit; loadAdminUsers(false)" class="rounded-lg border border-slate-200 dark:border-gray-700 px-3 py-1.5 text-base font-bold text-slate-700 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed">Next</button>
 
           </div>`;
 
@@ -40062,11 +39954,11 @@
 
           <div class="flex items-center justify-between gap-3 p-3 bg-gray-50 dark:bg-gray-950">
 
-            <button ${s.offset <= 0 ? "disabled" : ""} onclick="adminConsoleState.posts.offset=Math.max(0,adminConsoleState.posts.offset-adminConsoleState.posts.limit); loadAdminPosts(false)" class="rounded-lg border px-3 py-1.5 text-base font-bold shadow-md dark:border-gray-700 disabled:opacity-40 disabled:cursor-not-allowed">Previous</button>
+            <button ${s.offset <= 0 ? "disabled" : ""} onclick="adminConsoleState.posts.offset=Math.max(0,adminConsoleState.posts.offset-adminConsoleState.posts.limit); loadAdminPosts(false)" class="rounded-lg border px-3 py-1.5 text-base font-bold dark:border-gray-700 disabled:opacity-40 disabled:cursor-not-allowed">Previous</button>
 
             <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Showing ${pageStart}-${pageEnd}</span>
 
-            <button ${!hasNext ? "disabled" : ""} onclick="adminConsoleState.posts.offset+=adminConsoleState.posts.limit; loadAdminPosts(false)" class="rounded-lg border px-3 py-1.5 text-base font-bold shadow-md dark:border-gray-700 disabled:opacity-40 disabled:cursor-not-allowed">Next</button>
+            <button ${!hasNext ? "disabled" : ""} onclick="adminConsoleState.posts.offset+=adminConsoleState.posts.limit; loadAdminPosts(false)" class="rounded-lg border px-3 py-1.5 text-base font-bold dark:border-gray-700 disabled:opacity-40 disabled:cursor-not-allowed">Next</button>
 
           </div>`;
 
@@ -40160,7 +40052,7 @@
 
           btn.setAttribute("onclick", `adminToggleVerified('${String(userId).replace(/'/g, "\\'")}', ${shouldVerify})`);
 
-          btn.className = `rounded-xl border px-3 py-2 text-base font-bold shadow-md ${shouldVerify ? 'border-emerald-500/50 text-emerald-300' : 'border-green-500/50 text-green-300'}`;
+          btn.className = `rounded-xl border px-3 py-2 text-base font-bold ${shouldVerify ? 'border-emerald-500/50 text-emerald-300' : 'border-green-500/50 text-green-300'}`;
 
           btn.textContent = shouldVerify ? 'Revoke Verified Badge' : 'Grant Verified Badge';
 
@@ -40480,19 +40372,19 @@
 
             <div>
 
-              <button onclick="closeAdminUserDetail()" class="mb-3 inline-flex items-center gap-2 text-base font-bold shadow-md text-orange-300 hover:text-orange-200"><i data-lucide="arrow-left" class="w-4 h-4"></i> Back to users</button>
+              <button onclick="closeAdminUserDetail()" class="mb-3 inline-flex items-center gap-2 text-base font-bold text-orange-300 hover:text-orange-200"><i data-lucide="arrow-left" class="w-4 h-4"></i> Back to users</button>
 
             </div>
 
             <div class="flex flex-wrap gap-2">
 
-              <button onclick="adminUpdateUserStatus('${escapeHtml(u.id || "")}','${u.deactivated_at ? "reactivate" : "deactivate"}')" class="rounded-xl border border-amber-500/50 px-3 py-2 text-base font-bold shadow-md text-amber-200">${u.deactivated_at ? "Reactivate" : "Deactivate"}</button>
+              <button onclick="adminUpdateUserStatus('${escapeHtml(u.id || "")}','${u.deactivated_at ? "reactivate" : "deactivate"}')" class="rounded-xl border border-amber-500/50 px-3 py-2 text-base font-bold text-amber-200">${u.deactivated_at ? "Reactivate" : "Deactivate"}</button>
 
-              <button onclick="adminUpdateUserStatus('${escapeHtml(u.id || "")}','sign_out')" class="rounded-xl border border-red-500/50 px-3 py-2 text-base font-bold shadow-md text-red-200">Sign out devices</button>
+              <button onclick="adminUpdateUserStatus('${escapeHtml(u.id || "")}','sign_out')" class="rounded-xl border border-red-500/50 px-3 py-2 text-base font-bold text-red-200">Sign out devices</button>
 
               <button id="admin-detail-verified-toggle" onclick="adminToggleVerified('${escapeHtml(u.id || "")}', ${!!u.is_verified})"
 
-                class="rounded-xl border px-3 py-2 text-base font-bold shadow-md ${u.is_verified ? 'border-emerald-500/50 text-emerald-300' : 'border-green-500/50 text-green-300'}">
+                class="rounded-xl border px-3 py-2 text-base font-bold ${u.is_verified ? 'border-emerald-500/50 text-emerald-300' : 'border-green-500/50 text-green-300'}">
 
                 ${u.is_verified ? '✓ Revoke Verified Badge' : '☆ Grant Verified Badge'}
 
@@ -40552,7 +40444,7 @@
 
                 <input id="admin-detail-scope" placeholder="Scope value" class="min-w-0 w-full rounded-xl border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white">
 
-                <button onclick="grantAdminRoleToSelectedUser('${escapeHtml(u.id || "")}')" class="w-full md:col-span-2 xl:col-span-1 xl:w-auto rounded-xl bg-orange-500 px-4 py-2 text-base font-bold shadow-md text-white">Grant</button>
+                <button onclick="grantAdminRoleToSelectedUser('${escapeHtml(u.id || "")}')" class="w-full md:col-span-2 xl:col-span-1 xl:w-auto rounded-xl bg-orange-500 px-4 py-2 text-base font-bold text-white">Grant</button>
 
               </div>
 
@@ -40588,7 +40480,7 @@
 
               </div>
 
-              <button onclick="addAdminUserNote('${escapeHtml(u.id || "")}')" class="rounded-xl bg-orange-500 px-4 py-2 text-base font-bold shadow-md text-white">Save note/action</button>
+              <button onclick="addAdminUserNote('${escapeHtml(u.id || "")}')" class="rounded-xl bg-orange-500 px-4 py-2 text-base font-bold text-white">Save note/action</button>
 
               <div class="mt-4 space-y-2 max-h-64 overflow-y-auto">
 
@@ -40656,7 +40548,7 @@
 
                   ${resolvedActions.slice(0, 10).map((action) => `<div class="rounded-lg border border-gray-800 px-3 py-2">
 
-                    <p class="text-base font-bold shadow-md text-gray-200">${escapeHtml(adminActionLabel(action.action_type))}</p>
+                    <p class="text-base font-bold text-gray-200">${escapeHtml(adminActionLabel(action.action_type))}</p>
 
                     <p class="text-xs text-gray-500">Ended ${escapeHtml(action.ends_at ? formatDateTime(action.ends_at) : "inactive")}</p>
 
@@ -40686,7 +40578,7 @@
 
               ${visibleSessions.length ? visibleSessions.map((session) => `<div class="rounded-xl border border-gray-800 p-3 mb-2">
 
-                <p class="text-base font-bold shadow-md text-gray-100">${escapeHtml(session.revoked_at ? "Revoked" : "Session")}</p>
+                <p class="text-base font-bold text-gray-100">${escapeHtml(session.revoked_at ? "Revoked" : "Session")}</p>
 
                 <p class="text-xs text-gray-500">${escapeHtml(session.last_seen_at ? formatDateTime(session.last_seen_at) : "Never seen")} · expires ${escapeHtml(session.expires_at ? formatDateTime(session.expires_at) : "")}</p>
 
@@ -40694,11 +40586,11 @@
 
               <div class="flex items-center justify-between gap-3 pt-3 border-t border-gray-800">
 
-                <button ${adminConsoleState.userSessionPage <= 0 ? "disabled" : ""} onclick="changeAdminUserSessionPage(-1)" class="rounded-lg border border-slate-200 dark:border-gray-700 px-3 py-1.5 text-base font-bold shadow-md text-slate-700 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed">Previous</button>
+                <button ${adminConsoleState.userSessionPage <= 0 ? "disabled" : ""} onclick="changeAdminUserSessionPage(-1)" class="rounded-lg border border-slate-200 dark:border-gray-700 px-3 py-1.5 text-base font-bold text-slate-700 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed">Previous</button>
 
                 <span class="text-xs font-semibold text-gray-500">Page ${adminConsoleState.userSessionPage + 1} of ${sessionTotalPages}</span>
 
-                <button ${adminConsoleState.userSessionPage >= sessionTotalPages - 1 ? "disabled" : ""} onclick="changeAdminUserSessionPage(1)" class="rounded-lg border border-slate-200 dark:border-gray-700 px-3 py-1.5 text-base font-bold shadow-md text-slate-700 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed">Next</button>
+                <button ${adminConsoleState.userSessionPage >= sessionTotalPages - 1 ? "disabled" : ""} onclick="changeAdminUserSessionPage(1)" class="rounded-lg border border-slate-200 dark:border-gray-700 px-3 py-1.5 text-base font-bold text-slate-700 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed">Next</button>
 
               </div>
 
@@ -40975,16 +40867,17 @@
         galleries: "loadAdminGalleries",
 
         sessions: "loadAdminSessions",
+        verifications: "loadAdminVerifications",
 
       }[key];
 
       return `<div class="flex items-center justify-between gap-3 p-3 bg-gray-50 dark:bg-gray-950">
 
-        <button ${adminConsoleState[key].offset <= 0 ? "disabled" : ""} onclick="adminConsoleState.${key}.offset=Math.max(0,adminConsoleState.${key}.offset-adminConsoleState.${key}.limit); ${loader}(false)" class="rounded-lg border px-3 py-1.5 text-base font-bold shadow-md dark:border-gray-700 disabled:opacity-40 disabled:cursor-not-allowed">Previous</button>
+        <button ${adminConsoleState[key].offset <= 0 ? "disabled" : ""} onclick="adminConsoleState.${key}.offset=Math.max(0,adminConsoleState.${key}.offset-adminConsoleState.${key}.limit); ${loader}(false)" class="rounded-lg border px-3 py-1.5 text-base font-bold dark:border-gray-700 disabled:opacity-40 disabled:cursor-not-allowed">Previous</button>
 
         <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">Showing ${rowCount ? adminConsoleState[key].offset + 1 : 0}-${adminConsoleState[key].offset + rowCount}</span>
 
-        <button ${!hasNext ? "disabled" : ""} onclick="adminConsoleState.${key}.offset+=adminConsoleState.${key}.limit; ${loader}(false)" class="rounded-lg border px-3 py-1.5 text-base font-bold shadow-md dark:border-gray-700 disabled:opacity-40 disabled:cursor-not-allowed">Next</button>
+        <button ${!hasNext ? "disabled" : ""} onclick="adminConsoleState.${key}.offset+=adminConsoleState.${key}.limit; ${loader}(false)" class="rounded-lg border px-3 py-1.5 text-base font-bold dark:border-gray-700 disabled:opacity-40 disabled:cursor-not-allowed">Next</button>
 
       </div>`;
 
@@ -41708,11 +41601,11 @@
 
                   <button type="button" onclick="updateAdminRoleFromDashboard('${escapeHtml(role.id || "")}')"
 
-                    class="rounded-xl bg-brand-500 hover:bg-brand-600 px-4 py-2 text-base font-bold shadow-md text-white">Save</button>
+                    class="rounded-xl bg-brand-500 hover:bg-brand-600 px-4 py-2 text-base font-bold text-white">Save</button>
 
                   <button type="button" onclick="revokeAdminRoleFromDashboard('${escapeHtml(role.id || "")}')"
 
-                    class="rounded-xl border border-red-200 dark:border-red-900/60 px-4 py-2 text-base font-bold shadow-md text-red-600 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30">Revoke</button>
+                    class="rounded-xl border border-red-200 dark:border-red-900/60 px-4 py-2 text-base font-bold text-red-600 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30">Revoke</button>
 
                 </div>
 
@@ -41806,7 +41699,7 @@
 
               </div>
 
-              <button onclick="loadAdminEvents(true)" class="rounded-xl bg-brand-500 px-4 py-2 text-base font-bold shadow-md text-white hover:bg-brand-600">Refresh</button>
+              <button onclick="loadAdminEvents(true)" class="rounded-xl bg-brand-500 px-4 py-2 text-base font-bold text-white hover:bg-brand-600">Refresh</button>
 
             </div>
 
@@ -41948,7 +41841,7 @@
 
                     </div>
 
-                    <button onclick="adminDeleteEvent('${escapeHtml(e.id || "")}')" class="self-start rounded-xl border border-red-400/20 px-4 py-2 text-base font-bold shadow-md text-red-300 hover:bg-red-500/10">Delete event</button>
+                    <button onclick="adminDeleteEvent('${escapeHtml(e.id || "")}')" class="self-start rounded-xl border border-red-400/20 px-4 py-2 text-base font-bold text-red-300 hover:bg-red-500/10">Delete event</button>
 
                   </div>
 
@@ -41958,7 +41851,7 @@
 
                       <p class="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">Schedule</p>
 
-                      <p class="mt-2 text-base font-bold shadow-md text-white">${eventDate}</p>
+                      <p class="mt-2 text-base font-bold text-white">${eventDate}</p>
 
                       <p class="mt-1 text-sm text-slate-300">${eventTime}</p>
 
@@ -41976,7 +41869,7 @@
 
                       <p class="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">Organiser</p>
 
-                      <p class="mt-2 text-base font-bold shadow-md text-white">${owner}</p>
+                      <p class="mt-2 text-base font-bold text-white">${owner}</p>
 
                       <p class="mt-1 text-xs text-slate-400">${escapeHtml(e.id || "")}</p>
 
@@ -42026,7 +41919,7 @@
 
               </div>
 
-              <button onclick="loadAdminGalleries(true)" class="rounded-xl bg-brand-500 px-4 py-2 text-base font-bold shadow-md text-white hover:bg-brand-600">Refresh</button>
+              <button onclick="loadAdminGalleries(true)" class="rounded-xl bg-brand-500 px-4 py-2 text-base font-bold text-white hover:bg-brand-600">Refresh</button>
 
             </div>
 
@@ -42164,7 +42057,7 @@
 
                     </div>
 
-                    <button onclick="adminDeleteGallery('${escapeHtml(g.id || "")}')" class="self-start rounded-xl border border-red-400/20 px-4 py-2 text-base font-bold shadow-md text-red-300 hover:bg-red-500/10">Delete</button>
+                    <button onclick="adminDeleteGallery('${escapeHtml(g.id || "")}')" class="self-start rounded-xl border border-red-400/20 px-4 py-2 text-base font-bold text-red-300 hover:bg-red-500/10">Delete</button>
 
                   </div>
 
@@ -42174,7 +42067,7 @@
 
                       <p class="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">Owner</p>
 
-                      <p class="mt-2 text-base font-bold shadow-md text-white">${owner}</p>
+                      <p class="mt-2 text-base font-bold text-white">${owner}</p>
 
                       <p class="mt-1 text-xs text-slate-400">${pet_type} / ${breed}</p>
 
@@ -42234,7 +42127,7 @@
 
               </div>
 
-              <button onclick="loadAdminSessions(true)" class="rounded-xl bg-brand-500 px-4 py-2 text-base font-bold shadow-md text-white hover:bg-brand-600">Refresh</button>
+              <button onclick="loadAdminSessions(true)" class="rounded-xl bg-brand-500 px-4 py-2 text-base font-bold text-white hover:bg-brand-600">Refresh</button>
 
             </div>
 
@@ -42352,7 +42245,7 @@
 
                     </div>
 
-                    <button ${!session.is_active ? "disabled" : ""} onclick="adminRevokeSession('${escapeHtml(session.id || "")}')" class="self-start rounded-xl border border-red-400/20 px-4 py-2 text-base font-bold shadow-md text-red-300 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-40">Revoke</button>
+                    <button ${!session.is_active ? "disabled" : ""} onclick="adminRevokeSession('${escapeHtml(session.id || "")}')" class="self-start rounded-xl border border-red-400/20 px-4 py-2 text-base font-bold text-red-300 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-40">Revoke</button>
 
                   </div>
 
@@ -42362,7 +42255,7 @@
 
                       <p class="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">Last seen</p>
 
-                      <p class="mt-2 text-base font-bold shadow-md text-white">${escapeHtml(session.last_seen_at ? formatDateTime(session.last_seen_at) : "Never")}</p>
+                      <p class="mt-2 text-base font-bold text-white">${escapeHtml(session.last_seen_at ? formatDateTime(session.last_seen_at) : "Never")}</p>
 
                     </div>
 
@@ -42370,7 +42263,7 @@
 
                       <p class="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">Expires</p>
 
-                      <p class="mt-2 text-base font-bold shadow-md text-white">${escapeHtml(session.expires_at ? formatDateTime(session.expires_at) : "Unknown")}</p>
+                      <p class="mt-2 text-base font-bold text-white">${escapeHtml(session.expires_at ? formatDateTime(session.expires_at) : "Unknown")}</p>
 
                     </div>
 
@@ -42378,7 +42271,7 @@
 
                       <p class="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">Role at login</p>
 
-                      <p class="mt-2 text-base font-bold shadow-md text-white">${escapeHtml(session.user?.role || session.role || "member")}</p>
+                      <p class="mt-2 text-base font-bold text-white">${escapeHtml(session.user?.role || session.role || "member")}</p>
 
                     </div>
 
@@ -42432,7 +42325,7 @@
 
               </div>
 
-              <button onclick="loadAdminRoleList()" class="rounded-xl bg-brand-500 px-4 py-2 text-base font-bold shadow-md text-white hover:bg-brand-600">Refresh</button>
+              <button onclick="loadAdminRoleList()" class="rounded-xl bg-brand-500 px-4 py-2 text-base font-bold text-white hover:bg-brand-600">Refresh</button>
 
             </div>
 
@@ -42450,7 +42343,7 @@
 
                 </div>
 
-                <button type="button" onclick="switchAdminPanel('users')" class="rounded-xl border border-brand-400/40 px-4 py-2 text-base font-bold shadow-md text-brand-100 hover:bg-brand-500/10">Open users table</button>
+                <button type="button" onclick="switchAdminPanel('users')" class="rounded-xl border border-brand-400/40 px-4 py-2 text-base font-bold text-brand-100 hover:bg-brand-500/10">Open users table</button>
 
               </div>
 
@@ -42629,19 +42522,15 @@
     // ── Toolbar account dropdown ──
 
     function toggleProfileMenu(event) {
-
       if (event) event.stopPropagation();
-
       const menu = document.getElementById("toolbar-profile-menu");
-
       const btn = document.getElementById("toolbar-profile-btn");
-
       if (!menu) return;
-
       const willOpen = menu.classList.contains("hidden");
-
+      if (willOpen && typeof closeNotificationsPanel === 'function') {
+        closeNotificationsPanel();
+      }
       menu.classList.toggle("hidden");
-
       if (btn) btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
 
       if (willOpen) {
@@ -43196,7 +43085,7 @@
 
               <div class="flex justify-end gap-3 border-t border-gray-100 dark:border-gray-800 pt-4 mt-6">
 
-                <button type="button" onclick="closeServerModal()" class="rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-850 px-4 py-2 text-base font-bold shadow-md">Cancel</button>
+                <button type="button" onclick="closeServerModal()" class="rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-850 px-4 py-2 text-base font-bold">Cancel</button>
 
                 <button type="submit" class="rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm px-5 py-2">Save Node</button>
 
@@ -43734,6 +43623,139 @@
 
     }
 
+
+
+
+    // --- VERIFICATIONS ADMIN PANEL ---
+    function renderAdminVerificationsPanel() {
+      document.getElementById("admin-panel-page-title").textContent = "Verifications";
+      document.getElementById("admin-panel-page-subtitle").textContent = "Review and process user profile verification requests.";
+      const badgeContainer = document.getElementById("admin-panel-page-badges");
+      badgeContainer.innerHTML = `<span class="inline-flex items-center gap-1 rounded-full border border-blue-500/20 bg-blue-500/10 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-blue-300">Profile Badges</span>`;
+
+      const panel = document.getElementById("admin-panel-verifications");
+      panel.innerHTML = `
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex items-center gap-3">
+            <button onclick="loadAdminVerifications(true)" class="rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm px-4 py-2">Refresh</button>
+          </div>
+        </div>
+        <div id="admin-verifications-list" class="space-y-4"></div>
+        <div id="admin-verifications-pager"></div>
+      `;
+      loadAdminVerifications(true);
+    }
+
+    async function loadAdminVerifications(reset = false) {
+      if (reset) {
+        adminConsoleState.verifications.offset = 0;
+      }
+      const listEl = document.getElementById("admin-verifications-list");
+      const pagerEl = document.getElementById("admin-verifications-pager");
+      if (!listEl) return;
+
+      listEl.innerHTML = '<div class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 text-center text-sm text-gray-500">Loading requests...</div>';
+      
+      try {
+        const res = await api("admin_list_verification_requests", {
+          limit: adminConsoleState.verifications.limit,
+          offset: adminConsoleState.verifications.offset
+        });
+
+        if (res.status === "success") {
+          renderAdminVerificationsList(res.requests || []);
+          if (pagerEl) {
+            pagerEl.innerHTML = adminPagerHtml("verifications", (res.requests || []).length, (res.requests || []).length === adminConsoleState.verifications.limit);
+          }
+        } else {
+          listEl.innerHTML = `<div class="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">${escapeHtml(res.message || "Failed to load verification requests.")}</div>`;
+        }
+      } catch (err) {
+        listEl.innerHTML = `<div class="rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">${escapeHtml(err.message || "Could not load verification requests.")}</div>`;
+      }
+    }
+
+    function renderAdminVerificationsList(requests) {
+      const listEl = document.getElementById("admin-verifications-list");
+      if (!requests || requests.length === 0) {
+        listEl.innerHTML = `
+          <div class="flex flex-col items-center justify-center py-12 text-gray-400 text-center">
+            <i data-lucide="badge-check" class="w-8 h-8 mb-2"></i>
+            <p class="text-sm">No verification requests found.</p>
+          </div>
+        `;
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      listEl.innerHTML = requests.map(req => {
+        const u = req.user || {};
+        let statusColor = "text-yellow-500 bg-yellow-500/10 border-yellow-500/20";
+        if (req.status === 'approved') statusColor = "text-emerald-500 bg-emerald-500/10 border-emerald-500/20";
+        if (req.status === 'rejected') statusColor = "text-red-500 bg-red-500/10 border-red-500/20";
+
+        return `
+          <div class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-sm relative animate-in fade-in zoom-in-95 duration-200">
+            <div class="flex flex-col md:flex-row gap-4 justify-between">
+              <div class="flex gap-4">
+                <img src="${escapeHtml(u.avatar_url || '/placeholder.svg')}" alt="${escapeHtml(u.name || 'User')}" class="w-12 h-12 rounded-full object-cover border-2 border-gray-100 dark:border-gray-800" />
+                <div>
+                  <h4 class="font-bold text-gray-900 dark:text-white flex items-center gap-1">${escapeHtml(u.name || 'Unknown')} <span class="text-xs text-gray-400 font-normal">@${escapeHtml(u.username || '')}</span></h4>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 break-words">${escapeHtml(u.email || '')}</p>
+                  <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-2"><span class="text-xs uppercase text-gray-500 tracking-wider">Reason:</span> ${escapeHtml(req.verification_reason || 'None provided')}</p>
+                  ${req.verification_doc_url ? `<a href="${escapeHtml(req.verification_doc_url)}" target="_blank" class="mt-2 inline-flex items-center gap-1 text-xs font-bold text-brand-500 hover:underline"><i data-lucide="file-text" class="w-3 h-3"></i> View attached document</a>` : ''}
+                </div>
+              </div>
+              <div class="flex flex-col items-end justify-between min-w-[120px]">
+                <span class="px-2.5 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border ${statusColor}">
+                  ${escapeHtml(req.status)}
+                </span>
+                <span class="text-xs text-gray-400 mt-2">${timeAgo(req.created_at)}</span>
+              </div>
+            </div>
+            ${req.status === 'pending' ? `
+              <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-2">
+                <button onclick="adminReviewVerification(${req.id}, 'reject')" class="rounded-xl border border-red-200 dark:border-red-900/60 px-4 py-2 text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">Reject</button>
+                <button onclick="adminReviewVerification(${req.id}, 'approve')" class="rounded-xl bg-brand-500 px-4 py-2 text-sm font-bold text-white shadow-md hover:bg-brand-600">Approve</button>
+              </div>
+            ` : req.status === 'rejected' && req.rejection_reason ? `
+              <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+                <p class="text-xs text-red-400"><span class="font-bold">Rejection Reason:</span> ${escapeHtml(req.rejection_reason)}</p>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join("");
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    async function adminReviewVerification(requestId, action) {
+      let rejectionReason = null;
+      if (action === 'reject') {
+        rejectionReason = prompt("Please provide a reason for rejecting this verification request:");
+        if (rejectionReason === null) return; // cancelled
+      } else {
+        if (!confirm("Are you sure you want to approve this verification request?")) return;
+      }
+
+      try {
+        const res = await api("admin_review_verification_request", {
+          request_id: requestId,
+          review_action: action,
+          rejection_reason: rejectionReason
+        });
+        
+        if (res.status === "success") {
+          showToast(`Request ${action}d successfully.`, "success");
+          loadAdminVerifications(false);
+        } else {
+          showToast(res.message || `Failed to ${action} request.`, "error");
+        }
+      } catch (err) {
+        showToast(err.message || `An error occurred while trying to ${action} request.`, "error");
+      }
+    }
 
 
     class PetCircleGlobe {

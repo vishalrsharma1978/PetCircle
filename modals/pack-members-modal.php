@@ -17,7 +17,7 @@
         <!-- Add New Member Form -->
         <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
           <div class="flex items-center justify-between mb-3">
-            <h3 class="text-base font-bold shadow-md text-gray-800 dark:text-gray-200">Add New Member</h3>
+            <h3 class="text-base font-bold text-gray-800 dark:text-gray-200">Add New Member</h3>
             <div class="flex items-center gap-2">
               <span class="text-xs text-gray-500">Auto-fill from friends:</span>
               <select id="fam-import-friend" onchange="importFriendForPack(this.value)"
@@ -77,7 +77,7 @@
 
         <!-- Member List -->
         <div>
-          <h3 class="text-base font-bold shadow-md text-gray-800 dark:text-gray-200 mb-3">Current Members</h3>
+          <h3 class="text-base font-bold text-gray-800 dark:text-gray-200 mb-3">Current Members</h3>
           <div id="pack-members-list" class="space-y-3">
             <!-- Dynamically populated -->
           </div>

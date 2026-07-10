@@ -41,9 +41,9 @@
       <div
         class="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3">
         <button onclick="closeCreateGroupModal()"
-          class="px-4 py-2 text-base font-bold shadow-md text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">Cancel</button>
+          class="px-4 py-2 text-base font-bold text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">Cancel</button>
         <button onclick="saveGroupFromModal()"
-          class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2 rounded-lg text-base font-bold shadow-md shadow-sm transition-colors">Create
+          class="bg-brand-500 hover:bg-brand-600 text-white px-5 py-2 rounded-lg text-base font-bold shadow-sm transition-colors">Create
           Group</button>
       </div>
     </div>

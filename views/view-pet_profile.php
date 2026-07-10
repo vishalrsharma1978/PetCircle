@@ -27,7 +27,7 @@
           class="nav-scroll flex gap-2 w-full md:w-auto bg-gray-100 dark:bg-gray-800 p-1 rounded-xl overflow-x-auto no-scrollbar"
           style="--hscroll-fade:#f3f4f6;--hscroll-fade-dark:#1f2937;">
           <button onclick="switchHoroscopeTab('daily')" id="tab-pet_profile-daily"
-            class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-base font-bold shadow-md bg-white shadow-sm text-gray-800 dark:bg-gray-700 dark:text-white transition-all whitespace-nowrap">Daily
+            class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-base font-bold bg-white shadow-sm text-gray-800 dark:bg-gray-700 dark:text-white transition-all whitespace-nowrap">Daily
             Pet Profile</button>
           <button onclick="switchHoroscopeTab('kundali')" id="tab-pet_profile-kundali"
             class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-semibold text-gray-500 hover:text-gray-800 dark:hover:text-white transition-all whitespace-nowrap">Kundali</button>

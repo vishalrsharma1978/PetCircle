@@ -39,7 +39,7 @@
       <div class="flex-1 overflow-y-auto overflow-x-auto p-6 bg-gray-50 dark:bg-gray-900/50 no-scrollbar">
         <div class="min-w-[800px]">
           <div
-            class="grid grid-cols-7 text-base font-bold shadow-md text-gray-500 dark:text-gray-400 text-center mb-2 uppercase tracking-wider">
+            class="grid grid-cols-7 text-base font-bold text-gray-500 dark:text-gray-400 text-center mb-2 uppercase tracking-wider">
             <div>Sunday</div>
             <div>Monday</div>
             <div>Tuesday</div>

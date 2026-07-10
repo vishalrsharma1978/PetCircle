@@ -34,7 +34,7 @@
         </p>
         <div class="mt-5 flex flex-wrap items-center gap-3">
           <button id="ch-hero-cta" onclick="chPlayFeatured()"
-            class="no-faith-hover inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-gray-900 text-base font-bold shadow-md shadow-lg hover:scale-[1.03] transition-transform">
+            class="no-faith-hover inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-gray-900 text-base font-bold shadow-lg hover:scale-[1.03] transition-transform">
             <i data-lucide="play" class="w-4 h-4 fill-current"></i> Start watching
           </button>
           <span class="inline-flex items-center gap-2 text-xs font-semibold" style="color: rgba(255,255,255,.85)">

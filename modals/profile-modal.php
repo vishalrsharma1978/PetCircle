@@ -91,8 +91,8 @@
           <div class="grid grid-cols-1 gap-4">
             <div>
               <label class="block text-xs font-semibold text-gray-600 mb-1">Pet Type</label>
-              <input type="text" id="prof-pet_type" readonly
-                class="w-full px-3 py-2 border border-gray-200 bg-gray-50 text-gray-500 rounded-lg text-sm cursor-not-allowed" />
+              <input type="text" id="prof-pet_type"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-200 text-sm" />
             </div>
           </div>
           <div class="grid grid-cols-2 gap-4">
@@ -140,7 +140,7 @@
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-200 focus:border-brand-300 text-sm" />
               <button type="button" onclick="addProfileTag()"
                 style="--no-faith-hover-bg: var(--brand-500, #e04848); --no-faith-hover-color:#ffffff; --no-faith-hover-border: var(--brand-500, #e04848);"
-                class="no-faith-hover px-4 py-2 text-base font-bold shadow-md text-white bg-brand-400 hover:bg-brand-500 rounded-lg shadow-sm transition-colors flex items-center gap-1 whitespace-nowrap">
+                class="no-faith-hover px-4 py-2 text-base font-bold text-white bg-brand-400 hover:bg-brand-500 rounded-lg shadow-sm transition-colors flex items-center gap-1 whitespace-nowrap">
                 <i data-lucide="plus" class="w-4 h-4"></i> Add
               </button>
             </div>
@@ -153,7 +153,7 @@
           Cancel
         </button>
         <button id="save-profile-btn" type="button" onclick="saveProfile()"
-          class="px-5 py-2 text-base font-bold shadow-md text-white bg-brand-400 hover:bg-brand-500 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+          class="px-5 py-2 text-base font-bold text-white bg-brand-400 hover:bg-brand-500 rounded-lg shadow-sm transition-colors flex items-center gap-2">
           <span>Save Changes</span>
         </button>
       </div>

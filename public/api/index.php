@@ -14,7 +14,7 @@ error_reporting(E_ALL);
 define('PAWCIRCLE_BACKEND_BUILD', 'supabase-auth-bridge-otp-v1-2026-06-19');
 
 if (!function_exists('mb_substr')) {
-    
+
 }
 // Load .env first so PAWCIRCLE_DEBUG / ALLOWED_ORIGINS / Supabase keys are all available below.
 $envFile = dirname(__DIR__, 2) . '/.env';
@@ -117,6 +117,17 @@ if ($action === 'ping') {
     exit();
 }
 
+// Add this temporary block below $action === 'ping'
+if ($action === 'check_db_row') {
+    if (!PAWCIRCLE_DEBUG)
+        exit('Forbidden');
+    $uid = $_GET['user_id'] ?? '';
+    $res = supabaseRequest('GET', '/rest/v1/profiles', ['user_id' => 'eq.' . $uid]);
+    header('Content-Type: application/json');
+    echo json_encode($res);
+    exit();
+}
+
 if ($action === 'check_tables') {
     if (!PAWCIRCLE_DEBUG) {
         jsonError("Not found.", 404);
@@ -184,7 +195,6 @@ switch ($action) {
     case 'supabase_auth_login':
         handleSupabaseAuthLogin($inputData);
         break;
-    case 'public_signup':
     case 'signup':
         handleSignup($inputData);
         break;
@@ -288,6 +298,9 @@ switch ($action) {
     case 'update_profile':
         handleUpdateProfile($inputData);
         break;
+    case 'save_birth_details':
+        handleSaveBirthDetails($inputData);
+        break;
     case 'get_pet_pack_members':
         handleGetPetPackMembers($inputData);
         break;
@@ -296,6 +309,10 @@ switch ($action) {
         break;
     case 'delete_pet_pack_member':
         handleDeletePetPackMember($inputData);
+        break;
+
+    case 'send_email':
+        handleSendEmail($inputData);
         break;
 
     case 'upload_photo':
@@ -870,7 +887,7 @@ switch ($action) {
 // Create the real user + profile + session from a verified pending payload.
 // Emits the same success response the original signup flow returned.
 
-    
+
 // ---------------------------------------------------------------------------
 // MEMBER LOGIN
 // ---------------------------------------------------------------------------

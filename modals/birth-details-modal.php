@@ -48,7 +48,7 @@
             <button type="button" onclick="closeBirthDetailsModal()"
               class="px-5 py-2.5 rounded-xl text-gray-600 dark:text-gray-300 font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancel</button>
             <button type="submit"
-              class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold shadow-md shadow-brand-500/20 transition-all flex items-center gap-2">
+              class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold shadow-brand-500/20 transition-all flex items-center gap-2">
               <i data-lucide="save" class="w-4 h-4"></i> Save Details
             </button>
           </div>

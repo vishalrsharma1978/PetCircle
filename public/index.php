@@ -16,6 +16,9 @@
     </symbol>
   </svg>
 
+  <!-- ==================== PORTAL TRANSITION ==================== -->
+  <?php include '../components/portal-transition.php'; ?>
+
   <!-- ==================== PUBLIC LOGIN ==================== -->
 
   <?php include '../views/view-public-login.php'; ?>
@@ -125,6 +128,10 @@
 
       <button type="button" onclick="leaveZoomCallShell()">
         Leave call
+      </button>
+
+      <button type="button" onclick="endZoomCallShell()" class="text-red-500 hover:text-red-600 font-bold">
+        End call for all
       </button>
     </div>
   </div>

@@ -19,7 +19,7 @@
         <div class="flex flex-wrap items-center justify-end gap-3">
           <button type="button" onclick="returnToPetCircleFromAdmin()"
             title="Leave admin mode and return to the main PawCircle feed"
-            class="flex items-center px-4 py-2 bg-orange-500 text-white rounded-lg text-base font-bold shadow-md hover:bg-orange-600 transition-colors shadow-sm">
+            class="flex items-center px-4 py-2 bg-orange-500 text-white rounded-lg text-base font-bold hover:bg-orange-600 transition-colors shadow-sm">
             <i data-lucide="arrow-left-circle" class="w-4 h-4 mr-2"></i> Return to PawCircle
           </button>
           <button onclick="logout()"
@@ -153,6 +153,14 @@
                   <span class="mt-1 block text-xs text-gray-400">System nodes, location globe & health status</span>
                 </span>
               </button>
+              <button type="button" onclick="switchAdminPanel('verifications')" data-admin-panel="verifications"
+                class="admin-nav-btn flex w-full items-start gap-3 rounded-2xl border px-4 py-3 text-left">
+                <i data-lucide="badge-check" class="mt-0.5 h-5 w-5"></i>
+                <span class="min-w-0">
+                  <span class="block text-sm font-black">Verifications</span>
+                  <span class="mt-1 block text-xs text-gray-400">Review user profile verification requests</span>
+                </span>
+              </button>
             </div>
           </aside>
 
@@ -179,6 +187,7 @@
             <div id="admin-panel-platform" class="admin-panel hidden space-y-4"></div>
             <div id="admin-panel-roles" class="admin-panel hidden space-y-4"></div>
             <div id="admin-panel-servers" class="admin-panel hidden space-y-4"></div>
+            <div id="admin-panel-verifications" class="admin-panel hidden space-y-4"></div>
           </section>
         </div>
       </div>
@@ -200,7 +209,7 @@
                 breed or owner access with the correct scope.</p>
             </div>
             <button type="button" onclick="switchAdminPanel('users')"
-              class="rounded-xl border border-orange-400/40 px-4 py-2 text-base font-bold shadow-md text-orange-100 hover:bg-orange-500/10">Open
+              class="rounded-xl border border-orange-400/40 px-4 py-2 text-base font-bold text-orange-100 hover:bg-orange-500/10">Open
               users table</button>
           </div>
         </div>

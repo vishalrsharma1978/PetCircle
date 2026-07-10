@@ -24,7 +24,7 @@
             this event.</span>
         </button>
         <div class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 p-4">
-          <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300">Use existing gallery
+          <label class="block text-base font-bold text-gray-700 dark:text-gray-300">Use existing gallery
             <select id="link-gallery-existing-select"
               class="mt-2 w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:border-brand-500"></select>
           </label>
@@ -32,7 +32,7 @@
             galleries found. Create a new linked gallery instead.</p>
           <button id="link-gallery-existing-submit" type="button" onclick="linkExistingGalleryToEvent()"
             style="--no-faith-hover-bg: rgb(55 65 81); --no-faith-hover-color: rgb(255 255 255); --no-faith-hover-border: rgb(75 85 99);"
-            class="no-faith-hover mt-3 w-full px-4 py-2 rounded-xl bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100 border border-gray-900 dark:border-gray-600 text-base font-bold shadow-md">
+            class="no-faith-hover mt-3 w-full px-4 py-2 rounded-xl bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100 border border-gray-900 dark:border-gray-600 text-base font-bold">
             Link selected gallery
           </button>
         </div>

@@ -48,7 +48,7 @@
           class="no-faith-hover px-4 py-2 text-base font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">Cancel</button>
         <button id="edit-post-save-btn" onclick="saveEditedPost()"
           style="--no-faith-hover-bg: var(--brand-500,#e04848); --no-faith-hover-color:#fff; --no-faith-hover-border:var(--brand-500,#e04848);"
-          class="no-faith-hover px-5 py-2 text-base font-bold shadow-md text-white bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm flex items-center gap-2"><span>Save</span></button>
+          class="no-faith-hover px-5 py-2 text-base font-bold text-white bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm flex items-center gap-2"><span>Save</span></button>
       </div>
     </div>
   </div>

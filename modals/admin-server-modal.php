@@ -54,7 +54,7 @@
                 </div>
               </div>
               <div class="flex justify-end gap-3 border-t border-gray-100 dark:border-gray-800 pt-4 mt-6">
-                <button type="button" onclick="closeServerModal()" class="rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-850 px-4 py-2 text-base font-bold shadow-md">Cancel</button>
+                <button type="button" onclick="closeServerModal()" class="rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-850 px-4 py-2 text-base font-bold">Cancel</button>
                 <button type="submit" class="rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm px-5 py-2">Save Node</button>
               </div>
             </form>

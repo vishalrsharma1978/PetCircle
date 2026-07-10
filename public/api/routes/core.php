@@ -1,12 +1,12 @@
 <?php
 
 function mb_substr($string, $start, $length = null, $encoding = null)
-    {
-        if ($length === null) {
-            return substr($string, $start);
-        }
-        return substr($string, $start, $length);
+{
+    if ($length === null) {
+        return substr($string, $start);
     }
+    return substr($string, $start, $length);
+}
 
 function resolveCaBundlePath()
 {
@@ -144,7 +144,7 @@ function isHttpsRequest()
 function getBearerToken()
 {
     $header = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
-    
+
     // Apache often strips the Authorization header by default
     if (empty($header) && function_exists('apache_request_headers')) {
         $headers = apache_request_headers();
@@ -642,6 +642,84 @@ function getPetServiceRows()
     return ['ok' => true, 'message' => '', 'data' => $res['data']];
 }
 
+function handleSendEmail($data)
+{
+    // Only allow logged in users
+    $userId = $data['user_id'] ?? $data['auth_user_id'] ?? null;
+    if (!$userId) {
+        jsonError("Unauthorized", 401);
+        return;
+    }
+
+    $to = trim((string) ($data['to'] ?? ''));
+    $subject = trim((string) ($data['subject'] ?? ''));
+    $message = trim((string) ($data['message'] ?? ''));
+
+    if (!$to || !$subject || !$message) {
+        jsonError("Missing required fields", 400);
+        return;
+    }
+
+    // Call our resend helper
+    $res = sendEmailViaResend($to, $subject, $message);
+    if ($res['ok']) {
+        jsonSuccess(['mocked' => $res['mocked']]);
+    } else {
+        jsonError($res['detail'] ?? "Failed to send email", 502);
+    }
+}
+
+function sendEmailViaResend($to, $subject, $message, $html = null)
+{
+    if (!$to || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
+        return ['ok' => false, 'detail' => 'Invalid email address'];
+    }
+
+    $apiKey = envValue('RESEND_API_KEY', '');
+    $fromEmail = envValue('ESAMAJ_FROM_EMAIL', '');
+    $fromName = envValue('ESAMAJ_FROM_NAME', 'PetCircle');
+
+    if ($apiKey === '' || $fromEmail === '') {
+        error_log("[petcircle][" . requestId() . "] [Email MOCK] to $to | $subject: " . str_replace("\n", ' / ', $message));
+        return ['ok' => true, 'mocked' => true];
+    }
+
+    $htmlBody = $html ?: nl2br(htmlspecialchars($message, ENT_QUOTES));
+
+    $payload = [
+        'from' => "$fromName <$fromEmail>",
+        'to' => [$to],
+        'subject' => $subject,
+        'text' => $message,
+        'html' => $htmlBody
+    ];
+
+    $ch = curl_init('https://api.resend.com/emails');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_HTTPHEADER => [
+            'Authorization: Bearer ' . $apiKey,
+            'Content-Type: application/json',
+        ],
+        CURLOPT_POSTFIELDS => json_encode($payload),
+        CURLOPT_TIMEOUT => 15,
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr = curl_error($ch);
+
+    $body = json_decode($response, true);
+    if ($curlErr || $httpCode >= 300) {
+        $detail = is_array($body) ? ($body['message'] ?? json_encode($body)) : substr((string) $response, 0, 500);
+        error_log("[petcircle][" . requestId() . "] [Email ERROR] http=$httpCode err=$curlErr detail=$detail");
+        return ['ok' => false, 'mocked' => false, 'detail' => $detail];
+    }
+
+    return ['ok' => true, 'mocked' => false, 'message_id' => $body['id'] ?? null];
+}
+
 function normalisePetServiceRowForFrontend($row)
 {
     $slug = trim((string) ($row['slug'] ?? ''));
@@ -1014,15 +1092,16 @@ function handleEbookRedirect($data)
     exit();
 }
 
-function resolveTaxonomyValues($data) {
-        $breed = $data['pet_breed'] ?? $data['breed'] ?? $data['breed_group'] ?? $data['interest_circle'] ?? null;
-        $pet_type = $data['pet_type'] ?? $data['animal_type'] ?? $data['pet_type'] ?? null;
+function resolveTaxonomyValues($data)
+{
+    $breed = $data['pet_breed'] ?? $data['breed'] ?? $data['breed_group'] ?? $data['interest_circle'] ?? null;
+    $pet_type = $data['pet_type'] ?? $data['animal_type'] ?? $data['pet_type'] ?? null;
 
-        return [
-            'breed' => $breed,
-            'pet_type' => $pet_type,
-        ];
-    }
+    return [
+        'breed' => $breed,
+        'pet_type' => $pet_type,
+    ];
+}
 
 function buildUserPayload($user, $loginAt = null)
 {
@@ -1035,36 +1114,37 @@ function buildUserPayload($user, $loginAt = null)
 
     return [
         "id" => $user['id'],
-        "name" => $profile['pet_name'] ?? ($user['email'] ?? 'Member'),
+        "name" => $profile['full_name'] ?? $profile['pet_name'] ?? ($user['email'] ?? 'Member'),
         "pet_name" => $profile['pet_name'] ?? '',
         "parent_name" => $profile['parent_name'] ?? '',
         "email" => $user['email'] ?? '',
         "role" => $user['role'] ?? 'member',
         "pet_type" => $profile['pet_type'] ?? 'Dog',
         "breed" => $profile['breed'] ?? '',
-        "breed" => $profile['breed'] ?? '',
-        "pet_type" => $profile['pet_type'] ?? '',
         "membership_applied" => $profile['membership_applied'] ?? false,
         "membership_status" => $profile['status'] ?? 'none',
         "profile_photo_url" => $profile['profile_photo_url'] ?? null,
         "cover_photo_url" => $profile['cover_photo_url'] ?? null,
         "mobile_number" => $profile['mobile_number'] ?? null,
         "gender" => $profile['gender'] ?? null,
+        "date_of_birth" => $profile['date_of_birth'] ?? null,
+        "occupation" => $profile['occupation'] ?? null,
         "bio" => $profile['bio'] ?? '',
         "current_city" => $profile['current_city'] ?? null,
         "last_login_at" => $loginAt ?? ($user['last_login_at'] ?? null),
         "last_active_at" => $user['last_active_at'] ?? null,
-        // "primary_interests" => $customTags,
         "custom_tags" => $customTags,
         "system_tags" => $systemTags,
         "tags" => $displayTags,
         "socialProfile" => [
-            "name" => $profile['pet_name'] ?? ($user['email'] ?? 'Member'),
+            "name" => $profile['full_name'] ?? $profile['pet_name'] ?? ($user['email'] ?? 'Member'),
             "pet_name" => $profile['pet_name'] ?? '',
             "parent_name" => $profile['parent_name'] ?? '',
             "pet_type" => $profile['pet_type'] ?? '',
             "breed" => $profile['breed'] ?? '',
             "gender" => $profile['gender'] ?? null,
+            "date_of_birth" => $profile['date_of_birth'] ?? null,
+            "occupation" => $profile['occupation'] ?? null,
             "bio" => $profile['bio'] ?? '',
             "currentCity" => $profile['current_city'] ?? null,
             "contactNo" => $profile['mobile_number'] ?? null,
@@ -1169,7 +1249,6 @@ function handleSignOutOtherDevices($data)
 
 function handlePhotoUpload()
 {
-    $GLOBALS['PAWCIRCLE_AUTH_CONTEXT']['user_id'] = '00000000-0000-0000-0000-000000000000';
     $supabaseUrl = rtrim(getenv('SUPABASE_URL') ?: ($_ENV['SUPABASE_URL'] ?? ''), '/');
     $secretKey = getenv('SUPABASE_SECRET_KEY') ?: ($_ENV['SUPABASE_SECRET_KEY'] ?? '');
     $postMediaMaxBytes = 50 * 1024 * 1024;
@@ -1222,9 +1301,9 @@ function handlePhotoUpload()
 
     $bucketMap = [
         'profile-photos' => 'profiles',
-        'cover-photos'   => 'profiles',
-        'post-media'     => 'posts',
-        'gallery-media'  => 'gallery'
+        'cover-photos' => 'profiles',
+        'post-media' => 'posts',
+        'gallery-media' => 'gallery'
     ];
     $actualBucketName = $bucketMap[$bucketName] ?? $bucketName;
 
@@ -1557,6 +1636,7 @@ function normalizeVisibility($value)
 {
     $value = strtolower(trim((string) $value));
     $allowed = ['public', 'breed', 'pet_type', 'private'];
+    // FIX: Default to public so new accounts appear in the community pool
     return in_array($value, $allowed, true) ? $value : 'public';
 }
 
@@ -1888,7 +1968,7 @@ function handleDeactivateAccount($data)
     // Third-party (e.g. Google) accounts have no PawCircle password, so skip the
     // password check for them; password accounts must still confirm with it.
     $storedHash = (string) ($userRes['data'][0]['password_hash'] ?? '');
-    
+
     $passwordCorrect = false;
     if ($storedHash !== '') {
         $passwordCorrect = password_verify($password, $storedHash);
@@ -1939,7 +2019,7 @@ function handleDeleteAccountPermanently($data)
     // signed up through a third-party provider (e.g. Google) have no password
     // to enter, so the typed DELETE confirmation is sufficient.
     $storedHash = (string) ($userRes['data'][0]['password_hash'] ?? '');
-    
+
     $passwordCorrect = false;
     if ($storedHash !== '') {
         $passwordCorrect = password_verify($password, $storedHash);

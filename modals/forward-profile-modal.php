@@ -15,9 +15,9 @@
       </div>
       <div class="p-4 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-2">
         <button onclick="closeForwardProfileModal()"
-          class="px-4 py-2 rounded-xl text-base font-bold shadow-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancel</button>
+          class="px-4 py-2 rounded-xl text-base font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancel</button>
         <button onclick="submitForwardProfile()"
-          class="px-4 py-2 rounded-xl text-base font-bold shadow-md bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30 transition-all flex items-center gap-2"><i
+          class="px-4 py-2 rounded-xl text-base font-bold bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/30 transition-all flex items-center gap-2"><i
             data-lucide="forward" class="w-4 h-4"></i> Forward</button>
       </div>
     </div>

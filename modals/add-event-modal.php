@@ -4,7 +4,7 @@
 
     <!-- Modal Content -->
     <div
-      class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 relative z-10 w-full max-w-md max-h-[90vh] transform transition-all overflow-hidden flex flex-col">
+      class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 relative z-10 w-full max-w-xl max-h-[90vh] transform transition-all overflow-hidden flex flex-col">
       <div class="shrink-0 flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
         <div>
           <h3 id="event-modal-heading" class="text-xl font-bold text-gray-800 dark:text-white">
@@ -24,22 +24,22 @@
       <div class="modal-scroll overflow-y-auto px-6 py-5 space-y-4">
         <input id="event-modal-id" type="hidden">
         <div>
-          <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-1">Event Title *</label>
+          <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-1">Event Title *</label>
           <input type="text" id="event-modal-title" placeholder="e.g. Pet Breed Potluck"
             class="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500" />
         </div>
         <div id="event-modal-date-row" class="hidden">
-          <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-1">Event Date *</label>
+          <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-1">Event Date *</label>
           <input type="date" id="event-modal-date"
             class="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500" />
         </div>
         <div>
-          <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-1">Event Audience</label>
+          <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-1">Event Audience</label>
           <select id="event-modal-audience" onchange="handleEventAudienceChange()"
             class="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
             <option value="global">Global (Everyone on PawCircle)</option>
-            <option value="pet_type">Pet Type (My Faith Only)</option>
-            <option value="breed">Pet Breed (My Specific Caste/Sect)</option>
+            <option value="pet_type">Pet Type Only</option>
+            <option value="breed">Pet Breed Only</option>
             <option value="all_friends">All Friends</option>
             <option value="few_friends">A few friends</option>
             <option value="invite_only">Invite only (only people I select)</option>
@@ -51,7 +51,7 @@
           </p>
         </div>
         <div>
-          <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-1">Event Type *</label>
+          <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-1">Event Type *</label>
           <select id="event-modal-type"
             class="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
             <option value="online">Online</option>
@@ -59,24 +59,24 @@
           </select>
         </div>
         <div>
-          <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-1">Time (Optional)</label>
+          <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-1">Time (Optional)</label>
           <input type="time" id="event-modal-time"
             class="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500" />
         </div>
         <div>
-          <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-1">Description (Optional)</label>
+          <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-1">Description (Optional)</label>
           <textarea id="event-modal-desc" rows="3" placeholder="Add some details..."
             class="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500"></textarea>
         </div>
         <div>
-          <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-1">Meeting Link (Optional)</label>
+          <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-1">Meeting Link (Optional)</label>
           <input type="url" id="event-modal-link" placeholder="https://zoom.us/j/123456789"
             class="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500" />
         </div>
         <div class="rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 p-3">
           <div class="flex items-start justify-between gap-3">
             <div>
-              <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300">Linked Gallery (Optional)</label>
+              <label class="block text-base font-bold text-gray-700 dark:text-gray-300">Linked Gallery (Optional)</label>
               <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Create the event first, then attach a gallery
                 immediately or link one from gallery creation.</p>
               <label class="mt-3 inline-flex items-center gap-2 text-xs font-bold text-gray-600 dark:text-gray-300">
@@ -94,7 +94,7 @@
         </div>
         <div>
           <div class="flex items-center justify-between gap-3 mb-1">
-            <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300">Invite friends &amp; broadcast to
+            <label class="block text-base font-bold text-gray-700 dark:text-gray-300">Invite friends &amp; broadcast to
               groups (Optional)</label>
             <span id="event-invite-summary" class="text-xs text-gray-500 dark:text-gray-400">0 selected</span>
           </div>
@@ -121,7 +121,7 @@
 
         <!-- Recurring frequency -->
         <div>
-          <label class="block text-base font-bold shadow-md text-gray-700 dark:text-gray-300 mb-1">Recurrence</label>
+          <label class="block text-base font-bold text-gray-700 dark:text-gray-300 mb-1">Recurrence</label>
           <select id="event-modal-frequency"
             class="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
             <option value="none">One-time (No Repeat)</option>

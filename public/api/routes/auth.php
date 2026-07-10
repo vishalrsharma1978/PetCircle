@@ -186,19 +186,27 @@ function fetchAppUserWithProfileById($userId)
 
     $res = supabaseRequest('GET', '/rest/v1/users', [
         'id' => 'eq.' . strtolower($userId),
-        'select' => 'id,email,role,is_verified,verified_at,last_login_at,last_active_at,deactivated_at,auth_user_id,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city,privacy_settings)',
+        'select' => 'id,email,role,is_verified,verified_at,last_login_at,last_active_at,deactivated_at,auth_user_id,profiles(full_name,occupation,pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city,privacy_settings)',
         'limit' => '1',
     ]);
 
     if (($res['code'] ?? 500) >= 400) {
         $res = supabaseRequest('GET', '/rest/v1/users', [
             'id' => 'eq.' . strtolower($userId),
-            'select' => 'id,email,role,last_login_at,last_active_at,deactivated_at,auth_user_id,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city)',
+            'select' => 'id,email,role,last_login_at,last_active_at,deactivated_at,auth_user_id,profiles(full_name,occupation,pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city)',
             'limit' => '1',
         ]);
     }
 
-    return (($res['code'] ?? 500) < 400 && !empty($res['data'])) ? $res['data'][0] : null;
+    $user = (($res['code'] ?? 500) < 400 && !empty($res['data'])) ? $res['data'][0] : null;
+    if ($user && !empty($user['profiles']) && is_array($user['profiles'])) {
+        $prof = $user['profiles'][0] ?? [];
+        foreach ($prof as $k => $v) {
+            $user[$k] = $v;
+        }
+        unset($user['profiles']);
+    }
+    return $user;
 }
 
 function fetchAppUserWithProfileByAuthUserId($authUserId)
@@ -209,19 +217,27 @@ function fetchAppUserWithProfileByAuthUserId($authUserId)
 
     $res = supabaseRequest('GET', '/rest/v1/users', [
         'auth_user_id' => 'eq.' . strtolower($authUserId),
-        'select' => 'id,email,role,is_verified,verified_at,last_login_at,last_active_at,deactivated_at,auth_user_id,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city,privacy_settings)',
+        'select' => 'id,email,role,is_verified,verified_at,last_login_at,last_active_at,deactivated_at,auth_user_id,profiles(full_name,occupation,pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city,privacy_settings)',
         'limit' => '1',
     ]);
 
     if (($res['code'] ?? 500) >= 400) {
         $res = supabaseRequest('GET', '/rest/v1/users', [
             'auth_user_id' => 'eq.' . strtolower($authUserId),
-            'select' => 'id,email,role,last_login_at,last_active_at,deactivated_at,auth_user_id,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city)',
+            'select' => 'id,email,role,last_login_at,last_active_at,deactivated_at,auth_user_id,profiles(full_name,occupation,pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city)',
             'limit' => '1',
         ]);
     }
 
-    return (($res['code'] ?? 500) < 400 && !empty($res['data'])) ? $res['data'][0] : null;
+    $user = (($res['code'] ?? 500) < 400 && !empty($res['data'])) ? $res['data'][0] : null;
+    if ($user && !empty($user['profiles']) && is_array($user['profiles'])) {
+        $prof = $user['profiles'][0] ?? [];
+        foreach ($prof as $k => $v) {
+            $user[$k] = $v;
+        }
+        unset($user['profiles']);
+    }
+    return $user;
 }
 
 function ensureProfileForAppUser($appUserId, $authUser, $data = [], $existingProfile = null)
@@ -249,7 +265,7 @@ function ensureProfileForAppUser($appUserId, $authUser, $data = [], $existingPro
             $patch['pet_type'] = $pet_type;
         if ($breed !== '' && empty($existingProfile['breed']))
             $patch['breed'] = $breed;
-        
+
         if (!empty($patch)) {
             supabaseRequest('PATCH', '/rest/v1/profiles', ['user_id' => 'eq.' . strtolower($appUserId)], $patch, ['Prefer: return=minimal']);
             return true;
@@ -264,9 +280,12 @@ function ensureProfileForAppUser($appUserId, $authUser, $data = [], $existingPro
         'privacy_accepted' => false,
         'accuracy_certified' => false,
     ];
-    if ($pet_type !== '') $insert['pet_type'] = $pet_type;
-    if ($breed !== '') $insert['breed'] = $breed;
-    if ($avatarUrl !== '') $insert['profile_photo_url'] = $avatarUrl;
+    if ($pet_type !== '')
+        $insert['pet_type'] = $pet_type;
+    if ($breed !== '')
+        $insert['breed'] = $breed;
+    if ($avatarUrl !== '')
+        $insert['profile_photo_url'] = $avatarUrl;
 
     supabaseRequest('POST', '/rest/v1/profiles', [], $insert, ['Prefer: resolution=ignore-duplicates,return=minimal']);
     return true;
@@ -423,7 +442,7 @@ function handleSupabaseAuthLogin($data)
 {
     $email = filter_var($data['email'] ?? '', FILTER_SANITIZE_EMAIL);
     $password = $data['password'] ?? '';
-    
+
     if (!$email || !$password) {
         jsonError("Credentials cannot be empty.", 400);
         return;
@@ -1120,83 +1139,85 @@ function finalizeSignup($payload, $plainPassword = '')
     }
 }
 
-function handleSignup($data) {
-        if (empty($data['pet_name']) || empty($data['email']) || empty($data['password'])) {
-            http_response_code(400);
-            echo json_encode(["status" => "error", "message" => "Pet name, email, and password are required."]);
-            return;
-        }
-
-        $petName   = htmlspecialchars(strip_tags($data['pet_name']));
-        $email     = filter_var($data['email'] ?? '', FILTER_SANITIZE_EMAIL);
-        $phone     = htmlspecialchars(strip_tags($data['mobile_number'] ?? ''));
-        $password  = $data['password'];
-        $petType   = htmlspecialchars(strip_tags($data['pet_type'] ?? 'Dog'));
-        $breed     = htmlspecialchars(strip_tags($data['breed'] ?? ''));
-        $parentName= htmlspecialchars(strip_tags($data['parent_name'] ?? ''));
-
-        if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            http_response_code(400);
-            echo json_encode(["status" => "error", "message" => "Invalid email format."]);
-            return;
-        }
-
-        if (strlen($password) < 10) {
-            http_response_code(400);
-            echo json_encode(["status" => "error", "message" => "Password must be at least 10 characters."]);
-            return;
-        }
-
-        // Create Supabase Auth identity
-        $metadata = [
-            'pet_name' => $petName,
-            'parent_name' => $parentName,
-            'pet_type' => $petType,
-            'breed' => $breed,
-            'source' => 'pawcircle_signup'
-        ];
-        if (!empty($phone)) $metadata['mobile_number'] = $phone;
-
-        $authCreate = createSupabaseAuthUserForSignup($email, $password, $metadata);
-        if (empty($authCreate['ok'])) {
-            $msg = $authCreate['message'] ?? 'Could not create secure account.';
-            if (($authCreate['code'] ?? 0) === 409 || stripos($msg, 'already') !== false || stripos($msg, 'registered') !== false) {
-                http_response_code(409);
-                echo json_encode(["status" => "error", "message" => "An account with this email already exists."]);
-                return;
-            }
-            http_response_code(500);
-            echo json_encode(["status" => "error", "message" => $msg]);
-            return;
-        }
-
-        $authUser = $authCreate['user'];
-        $appUser = linkOrCreateAppUserForSupabaseAuth($authUser, $metadata);
-
-        if (!$appUser || empty($appUser['id'])) {
-            http_response_code(500);
-            echo json_encode(["status" => "error", "message" => "Failed to link app user. Please try again."]);
-            return;
-        }
-
-        $userId = $appUser['id'];
-        $session = createUserSession($userId, 'member');
-
-        echo json_encode([
-            "status"  => "success",
-            "message" => "Account created successfully.",
-            "session" => $session,
-            "user"    => [
-                "id"          => $userId,
-                "pet_name"    => $petName,
-                "parent_name" => $parentName,
-                "email"       => $email,
-                "role"        => "member",
-                "pet_type"    => $petType,
-                "breed"       => $breed
-            ],
-        ]);
+function handleSignup($data)
+{
+    if (empty($data['pet_name']) || empty($data['email']) || empty($data['password'])) {
+        http_response_code(400);
+        echo json_encode(["status" => "error", "message" => "Pet name, email, and password are required."]);
+        return;
     }
+
+    $petName = htmlspecialchars(strip_tags($data['pet_name']));
+    $email = filter_var($data['email'] ?? '', FILTER_SANITIZE_EMAIL);
+    $phone = htmlspecialchars(strip_tags($data['mobile_number'] ?? ''));
+    $password = $data['password'];
+    $petType = htmlspecialchars(strip_tags($data['pet_type'] ?? 'Dog'));
+    $breed = htmlspecialchars(strip_tags($data['breed'] ?? ''));
+    $parentName = htmlspecialchars(strip_tags($data['parent_name'] ?? ''));
+
+    if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        http_response_code(400);
+        echo json_encode(["status" => "error", "message" => "Invalid email format."]);
+        return;
+    }
+
+    if (strlen($password) < 10) {
+        http_response_code(400);
+        echo json_encode(["status" => "error", "message" => "Password must be at least 10 characters."]);
+        return;
+    }
+
+    // Create Supabase Auth identity
+    $metadata = [
+        'pet_name' => $petName,
+        'parent_name' => $parentName,
+        'pet_type' => $petType,
+        'breed' => $breed,
+        'source' => 'pawcircle_signup'
+    ];
+    if (!empty($phone))
+        $metadata['mobile_number'] = $phone;
+
+    $authCreate = createSupabaseAuthUserForSignup($email, $password, $metadata);
+    if (empty($authCreate['ok'])) {
+        $msg = $authCreate['message'] ?? 'Could not create secure account.';
+        if (($authCreate['code'] ?? 0) === 409 || stripos($msg, 'already') !== false || stripos($msg, 'registered') !== false) {
+            http_response_code(409);
+            echo json_encode(["status" => "error", "message" => "An account with this email already exists."]);
+            return;
+        }
+        http_response_code(500);
+        echo json_encode(["status" => "error", "message" => $msg]);
+        return;
+    }
+
+    $authUser = $authCreate['user'];
+    $appUser = linkOrCreateAppUserForSupabaseAuth($authUser, $metadata);
+
+    if (!$appUser || empty($appUser['id'])) {
+        http_response_code(500);
+        echo json_encode(["status" => "error", "message" => "Failed to link app user. Please try again."]);
+        return;
+    }
+
+    $userId = $appUser['id'];
+    $session = createUserSession($userId, 'member');
+
+    echo json_encode([
+        "status" => "success",
+        "message" => "Account created successfully.",
+        "session" => $session,
+        "user" => [
+            "id" => $userId,
+            "pet_name" => $petName,
+            "parent_name" => $parentName,
+            "email" => $email,
+            "role" => "member",
+            "pet_type" => $petType,
+            "breed" => $breed
+        ],
+    ]);
+}
 
 function handleTestUserLogin($shortcut)
 {
@@ -1214,7 +1235,7 @@ function handleTestUserLogin($shortcut)
     $email = $test['email'];
     $res = supabaseRequest('GET', '/rest/v1/users', [
         'email' => 'eq.' . $email,
-        'select' => 'id,email,role,is_verified,verified_at,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city,privacy_settings)',
+        'select' => 'id,email,role,is_verified,verified_at,profiles(full_name,occupation,pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city,privacy_settings)',
         'limit' => '1',
     ]);
 
@@ -1252,7 +1273,7 @@ function handleTestUserLogin($shortcut)
 
         $res = supabaseRequest('GET', '/rest/v1/users', [
             'id' => 'eq.' . $userId,
-            'select' => 'id,email,role,is_verified,verified_at,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city,privacy_settings)',
+            'select' => 'id,email,role,is_verified,verified_at,profiles(full_name,occupation,pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city,privacy_settings)',
             'limit' => '1',
         ]);
     }
@@ -1296,9 +1317,56 @@ function handleLogin($data, $expectedRole)
 
     checkLoginRateLimit($email, $scope);
 
+    // Attempt Supabase Auth First
+    $url = rtrim(envValue('SUPABASE_URL'), '/');
+    $anonKey = supabaseAnonKey();
+    if ($url !== '' && $anonKey !== '') {
+        $authRes = supabaseRequest('POST', '/auth/v1/token?grant_type=password', [], [
+            'email' => $email,
+            'password' => $password,
+        ]);
+        if (($authRes['code'] ?? 500) === 200 && !empty($authRes['data']['access_token'])) {
+            $authUser = $authRes['data']['user'];
+            if ($authUser && !empty($authUser['id'])) {
+                $user = linkOrCreateAppUserForSupabaseAuth($authUser, $data);
+                if ($user) {
+                    if (!empty($user['deactivated_at'])) {
+                        jsonError('This account is deactivated. Contact support if you believe this is incorrect.', 403);
+                        return;
+                    }
+                    $loginPunishments = getActiveUserPunishments($user['id'] ?? '');
+                    $ban = activePunishmentOfType($loginPunishments, ['ban']);
+                    if ($ban) {
+                        jsonError('This account has been banned. Contact support if you believe this is incorrect.', 403);
+                        return;
+                    }
+                    $suspension = activePunishmentOfType($loginPunishments, ['suspension']);
+                    if ($suspension) {
+                        jsonError('This account is currently suspended.', 403);
+                        return;
+                    }
+                    $session = createUserSession($user['id'], $scope);
+                    $loginAt = nowIsoUtc();
+                    $payload = buildUserPayload($user, $loginAt);
+                    $payload['auth_user_id'] = $authUser['id'];
+                    jsonSuccess([
+                        'message' => 'Supabase Auth login successful.',
+                        'session' => $session,
+                        'user' => $payload,
+                    ]);
+                    finishResponseEarly();
+                    markSuccessfulLogin($user['id'], $user['email'] ?? ($authUser['email'] ?? ''), 'supabase_auth');
+                    clearLoginRateLimit($user['email'] ?? ($authUser['email'] ?? ''), $scope);
+                    return;
+                }
+            }
+        }
+    }
+
+    // Fallback to legacy local login
     $res = supabaseRequest('GET', '/rest/v1/users', [
         'email' => 'eq.' . $email,
-        'select' => 'id,email,role,password_hash,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city)',
+        'select' => 'id,email,role,password_hash,profiles(full_name,occupation,pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city)',
         'limit' => '1',
     ]);
 
@@ -1448,34 +1516,42 @@ function normaliseProfileEmbed($raw)
 function handleSessionMe($data)
 {
     $userId = requireUuid($data['auth_user_id'] ?? '', 'user_id');
+
+    // 1. Fetch User Base Data
     $res = supabaseRequest('GET', '/rest/v1/users', [
         'id' => 'eq.' . $userId,
-        'select' => 'id,email,role,is_verified,verified_at,last_login_at,last_active_at,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city,privacy_settings)',
+        'select' => 'id,email,role,is_verified,verified_at,last_login_at,last_active_at',
         'limit' => '1',
     ]);
 
-    // Fall back to a base select if the phase-1/2 columns aren't migrated yet,
-    // so existing sessions still resume instead of being force-signed-out.
-    if (($res['code'] ?? 500) >= 400) {
-        $res = supabaseRequest('GET', '/rest/v1/users', [
-            'id' => 'eq.' . $userId,
-            'select' => 'id,email,role,last_login_at,last_active_at,profiles(pet_name,parent_name,pet_type,breed,date_of_birth,membership_applied,status,profile_photo_url,cover_photo_url,mobile_number,gender,bio,current_city)',
-            'limit' => '1',
-        ]);
-    }
-
-    if (($res['code'] ?? 500) >= 400 || empty($res['data'])) {
+    if (supabaseFailed($res) || empty($res['data'])) {
         clearSessionCookies();
         jsonError("Session user no longer exists. Please sign in again.", 401);
         return;
     }
 
-    $user = buildUserPayload($res['data'][0]);
-    $user['admin_mode_active'] = !empty($data['auth_role']) && (($data['auth_role'] ?? '') === 'admin' || ($GLOBALS['PAWCIRCLE_AUTH_CONTEXT']['admin_mode_active'] ?? false));
-    $user['admin_mode_until'] = $GLOBALS['PAWCIRCLE_AUTH_CONTEXT']['admin_mode_until'] ?? null;
-    jsonSuccess(["user" => $user]);
-}
+    $user = $res['data'][0];
 
+    // 2. Fetch Profile
+    $profile = getAccountProfile($userId);
+
+    // FIX: Fallback to email if name is missing, don't hardcode "Member"
+    if (empty($profile)) {
+        $profile = [
+            'full_name' => explode('@', $user['email'])[0] ?? 'User',
+            'pet_type' => '',
+            'breed' => ''
+        ];
+    }
+
+    $user['profiles'] = [$profile];
+
+    $userPayload = buildUserPayload($user);
+    $userPayload['admin_mode_active'] = !empty($data['auth_role']) && (($data['auth_role'] ?? '') === 'admin' || ($GLOBALS['PAWCIRCLE_AUTH_CONTEXT']['admin_mode_active'] ?? false));
+    $userPayload['admin_mode_until'] = $GLOBALS['PAWCIRCLE_AUTH_CONTEXT']['admin_mode_until'] ?? null;
+
+    jsonSuccess(["user" => $userPayload]);
+}
 function handleAdminClearUserSessionHistory($data)
 {
     $actorId = requireUuid($data['auth_user_id'] ?? '', 'user_id');
@@ -1565,6 +1641,53 @@ function handleAdminRevokeSession($data)
     jsonSuccess(['message' => 'Session revoked.', 'revoked_count' => count($res['data'] ?? [])]);
 }
 
+function handleSaveBirthDetails($data)
+{
+    $userId = cleanNullableText($data['user_id'] ?? '', 80);
+    $memberId = cleanNullableText($data['member_id'] ?? '', 80);
+
+    if (!$userId || !$memberId) {
+        jsonError("user_id and member_id are required.");
+        return;
+    }
+
+    $dob = cleanDateValue($data['dob'] ?? null);
+    $birthTime = cleanNullableText($data['birthTime'] ?? null, 10);
+    $birthCity = cleanNullableText($data['birthCity'] ?? null, 100);
+    $gender = cleanNullableText($data['gender'] ?? null, 40);
+
+    $update = [];
+    if ($dob)
+        $update['date_of_birth'] = $dob;
+    if ($birthTime)
+        $update['birth_time'] = $birthTime;
+    if ($birthCity)
+        $update['birth_city'] = $birthCity;
+    if ($gender)
+        $update['gender'] = $gender;
+
+    if (empty($update)) {
+        jsonSuccess(["message" => "Nothing to update."]);
+        return;
+    }
+
+    if ($memberId === 'self') {
+        $res = supabaseRequest('PATCH', '/rest/v1/profiles', ['user_id' => 'eq.' . $userId], $update);
+    } else {
+        $res = supabaseRequest('PATCH', '/rest/v1/pet_pack_members', [
+            'id' => 'eq.' . $memberId,
+            'owner_user_id' => 'eq.' . $userId
+        ], $update);
+    }
+
+    if (($res['code'] ?? 500) >= 400) {
+        jsonError("Failed to update birth details.", 500, ["supabase_response" => $res['data'] ?? []]);
+        return;
+    }
+
+    jsonSuccess(["message" => "Birth details saved."]);
+}
+
 function handleUpdateProfile($data)
 {
     if (empty($data['user_id'])) {
@@ -1578,10 +1701,12 @@ function handleUpdateProfile($data)
     // Build update payload from whatever fields are present
     $allowed = [
         'pet_name',
+        'full_name',
         'pet_type',
         'breed',
         'date_of_birth',
         'gender',
+        'occupation',
         'bio',
         'current_city',
         'visibility',
@@ -1615,21 +1740,20 @@ function handleUpdateProfile($data)
         $oldCoverPhoto = $ex['cover_photo_url'] ?? null;
     }
 
-    // Array fields (text[]). User-editable profile tags are stored in
-    // primary_interests for compatibility with the existing profiles schema.
-    // if (isset($data['tags']) && !isset($data['primary_interests'])) {
-        // $data['primary_interests'] = $data['tags'];
-    // }
-
     if (isset($data['skills'])) {
         $update['skills'] = is_array($data['skills'])
             ? array_values(array_filter(array_map(fn($v) => normaliseProfileTagValue($v, 40), $data['skills'])))
             : array_values(array_filter(array_map(fn($v) => normaliseProfileTagValue($v, 40), explode(',', (string) $data['skills']))));
     }
 
-    // if (isset($data['primary_interests'])) {
-        // $update['primary_interests'] = normaliseProfileTagsInput($data['primary_interests']);
-    // }
+    // FIX: Uncommented and mapped the tags property correctly
+    if (isset($data['tags']) && !isset($data['primary_interests'])) {
+        $data['primary_interests'] = $data['tags'];
+    }
+
+    if (isset($data['primary_interests'])) {
+        $update['primary_interests'] = normaliseProfileTagsInput($data['primary_interests']);
+    }
 
     if (empty($update)) {
         echo json_encode(["status" => "success", "message" => "Nothing to update."]);
@@ -1644,8 +1768,10 @@ function handleUpdateProfile($data)
         ['Prefer: return=representation']
     );
 
-    if ($res['code'] >= 400) {
-        $msg = is_array($res['data']) ? ($res['data']['message'] ?? json_encode($res['data'])) : 'Unknown error';
+    // FIX: Strict validation that rows were actually modified!
+    // Without empty($res['data']), Supabase returns a 200 OK even if 0 rows update.
+    if (($res['code'] ?? 500) >= 400 || empty($res['data'])) {
+        $msg = is_array($res['data'] ?? null) ? ($res['data']['message'] ?? json_encode($res['data'])) : 'Profile row not found or database sync failed.';
         http_response_code(500);
         echo json_encode(["status" => "error", "message" => "Profile update failed: " . $msg]);
         return;

@@ -7265,6 +7265,29 @@
 
         });
 
+        // Re-colour the active feed filter pill and the Post button with the new accent
+        const activeFilterBtn = document.querySelector("#feed-filters .feed-filter-btn[style*='background-color']");
+
+        if (activeFilterBtn) {
+
+          activeFilterBtn.style.backgroundColor = accent;
+
+          activeFilterBtn.style.borderColor = accent;
+
+        }
+
+        const postSubmitBtn = document.getElementById("feed-post-submit-btn");
+
+        if (postSubmitBtn) {
+
+          postSubmitBtn.style.background = `linear-gradient(135deg, ${accent} 0%, color-mix(in srgb, ${accent} 70%, #f59e0b) 100%)`;
+
+        }
+
+        const addUrlBtn = document.querySelector("[onclick='addPostMediaUrl()']");
+
+        if (addUrlBtn) addUrlBtn.style.backgroundColor = accent;
+
       }
 
       if (headerGreetingNative) {
@@ -18627,6 +18650,15 @@
 
       setCheckboxChecked("prof-share-contact", prof.shareContact);
 
+      // Pre-fill parent name
+      const parentNameEl = document.getElementById("prof-parent-name");
+
+      if (parentNameEl) {
+
+        parentNameEl.value = currentUserObj.parent_name || currentUserObj.socialProfile?.parent_name || "";
+
+      }
+
 
 
       const genderEl = document.getElementById("prof-gender");
@@ -18765,6 +18797,8 @@
 
         const name = document.getElementById("prof-name").value;
 
+        const parentName = (document.getElementById("prof-parent-name")?.value || "").trim();
+
         const breed = document.getElementById("prof-breed").value;
 
         const petTypeEl = document.getElementById("prof-pet_type");
@@ -18791,6 +18825,8 @@
 
         currentUserObj.name = name;
 
+        currentUserObj.parent_name = parentName;
+
         currentUserObj.breed = breed;
 
         currentUserObj.pet_type = pet_type;
@@ -18804,6 +18840,8 @@
         currentUserObj.mobile_number = contactNo;
 
         currentUserObj.socialProfile.name = name;
+
+        currentUserObj.socialProfile.parent_name = parentName;
 
         currentUserObj.socialProfile.breed = breed;
 
@@ -18916,6 +18954,8 @@
               user_id: currentUserObj.id,
 
               full_name: name,
+
+              parent_name: parentName || undefined,
 
               breed,
 

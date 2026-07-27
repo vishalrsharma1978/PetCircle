@@ -76,15 +76,6 @@ if (($_SERVER['HTTPS'] ?? '') === 'on' || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ??
     header("Strict-Transport-Security: max-age=31536000; includeSubDomains");
 }
 
-define('PAWCIRCLE_SESSION_COOKIE', 'pawcircle_session_token');
-define('PAWCIRCLE_CSRF_COOKIE', 'pawcircle_csrf_token');
-define('PAWCIRCLE_SESSION_TTL_SECONDS', 60 * 60 * 24 * 7);
-define('PAWCIRCLE_SIGNUP_CODE_TTL_SECONDS', 60 * 15);
-define('PAWCIRCLE_SIGNUP_CODE_MAX_ATTEMPTS', 6);
-// Email verification is temporarily disabled (SendPulse account pending review):
-// signups create the account immediately. Set to true to re-enable the emailed
-// 6-digit code flow once SendPulse is verified.
-define('PAWCIRCLE_EMAIL_VERIFICATION_ENABLED', false);
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);

@@ -862,6 +862,8 @@
 
     function applyFilterButtonStyles(activeBtn) {
 
+      const accent = getComputedStyle(document.documentElement).getPropertyValue('--faith-accent').trim() || '#f97316';
+
       const buttons = document.querySelectorAll("#feed-filters .feed-filter-btn");
 
       buttons.forEach((btn) => {
@@ -876,7 +878,9 @@
 
         } else {
 
-          btn.className += " text-gray-600 border-gray-200 hover:text-[#f97316] hover:border-[#f97316]";
+          btn.className += " text-gray-600 border-gray-200";
+
+          btn.style.removeProperty('--hover-accent');
 
         }
 
@@ -886,7 +890,11 @@
 
         activeBtn.className =
 
-          "feed-filter-btn px-6 py-2 rounded-full bg-[#f97316] text-white text-base font-bold whitespace-nowrap shadow-md hover:bg-[#ea580c] transition-colors border-2 border-[#f97316]";
+          "feed-filter-btn px-6 py-2 rounded-full text-white text-base font-bold whitespace-nowrap shadow-md transition-colors border-2";
+
+        activeBtn.style.backgroundColor = accent;
+
+        activeBtn.style.borderColor = accent;
 
       }
 

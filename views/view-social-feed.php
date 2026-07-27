@@ -508,13 +508,14 @@
           <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
             <div id="feed-filters" class="nav-scroll flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
               <button onclick="setActiveFilter(this, 'All Posts')"
-                class="feed-filter-btn px-6 py-2 rounded-full bg-[#f97316] text-white text-base font-bold whitespace-nowrap shadow-md hover:bg-[#ea580c] transition-colors border-2 border-[#f97316]">All Posts</button>
+                style="background-color:var(--faith-accent,#f97316);border-color:var(--faith-accent,#f97316);"
+                class="feed-filter-btn px-6 py-2 rounded-full text-white text-base font-bold whitespace-nowrap shadow-md transition-colors border-2">All Posts</button>
               <button onclick="setActiveFilter(this, 'My Pack')"
-                class="feed-filter-btn px-6 py-2 rounded-full bg-white text-gray-600 hover:text-[#f97316] hover:border-[#f97316] text-base font-semibold whitespace-nowrap shadow-sm border-2 border-gray-200 transition-all">My Pack</button>
+                class="feed-filter-btn px-6 py-2 rounded-full bg-white text-gray-600 text-base font-semibold whitespace-nowrap shadow-sm border-2 border-gray-200 transition-all">My Pack</button>
               <button onclick="setActiveFilter(this, 'Playdate')"
-                class="feed-filter-btn px-6 py-2 rounded-full bg-white text-gray-600 hover:text-[#f97316] hover:border-[#f97316] text-base font-semibold whitespace-nowrap shadow-sm border-2 border-gray-200 transition-all">Playdate</button>
+                class="feed-filter-btn px-6 py-2 rounded-full bg-white text-gray-600 text-base font-semibold whitespace-nowrap shadow-sm border-2 border-gray-200 transition-all">Playdate</button>
               <button onclick="setActiveFilter(this, 'Business')"
-                class="feed-filter-btn px-6 py-2 rounded-full bg-white text-gray-600 hover:text-[#f97316] hover:border-[#f97316] text-base font-semibold whitespace-nowrap shadow-sm border-2 border-gray-200 transition-all">Business</button>
+                class="feed-filter-btn px-6 py-2 rounded-full bg-white text-gray-600 text-base font-semibold whitespace-nowrap shadow-sm border-2 border-gray-200 transition-all">Business</button>
               <button onclick="setActiveFilter(this, 'Announcements')"
                 class="feed-filter-btn px-6 py-2 rounded-full bg-white text-gray-800 hover:bg-black hover:text-white text-base font-semibold whitespace-nowrap shadow-sm border-2 border-black transition-all">Announcements</button>
             </div>
@@ -555,7 +556,7 @@
                   <div id="feed-post-media-url-row" class="hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-2">
                     <div class="flex items-center gap-2">
                       <input type="url" id="feed-post-media-url" placeholder="Paste a secure media URL" class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 outline-none transition-colors focus:border-brand-400 dark:focus:border-brand-400" />
-                      <button type="button" onclick="addPostMediaUrl()" class="px-3 py-2 rounded-xl bg-[#f97316] text-white text-xs font-bold hover:bg-[#ea580c]">Add</button>
+                      <button type="button" onclick="addPostMediaUrl()" style="background-color:var(--faith-accent,#f97316);" class="px-3 py-2 rounded-xl text-white text-xs font-bold hover:opacity-90 transition-opacity">Add</button>
                     </div>
                   </div>
                   <div id="feed-post-media-preview" class="hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50"></div>
@@ -589,7 +590,9 @@
               <p id="feed-post-status" class="hidden text-xs font-medium text-gray-500 dark:text-gray-400"></p>
               <div class="flex items-center gap-3 ml-auto">
                 <button id="feed-post-cancel-btn" type="button" onclick="resetPostComposer()" class="px-5 py-2.5 rounded-full text-sm font-semibold text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200">Cancel</button>
-                <button id="feed-post-submit-btn" type="button" onclick="submitPost()" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-bold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 active:scale-95">Post</button>
+                <button id="feed-post-submit-btn" type="button" onclick="submitPost()"
+                  style="background:linear-gradient(135deg, var(--faith-accent,#f97316) 0%, color-mix(in srgb, var(--faith-accent,#f97316) 70%, #f59e0b) 100%);"
+                  class="px-6 py-2.5 rounded-full text-white text-sm font-bold hover:opacity-90 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 active:scale-95">Post</button>
               </div>
             </div>
           </div>

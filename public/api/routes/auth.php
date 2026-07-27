@@ -1,5 +1,8 @@
 <?php
 
+require_once __DIR__ . '/core.php';
+require_once dirname(__DIR__) . '/utils/supabase_client.php';
+
 function handleAuthConfig()
 {
     $url = rtrim(envValue('SUPABASE_URL'), '/');
@@ -1720,6 +1723,7 @@ function handleUpdateProfile($data)
     // Build update payload from whatever fields are present
     $allowed = [
         'pet_name',
+        'parent_name',
         'full_name',
         'pet_type',
         'breed',

@@ -68,8 +68,13 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">Full Name</label>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Full Name (Pet's Name)</label>
             <input type="text" id="prof-name"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-200 focus:border-brand-300 text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Parent / Owner Name</label>
+            <input type="text" id="prof-parent-name" placeholder="e.g. John Smith"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-200 focus:border-brand-300 text-sm" />
           </div>
           <div class="grid grid-cols-2 gap-4 mb-4">

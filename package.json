@@ -1,0 +1,16 @@
+{
+  "name": "petcircle",
+  "version": "0.1.0",
+  "description": "PawCircle: a social platform for pet parents to connect, coordinate playdates, find rescue and volunteer opportunities, and build their pet's pack. Rebuilt on the eSamaj (community_proj) platform architecture.",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "tailwindcss -i ./css/input.css -o ./css/tailwind.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  }
+}

@@ -1,0 +1,120 @@
+/* --- DYNAMIC ADMIN RELIGION THEME OVERRIDES --- */
+    #view-admin-dashboard,
+    #admin-loading-overlay,
+    #admin-password-modal,
+    .admin-popups {
+      --admin-color-500: var(--brand-500, #f97316);
+      --admin-color-5-percent: color-mix(in srgb, var(--brand-500, #f97316) 5%, transparent);
+      --admin-color-50: var(--brand-50, #fff5f5);
+      --admin-color-100: var(--brand-100, #ffd45a);
+      --admin-color-200: var(--brand-200, #ffa95a);
+      --admin-color-300: var(--brand-300, #ff8b5a);
+      --admin-color-400: var(--brand-400, #ff5a5a);
+      --admin-color-900: var(--brand-900, #730e0e);
+    }
+
+    #view-admin-dashboard .border-orange-500\/20,
+    #admin-password-modal .border-orange-500\/30,
+    #admin-loading-overlay .border-orange-500\/30 {
+      border-color: color-mix(in srgb, var(--admin-color-500) 25%, transparent) !important;
+    }
+
+    #view-admin-dashboard .bg-orange-500,
+    #admin-password-modal .bg-orange-500 {
+      background-color: var(--admin-color-500) !important;
+    }
+
+    #view-admin-dashboard .hover\:bg-orange-600:hover,
+    #admin-password-modal .hover\:bg-orange-600:hover {
+      background-color: var(--admin-color-900) !important;
+    }
+
+    #view-admin-dashboard .text-orange-300,
+    #admin-loading-overlay .text-orange-300 {
+      color: var(--admin-color-300) !important;
+    }
+
+    #view-admin-dashboard .text-orange-700 {
+      color: var(--admin-color-900) !important;
+    }
+
+    #view-admin-dashboard .bg-orange-500\/15,
+    #admin-loading-overlay .bg-orange-500\/15 {
+      background-color: color-mix(in srgb, var(--admin-color-500) 15%, transparent) !important;
+    }
+
+    #view-admin-dashboard .bg-orange-500\/10 {
+      background-color: color-mix(in srgb, var(--admin-color-500) 10%, transparent) !important;
+    }
+
+    #view-admin-dashboard .border-t-orange-500,
+    #admin-loading-overlay .border-t-orange-500 {
+      border-top-color: var(--admin-color-500) !important;
+    }
+
+    #view-admin-dashboard .text-orange-300\/80 {
+      color: color-mix(in srgb, var(--admin-color-300) 80%, transparent) !important;
+    }
+
+    #view-admin-dashboard .hover\:bg-orange-50:hover {
+      background-color: color-mix(in srgb, var(--admin-color-500) 8%, transparent) !important;
+    }
+
+    #view-admin-dashboard .hover\:bg-orange-950\/20:hover {
+      background-color: color-mix(in srgb, var(--admin-color-500) 15%, transparent) !important;
+    }
+
+    #view-admin-dashboard .focus\:border-orange-400:focus,
+    #admin-password-modal .focus\:border-orange-400:focus {
+      border-color: var(--admin-color-500) !important;
+    }
+
+    #view-admin-dashboard .focus\:ring-orange-400\/20:focus,
+    #admin-password-modal .focus\:ring-orange-400\/20:focus {
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--admin-color-500) 20%, transparent) !important;
+    }
+
+    #view-admin-dashboard .admin-nav-btn.is-active {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.18), rgba(59, 130, 246, 0.10)) !important;
+      border-color: rgba(167, 139, 250, 0.28) !important;
+      box-shadow: 0 12px 28px rgba(30, 41, 59, 0.24) !important;
+    }
+
+    #view-admin-dashboard .border-brand-500 {
+      border-color: var(--admin-color-500) !important;
+    }
+
+    #view-admin-dashboard .bg-brand-500 {
+      background-color: var(--admin-color-500) !important;
+    }
+
+    #view-admin-dashboard .text-brand-500 {
+      color: var(--admin-color-500) !important;
+    }
+
+    /* Theme-tinted border outlines matching active color scheme */
+    #view-admin-dashboard .border-white\/12 {
+      border-color: color-mix(in srgb, var(--admin-color-500) 18%, transparent) !important;
+    }
+
+    #view-admin-dashboard .border-white\/10 {
+      border-color: color-mix(in srgb, var(--admin-color-500) 14%, transparent) !important;
+    }
+
+    #view-admin-dashboard .border-white\/8 {
+      border-color: color-mix(in srgb, var(--admin-color-500) 10%, transparent) !important;
+    }
+
+    #view-admin-dashboard .border-gray-150,
+    #view-admin-dashboard .dark\:border-gray-800 {
+      border-color: color-mix(in srgb, var(--admin-color-500) 14%, transparent) !important;
+    }
+
+    #view-admin-dashboard .border-gray-200,
+    #view-admin-dashboard .dark\:border-gray-700 {
+      border-color: color-mix(in srgb, var(--admin-color-500) 25%, transparent) !important;
+    }
+
+    #view-admin-dashboard .hover\:bg-white\/5:hover {
+      background-color: color-mix(in srgb, var(--admin-color-500) 8%, transparent) !important;
+    }

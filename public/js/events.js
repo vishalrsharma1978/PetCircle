@@ -483,3 +483,375 @@ async function loadEventAnalytics() {
     console.error(err);
   }
 }
+
+
+function openEnlargedCalendarModal() {
+  document
+    .getElementById("enlarged-calendar-modal")
+    .classList.remove("hidden");
+  renderEnlargedCalendar();
+}
+
+function closeEnlargedCalendarModal() {
+  document
+    .getElementById("enlarged-calendar-modal")
+    .classList.add("hidden");
+}
+
+function renderEnlargedCalendar() {
+  const container = document.getElementById("enlarged-calendar-grid");
+  const year = currentCalendarViewDate.getFullYear();
+  const month = currentCalendarViewDate.getMonth();
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const monthStr = `${year}-${String(month + 1).padStart(2, "0")}`;
+  const evts = getAllLocalEvents();
+
+  const religion = activeScope().religion || "General";
+  const officialFestivals = religiousFestivals[religion] || [];
+
+  let gridHtml = "";
+  for (let i = 0; i < firstDay; i++) {
+    gridHtml += `<div class="p-2 border-r border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/20 min-h-[120px]"></div>`;
+  }
+
+  for (let i = 1; i <= daysInMonth; i++) {
+    const dateStr = `${monthStr}-${String(i).padStart(2, "0")}`;
+    const dayEvents = evts.filter((e) => e.date === dateStr);
+    const dayFestivals = officialFestivals.filter(
+      (f) => parseFestivalDateToYMD(f.date) === dateStr,
+    );
+
+    let eventsHtml = "";
+    dayFestivals.forEach((f) => {
+      let imageHtml = "";
+      const festivalImgMap = {
+        "Makar Sankranti": "makar_sankranti.png",
+        "Vasant Panchami": "vasant_panchami.png",
+        "Maha Shivaratri": "maha_shivaratri.png",
+        "Holika Dahan": "holika_dahan.png",
+        "Holi / Dhulandi": "holi.png",
+        "Chaitra Navratri": "chaitra_navratri.png",
+        "Rama Navami": "ram_navami.png",
+        "Akshaya Tritiya": "akshaya_tritiya.png",
+        "Nirjala Ekadashi": "nirjala_ekadashi.png",
+        "Guru Purnima": "guru_purnima.png",
+        "Raksha Bandhan": "raksha_bandhan.png",
+        "Krishna Janmashtami": "krishna_janmashtami.png",
+        "Ganesh Chaturthi": "ganesh_chaturthi.png",
+        "Pitru Paksha Starts": "pitru_paksha.png",
+        "Sharad Navratri": "sharad_navratri.png",
+        "Maha Navami": "maha_navami.png",
+        Dussehra: "dussehra.png",
+        "Karwa Chauth": "karwa_chauth.png",
+        Dhanteras: "dhanteras.png",
+        Diwali: "diwali.png",
+        "Bhai Dooj": "bhai_dooj.png",
+        "Devutthana Ekadashi": "devutthana.png",
+        "Isra and Mi'raj": "isra_miraj.png",
+        "Mid-Sha'ban": "mid_shaban.png",
+        "Ramadan Begins": "ramadan.png",
+        "Laylat al-Qadr": "laylat_al_qadr.png",
+        "Eid al-Fitr": "eid_al_fitr.png",
+        "Day of Arafah": "day_of_arafah.png",
+        "Eid al-Adha": "eid_al_adha.png",
+        "Islamic New Year": "islamic_new_year.png",
+        "Day of Ashura": "day_of_ashura.png",
+        "Mawlid": "mawlid_al_nabi.png",
+        "Guru Gobind Singh Jayanti": "guru_gobind_singh_jayanti.png",
+        "Lohri": "lohri.png",
+        "Hola Mohalla": "hola_mohalla.png",
+        "Vaisakhi": "vaisakhi.png",
+        "Martyrdom of Guru Arjan": "martyrdom_of_guru_arjan.png",
+        "First Prakash Guru Granth Sahib": "first_prakash_guru_granth_sahib.png",
+        "Gurgaddi Guru Har Krishan": "gurgaddi_guru_har_krishan.png",
+        "Bandi Chhor Divas": "bandi_chhor_divas.png",
+        "Guru Nanak Jayanti": "guru_nanak_jayanti.png",
+        "Martyrdom of Guru Tegh Bahadur": "martyrdom_of_guru_tegh_bahadur.png",
+        "Epiphany": "epiphany.png",
+        "Ash Wednesday": "ash_wednesday.png",
+        "St. Patrick's Day": "st_patricks_day.png",
+        "Palm Sunday": "palm_sunday.png",
+        "Good Friday": "good_friday.png",
+        "Easter Sunday": "easter_sunday.png",
+        "Ascension Day": "ascension_day.png",
+        "Pentecost": "pentecost.png",
+        "All Saints' Day": "all_saints_day.png",
+        "Christmas": "christmas.png",
+      };
+
+      let imgName = festivalImgMap[f.name];
+      if (!imgName) {
+        let imgKey = f.name
+          .toLowerCase()
+          .replace(/ \/ dhulandi/, "")
+          .replace("rama", "ram")
+          .replace(" starts", "")
+          .replace(/ /g, "_")
+          .replace(/'/g, "")
+          .replace(/-/g, "_");
+        imgName = imgKey + ".png";
+      }
+      if (imgName) {
+        imageHtml = `<img src="img/${imgName}" class="w-full h-auto object-contain rounded mt-1 mb-1 shadow-sm" onerror="this.style.display='none'">`;
+      }
+
+      let fontClass = "font-normal";
+      let badgeHtml = "";
+      const indianHolidays = [
+        "Diwali",
+        "Holi / Dhulandi",
+        "Raksha Bandhan",
+        "Dussehra",
+        "Makar Sankranti",
+        "Maha Shivaratri",
+        "Eid al-Fitr",
+        "Eid al-Adha",
+        "Guru Nanak Jayanti",
+        "Vaisakhi",
+        "Christmas",
+        "Good Friday",
+        "Vesak",
+        "Mahavir Jayanti",
+        "Navroz",
+      ];
+      if (indianHolidays.includes(f.name)) {
+        fontClass = "font-bold text-gray-900 dark:text-white";
+        badgeHtml = `<span class="absolute top-1 right-1 text-[8px] font-bold text-red-500 uppercase tracking-tighter bg-red-50 dark:bg-red-900/30 px-1.5 py-0.5 rounded border border-red-200 dark:border-red-800/50 shadow-sm z-10">Govt Holiday</span>`;
+      }
+
+      eventsHtml += `
+                    <div class="relative text-[11px] mt-1 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-700 px-1.5 py-1 rounded overflow-hidden shadow-sm">
+                        ${badgeHtml}
+                        ${imageHtml}
+                        <span class="truncate block ${fontClass} pr-16">${f.name}</span>
+                        <span class="text-xs font-normal text-gray-500 dark:text-gray-400 leading-tight block mt-0.5" style="white-space: normal;">${f.desc}</span>
+                    </div>`;
+    });
+    dayEvents.forEach((e) => {
+      const linkHtml = e.link
+        ? `<a href="${e.link}" target="_blank" class="ml-1 text-blue-500 hover:underline inline-flex" title="Meeting Link"><i data-lucide="video" class="w-3 h-3"></i></a>`
+        : "";
+      const shareId = e.db_id || e.id;
+      eventsHtml += `<div class="text-[11px] mt-1 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-300 px-1.5 py-0.5 rounded flex justify-between items-center gap-1 group">
+                        <span class="truncate pr-1">${e.title}${linkHtml}</span>
+                        <span class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onclick="event.stopPropagation(); copyEventLink('${shareId}')" class="text-gray-400 hover:text-brand-500" title="Copy event link"><i data-lucide="link" class="w-3 h-3"></i></button>
+                          <button onclick="event.stopPropagation(); shareCalendarEvent('${shareId}')" class="text-gray-400 hover:text-brand-500" title="Share event"><i data-lucide="share-2" class="w-3 h-3"></i></button>
+                          <button onclick="event.stopPropagation(); deleteCalendarEvent('${e.id}')" class="text-red-500 hover:text-red-700"><i data-lucide="x" class="w-3 h-3"></i></button>
+                        </span>
+                    </div>`;
+    });
+
+    gridHtml += `
+                <div id="enlarged-cal-day-${dateStr}" class="p-2 border-r border-b border-gray-200 dark:border-gray-700 min-h-[120px] hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors relative group transition-all duration-500">
+                    <div class="flex justify-between items-start">
+                        <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">${i}</span>
+                        <button onclick="openAddEventModal('${dateStr}')" class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-brand-500 transition-opacity"><i data-lucide="plus" class="w-4 h-4"></i></button>
+function openEnlargedCalendarModal() {
+  document
+    .getElementById("enlarged-calendar-modal")
+    .classList.remove("hidden");
+  renderEnlargedCalendar();
+}
+
+function closeEnlargedCalendarModal() {
+  document
+    .getElementById("enlarged-calendar-modal")
+    .classList.add("hidden");
+}
+
+function renderEnlargedCalendar() {
+  const container = document.getElementById("enlarged-calendar-grid");
+  const year = currentCalendarViewDate.getFullYear();
+  const month = currentCalendarViewDate.getMonth();
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const monthStr = `${year}-${String(month + 1).padStart(2, "0")}`;
+  const evts = getAllLocalEvents();
+
+  const religion = activeScope().religion || "General";
+  const officialFestivals = religiousFestivals[religion] || [];
+
+  let gridHtml = "";
+  for (let i = 0; i < firstDay; i++) {
+    gridHtml += `<div class="p-2 border-r border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/20 min-h-[120px]"></div>`;
+  }
+
+  for (let i = 1; i <= daysInMonth; i++) {
+    const dateStr = `${monthStr}-${String(i).padStart(2, "0")}`;
+    const dayEvents = evts.filter((e) => e.date === dateStr);
+    const dayFestivals = officialFestivals.filter(
+      (f) => parseFestivalDateToYMD(f.date) === dateStr,
+    );
+
+    let eventsHtml = "";
+    dayFestivals.forEach((f) => {
+      let imageHtml = "";
+      const festivalImgMap = {
+        "Makar Sankranti": "makar_sankranti.png",
+        "Vasant Panchami": "vasant_panchami.png",
+        "Maha Shivaratri": "maha_shivaratri.png",
+        "Holika Dahan": "holika_dahan.png",
+        "Holi / Dhulandi": "holi.png",
+        "Chaitra Navratri": "chaitra_navratri.png",
+        "Rama Navami": "ram_navami.png",
+        "Akshaya Tritiya": "akshaya_tritiya.png",
+        "Nirjala Ekadashi": "nirjala_ekadashi.png",
+        "Guru Purnima": "guru_purnima.png",
+        "Raksha Bandhan": "raksha_bandhan.png",
+        "Krishna Janmashtami": "krishna_janmashtami.png",
+        "Ganesh Chaturthi": "ganesh_chaturthi.png",
+        "Pitru Paksha Starts": "pitru_paksha.png",
+        "Sharad Navratri": "sharad_navratri.png",
+        "Maha Navami": "maha_navami.png",
+        Dussehra: "dussehra.png",
+        "Karwa Chauth": "karwa_chauth.png",
+        Dhanteras: "dhanteras.png",
+        Diwali: "diwali.png",
+        "Bhai Dooj": "bhai_dooj.png",
+        "Devutthana Ekadashi": "devutthana.png",
+        "Isra and Mi'raj": "isra_miraj.png",
+        "Mid-Sha'ban": "mid_shaban.png",
+        "Ramadan Begins": "ramadan.png",
+        "Laylat al-Qadr": "laylat_al_qadr.png",
+        "Eid al-Fitr": "eid_al_fitr.png",
+        "Day of Arafah": "day_of_arafah.png",
+        "Eid al-Adha": "eid_al_adha.png",
+        "Islamic New Year": "islamic_new_year.png",
+        "Day of Ashura": "day_of_ashura.png",
+        "Mawlid": "mawlid_al_nabi.png",
+        "Guru Gobind Singh Jayanti": "guru_gobind_singh_jayanti.png",
+        "Lohri": "lohri.png",
+        "Hola Mohalla": "hola_mohalla.png",
+        "Vaisakhi": "vaisakhi.png",
+        "Martyrdom of Guru Arjan": "martyrdom_of_guru_arjan.png",
+        "First Prakash Guru Granth Sahib": "first_prakash_guru_granth_sahib.png",
+        "Gurgaddi Guru Har Krishan": "gurgaddi_guru_har_krishan.png",
+        "Bandi Chhor Divas": "bandi_chhor_divas.png",
+        "Guru Nanak Jayanti": "guru_nanak_jayanti.png",
+        "Martyrdom of Guru Tegh Bahadur": "martyrdom_of_guru_tegh_bahadur.png",
+        "Epiphany": "epiphany.png",
+        "Ash Wednesday": "ash_wednesday.png",
+        "St. Patrick's Day": "st_patricks_day.png",
+        "Palm Sunday": "palm_sunday.png",
+        "Good Friday": "good_friday.png",
+        "Easter Sunday": "easter_sunday.png",
+        "Ascension Day": "ascension_day.png",
+        "Pentecost": "pentecost.png",
+        "All Saints' Day": "all_saints_day.png",
+        "Christmas": "christmas.png",
+      };
+
+      let imgName = festivalImgMap[f.name];
+      if (!imgName) {
+        let imgKey = f.name
+          .toLowerCase()
+          .replace(/ \/ dhulandi/, "")
+          .replace("rama", "ram")
+          .replace(" starts", "")
+          .replace(/ /g, "_")
+          .replace(/'/g, "")
+          .replace(/-/g, "_");
+        imgName = imgKey + ".png";
+      }
+      if (imgName) {
+        imageHtml = `<img src="img/${imgName}" class="w-full h-auto object-contain rounded mt-1 mb-1 shadow-sm" onerror="this.style.display='none'">`;
+      }
+
+      let fontClass = "font-normal";
+      let badgeHtml = "";
+      const indianHolidays = [
+        "Diwali",
+        "Holi / Dhulandi",
+        "Raksha Bandhan",
+        "Dussehra",
+        "Makar Sankranti",
+        "Maha Shivaratri",
+        "Eid al-Fitr",
+        "Eid al-Adha",
+        "Guru Nanak Jayanti",
+        "Vaisakhi",
+        "Christmas",
+        "Good Friday",
+        "Vesak",
+        "Mahavir Jayanti",
+        "Navroz",
+      ];
+      if (indianHolidays.includes(f.name)) {
+        fontClass = "font-bold text-gray-900 dark:text-white";
+        badgeHtml = `<span class="absolute top-1 right-1 text-[8px] font-bold text-red-500 uppercase tracking-tighter bg-red-50 dark:bg-red-900/30 px-1.5 py-0.5 rounded border border-red-200 dark:border-red-800/50 shadow-sm z-10">Govt Holiday</span>`;
+      }
+
+      eventsHtml += `
+                    <div class="relative text-[11px] mt-1 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-700 px-1.5 py-1 rounded overflow-hidden shadow-sm">
+                        ${badgeHtml}
+                        ${imageHtml}
+                        <span class="truncate block ${fontClass} pr-16">${f.name}</span>
+                        <span class="text-xs font-normal text-gray-500 dark:text-gray-400 leading-tight block mt-0.5" style="white-space: normal;">${f.desc}</span>
+                    </div>`;
+    });
+    dayEvents.forEach((e) => {
+      const linkHtml = e.link
+        ? `<a href="${e.link}" target="_blank" class="ml-1 text-blue-500 hover:underline inline-flex" title="Meeting Link"><i data-lucide="video" class="w-3 h-3"></i></a>`
+        : "";
+      const shareId = e.db_id || e.id;
+      eventsHtml += `<div class="text-[11px] mt-1 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-300 px-1.5 py-0.5 rounded flex justify-between items-center gap-1 group">
+                        <span class="truncate pr-1">${e.title}${linkHtml}</span>
+                        <span class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onclick="event.stopPropagation(); copyEventLink('${shareId}')" class="text-gray-400 hover:text-brand-500" title="Copy event link"><i data-lucide="link" class="w-3 h-3"></i></button>
+                          <button onclick="event.stopPropagation(); shareCalendarEvent('${shareId}')" class="text-gray-400 hover:text-brand-500" title="Share event"><i data-lucide="share-2" class="w-3 h-3"></i></button>
+                          <button onclick="event.stopPropagation(); deleteCalendarEvent('${e.id}')" class="text-red-500 hover:text-red-700"><i data-lucide="x" class="w-3 h-3"></i></button>
+                        </span>
+                    </div>`;
+    });
+
+    gridHtml += `
+                <div id="enlarged-cal-day-${dateStr}" class="p-2 border-r border-b border-gray-200 dark:border-gray-700 min-h-[120px] hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors relative group transition-all duration-500">
+                    <div class="flex justify-between items-start">
+                        <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">${i}</span>
+                        <button onclick="openAddEventModal('${dateStr}')" class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-brand-500 transition-opacity"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                    </div>
+                    <div class="mt-1">${eventsHtml}</div>
+                </div>`;
+  }
+
+  let calendarTitle = `${monthNames[month]} ${year} Calendar`;
+
+  document.getElementById("enlarged-calendar-title").innerText =
+    calendarTitle;
+  container.innerHTML = gridHtml;
+  lucide.createIcons();
+}

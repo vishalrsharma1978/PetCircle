@@ -457,3 +457,400 @@ document.addEventListener("DOMContentLoaded", () => {
   // Body visibility is restored by auth.js once the session check (and
   // resulting view choice) completes, to avoid a flash of the wrong view.
 });
+
+
+// --- Global Search ---
+let globalSearchTimeout = null;
+let currentSearchTab = 'all';
+let lastSearchData = { members: [], posts: [], events: [], connections: [] };
+
+function getRecentSearches() {
+  try {
+    return JSON.parse(localStorage.getItem('esamaj_recent_searches') || '[]');
+  } catch (e) {
+    return [];
+  }
+}
+function saveRecentSearch(q) {
+  if (!q || q.trim().length === 0) return;
+  let recents = getRecentSearches();
+  recents = recents.filter(x => x.toLowerCase() !== q.toLowerCase());
+  recents.unshift(q);
+  recents = recents.slice(0, 5);
+  localStorage.setItem('esamaj_recent_searches', JSON.stringify(recents));
+}
+function clearRecentSearches() {
+  localStorage.removeItem('esamaj_recent_searches');
+  showGlobalSearchDropdown(document.getElementById('global-search-input').value);
+}
+
+function showGlobalSearchDropdown(query) {
+  const dropdown = document.getElementById('global-search-dropdown');
+  if (!dropdown) return;
+
+  let html = '';
+  const qTrim = query.trim();
+
+  if (qTrim) {
+    html += `
+                <div class="p-3 text-sm text-gray-500 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-t-xl transition-colors border-b border-gray-100 dark:border-gray-800/60" onclick="runAdvancedSearch('${escapeHtml(qTrim)}')">
+                    <i data-lucide="search" class="inline-block w-4 h-4 mr-2 text-brand-500"></i>
+                    Press enter to search for "<span class="font-semibold text-gray-700 dark:text-gray-300">${escapeHtml(qTrim)}</span>"
+                </div>
+            `;
+
+    // Autocomplete local connections matching typed query
+    const matches = (window.globalFriends || []).filter(f => (f.name || '').toLowerCase().includes(qTrim.toLowerCase())).slice(0, 3);
+    if (matches.length > 0) {
+      html += `
+                    <div class="p-3 border-b border-gray-100 dark:border-gray-800/60">
+                        <div class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Matching Connections</div>
+                        <div class="space-y-1">
+                            ${matches.map(m => `
+                                <div onclick="openUserProfile('${escapeHtml((m.name || 'Member').replace(/'/g, "\\'"))}', '${escapeHtml((m.role || 'Member').replace(/'/g, "\\'"))}', '${String(m.id).replace(/'/g, "\\'")}', '${escapeHtml(m.photo || '')}')" class="flex items-center gap-3 px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
+                                    <i data-lucide="user" class="w-4 h-4 text-brand-500"></i>
+                                    <span>${escapeHtml(m.name)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+    } else {
+        html += `
+                      <div class="p-3 border-b border-gray-100 dark:border-gray-800/60">
+                          <div class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Matching Connections</div>
+                          <div class="text-sm text-gray-500 px-3 py-1.5 italic">No matching connections found.</div>
+                      </div>
+                  `;
+      }
+  } else {
+    // Show recent searches if empty
+    const recents = getRecentSearches();
+    if (recents.length > 0) {
+      html += `
+                    <div class="p-3 border-b border-gray-100 dark:border-gray-800/60">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Recent Searches</div>
+                            <button onclick="clearRecentSearches()" class="text-[10px] font-bold text-red-500 hover:underline">Clear All</button>
+                        </div>
+                        <div class="space-y-1">
+                            ${recents.map(r => `
+                                <div onclick="document.getElementById('global-search-input').value = '${escapeHtml(r)}'; runAdvancedSearch('${escapeHtml(r)}');" class="flex items-center justify-between px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
+                                    <span class="flex items-center gap-3">
+                                        <i data-lucide="history" class="w-4 h-4 text-gray-400"></i>
+                                        <span>${escapeHtml(r)}</span>
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+    }
+  }
+
+  // Suggested searches panel
+  html += `
+            <div class="p-4">
+                <div class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Suggested Searches</div>
+                <div class="space-y-1">
+                    <div onclick="const input = document.getElementById('global-search-input'); if (input) { input.value = 'Dog'; input.blur(); } runAdvancedSearch('Dog')" class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
+                        <i data-lucide="bone" class="w-4 h-4 text-brand-500"></i>
+                        <span>Find Dogs</span>
+                    </div>
+                    <div onclick="document.getElementById('global-search-input').value = 'Events'; runAdvancedSearch('', { showAllEvents: true })" class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
+                        <i data-lucide="calendar-heart" class="w-4 h-4 text-brand-500"></i>
+                        <span>Explore All Events</span>
+                    </div>
+                    <div data-feature-gate="matchmaking" onclick="switchView('view-social-feed'); switchSocialTab('playdates');" class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
+                        <i data-lucide="heart-handshake" class="w-4 h-4 text-brand-500"></i>
+                        <span>Playdates</span>
+                    </div>
+                    <div onclick="switchView('view-social-feed'); switchSocialTab('friends'); switchFriendsView('discover');" class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
+                        <i data-lucide="user-plus" class="w-4 h-4 text-brand-500"></i>
+                        <span>Discover People / Add Friends</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+  if (!html) {
+    html = `
+        <div class="p-3 text-sm text-gray-500 italic text-center py-4">
+            Type to start searching...
+        </div>
+      `;
+  }
+
+  dropdown.innerHTML = html;
+  if (typeof lucide !== 'undefined') lucide.createIcons({ root: dropdown });
+  dropdown.classList.remove('hidden');
+}
+
+function debouncedGlobalTypeahead(query) {
+  clearTimeout(globalSearchTimeout);
+  globalSearchTimeout = setTimeout(() => {
+    showGlobalSearchDropdown(query);
+  }, 150);
+}
+
+document.addEventListener('click', (e) => {
+  const searchContainer = document.querySelector('#global-search-input')?.closest('.relative');
+  if (searchContainer && !searchContainer.contains(e.target)) {
+    document.getElementById('global-search-dropdown')?.classList.add('hidden');
+  }
+});
+
+async function runAdvancedSearch(query, options = {}) {
+  let q = (query || "").trim();
+  const dropdown = document.getElementById('global-search-dropdown');
+  if (dropdown) dropdown.classList.add('hidden');
+
+  // Also set input value
+  const input = document.getElementById('global-search-input');
+  if (input) {
+    input.value = q.trim();
+    input.blur();
+  }
+
+  // Save query to recent searches
+  if (q && !options.religion && !options.showAllEvents && !options.skipSaveRecent) {
+    saveRecentSearch(q);
+  }
+  sessionStorage.setItem("esamaj_last_search_query", q);
+
+  if (typeof switchView === "function") switchView("view-social-feed");
+  if (typeof switchSocialTab === "function") switchSocialTab("search-results");
+
+  let displayText = q ? `Results for "${q}"` : "Search Results";
+  if (options.religion) {
+    displayText = `Members: ${options.religion}`;
+  } else if (options.showAllEvents) {
+    displayText = "All Community Events";
+  }
+  const metaObj = document.getElementById('search-results-meta');
+  if (metaObj) metaObj.innerText = q ? `Searching for "${q}"...` : "Searching...";
+
+  ['all', 'pets', 'people', 'connections', 'posts', 'events'].forEach(tab => {
+    const tabEl = document.getElementById(`search-content-${tab}`);
+    if (tabEl) tabEl.innerHTML = '<div class="col-span-full py-12 text-center text-gray-500"><div class="inline-block animate-spin w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full mb-4"></div><p>Searching...</p></div>';
+  });
+
+  try {
+    // Build API payloads
+    const memberPayload = { user_id: currentUserObj?.id, limit: 24 };
+    if (options.religion) {
+      memberPayload.religion = options.religion;
+    } else if (q) {
+      memberPayload.query = q;
+    }
+
+    const postPayload = {
+      user_id: currentUserObj?.id,
+      religion: currentUserObj?.religion,
+      community: currentUserObj?.community,
+      limit: 10
+    };
+    if (q) postPayload.search_query = q;
+
+    const eventPayload = {
+      user_id: currentUserObj?.id,
+      religion: currentUserObj?.religion,
+      community: currentUserObj?.community,
+      limit: 10
+    };
+    if (q) eventPayload.search_query = q;
+
+    // Perform requests
+    const [membersRes, postsRes, eventsRes] = await Promise.all([
+      api("search_users", memberPayload),
+      api("get_posts", postPayload),
+      api("get_events", eventPayload)
+    ]);
+
+    // Connections filtering
+    let connections = [];
+    if (q) {
+      const lcQuery = q.toLowerCase();
+      connections = (window.globalFriends || []).filter(f =>
+        (f.name || "").toLowerCase().includes(lcQuery) ||
+        (f.current_city || "").toLowerCase().includes(lcQuery) ||
+        (f.gotra || "").toLowerCase().includes(lcQuery)
+      );
+    } else {
+      connections = window.globalFriends || [];
+    }
+
+    lastSearchData = {
+      members: (membersRes?.results || []),
+      posts: (postsRes?.posts || []).map(p => typeof normalizePostFromApi === 'function' ? normalizePostFromApi(p) : p),
+      events: (eventsRes?.events || []).map((e) => ({
+        id: e.id,
+        db_id: e.id,
+        user_id: e.created_by,
+        creator: e.creator || "",
+        date: e.event_date,
+        title: e.event_time ? `${String(e.event_time).slice(0, 5)} - ${e.title}` : e.title,
+        link: e.meeting_url,
+        description: e.description || "",
+        location: e.location || "",
+        community: e.community || null,
+        religion: e.religion || null
+      })),
+      connections: connections
+    };
+
+    const mObj = document.getElementById('search-results-meta');
+    if (mObj) mObj.innerText = displayText;
+
+    // Focus the appropriate tab
+    if (options.religion) {
+      switchSearchTab('people');
+    } else if (options.showAllEvents) {
+      switchSearchTab('events');
+    } else {
+      switchSearchTab('all');
+    }
+  } catch (err) {
+    console.error("Search error:", err);
+    const eObj = document.getElementById('search-results-meta');
+    if (eObj) eObj.innerText = `Error searching. Please try again.`;
+  }
+}
+
+function switchSearchTab(tab) {
+  currentSearchTab = tab;
+  ['all', 'pets', 'people', 'connections', 'posts', 'events'].forEach(t => {
+    const btn = document.getElementById(`search-tab-${t}`);
+    const content = document.getElementById(`search-content-${t}`);
+    if (t === tab) {
+      btn.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300', 'dark:text-gray-400', 'dark:hover:text-gray-300', 'dark:hover:border-gray-600');
+      btn.classList.add('border-brand-600', 'text-brand-600', 'dark:text-brand-400', 'dark:border-brand-400');
+      content.classList.remove('hidden');
+    } else {
+      btn.classList.remove('border-brand-600', 'text-brand-600', 'dark:text-brand-400', 'dark:border-brand-400');
+      btn.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300', 'dark:text-gray-400', 'dark:hover:text-gray-300', 'dark:hover:border-gray-600');
+      content.classList.add('hidden');
+    }
+  });
+  renderSearchResults();
+}
+
+let searchFilters = { religion: '', gender: '', community: '', sortBy: 'name_asc' };
+
+function toggleSearchFilters() {
+  const panel = document.getElementById('search-filters-panel');
+  if (panel) {
+    panel.classList.toggle('hidden');
+  }
+}
+
+function resetSearchFilters() {
+  document.getElementById('search-filter-religion').value = '';
+  document.getElementById('search-filter-gender').value = '';
+  document.getElementById('search-filter-community').value = '';
+  document.getElementById('search-sort-by').value = 'name_asc';
+  applySearchFilters();
+}
+
+function applySearchFilters() {
+  searchFilters.religion = document.getElementById('search-filter-religion').value;
+  searchFilters.gender = document.getElementById('search-filter-gender').value;
+  searchFilters.community = document.getElementById('search-filter-community').value.trim().toLowerCase();
+  searchFilters.sortBy = document.getElementById('search-sort-by').value;
+  renderSearchResults();
+}
+
+function renderSearchResults() {
+  const { members, posts, events, connections } = lastSearchData;
+  const renderEmpty = (msg) => `<div class="col-span-full py-12 text-center text-gray-500 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">${msg}</div>`;
+
+  // Apply local filtering & sorting to members
+  let filteredMembers = [...members];
+  if (searchFilters.religion) {
+    filteredMembers = filteredMembers.filter(m => (m.religion || '').toLowerCase() === searchFilters.religion.toLowerCase());
+  }
+  if (searchFilters.gender) {
+    filteredMembers = filteredMembers.filter(m => (m.gender || '').toLowerCase() === searchFilters.gender.toLowerCase());
+  }
+  if (searchFilters.community) {
+    filteredMembers = filteredMembers.filter(m => (m.community || '').toLowerCase().includes(searchFilters.community));
+  }
+
+  if (searchFilters.sortBy === 'name_asc') {
+    filteredMembers.sort((a, b) => (a.name || a.full_name || '').localeCompare(b.name || b.full_name || ''));
+  } else if (searchFilters.sortBy === 'name_desc') {
+    filteredMembers.sort((a, b) => (b.name || b.full_name || '').localeCompare(a.name || a.full_name || ''));
+  } else if (searchFilters.sortBy === 'age_asc') {
+    filteredMembers.sort((a, b) => (a.age || 0) - (b.age || 0));
+  } else if (searchFilters.sortBy === 'age_desc') {
+    filteredMembers.sort((a, b) => (b.age || 0) - (a.age || 0));
+  }
+
+  const qLower = (document.getElementById('global-search-input')?.value || "").toLowerCase().trim();
+  let petMatches = filteredMembers;
+  let peopleMatches = filteredMembers;
+
+  if (qLower) {
+    petMatches = filteredMembers.filter(m => (m.pet_name || "").toLowerCase().includes(qLower));
+    peopleMatches = filteredMembers.filter(m => (m.parent_name || m.name || m.full_name || "").toLowerCase().includes(qLower));
+  }
+
+  const renderPeopleSection = (list, limit = list.length) => {
+    if (!list || list.length === 0) return renderEmpty("No people/pets found.");
+    return list.slice(0, limit).map(m => {
+      const id = m.id || m.user_id;
+      const name = m.pet_name || m.name || m.full_name || "Pet";
+      const parent_name = m.parent_name || m.name || m.full_name || "";
+      const photo = m.photo || m.profile_photo_url || null;
+      const initials = escapeHtml((name || "P")[0].toUpperCase());
+      const safePhoto = photo ? escapeHtml(photo) : null;
+      
+      return `
+      <div class="warm-glass warm-lift rounded-2xl p-4 flex items-center justify-between gap-2" data-search-user-id="${id}">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-11 h-11 rounded-full bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center flex-shrink-0 overflow-hidden">
+            ${safePhoto ? `<img src="${safePhoto}" class="w-full h-full object-cover">` : `<span class="font-bold text-brand-700 dark:text-brand-300">${initials}</span>`}
+          </div>
+          <div class="min-w-0">
+            <p class="text-sm font-bold text-gray-900 dark:text-white truncate">${escapeHtml(name)}</p>
+            <p class="text-xs text-gray-400">${parent_name ? "with " + escapeHtml(parent_name) : "Member"}</p>
+          </div>
+        </div>
+        <button onclick="sendFriendRequest('${id}', this)" class="text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 px-3 py-1.5 rounded-lg flex-shrink-0">Add</button>
+      </div>`;
+    }).join("");
+  };
+
+  const renderPostsSection = (list, limit = list.length) => {
+    if (!list || list.length === 0) return renderEmpty("No posts found.");
+    return list.slice(0, limit).map(p => postCardHtml(p)).join("");
+  };
+
+  const renderEventsSection = (list, limit = list.length) => {
+    if (!list || list.length === 0) return renderEmpty("No events found.");
+    return list.slice(0, limit).map(e => eventCardHtml(e, false)).join("");
+  };
+
+  if (currentSearchTab === 'all') {
+    const allContainer = document.getElementById('search-content-all');
+    let html = "";
+    if (petMatches.length > 0) html += `<div class="mb-8"><h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Pets</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${renderPeopleSection(petMatches, 3)}</div><button onclick="switchSearchTab('pets')" class="mt-4 text-brand-600 dark:text-brand-400 font-medium text-sm hover:underline">See all pet results &rarr;</button></div>`;
+    if (peopleMatches.length > 0) html += `<div class="mb-8"><h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">People</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${renderPeopleSection(peopleMatches, 3)}</div><button onclick="switchSearchTab('people')" class="mt-4 text-brand-600 dark:text-brand-400 font-medium text-sm hover:underline">See all people results &rarr;</button></div>`;
+    if (connections.length > 0) html += `<div class="mb-8"><h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Connections</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${renderPeopleSection(connections, 3)}</div><button onclick="switchSearchTab('connections')" class="mt-4 text-brand-600 dark:text-brand-400 font-medium text-sm hover:underline">See all connection results &rarr;</button></div>`;
+    if (posts.length > 0) html += `<div class="mb-8"><h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Posts</h3><div class="space-y-4 max-w-2xl mx-auto">${renderPostsSection(posts, 3)}</div><button onclick="switchSearchTab('posts')" class="mt-4 text-brand-600 dark:text-brand-400 font-medium text-sm hover:underline">See all post results &rarr;</button></div>`;
+    if (events.length > 0) html += `<div class="mb-8"><h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Events</h3><div class="space-y-4">${renderEventsSection(events, 3)}</div><button onclick="switchSearchTab('events')" class="mt-4 text-brand-600 dark:text-brand-400 font-medium text-sm hover:underline">See all event results &rarr;</button></div>`;
+    if (!html) html = renderEmpty("No results found for your query.");
+    allContainer.innerHTML = html;
+  } else if (currentSearchTab === 'pets') {
+    document.getElementById('search-content-pets').innerHTML = renderPeopleSection(petMatches);
+  } else if (currentSearchTab === 'people') {
+    document.getElementById('search-content-people').innerHTML = renderPeopleSection(peopleMatches);
+  } else if (currentSearchTab === 'connections') {
+    document.getElementById('search-content-connections').innerHTML = renderPeopleSection(connections);
+  } else if (currentSearchTab === 'posts') {
+    document.getElementById('search-content-posts').innerHTML = renderPostsSection(posts);
+  } else if (currentSearchTab === 'events') {
+    document.getElementById('search-content-events').innerHTML = renderEventsSection(events);
+  }
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+}

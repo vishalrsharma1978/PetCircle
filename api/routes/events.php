@@ -146,6 +146,11 @@ function handleGetEvents($data)
         $params['or'] = '(pet_type.is.null,pet_type.eq.' . $petType . ')';
     }
 
+    if (!empty($data['search_query'])) {
+        $safe = str_replace(['*', ',', '(', ')'], '', $data['search_query']);
+        $params['title'] = 'ilike.*' . $safe . '*';
+    }
+
     $res = supabaseRequest('GET', '/rest/v1/events', $params);
     if (supabaseFailed($res)) {
         sendSupabaseError("Failed to fetch events.", $res);

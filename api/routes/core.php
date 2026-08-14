@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/s3_storage.php';
+
 /**
  * Core profile system: account/pet profile read+update, pet_type/breed
  * changes, and photo uploads to Supabase Storage. Adapted from PetCircle's
@@ -189,14 +191,18 @@ function handleUpdateProfile($data)
 
     // Clean up replaced photo files from storage after responding.
     if (isset($update['profile_photo_url']) && $oldProfilePhoto && $oldProfilePhoto !== $update['profile_photo_url']) {
-        $parsed = parsePublicStorageUrl($oldProfilePhoto);
-        if ($parsed)
+        if ($s3Info = parseS3Url($oldProfilePhoto)) {
+            s3DeleteObject($s3Info['key']);
+        } else if ($parsed = parsePublicStorageUrl($oldProfilePhoto)) {
             supabaseStorageDelete($parsed['bucket'], $parsed['path']);
+        }
     }
     if (isset($update['cover_photo_url']) && $oldCoverPhoto && $oldCoverPhoto !== $update['cover_photo_url']) {
-        $parsed = parsePublicStorageUrl($oldCoverPhoto);
-        if ($parsed)
+        if ($s3Info = parseS3Url($oldCoverPhoto)) {
+            s3DeleteObject($s3Info['key']);
+        } else if ($parsed = parsePublicStorageUrl($oldCoverPhoto)) {
             supabaseStorageDelete($parsed['bucket'], $parsed['path']);
+        }
     }
 }
 
@@ -371,6 +377,19 @@ function handlePhotoUpload()
     }
     $pathParts = array_filter([$userId, $folder, $filename]);
     $objectPath = implode('/', $pathParts);
+
+    if (function_exists('s3IsConfigured') && s3IsConfigured()) {
+        $s3Key = $actualBucket . '/' . $objectPath;
+        $fp = fopen($file['tmp_name'], 'r');
+        $s3Res = s3PutObject($s3Key, $fp, $detectedType);
+        if ($s3Res['code'] === 200 || $s3Res['code'] === 204) {
+            $publicUrl = s3PublicUrl($s3Key);
+            jsonSuccess(["photo_url" => $publicUrl, "bucket" => $requestedBucket, "path" => $objectPath, "mime_type" => $detectedType]);
+        } else {
+            jsonError("Storage upload to S3 failed. HTTP " . $s3Res['code'], 500);
+        }
+        return;
+    }
 
     $uploadUrl = "{$supabaseUrl}/storage/v1/object/{$actualBucket}/{$objectPath}";
     $ch = curl_init($uploadUrl);

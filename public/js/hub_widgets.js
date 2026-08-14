@@ -166,7 +166,10 @@ function renderHubCalendarWidget() {
     <div class="flex items-center justify-between mb-3">
       <button onclick="hubCalendarChangeMonth(-1)" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
       <h4 class="text-sm font-bold text-gray-800 dark:text-gray-100">${escapeHtml(monthLabel)}</h4>
-      <button onclick="hubCalendarChangeMonth(1)" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+      <div class="flex gap-1">
+        <button onclick="openEnlargedCalendarModal()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-brand-500"><i data-lucide="maximize-2" class="w-4 h-4"></i></button>
+        <button onclick="hubCalendarChangeMonth(1)" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+      </div>
     </div>
     <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-gray-400 mb-1">
       ${["S", "M", "T", "W", "T", "F", "S"].map((d) => `<span>${d}</span>`).join("")}

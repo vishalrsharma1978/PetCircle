@@ -17,7 +17,7 @@ function handleSearchUsers($data)
     ];
     if ($query !== null) {
         $safe = str_replace(['*', ',', '(', ')'], '', $query);
-        $params['pet_name'] = 'ilike.*' . $safe . '*';
+        $params['or'] = '(pet_name.ilike.*' . $safe . '*,parent_name.ilike.*' . $safe . '*)';
     }
 
     $res = supabaseRequest('GET', '/rest/v1/profiles', $params);

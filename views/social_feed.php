@@ -15,12 +15,18 @@
           </div>
         </button>
 
-        <!-- Search (visual placeholder — no backend search yet) -->
+        <!-- Search -->
         <div class="col-span-2 xl:col-span-1 xl:col-start-2 row-start-2 xl:row-start-1 flex justify-center min-w-0">
           <div class="relative w-full xl:max-w-xl">
-            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500"></i>
-            <input type="text" placeholder="Search pets, posts, events…" disabled
-              class="bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:placeholder-gray-500 rounded-full py-2.5 pl-12 pr-5 text-sm w-full cursor-not-allowed">
+            <i data-lucide="search" class="absolute left-4 top-3 w-5 h-5 text-gray-400 dark:text-gray-500"></i>
+            <input type="search" name="global_search_query" id="global-search-input" placeholder="Search pets, posts, events…" 
+              autocomplete="new-password" spellcheck="false"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();runAdvancedSearch(this.value);}"
+              oninput="debouncedGlobalTypeahead(this.value)" 
+              onfocus="showGlobalSearchDropdown(this.value)"
+              onclick="showGlobalSearchDropdown(this.value)"
+              class="bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:placeholder-gray-500 rounded-full py-2.5 pl-12 pr-5 text-sm w-full focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <div id="global-search-dropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl shadow-xl overflow-hidden z-[100] max-h-[80vh] overflow-y-auto"></div>
           </div>
         </div>
 
@@ -258,7 +264,7 @@
         <div id="friends-subtab-discover" class="hidden space-y-4">
           <div class="relative">
             <i data-lucide="search" class="absolute left-3 top-3 w-4 h-4 text-gray-400"></i>
-            <input type="text" id="friend-search-input" placeholder="Search pets by name…" oninput="debounceFriendSearch(this.value)"
+            <input type="text" id="friend-search-input" placeholder="Search pets by name…" autocomplete="off" oninput="debounceFriendSearch(this.value)"
               class="w-full pl-9 pr-3 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm bg-gray-50 dark:bg-gray-800 dark:text-white">
           </div>
           <div id="friend-search-results" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -429,6 +435,9 @@
          matches eSamaj's real entry point. Fully JS-rendered (renderSettingsTab() in
          settings.js), same pattern as the Galleries tab. -->
     <div id="social-tab-settings" class="social-tab-panel hidden"></div>
+
+    <!-- ======= SEARCH RESULTS TAB ======= -->
+    <?php include 'views/search_results.php'; ?>
 
     </div>
 

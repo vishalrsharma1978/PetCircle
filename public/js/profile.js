@@ -131,16 +131,31 @@ async function handleAvatarUpload(input) {
   const file = input.files?.[0];
   if (!file) return;
   try {
-    const data = await uploadPhotoFile(file, "profile-photos");
-    if (data.status !== "success") {
-      showToast(data.message || "Could not upload photo.", "error");
-      return;
-    }
-    setAvatarPreview("profile-modal-avatar-img", "profile-modal-avatar-text", data.photo_url, "P");
-    input.dataset.pendingUrl = data.photo_url;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const croppedBlob = await openCropperModal(e.target.result, 1);
+        if (!croppedBlob) {
+          input.value = "";
+          return;
+        }
+        const croppedFile = new File([croppedBlob], file.name, { type: "image/jpeg" });
+        const data = await uploadPhotoFile(croppedFile, "profile-photos");
+        if (data.status !== "success") {
+          showToast(data.message || "Could not upload photo.", "error");
+          return;
+        }
+        setAvatarPreview("profile-modal-avatar-img", "profile-modal-avatar-text", data.photo_url, "P");
+        input.dataset.pendingUrl = data.photo_url;
+      } catch (err) {
+        console.error(err);
+        showToast("Could not upload photo.", "error");
+      }
+    };
+    reader.readAsDataURL(file);
   } catch (err) {
     console.error(err);
-    showToast("Could not upload photo.", "error");
+    showToast("Could not read photo.", "error");
   }
 }
 
@@ -148,16 +163,31 @@ async function handleCoverUpload(input) {
   const file = input.files?.[0];
   if (!file) return;
   try {
-    const data = await uploadPhotoFile(file, "cover-photos");
-    if (data.status !== "success") {
-      showToast(data.message || "Could not upload photo.", "error");
-      return;
-    }
-    setCoverPreview("prof-banner-img", data.photo_url);
-    input.dataset.pendingUrl = data.photo_url;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const croppedBlob = await openCropperModal(e.target.result, 6 / 1);
+        if (!croppedBlob) {
+          input.value = "";
+          return;
+        }
+        const croppedFile = new File([croppedBlob], file.name, { type: "image/jpeg" });
+        const data = await uploadPhotoFile(croppedFile, "cover-photos");
+        if (data.status !== "success") {
+          showToast(data.message || "Could not upload photo.", "error");
+          return;
+        }
+        setCoverPreview("prof-banner-img", data.photo_url);
+        input.dataset.pendingUrl = data.photo_url;
+      } catch (err) {
+        console.error(err);
+        showToast("Could not upload photo.", "error");
+      }
+    };
+    reader.readAsDataURL(file);
   } catch (err) {
     console.error(err);
-    showToast("Could not upload photo.", "error");
+    showToast("Could not read photo.", "error");
   }
 }
 

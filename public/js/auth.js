@@ -338,7 +338,9 @@ document.getElementById("forgot-new-password-form")?.addEventListener("submit", 
 // ---------------- Session restore on load ----------------
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const hasSessionCookie = !!getCookieValue("pawcircle_session_token");
+  // We check for the CSRF token instead of the session token,
+  // because the session token is HttpOnly and cannot be read by JavaScript.
+  const hasSessionCookie = !!getCookieValue("pawcircle_csrf_token");
   if (!hasSessionCookie) {
     document.body.style.visibility = "visible";
     return;

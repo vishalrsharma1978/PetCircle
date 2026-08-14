@@ -66,17 +66,19 @@
   <!-- Gallery Lightbox -->
   <?php include 'modals/gallery_lightbox.php'; ?>
 
-  <!-- Rescue & Seva Apply Modal -->
+  <?php include 'modals/event_share_modal.php'; ?>
+  <?php include 'modals/create_gallery_modal.php'; ?>
   <?php include 'modals/rescue_apply_modal.php'; ?>
-
-  <!-- Create Rescue Opportunity Modal -->
   <?php include 'modals/create_rescue_modal.php'; ?>
-
-  <!-- Verified Pet Parent Modal -->
   <?php include 'modals/verification_modal.php'; ?>
-
-  <!-- Admin Mode Password Modal -->
   <?php include 'modals/admin_mode_modal.php'; ?>
+  <?php include 'modals/edit_post_modal.php'; ?>
+  <?php include 'modals/share_post_modal.php'; ?>
+  <?php include 'modals/announcement_modal.php'; ?>
+  <?php include 'modals/broadcast_modal.php'; ?>
+  <?php include 'modals/condolence_modal.php'; ?>
+  <?php include 'modals/image_cropper_modal.php'; ?>
+  <?php include 'modals/enlarged_calendar_modal.php'; ?>
 
   <!-- Zoom call shell: floating toolbar + minimized "return to call" chip.
        The Meeting SDK injects its own #zmmtg-root container at ZoomMtg.init()
@@ -102,6 +104,7 @@
   <script src="js/core.js?v=<?= assetVer('js/core.js') ?>" defer></script>
   <script src="js/auth.js?v=<?= assetVer('js/auth.js') ?>" defer></script>
   <script src="js/profile.js?v=<?= assetVer('js/profile.js') ?>" defer></script>
+  <script src="js/cropper.js?v=<?= assetVer('js/cropper.js') ?>" defer></script>
   <script src="js/verification.js?v=<?= assetVer('js/verification.js') ?>" defer></script>
   <script src="js/hub_widgets.js?v=<?= assetVer('js/hub_widgets.js') ?>" defer></script>
   <script src="js/posts.js?v=<?= assetVer('js/posts.js') ?>" defer></script>

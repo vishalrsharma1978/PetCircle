@@ -290,6 +290,7 @@ function friendChatBubbleHtml(m) {
         ${replyStripHtml}
         ${m.content ? escapeHtml(m.content) : ""}
         ${m.media_url ? `<img src="${escapeHtml(m.media_url)}" class="mt-2 rounded-lg max-h-56 object-cover">` : ""}
+        <div id="preview-container-friend-chat-${m.id}" class="mt-2"></div>
         ${statusRowHtml}
         ${reactionPillHtml}
       </div>
@@ -437,6 +438,12 @@ function renderFriendChatTimeline() {
   container.innerHTML = timeline.map((t) => t.html).join("") || `<p class="text-center text-sm text-gray-400 py-8">No messages yet — say hello!</p>`;
   container.scrollTop = container.scrollHeight;
   if (window.lucide) lucide.createIcons();
+  
+  if (typeof detectAndRenderLinkPreview === 'function') {
+    [...currentFriendChatMessages, ...friendChatOutboxAsMessages()].forEach(m => {
+      detectAndRenderLinkPreview(m.id, m.content, 'friend-chat-');
+    });
+  }
 }
 
 async function refreshFriendChatMessages() {

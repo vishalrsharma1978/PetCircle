@@ -42,6 +42,8 @@
   <!-- ==================== ADMIN DASHBOARD ==================== -->
   <?php include 'views/admin_dashboard.php'; ?>
 
+
+
   <!-- Edit Pack Profile Modal -->
   <?php include 'modals/profile_modal.php'; ?>
 

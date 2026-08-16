@@ -26,15 +26,59 @@ if (!function_exists('assetVer')) {
 }
 require_once dirname(__DIR__) . '/api/utils/build_id.php';
 ?>
+
+<?php
+$ogTitle = 'PawCircle';
+$ogDescription = 'Find your pack on PawCircle.';
+$ogImage = '';
+
+if (!empty($_GET['post'])) {
+    $postId = $_GET['post'];
+    require_once dirname(__DIR__) . '/api/utils/supabase_client.php';
+    
+    $envFile = dirname(__DIR__) . '/.env';
+    if (file_exists($envFile)) {
+        $parsed = @parse_ini_file($envFile);
+        if ($parsed) {
+            foreach ($parsed as $key => $value) {
+                putenv("$key=$value");
+                $_ENV[$key] = $value;
+            }
+        }
+    }
+    
+    $res = supabaseRequest('GET', '/rest/v1/posts', [
+        'id' => 'eq.' . $postId,
+        'select' => 'content,media_url,users(name)'
+    ]);
+    
+    if (!empty($res['data'][0])) {
+        $post = $res['data'][0];
+        $authorName = $post['users']['name'] ?? 'Member';
+        $ogTitle = 'Post by ' . $authorName;
+        if (!empty($post['content'])) {
+            $ogDescription = mb_substr(strip_tags($post['content']), 0, 160);
+        } else {
+            $ogDescription = 'View this post on PawCircle.';
+        }
+        if (!empty($post['media_url'])) {
+            $ogImage = $post['media_url'];
+        }
+    }
+}
+?>
 <head>
   <meta charset="UTF-8" />
   <script>window.__PAWCIRCLE_BUILD__ = "<?= appBuildId() ?>";</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PawCircle</title>
   <meta name="description" content="PawCircle is a social platform for pet parents to connect, coordinate playdates, find rescue and volunteer opportunities, and build their pet's pack." />
-  <meta property="og:title" content="PawCircle" />
-  <meta property="og:description" content="Find your pack on PawCircle." />
+  <meta property="og:title" content="<?= htmlspecialchars($ogTitle, ENT_QUOTES) ?>" />
+  <meta property="og:description" content="<?= htmlspecialchars($ogDescription, ENT_QUOTES) ?>" />
   <meta property="og:type" content="website" />
+  <?php if ($ogImage): ?>
+  <meta property="og:image" content="<?= htmlspecialchars($ogImage, ENT_QUOTES) ?>" />
+  <?php endif; ?>
   <link rel="stylesheet" href="css/fonts.css?v=<?= assetVer('css/fonts.css') ?>">
   <link rel="stylesheet" href="css/tailwind.css?v=<?= assetVer('css/tailwind.css') ?>">
   <link rel="stylesheet" href="css/style_0.css?v=<?= assetVer('css/style_0.css') ?>">

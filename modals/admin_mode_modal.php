@@ -14,13 +14,14 @@
     <div class="p-6">
       <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Re-enter your password to unlock admin actions for 15 minutes.</p>
       <div id="admin-mode-modal-error" class="hidden mb-4 bg-red-50 border-l-4 border-red-400 p-3 rounded text-sm text-red-700"></div>
-      <input type="password" id="admin-mode-password" placeholder="Password"
-        onkeydown="if(event.key==='Enter'){submitAdminModePassword();}"
-        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm mb-4">
-      <button id="admin-mode-submit-btn" onclick="submitAdminModePassword()"
-        class="w-full px-4 py-2.5 rounded-lg text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 transition-colors">
-        Unlock Admin Mode
-      </button>
+      <form onsubmit="event.preventDefault(); submitAdminModePassword();">
+        <input type="password" id="admin-mode-password" placeholder="Password" autocomplete="current-password"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm mb-4">
+        <button type="submit" id="admin-mode-submit-btn"
+          class="w-full px-4 py-2.5 rounded-lg text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 transition-colors">
+          Unlock Admin Mode
+        </button>
+      </form>
     </div>
   </div>
 </div>

@@ -3,6 +3,12 @@
   style="--login-accent: #f97316;">
 
   <!-- ── LEFT PANE: Feature Showcase & Feed ────────────────────────────── -->
+  <style>
+    @media (min-width: 1024px) {
+      #lp-left-pane { width: 63% !important; flex: none !important; }
+      #lp-right-pane { width: 37% !important; flex: none !important; }
+    }
+  </style>
   <div id="lp-left-pane"
     class="w-full lg:w-[55%] h-full max-h-[100dvh] flex flex-col p-4 sm:p-5 lg:p-6 overflow-hidden overflow-x-hidden no-scrollbar relative"
     style="background:linear-gradient(160deg, color-mix(in srgb, var(--login-accent) 32%, #ffffff) 0%, color-mix(in srgb, var(--login-accent) 22%, #f8fafc) 100%); transition:background 0.5s ease, --login-accent 0.5s ease">

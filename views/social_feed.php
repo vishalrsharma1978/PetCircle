@@ -103,13 +103,15 @@
         <!-- Name + stats -->
         <div class="w-full xl:flex-1 pb-1 min-w-0">
           <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white leading-tight truncate flex items-center gap-2">
-            <span id="hub-hero-pet-name">Pet Name</span>
+            <span id="hub-hero-pet-name">
+              <div class="h-8 sm:h-9 w-48 rounded-lg bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
+            </span>
             <span id="hub-verified-badge" class="hidden text-brand-500" title="Verified Pet Parent">
               <i data-lucide="badge-check" class="w-6 h-6"></i>
             </span>
           </h2>
           <p class="text-gray-500 dark:text-gray-400 text-sm mt-0.5" id="hub-hero-friends">
-            <span id="hub-hero-friends-count" class="font-semibold text-gray-700 dark:text-gray-300">0</span> friends
+            <span id="hub-hero-friends-count" class="font-semibold text-gray-700 dark:text-gray-300"><span class="inline-block h-4 w-6 rounded bg-gray-200 dark:bg-gray-800 animate-pulse align-middle"></span></span> friends
           </p>
           <div class="flex flex-wrap gap-1.5 mt-3" id="hub-hero-tags"></div>
         </div>
@@ -151,7 +153,7 @@
 
   <div class="max-w-7xl mx-auto w-full px-4 py-6 flex flex-col lg:flex-row gap-6">
     <!-- ======= Left Sidebar ======= -->
-    <aside class="hidden lg:flex flex-col w-64 flex-shrink-0 self-start sticky top-6">
+    <aside id="social-left-sidebar" class="hidden lg:flex flex-col w-64 flex-shrink-0 self-start sticky top-6">
       <div id="social-left-nav" class="warm-glass rounded-[20px] p-2 flex flex-col gap-1">
         <button data-social-tab="hub" onclick="switchSocialTab('hub')" class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
           <div class="p-1.5 rounded-lg"><i data-lucide="sparkles" class="w-5 h-5"></i></div> Hub
@@ -181,7 +183,7 @@
     </aside>
 
     <!-- ======= Mobile tab strip (sidebar is desktop-only) ======= -->
-    <nav class="lg:hidden flex items-center gap-1 overflow-x-auto no-scrollbar -mt-2">
+    <nav id="social-mobile-nav" class="lg:hidden flex items-center gap-1 overflow-x-auto no-scrollbar -mt-2">
       <button data-social-tab="hub" onclick="switchSocialTab('hub')" class="social-tab-btn whitespace-nowrap px-3 py-2">Hub</button>
       <button data-social-tab="feed" onclick="switchSocialTab('feed')" class="social-tab-btn whitespace-nowrap px-3 py-2">Feed</button>
       <button data-social-tab="friends" onclick="switchSocialTab('friends')" class="social-tab-btn whitespace-nowrap px-3 py-2">Friends</button>
@@ -193,7 +195,7 @@
     </nav>
 
     <!-- ======= Main Column ======= -->
-    <div class="flex-1 min-w-0 max-w-2xl mx-auto lg:mx-0 w-full space-y-4">
+    <div id="social-main-column" class="flex-1 min-w-0 max-w-2xl mx-auto lg:mx-0 w-full space-y-4">
 
     <!-- ======= HUB TAB ======= -->
     <div id="social-tab-hub" class="social-tab-panel hidden">
@@ -230,6 +232,11 @@
       <div id="feed-list" class="space-y-4">
         <p class="text-center text-sm text-gray-400 py-8">Loading feed…</p>
       </div>
+    </div>
+
+    <!-- ======= POST DETAIL TAB ======= -->
+    <div id="social-tab-post-detail" class="social-tab-panel hidden">
+      <div id="post-detail-view" class="post-detail-shell"></div>
     </div>
 
     <!-- ======= FRIENDS TAB ======= -->
@@ -442,7 +449,7 @@
     </div>
 
     <!-- ======= Right Widget Rail ======= -->
-    <div class="hidden xl:flex xl:flex-col w-80 flex-shrink-0 self-start gap-6 sticky top-24">
+    <div id="social-right-sidebar" class="hidden xl:flex xl:flex-col w-80 flex-shrink-0 self-start gap-6 sticky top-24">
       <!-- Highlight card -->
       <div id="hub-highlight-card" class="warm-glass warm-lift breathing-glow rounded-[20px] overflow-hidden hidden">
         <div id="hub-highlight-banner" class="h-24 relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-brand-400 to-brand-600">

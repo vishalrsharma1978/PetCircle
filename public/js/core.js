@@ -3,6 +3,30 @@
 // deliberately small for the auth slice rather than pre-stubbing functions
 // for features that don't exist yet.
 
+function formatDateTime(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleString();
+}
+
+function clearErrors() {
+  document.querySelectorAll('[id$="-error"]').forEach((el) => {
+    el.classList.add("hidden");
+    el.innerText = "";
+  });
+}
+
+function showError(type, message) {
+  const el = document.getElementById(type + "-error");
+  if (!el) {
+    if (typeof showToast === "function") showToast(message || "Something went wrong.");
+    return;
+  }
+  el.innerText = message;
+  el.classList.remove("hidden");
+}
+
 const breedsByPetType = {
   Dog: ["Labrador Retriever", "Golden Retriever", "German Shepherd", "Poodle", "Bulldog", "Beagle", "Rottweiler", "Dachshund", "Corgi", "Husky", "Pug", "Shih Tzu", "Boxer", "Chihuahua", "Mixed Breed", "other"],
   Cat: ["Persian", "Maine Coon", "Siamese", "Ragdoll", "Bengal", "Sphynx", "British Shorthair", "Abyssinian", "Scottish Fold", "Mixed Breed", "other"],
@@ -205,7 +229,31 @@ const SOCIAL_TAB_LOADERS = {
   settings: () => loadAccountSettings(),
 };
 
+function updateSocialLayoutForTab(tabId) {
+  const isSettings = tabId === "settings";
+  const isPostDetail = tabId === "post-detail";
+  const isFullWidthMainTab = tabId === "galleries" || isPostDetail;
+  const mobileNav = document.getElementById("social-mobile-nav");
+  const socialSidebar = document.getElementById("social-left-sidebar");
+  const rightSidebar = document.getElementById("social-right-sidebar");
+  const mainColumn = document.getElementById("social-main-column");
+
+  if (mobileNav) mobileNav.style.display = (isSettings || isPostDetail) ? "none" : "";
+  if (rightSidebar) rightSidebar.style.display = (isSettings || isFullWidthMainTab) ? "none" : "";
+  if (socialSidebar) {
+    socialSidebar.classList.toggle("lg:flex", !isSettings && !isPostDetail);
+    socialSidebar.classList.toggle("lg:hidden", isSettings || isPostDetail);
+  }
+  if (mainColumn) {
+    mainColumn.classList.toggle("max-w-2xl", !isSettings && !isFullWidthMainTab);
+    mainColumn.classList.toggle("max-w-none", isSettings || isFullWidthMainTab);
+    mainColumn.classList.toggle("mx-auto", !isSettings && !isFullWidthMainTab);
+    mainColumn.classList.toggle("lg:mx-0", !isSettings && !isFullWidthMainTab);
+  }
+}
+
 function switchSocialTab(tab) {
+  updateSocialLayoutForTab(tab);
   document.querySelectorAll(".social-tab-panel").forEach((el) => el.classList.add("hidden"));
   document.getElementById(`social-tab-${tab}`)?.classList.remove("hidden");
   document.querySelectorAll("[data-social-tab]").forEach((btn) => {
@@ -853,4 +901,195 @@ function renderSearchResults() {
     document.getElementById('search-content-events').innerHTML = renderEventsSection(events);
   }
   if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+const EMOJI_REACTIONS = [
+  { emoji: "🐶", label: "Woof" },
+  { emoji: "🐾", label: "Paw" },
+  { emoji: "❤️", label: "Love" },
+  { emoji: "🦴", label: "Bone" },
+  { emoji: "😂", label: "Haha" },
+  { emoji: "😮", label: "Wow" },
+  { emoji: "😢", label: "Sad" },
+  { emoji: "🔥", label: "Fire" },
+];
+
+let customReactionsList = [];
+let customReactionsByKey = {};
+
+async function loadCustomReactions() {
+  try {
+    const profile = typeof currentUserObj !== 'undefined' ? currentUserObj : null;
+    const data = await api("get_active_reactions", { 
+      pet_type: profile ? profile.pet_type : '', 
+      breed: profile ? profile.breed : '' 
+    });
+    if (data && data.status === "success" && Array.isArray(data.reactions)) {
+      customReactionsList = data.reactions;
+      customReactionsByKey = Object.fromEntries(customReactionsList.map((r) => [r.reaction_key, r]));
+    }
+  } catch (err) {
+    console.error("Failed to load custom reactions", err);
+  }
+}
+
+// Ensure loadCustomReactions is called after login or init
+document.addEventListener("DOMContentLoaded", () => {
+    if (typeof currentUserObj !== 'undefined' && currentUserObj) {
+        loadCustomReactions();
+    }
+});
+
+const POST_REACTIONS = {
+  "Liked": { icon: "thumbs-up", color: "#f97316", label: "Like", hideFromPicker: true },
+};
+
+function resolveReaction(key) {
+  if (!key) return null;
+  if (key.startsWith("emoji:")) {
+    const emoji = key.slice(6);
+    const meta = EMOJI_REACTIONS.find((e) => e.emoji === emoji);
+    return { type: "emoji", emoji, label: meta ? meta.label : emoji };
+  }
+  if (customReactionsByKey[key]) {
+    const c = customReactionsByKey[key];
+    return { type: "custom", imageUrl: c.image_url, label: c.label || "Reaction" };
+  }
+  const s = POST_REACTIONS[key] || POST_REACTIONS["Liked"];
+  return { type: "icon", icon: s.icon, color: s.color, label: s.label };
+}
+
+function reactionGlyphHtml(key, sizeClass = "w-3.5 h-3.5") {
+  const r = resolveReaction(key);
+  if (!r) return "";
+  if (r.type === "emoji") return `<span class="leading-none">${r.emoji}</span>`;
+  if (r.type === "custom") return r.imageUrl
+    ? `<img src="${escapeHtml(r.imageUrl)}" alt="${escapeHtml(r.label)}" class="${sizeClass} rounded-sm object-cover inline-block">`
+    : `<i data-lucide="smile" class="${sizeClass}"></i>`;
+  return `<i data-lucide="${r.icon}" class="${sizeClass}" style="color:${r.color}"></i>`;
+}
+
+function renderReactionBadgeHtml(post) {
+  const summary = (post && post.reaction_summary) || {};
+  const keys = Object.keys(summary).filter((k) => summary[k] > 0);
+  if (!keys.length) return "";
+
+  const sorted = keys.sort((a, b) => summary[b] - summary[a]);
+  const userReaction = post.viewer_reaction || post.reaction;
+
+  const MAX_BADGES = 4;
+  const visible = sorted.slice(0, MAX_BADGES);
+  const hiddenCount = sorted.length - MAX_BADGES;
+
+  let glyphs = visible.map((k) => {
+    const hasReacted = userReaction === k;
+    const bgClass = hasReacted ? "bg-brand-50 dark:bg-brand-900/30 border-brand-200 dark:border-brand-800" : "bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700";
+    const textClass = hasReacted ? "text-brand-700 dark:text-brand-300" : "text-gray-600 dark:text-gray-300";
+    const safeKey = k.replace(/'/g, "\\'");
+
+    return `<button data-no-post-open onclick="event.stopPropagation(); reactToPost('${post.id}', '${safeKey}')" oncontextmenu="event.preventDefault(); event.stopPropagation(); reactToPost('${post.id}', '${safeKey}')" class="inline-flex items-center justify-center border rounded-full px-2 py-0.5 gap-1 shadow-sm text-[11px] font-medium transition-colors hover:opacity-80 focus:outline-none ${bgClass} ${textClass}" title="${hasReacted ? 'Remove reaction' : 'Add reaction'}">
+      ${reactionGlyphHtml(k, "w-3 h-3")} <span>${summary[k]}</span>
+     </button>`;
+  }).join("");
+
+  if (hiddenCount > 0) {
+    glyphs += `<button data-no-post-open onclick="event.stopPropagation(); openPostReactions('${post.id}')" class="inline-flex items-center justify-center border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-full px-2 py-0.5 text-[11px] font-medium text-gray-500 hover:opacity-80 shadow-sm">
+       +${hiddenCount} more
+     </button>`;
+  }
+
+  return `<div class="ml-2 flex flex-wrap items-center gap-1.5">${glyphs}</div>`;
+}
+
+function renderReactionPickerHtml(postId) {
+  const emojis = EMOJI_REACTIONS.map((e) => {
+    const key = `emoji:${e.emoji}`;
+    return `<button onclick="event.stopPropagation(); reactToPost('${postId}', '${key.replace(/'/g, "\\'")}')" class="w-8 h-8 rounded-full flex items-center justify-center text-lg leading-none hover:bg-gray-100 dark:hover:bg-gray-700 transition-transform hover:scale-125" title="${escapeHtml(e.label)}">${e.emoji}</button>`;
+  }).join("");
+
+  const customs = (customReactionsList || []).map((c) => {
+    return `<button onclick="event.stopPropagation(); reactToPost('${postId}', '${escapeHtml(c.reaction_key).replace(/'/g, "\\'")}')" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-transform hover:scale-125 overflow-hidden" title="${escapeHtml(c.label)}"><img src="${escapeHtml(c.image_url)}" alt="${escapeHtml(c.label)}" class="w-6 h-6 object-cover rounded-sm"></button>`;
+  }).join("");
+
+  const customSep = customs ? `<span class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-0.5"></span>` : "";
+
+  return `<div class="reaction-picker-scroll no-scrollbar flex items-center gap-1 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-xl rounded-full p-1.5 transform transition-all opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0">
+    ${emojis}
+    ${customSep}${customs}
+  </div>`;
+}
+
+function setLocalReaction(post, toggleKey) {
+  const summary = { ...(post.reaction_summary || {}) };
+  const currentReaction = post.viewer_reaction || post.reaction; // for compatibility
+  let didChange = false;
+
+  if (!toggleKey) {
+    if (currentReaction && summary[currentReaction]) {
+      summary[currentReaction] = Math.max(0, parseInt(summary[currentReaction], 10) - 1);
+      if (summary[currentReaction] === 0) delete summary[currentReaction];
+    }
+    post.reaction = null;
+    post.viewer_reaction = null;
+    didChange = true;
+  } else {
+    if (currentReaction === toggleKey) {
+      if (summary[toggleKey]) {
+        summary[toggleKey] = Math.max(0, parseInt(summary[toggleKey], 10) - 1);
+        if (summary[toggleKey] === 0) delete summary[toggleKey];
+      }
+      post.reaction = null;
+      post.viewer_reaction = null;
+      didChange = true;
+    } else {
+      if (currentReaction && summary[currentReaction]) {
+        summary[currentReaction] = Math.max(0, parseInt(summary[currentReaction], 10) - 1);
+        if (summary[currentReaction] === 0) delete summary[currentReaction];
+      }
+      post.reaction = toggleKey;
+      post.viewer_reaction = toggleKey;
+      summary[toggleKey] = (parseInt(summary[toggleKey], 10) || 0) + 1;
+      didChange = true;
+    }
+  }
+
+  if (didChange) {
+    post.reaction_summary = summary;
+  }
+
+  return { didChange, isAdd: didChange && toggleKey && post.reaction === toggleKey };
+}
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".reaction-picker-container") && !e.target.closest('[onclick^="toggleMobileReactionPicker"]')) {
+    document.querySelectorAll(".mobile-reaction-picker").forEach((m) => m.classList.add("hidden"));
+  }
+});
+
+function getSocialAvatar(name) {
+  return name ? name.charAt(0).toUpperCase() : "P";
+}
+
+function formatDateTime(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleString();
+}
+
+function clearErrors() {
+  document.querySelectorAll('[id$=-error]').forEach((el) => {
+    el.classList.add('hidden');
+    el.innerText = '';
+  });
+}
+
+function showError(type, message) {
+  const el = document.getElementById(type + '-error');
+  if (!el) {
+    if (typeof showToast === 'function') showToast(message || 'Something went wrong.');
+    return;
+  }
+  el.innerText = message;
+  el.classList.remove('hidden');
 }

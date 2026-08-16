@@ -94,6 +94,7 @@
       <div id="forgot-new-password-error" class="hidden mb-4 bg-red-50 border-l-4 border-brand-400 p-3 rounded text-sm text-red-700"></div>
 
       <form id="forgot-new-password-form" novalidate class="space-y-6">
+        <input type="text" autocomplete="username" name="username" class="hidden" aria-hidden="true" value="user" />
         <div>
           <label class="block text-sm font-medium text-gray-700">New Password</label>
           <div class="mt-1 relative">

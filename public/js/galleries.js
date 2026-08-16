@@ -225,75 +225,101 @@ function renderGalleryMediaPreviewHtml(item, classes = "") {
 // one via a negative margin (see .gallery-preview-tile in main.css) and gets
 // a small fixed rotation for the fanned-deck look; hovering a tile just lifts
 // and un-rotates that one tile in place.
-const GALLERY_PREVIEW_ROTATIONS = {
-  1: [0],
-  2: [-6, 6],
-  3: [-8, 0, 8],
-  4: [-10, -3, 4, 11],
-};
-
-function galleryPreviewRotation(index, previewCount) {
-  const set = GALLERY_PREVIEW_ROTATIONS[Math.min(Math.max(previewCount, 1), 4)] || GALLERY_PREVIEW_ROTATIONS[4];
-  return set[index] ?? 0;
-}
-
 function renderGalleryPreviewCardHtml(item, index, extraCount, galleryId, previewCount = 4) {
-  const rotation = galleryPreviewRotation(index, previewCount);
+  const transformSets = {
+    1: [
+      ["translateX(8px) translateY(8px) rotate(-3deg)", "translateX(-95px) translateY(0px) rotate(0deg)", "2deg"],
+    ],
+    2: [
+      ["translateX(18px) translateY(4px) rotate(-8deg)", "translateX(-165px) translateY(0px) rotate(-2deg)", "-5deg"],
+      ["translateX(-8px) translateY(14px) rotate(7deg)", "translateX(-35px) translateY(0px) rotate(2deg)", "5deg"],
+    ],
+    3: [
+      ["translateX(22px) translateY(0px) rotate(-10deg)", "translateX(-230px) translateY(0px) rotate(-3deg)", "-6deg"],
+      ["translateX(2px) translateY(10px) rotate(-1deg)", "translateX(-100px) translateY(0px) rotate(0deg)", "0deg"],
+      ["translateX(-18px) translateY(20px) rotate(9deg)", "translateX(30px) translateY(0px) rotate(3deg)", "6deg"],
+    ],
+    4: [
+      ["translateX(24px) translateY(0px) rotate(-12deg)", "translateX(-295px) translateY(0px) rotate(-3deg)", "-7deg"],
+      ["translateX(6px) translateY(8px) rotate(-4deg)", "translateX(-165px) translateY(0px) rotate(-1deg)", "-3deg"],
+      ["translateX(-12px) translateY(16px) rotate(5deg)", "translateX(-35px) translateY(0px) rotate(1deg)", "3deg"],
+      ["translateX(-30px) translateY(24px) rotate(13deg)", "translateX(95px) translateY(0px) rotate(3deg)", "7deg"],
+    ],
+  };
+  const transforms = (transformSets[Math.min(Math.max(previewCount, 1), 4)] || transformSets[4])[index] || transformSets[1][0];
+  const style = `--gallery-base-transform:${transforms[0]};--gallery-fan-transform:${transforms[1]};--gallery-hover-rotate:${transforms[2]};z-index:${12 + index};`;
   const moreHtml = extraCount > 0
     ? `<div class="settings-gallery-more-card absolute inset-0 flex flex-col items-center justify-center text-white backdrop-blur-[1px]">
-         <span class="text-3xl font-black">+${extraCount}</span>
-         <span class="text-xs font-bold uppercase tracking-wide text-white/75">more</span>
-       </div>`
+            <span class="text-3xl font-black">+${extraCount}</span>
+            <span class="text-xs font-bold uppercase tracking-wide text-white/75">more</span>
+          </div>`
     : "";
-  return `<div class="gallery-preview-tile w-36 h-44 rounded-2xl overflow-hidden shadow-2xl bg-gray-100 dark:bg-gray-800 cursor-pointer" style="transform:rotate(${rotation}deg);z-index:${10 + index};" onclick="event.stopPropagation(); openGallerySlideshow('${galleryId}', ${index})">
-      ${renderGalleryMediaPreviewHtml(item, "w-full h-full object-cover pointer-events-none")}
-      ${moreHtml}
-    </div>`;
-}
-
-function renderGalleryPlaceholderPreviewHtml(index, previewCount) {
-  const rotation = galleryPreviewRotation(index, previewCount);
-  return `<div class="gallery-preview-tile settings-gallery-placeholder w-36 h-44 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center text-white/80" style="transform:rotate(${rotation}deg);z-index:${10 + index};">
-      <i data-lucide="paw-print" class="w-8 h-8"></i>
-    </div>`;
+  return `<div class="settings-gallery-preview absolute top-10 right-10 w-36 h-44 rounded-2xl overflow-hidden shadow-2xl bg-gray-100 dark:bg-gray-800 cursor-pointer transition-transform duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)]" style="${style}" onclick="event.stopPropagation(); openGallerySlideshow('${galleryId}', ${index})">
+        ${renderGalleryMediaPreviewHtml(item, "w-full h-full object-cover pointer-events-none")}
+        ${moreHtml}
+      </div>`;
 }
 
 function getGalleryAccentColor(petType) {
-  return (typeof PET_TYPE_PREVIEW_ACCENTS !== "undefined" && (PET_TYPE_PREVIEW_ACCENTS[petType] || PET_TYPE_PREVIEW_ACCENTS[""])) || "#e04848";
+  const accents = {
+    "Dog": "#f97316",
+    "Cat": "#059669",
+    "Bird": "#0284c7",
+    "Reptile": "#7c3aed",
+    "Small Pet": "#ca8a04",
+    "Fish": "#e11d48",
+    "Horse": "#e04848",
+    Hindu: "#f97316",
+    Muslim: "#059669",
+    Sikh: "#0284c7",
+    Christian: "#7c3aed",
+    Buddhist: "#ca8a04",
+    Jain: "#e11d48",
+    Parsi: "#e04848",
+  };
+  return accents[petType] || "var(--gallery-accent, #f97316)";
 }
 
-function renderGalleryAlbumCardHtml(gallery) {
-  const linkedEvent = gallery.event_id ? eventsCacheForGalleries.find((e) => String(e.id) === String(gallery.event_id)) : null;
+function renderGalleryAlbumCardHtml(gallery, events = []) {
+  const linkedEvent = gallery.event_id ? events.find((eventItem) => String(eventItem.id) === String(gallery.event_id)) : null;
   const items = Array.isArray(gallery.items) ? gallery.items : [];
-  const previewHtml = items.length
-    ? items.slice(0, 4).map((item, index) => renderGalleryPreviewCardHtml(item, index, index === 3 ? Math.max(0, items.length - 4) : 0, gallery.id, Math.min(items.length, 4))).join("")
-    : Array.from({ length: 4 }).map((_, index) => renderGalleryPlaceholderPreviewHtml(index, 4)).join("");
+  const fallbackImages = [
+    "img/bg_hindu.png",
+    "img/bg_sikh.png",
+    "img/bg_buddhist.png",
+    "img/bg_jain.png",
+  ];
+  const previewItems = items.length ? items.slice(0, 4) : fallbackImages.map((url) => ({ media_url: url }));
+  const extraCount = Math.max(0, items.length - 4);
   const safeGalleryId = escapeHtml(String(gallery.id || ""));
   const accentColor = getGalleryAccentColor(currentUserObj?.pet_type);
   const cardStyle = `--gallery-accent:${accentColor};border-color:color-mix(in srgb, var(--gallery-accent) 34%, transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--gallery-accent) 14%, transparent),0 14px 30px rgba(15,23,42,.06);`;
   return `
-    <article class="group max-w-md mx-auto w-full rounded-[1.75rem] border bg-white dark:bg-gray-800 min-h-72 overflow-hidden shadow-sm relative" style="${cardStyle}">
-      <div class="absolute inset-x-6 top-0 h-1 rounded-b-full opacity-80" style="background:linear-gradient(90deg, transparent, var(--gallery-accent), transparent);"></div>
-      <div class="absolute inset-0 rounded-[1.75rem] pointer-events-none" style="background:linear-gradient(135deg, color-mix(in srgb, var(--gallery-accent) 7%, transparent), transparent 42%);"></div>
-      <div class="absolute left-6 top-6 z-10 pointer-events-none">
-        <h5 class="text-gray-900 dark:text-white text-xl font-black truncate max-w-52">${escapeHtml(gallery.title || "Untitled gallery")}</h5>
-        <p class="text-gray-600 dark:text-gray-400 text-xs mt-1">${items.length} item${items.length === 1 ? "" : "s"}${linkedEvent ? ` · ${escapeHtml(linkedEvent.title || "Linked event")}` : ""}</p>
-      </div>
-      <div class="absolute left-6 bottom-6 z-20 flex flex-wrap gap-2">
-        <button type="button" onclick="event.stopPropagation(); openEditGalleryModal('${safeGalleryId}')" class="no-accent-hover inline-flex items-center gap-1.5 rounded-xl bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 px-3 py-2 text-xs font-bold text-gray-800 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-          <i data-lucide="pencil" class="w-3.5 h-3.5"></i> Edit
-        </button>
-        <button type="button" onclick="event.stopPropagation(); openGallerySlideshow('${safeGalleryId}')" class="no-accent-hover inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold text-white border" style="background:var(--gallery-accent);border-color:color-mix(in srgb, var(--gallery-accent) 80%, #111827);">
-          <i data-lucide="images" class="w-3.5 h-3.5"></i> Browse
-        </button>
-        <button type="button" onclick="event.stopPropagation(); deleteGallery('${safeGalleryId}', this)" class="no-accent-hover inline-flex items-center gap-1.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-red-200 dark:border-red-900/70 px-3 py-2 text-xs font-bold text-red-600 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors">
-          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Delete
-        </button>
-      </div>
-      <div class="absolute inset-0 flex items-center justify-center cursor-pointer" onclick="openGallerySlideshow('${safeGalleryId}')">
-        ${previewHtml}
-      </div>
-    </article>`;
+        <article class="group rounded-[1.75rem] border bg-white dark:bg-gray-800 min-h-72 overflow-visible shadow-sm relative" style="${cardStyle}">
+          <div class="absolute inset-x-6 top-0 h-1 rounded-b-full opacity-80" style="background:linear-gradient(90deg, transparent, var(--gallery-accent), transparent);"></div>
+          <div class="absolute inset-0 rounded-[1.75rem] pointer-events-none" style="background:linear-gradient(135deg, color-mix(in srgb, var(--gallery-accent) 7%, transparent), transparent 42%);"></div>
+          <div class="absolute left-6 top-6 z-10 pointer-events-none">
+            <h5 class="text-gray-900 dark:text-white text-xl font-black truncate max-w-52">${escapeHtml(gallery.title || "Untitled gallery")}</h5>
+            <p class="text-gray-600 dark:text-gray-400 text-xs mt-1">${items.length} item${items.length === 1 ? "" : "s"}${linkedEvent ? ` · ${escapeHtml(linkedEvent.title || "Linked event")}` : ""}</p>
+          </div>
+          <div class="absolute left-6 bottom-6 z-20 flex flex-wrap gap-2">
+            <button type="button" onclick="event.stopPropagation(); openEditGalleryModal('${safeGalleryId}')" class="no-accent-hover inline-flex items-center gap-1.5 rounded-xl bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 px-3 py-2 text-xs font-bold text-gray-800 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+              <i data-lucide="pencil" class="w-3.5 h-3.5"></i> Edit gallery
+            </button>
+            ${linkedEvent ? `<button type="button" onclick="event.stopPropagation(); openEditEventModal('${escapeHtml(String(linkedEvent.id))}')" class="no-accent-hover inline-flex items-center gap-1.5 rounded-xl bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 px-3 py-2 text-xs font-bold text-gray-800 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+              <i data-lucide="calendar-cog" class="w-3.5 h-3.5"></i> Edit event
+            </button>` : ""}
+            <button type="button" onclick="event.stopPropagation(); openGallerySlideshow('${safeGalleryId}')" class="no-accent-hover inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold text-white border" style="background:var(--gallery-accent);border-color:color-mix(in srgb, var(--gallery-accent) 80%, #111827);">
+              <i data-lucide="images" class="w-3.5 h-3.5"></i> Browse
+            </button>
+            <button type="button" onclick="event.stopPropagation(); deleteGallery('${safeGalleryId}')" class="no-accent-hover inline-flex items-center gap-1.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-red-200 dark:border-red-900/70 px-3 py-2 text-xs font-bold text-red-600 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Delete
+            </button>
+          </div>
+          <div class="absolute inset-0 cursor-pointer" onclick="openGallerySlideshow('${safeGalleryId}')">
+            ${previewItems.map((item, index) => renderGalleryPreviewCardHtml(item, index, index === 3 ? extraCount : 0, safeGalleryId, previewItems.length)).join("")}
+          </div>
+        </article>`;
 }
 
 // ---------------- Create / edit modal ----------------

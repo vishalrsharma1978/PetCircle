@@ -237,13 +237,23 @@ $routes = [
 
     // Posts
     'create_post' => 'handleCreatePost',
+    'edit_post' => 'handleEditPost',
+    'get_link_preview' => 'handleGetLinkPreview',
     'get_posts' => 'handleGetPosts',
+    'get_post_by_id' => 'handleGetPostById',
     'get_user_posts' => 'handleGetUserPosts',
     'delete_post' => 'handleDeletePost',
+    'archive_post' => 'handleArchivePost',
+    'report_post' => 'handleReportPost',
     'toggle_like' => 'handleToggleLike',
+    'set_post_reaction' => 'handleSetPostReaction',
+    'get_active_reactions' => 'handleGetActiveReactions',
     'add_comment' => 'handleAddComment',
+    'submit_comment' => 'handleSubmitComment',
     'get_comments' => 'handleGetComments',
     'delete_comment' => 'handleDeleteComment',
+    'edit_comment' => 'handleEditComment',
+    'toggle_comment_like' => 'handleToggleCommentLike',
 
     // Friends
     'search_users' => 'handleSearchUsers',

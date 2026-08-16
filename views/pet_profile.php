@@ -39,7 +39,9 @@
           </div>
           <div class="pb-1 min-w-0">
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white truncate flex items-center gap-1.5">
-              <span id="pp-pet-name">Pet Name</span>
+              <span id="pp-pet-name">
+                <div class="h-6 sm:h-7 w-32 rounded-lg bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
+              </span>
               <span id="pp-verified-badge" class="hidden text-brand-500" title="Verified Pet Parent">
                 <i data-lucide="badge-check" class="w-5 h-5"></i>
               </span>

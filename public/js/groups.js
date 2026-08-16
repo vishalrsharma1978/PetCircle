@@ -330,6 +330,12 @@ function renderGroupChatTimeline() {
   container.innerHTML = timeline.map((t) => t.html).join("") || `<p class="text-center text-sm text-gray-400 py-8">No messages yet — say hello!</p>`;
   container.scrollTop = container.scrollHeight;
   if (window.lucide) lucide.createIcons();
+  
+  if (typeof detectAndRenderLinkPreview === 'function') {
+    [...currentGroupChatMessages, ...groupChatOutboxAsMessages()].forEach(m => {
+      detectAndRenderLinkPreview(m.id, m.content, 'group-chat-');
+    });
+  }
 }
 
 async function refreshGroupMessages() {

@@ -972,13 +972,6 @@
       color: #9ca3af;
     }
 
-    .profile-status-dot {
-      position: absolute;
-      right: 0.75rem;
-      bottom: 0.75rem;
-      transform: none;
-    }
-
     .user-profile-modal-panel {
       overflow: visible;
     }
@@ -5548,4 +5541,27 @@ body.zoom-call-minimized #zoom-return-chip {
 #incoming-call-toast .incoming-call-decline {
   background: rgba(255, 255, 255, 0.12) !important;
   color: white !important;
+}
+
+/* ==================== PRESENCE INDICATOR ==================== */
+/* Auto-computed from users.last_active_at by default (see derivePresenceStatus()
+   in core.php), or a manual online/away/busy/offline override set from
+   Settings > Security (step 16). Position is intentionally NOT set here —
+   avatars this dot appears on vary in size across the app, so each call site
+   supplies its own absolute bottom-0 right-0-style positioning classes via
+   presenceDotHtml()'s extraClasses argument. */
+.profile-status-dot {
+  display: inline-block;
+}
+.profile-status-dot.presence-online {
+  background-color: #22c55e;
+}
+.profile-status-dot.presence-away {
+  background-color: #f59e0b;
+}
+.profile-status-dot.presence-busy {
+  background-color: #ef4444;
+}
+.profile-status-dot.presence-offline {
+  background-color: #9ca3af;
 }

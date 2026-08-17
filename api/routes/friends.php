@@ -136,7 +136,11 @@ function handleRemoveFriend($data)
 
 function handleGetFriends($data)
 {
-    $userId = requireUuid($data['user_id'] ?? '', 'user_id');
+    $callerId = requireUuid($data['user_id'] ?? '', 'user_id');
+    $userId = !empty($data['target_user_id']) ? requireUuid($data['target_user_id'], 'target_user_id') : $callerId;
+    if (!$userId) {
+        return;
+    }
 
     $res = supabaseRequest('GET', '/rest/v1/friendships', [
         'or' => '(requester.eq.' . $userId . ',addressee.eq.' . $userId . ')',
@@ -157,6 +161,7 @@ function handleGetFriends($data)
     }
 
     $profileMap = fetchProfilesMap($friendIds);
+    $presenceMap = fetchPresenceMap($friendIds);
     $friends = [];
     foreach ($friendIds as $fid) {
         $p = $profileMap[$fid] ?? null;
@@ -167,6 +172,7 @@ function handleGetFriends($data)
             'pet_type' => $p['pet_type'] ?? null,
             'breed' => $p['breed'] ?? null,
             'profile_photo_url' => $p['profile_photo_url'] ?? null,
+            'presence' => $presenceMap[$fid] ?? 'offline',
         ];
     }
 

@@ -236,6 +236,11 @@ function handleGetPlaydateDeck($data)
         if (!$cp)
             continue;
 
+        // Respect "Hide me from Playdates matching" (Settings > Privacy).
+        $candidatePrivacy = is_array($cp['privacy_settings'] ?? null) ? $cp['privacy_settings'] : [];
+        if (!empty($candidatePrivacy['hide_from_playdates']))
+            continue;
+
         // Hard filters: pet type preference and age range.
         if ($prefPetType !== 'Any' && strcasecmp($prefPetType, $cp['pet_type'] ?? '') !== 0)
             continue;
@@ -273,7 +278,7 @@ function fetchProfilesMapExtended($userIds)
         return [];
     $res = supabaseRequest('GET', '/rest/v1/profiles', [
         'user_id' => 'in.(' . implode(',', $userIds) . ')',
-        'select' => 'user_id,pet_name,pet_type,breed,current_city,profile_photo_url,bio,date_of_birth,gender',
+        'select' => 'user_id,pet_name,pet_type,breed,current_city,profile_photo_url,bio,date_of_birth,gender,privacy_settings',
     ]);
     if (supabaseFailed($res))
         return [];

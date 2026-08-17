@@ -127,7 +127,6 @@ $publicActions = [
     'verify_signup',
     'resend_signup_code',
     'public_login',
-    'get_build_id',
     'request_password_reset',
     'verify_password_reset_code',
     'reset_password',
@@ -201,7 +200,6 @@ if (!in_array($action, $publicActions, true)) {
 }
 
 $routes = [
-    'get_build_id' => 'handleGetBuildId',
     'signup' => 'handleSignup',
     'verify_signup' => 'handleVerifySignup',
     'resend_signup_code' => 'handleResendSignupCode',
@@ -220,6 +218,7 @@ $routes = [
 
     // Account settings
     'get_account_settings' => 'handleGetAccountSettings',
+    'set_online_status' => 'handleSetOnlineStatus',
     'change_account_credentials' => 'handleChangeAccountCredentials',
     'sign_out_other_devices' => 'handleSignOutOtherDevices',
     'get_privacy_settings' => 'handleGetPrivacySettings',
@@ -244,12 +243,13 @@ $routes = [
     'get_user_posts' => 'handleGetUserPosts',
     'delete_post' => 'handleDeletePost',
     'archive_post' => 'handleArchivePost',
+    'unarchive_post' => 'handleUnarchivePost',
     'report_post' => 'handleReportPost',
     'toggle_like' => 'handleToggleLike',
     'set_post_reaction' => 'handleSetPostReaction',
     'get_active_reactions' => 'handleGetActiveReactions',
     'add_comment' => 'handleAddComment',
-    'submit_comment' => 'handleSubmitComment',
+    'submit_comment' => 'handleAddComment',
     'get_comments' => 'handleGetComments',
     'delete_comment' => 'handleDeleteComment',
     'edit_comment' => 'handleEditComment',

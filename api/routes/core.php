@@ -112,15 +112,159 @@ function fetchProfilesMap($userIds)
     return $map;
 }
 
+// Presence is derived from users.last_active_at at read time (see plan step
+// 14 Part C) unless the pet parent has set a manual override via Settings >
+// Security (step 16 Part C1) — profiles.online_status: 'auto' (or empty)
+// falls through to the activity-based computation below; any of
+// online/away/busy/offline wins outright, matching eSamaj's own simple,
+// no-expiry manual-status behavior.
+function derivePresenceStatus($lastActiveAt, $manualStatus = null)
+{
+    if (in_array($manualStatus, ['online', 'away', 'busy', 'offline'], true)) {
+        return $manualStatus;
+    }
+    if (!$lastActiveAt) {
+        return 'offline';
+    }
+    $ts = strtotime($lastActiveAt);
+    if ($ts === false) {
+        return 'offline';
+    }
+    $diffSeconds = time() - $ts;
+    if ($diffSeconds < 5 * 60) {
+        return 'online';
+    }
+    if ($diffSeconds < 30 * 60) {
+        return 'away';
+    }
+    return 'offline';
+}
+
+function fetchPresenceMap($userIds)
+{
+    $userIds = normalizeUuidList($userIds);
+    if (empty($userIds)) {
+        return [];
+    }
+    $res = supabaseRequest('GET', '/rest/v1/users', [
+        'id' => 'in.(' . implode(',', $userIds) . ')',
+        'select' => 'id,last_active_at,profiles(online_status)',
+    ]);
+    if (supabaseFailed($res)) {
+        return [];
+    }
+    $map = [];
+    foreach (($res['data'] ?? []) as $row) {
+        $profileEmbed = normaliseProfileEmbed($row['profiles'] ?? []);
+        $manualStatus = $profileEmbed['online_status'] ?? null;
+        $map[$row['id']] = derivePresenceStatus($row['last_active_at'] ?? null, $manualStatus);
+    }
+    return $map;
+}
+
+// Resolves the relationship between two users for the profile-viewing UI's
+// action button (Add Friend / Request Pending / Message / Your Profile).
+function resolveFriendshipStatus($userId, $otherId)
+{
+    if ($userId === $otherId) {
+        return ['status' => 'self', 'friendship_id' => null];
+    }
+    $res = supabaseRequest('GET', '/rest/v1/friendships', [
+        'or' => '(and(requester.eq.' . $userId . ',addressee.eq.' . $otherId . '),and(requester.eq.' . $otherId . ',addressee.eq.' . $userId . '))',
+        'select' => 'id,requester,addressee,status',
+        'limit' => '1',
+    ]);
+    if (supabaseFailed($res) || empty($res['data'])) {
+        return ['status' => 'none', 'friendship_id' => null];
+    }
+    $row = $res['data'][0];
+    if ($row['status'] === 'accepted') {
+        return ['status' => 'accepted', 'friendship_id' => $row['id']];
+    }
+    return ['status' => $row['requester'] === $userId ? 'pending_sent' : 'pending_received', 'friendship_id' => $row['id']];
+}
+
+// Own profile (no target_user_id, or target === caller) returns everything,
+// unfiltered — matches the existing behavior every current self-fetch caller
+// (hub_widgets.js, profile.js) already relies on. Viewing ANOTHER member's
+// profile applies real privacy filtering: normalizeVisibility()'s
+// public|pet_type|breed|private against the viewer's own pet_type/breed
+// (bypassed entirely for accepted friends), plus per-field hide_phone/
+// hide_email toggles from profiles.privacy_settings. A blocked view returns
+// a graceful minimal "limited" card rather than a 404.
 function handleGetProfile($data)
 {
-    $userId = requireUuid($data['target_user_id'] ?? $data['user_id'] ?? '', 'user_id');
-    $profile = getAccountProfile($userId);
+    $callerId = requireUuid($data['user_id'] ?? '', 'user_id');
+    $targetId = !empty($data['target_user_id']) ? requireUuid($data['target_user_id'], 'target_user_id') : $callerId;
+    if (!$targetId) {
+        return;
+    }
+
+    $profile = getAccountProfile($targetId);
     if (empty($profile)) {
         jsonError("Profile not found.", 404);
         return;
     }
-    jsonSuccess(['profile' => $profile]);
+
+    // is_verified/handle live on users, not profiles — getAccountProfile()'s
+    // select is shared by other callers that don't need them, so a small
+    // targeted query here rather than widening it.
+    $userRes = supabaseRequest('GET', '/rest/v1/users', [
+        'id' => 'eq.' . $targetId,
+        'select' => 'is_verified,verified_at,handle',
+        'limit' => '1',
+    ]);
+    if (!supabaseFailed($userRes) && !empty($userRes['data'])) {
+        $profile['is_verified'] = $userRes['data'][0]['is_verified'] ?? false;
+        $profile['verified_at'] = $userRes['data'][0]['verified_at'] ?? null;
+        $profile['handle'] = $userRes['data'][0]['handle'] ?? null;
+    }
+
+    if ($targetId === $callerId) {
+        $profile['presence'] = fetchPresenceMap([$targetId])[$targetId] ?? 'offline';
+        jsonSuccess(['profile' => $profile, 'friendship' => ['status' => 'self', 'friendship_id' => null]]);
+        return;
+    }
+
+    $friendship = resolveFriendshipStatus($callerId, $targetId);
+    $isFriend = $friendship['status'] === 'accepted';
+    $privacy = is_array($profile['privacy_settings'] ?? null) ? $profile['privacy_settings'] : [];
+
+    if (!$isFriend) {
+        $visibility = normalizeVisibility($profile['visibility'] ?? 'public');
+        $allowed = true;
+        if ($visibility === 'private') {
+            $allowed = false;
+        } elseif ($visibility === 'pet_type' || $visibility === 'breed') {
+            $viewerProfile = getAccountProfile($callerId);
+            $allowed = $visibility === 'pet_type'
+                ? (($viewerProfile['pet_type'] ?? null) === ($profile['pet_type'] ?? null))
+                : (($viewerProfile['breed'] ?? null) === ($profile['breed'] ?? null));
+        }
+        if (!$allowed) {
+            jsonSuccess([
+                'profile' => [
+                    'user_id' => $profile['user_id'],
+                    'pet_name' => $profile['pet_name'],
+                    'profile_photo_url' => $profile['profile_photo_url'],
+                    'pet_type' => $profile['pet_type'],
+                    'is_limited' => true,
+                ],
+                'friendship' => $friendship,
+            ]);
+            return;
+        }
+
+        if (!empty($privacy['hide_phone'])) {
+            $profile['mobile_number'] = null;
+        }
+    }
+
+    $profile['presence'] = empty($privacy['hide_online_status']) || $isFriend
+        ? (fetchPresenceMap([$targetId])[$targetId] ?? 'offline')
+        : 'hidden';
+
+    jsonSuccess(['profile' => $profile, 'friendship' => $friendship]);
 }
 
 function handleUpdateProfile($data)

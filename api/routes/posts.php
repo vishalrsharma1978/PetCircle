@@ -18,6 +18,22 @@ function enrichPosts($posts, $viewerUserId = null)
     $authorIds = normalizeUuidList(array_column($posts, 'user_id'));
     $profileMap = fetchProfilesMap($authorIds);
 
+    // Handle lives on users, not profiles — a small targeted query rather
+    // than widening fetchProfilesMap()'s select, since that helper is reused
+    // by callers that don't need it.
+    $handleMap = [];
+    if (!empty($authorIds)) {
+        $handleRes = supabaseRequest('GET', '/rest/v1/users', [
+            'id' => 'in.(' . implode(',', $authorIds) . ')',
+            'select' => 'id,handle',
+        ]);
+        foreach (($handleRes['data'] ?? []) as $row) {
+            if (!empty($row['handle'])) {
+                $handleMap[$row['id']] = $row['handle'];
+            }
+        }
+    }
+
     $likeCounts = [];
     $reactionSummaries = [];
     $viewerLikes = [];
@@ -59,15 +75,18 @@ function enrichPosts($posts, $viewerUserId = null)
         }
     }
 
-    return array_map(function ($post) use ($profileMap, $likeCounts, $reactionSummaries, $viewerLikes, $viewerReactions, $commentCounts) {
-        $author = $profileMap[$post['user_id']] ?? null;
+    return array_map(function ($post) use ($profileMap, $handleMap, $likeCounts, $reactionSummaries, $viewerLikes, $viewerReactions, $commentCounts) {
+        $authorId = $post['user_id'];
+        $author = $profileMap[$authorId] ?? null;
+
         $post['author'] = $author ? [
-            'user_id' => $post['user_id'],
+            'user_id' => $authorId,
             'name' => $author['pet_name'] ?? $author['full_name'] ?? 'Member',
+            'handle' => $handleMap[$authorId] ?? null,
             'pet_type' => $author['pet_type'] ?? null,
             'breed' => $author['breed'] ?? null,
             'profile_photo_url' => $author['profile_photo_url'] ?? null,
-        ] : ['user_id' => $post['user_id'], 'name' => 'Member'];
+        ] : ['user_id' => $authorId, 'name' => 'Member', 'handle' => $handleMap[$authorId] ?? null];
         $post['like_count'] = $likeCounts[$post['id']] ?? 0;
         $post['reaction_summary'] = $reactionSummaries[$post['id']] ?? [];
         $post['comment_count'] = $commentCounts[$post['id']] ?? 0;
@@ -190,16 +209,26 @@ function handleGetPosts($data)
 
 function handleGetUserPosts($data)
 {
-    $userId = requireUuid($data['target_user_id'] ?? $data['user_id'] ?? '', 'user_id');
+    // Archived posts are private — only ever the caller's own, never a
+    // target_user_id's, regardless of what's passed.
+    $wantsArchived = !empty($data['archived']);
+    $userId = $wantsArchived
+        ? requireUuid($data['user_id'] ?? '', 'user_id')
+        : requireUuid($data['target_user_id'] ?? $data['user_id'] ?? '', 'user_id');
+    if (!$userId) {
+        return;
+    }
     $limit = isset($data['limit']) ? max(1, min((int) $data['limit'], 100)) : 50;
+    $offset = isset($data['offset']) ? max(0, (int) $data['offset']) : 0;
 
     $res = supabaseRequest('GET', '/rest/v1/posts', [
         'user_id' => 'eq.' . $userId,
         'is_deleted' => 'eq.false',
-        'is_archived' => 'eq.false',
+        'is_archived' => $wantsArchived ? 'eq.true' : 'eq.false',
         'select' => 'id,user_id,content,media_url,post_type,pet_type,breed,is_deleted,created_at,updated_at,hashtags',
         'order' => 'created_at.desc',
         'limit' => (string) $limit,
+        'offset' => (string) $offset,
     ]);
 
     if (supabaseFailed($res)) {
@@ -657,6 +686,28 @@ function handleArchivePost($data)
     }
 
     jsonSuccess(["message" => "Post archived."]);
+}
+
+function handleUnarchivePost($data)
+{
+    if (!requireFields($data, ['user_id', 'post_id']))
+        return;
+
+    $res = supabaseRequest('PATCH', '/rest/v1/posts', [
+        'id' => 'eq.' . $data['post_id'],
+        'user_id' => 'eq.' . $data['user_id'],
+    ], ['is_archived' => false, 'updated_at' => gmdate('c')], ['Prefer: return=representation']);
+
+    if (supabaseFailed($res)) {
+        sendSupabaseError("Failed to unarchive post.", $res);
+        return;
+    }
+    if (empty($res['data'])) {
+        jsonError("Post not found.", 404);
+        return;
+    }
+
+    jsonSuccess(["message" => "Post restored to your feed."]);
 }
 
 function handleReportPost($data)

@@ -49,6 +49,27 @@ function handleGetAccountSettings($data)
     ]);
 }
 
+// Manual presence override (step 16 Part C1) — 'auto' (or unset) leaves
+// presence purely activity-derived (derivePresenceStatus in core.php);
+// any of online/away/busy/offline wins outright wherever presence is read.
+function handleSetOnlineStatus($data)
+{
+    $userId = requireUuid($data['user_id'] ?? '', 'user_id');
+    $status = (string) ($data['online_status'] ?? '');
+    if (!in_array($status, ['auto', 'online', 'away', 'busy', 'offline'], true)) {
+        jsonError("online_status must be one of: auto, online, away, busy, offline.", 400);
+        return;
+    }
+
+    $res = supabaseRequest('PATCH', '/rest/v1/profiles', ['user_id' => 'eq.' . $userId], ['online_status' => $status], ['Prefer: return=minimal']);
+    if (supabaseFailed($res)) {
+        sendSupabaseError("Failed to update online status.", $res);
+        return;
+    }
+
+    jsonSuccess(["online_status" => $status]);
+}
+
 // ---------------- Credential changes ----------------
 
 function handleChangeAccountCredentials($data)
@@ -129,7 +150,7 @@ function handleSignOutOtherDevices($data)
 
 // ---------------- Privacy ----------------
 
-$GLOBALS['SETTINGS_PRIVACY_KEYS'] = ['hide_online_status', 'hide_phone', 'hide_email'];
+$GLOBALS['SETTINGS_PRIVACY_KEYS'] = ['hide_online_status', 'hide_phone', 'hide_email', 'hide_from_playdates'];
 
 function handleGetPrivacySettings($data)
 {

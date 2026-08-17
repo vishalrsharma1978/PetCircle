@@ -94,21 +94,24 @@ function postCardHtml(post, index = 0) {
 
   const menuBtn = `
     <div class="relative flex-shrink-0">
-      <button onclick="event.stopPropagation(); togglePostMenu(event, 'post-menu-${post.id}')" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"><i data-lucide="more-vertical" class="w-4 h-4"></i></button>
-      <div id="post-menu-${post.id}" class="post-dropdown-menu hidden absolute right-0 mt-1 w-36 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-30">
+      <button onclick="event.stopPropagation(); toggleDropdownMenu(event, 'post-menu-${post.id}')" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"><i data-lucide="more-vertical" class="w-4 h-4"></i></button>
+      <div id="post-menu-${post.id}" class="dropdown-menu hidden absolute right-0 mt-1 w-36 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-30">
         ${menuItems}
       </div>
     </div>`;
 
   return `
-  <div class="warm-glass warm-lift rounded-2xl p-4 cursor-pointer relative" style="z-index: ${1000 - (typeof index === 'number' ? index : 0)};" data-post-id="${post.id}" onclick="openPostPage('${post.id}')">
+  <div class="warm-glass warm-lift rounded-2xl p-4 cursor-pointer relative" style="z-index: ${Math.max(1, 30 - (typeof index === 'number' ? index : 0))};" data-post-id="${post.id}" onclick="openPostPage('${post.id}')">
     <div class="flex items-start justify-between gap-2">
       <div class="flex items-center gap-3 min-w-0">
-        <div class="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center overflow-hidden flex-shrink-0 ring-2 ring-transparent hover:ring-brand-400 transition-all">
+        <div class="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center overflow-hidden flex-shrink-0 ring-2 ring-transparent hover:ring-brand-400 transition-all cursor-pointer" onclick="event.stopPropagation(); openMemberProfile('${author.user_id}')">
           ${author.profile_photo_url ? `<img src="${escapeHtml(author.profile_photo_url)}" class="w-full h-full object-cover">` : `<span class="font-bold text-brand-700 dark:text-brand-300">${escapeHtml((author.name || "P")[0])}</span>`}
         </div>
         <div class="min-w-0">
-          <p class="font-bold text-sm text-gray-900 dark:text-white truncate">${escapeHtml(author.name || "Member")}</p>
+          <p class="font-bold text-sm text-gray-900 dark:text-white truncate cursor-pointer hover:underline flex items-center gap-1" onclick="event.stopPropagation(); openMemberProfile('${author.user_id}')">
+            <span class="truncate">${escapeHtml(author.name || "Member")}</span>
+            ${author.handle ? `<span class="text-xs text-gray-500 dark:text-gray-400 font-normal flex-shrink-0">@${escapeHtml(author.handle)}</span>` : ""}
+          </p>
           <p class="text-xs text-gray-400">${[author.pet_type, author.breed].filter(Boolean).map(escapeHtml).join(" · ")} · ${timeAgo(post.created_at)}</p>
         </div>
       </div>
@@ -135,7 +138,7 @@ function postCardHtml(post, index = 0) {
         </div>
       </div>
       <div id="reaction-badge-${post.id}" class="inline-flex items-center gap-1 mr-auto">${renderReactionBadgeHtml(post)}</div>
-      <button onclick="event.stopPropagation(); toggleCommentBox('${post.id}')" class="flex items-center gap-1.5 text-sm font-semibold text-gray-500 dark:text-gray-400">
+      <button onclick="event.stopPropagation(); toggleComments('${post.id}')" class="flex items-center gap-1.5 text-sm font-semibold text-gray-500 dark:text-gray-400">
         <i data-lucide="message-circle" class="w-4 h-4"></i>
         <span data-comment-count>${post.comment_count}</span>
       </button>
@@ -151,15 +154,15 @@ function postCardHtml(post, index = 0) {
   </div>`;
 }
 
-function togglePostMenu(evt, menuId) {
+function toggleDropdownMenu(evt, menuId) {
   evt.stopPropagation();
-  document.querySelectorAll('.post-dropdown-menu').forEach((menu) => {
+  document.querySelectorAll('.dropdown-menu').forEach((menu) => {
     if (menu.id !== menuId) menu.classList.add("hidden");
   });
   document.getElementById(menuId)?.classList.toggle("hidden");
 }
 document.addEventListener("click", () => {
-  document.querySelectorAll('.post-dropdown-menu').forEach((menu) => menu.classList.add("hidden"));
+  document.querySelectorAll('.dropdown-menu').forEach((menu) => menu.classList.add("hidden"));
 });
 
 function postDetailSkeletonHtml() {
@@ -209,9 +212,10 @@ async function openPostPage(postId) {
     const isMine = currentUserObj && post.user_id === currentUserObj.id;
     const author = post.author || {};
     const safeAuthorName = escapeHtml(author.name || "Member");
-    const safeAvatar = author.profile_photo_url 
-      ? `<img src="${escapeHtml(author.profile_photo_url)}" class="w-11 h-11 rounded-full object-cover">`
-      : `<div class="w-11 h-11 bg-brand-100 dark:bg-brand-900/40 rounded-full flex items-center justify-center font-bold text-brand-700 dark:text-brand-300">${safeAuthorName[0]}</div>`;
+    const safeAuthorId = String(author.user_id || "").replace(/'/g, "\\'");
+    const safeAvatar = author.profile_photo_url
+      ? `<img src="${escapeHtml(author.profile_photo_url)}" class="w-11 h-11 rounded-full object-cover cursor-pointer" onclick="openMemberProfile('${safeAuthorId}')">`
+      : `<div class="w-11 h-11 bg-brand-100 dark:bg-brand-900/40 rounded-full flex items-center justify-center font-bold text-brand-700 dark:text-brand-300 cursor-pointer" onclick="openMemberProfile('${safeAuthorId}')">${safeAuthorName[0]}</div>`;
       
     const menuItems = isMine
       ? `<button onclick="event.stopPropagation(); deletePost('${post.id}')" class="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete post</button>
@@ -222,8 +226,8 @@ async function openPostPage(postId) {
 
     const moreHtml = `
       <div class="relative flex-shrink-0">
-        <button onclick="togglePostMenu(event, 'detail-post-menu-${post.id}')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
-        <div id="detail-post-menu-${post.id}" class="post-dropdown-menu hidden absolute right-0 mt-1 w-44 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-30 py-1">
+        <button onclick="toggleDropdownMenu(event, 'detail-post-menu-${post.id}')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+        <div id="detail-post-menu-${post.id}" class="dropdown-menu hidden absolute right-0 mt-1 w-44 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-30 py-1">
           ${menuItems}
         </div>
       </div>`;
@@ -257,7 +261,8 @@ async function openPostPage(postId) {
               ${safeAvatar}
               <div class="min-w-0">
                 <div class="flex flex-wrap items-center gap-1.5 text-sm font-bold text-gray-900 dark:text-gray-100">
-                  <span class="hover:underline flex items-center gap-1">${safeAuthorName}</span>
+                  <span class="cursor-pointer hover:underline flex items-center gap-1" onclick="openMemberProfile('${safeAuthorId}')">${safeAuthorName}</span>
+                  ${author.handle ? `<span class="text-xs text-gray-500 dark:text-gray-400 font-normal">@${escapeHtml(author.handle)}</span>` : ""}
                 </div>
                 <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">${timeAgo(post.created_at)}</div>
               </div>
@@ -766,7 +771,7 @@ function archiveComment(postId, commentId) {
 
 async function deleteComment(postId, commentId) {
   document.querySelectorAll(".comment-menu").forEach((m) => m.classList.add("hidden"));
-  if (!(await showConfirm("Delete comment?", "This cannot be undone.", { confirmText: "Delete", danger: true }))) return;
+  if (!confirm("Delete this comment? This cannot be undone.")) return;
   const post = feedPosts.find((p) => String(p.id) === String(postId));
   if (post && Array.isArray(post.commentList)) {
     post.commentList = post.commentList.filter((c) => String(c.id) !== String(commentId));
@@ -966,18 +971,46 @@ async function reactToPost(postId, key) {
     });
     if (data.status !== "success") throw new Error(data.message || "Could not react.");
 
-    post.reaction = data.reaction ?? null;
-    post.viewer_reaction = data.reaction ?? null;
-    if (data.reaction_summary && typeof data.reaction_summary === "object") {
-      post.reaction_summary = data.reaction_summary;
-    }
-    updatePostReactionDom(postId);
+    // Intentionally omitting overwrite of local state on success to prevent race conditions.
   } catch (err) {
     restorePostReaction(post, snap);
     updatePostReactionDom(postId);
     console.error(err);
     showToast(err.message || "Could not react.", "error");
   }
+}
+
+function openPostReactions(postId) {
+  const post = feedPosts.find((p) => String(p.id) === String(postId));
+  const summary = (post && post.reaction_summary) || {};
+  const keys = Object.keys(summary).filter((k) => summary[k] > 0).sort((a, b) => summary[b] - summary[a]);
+
+  let overlay = document.getElementById("post-reactions-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.id = "post-reactions-overlay";
+    overlay.className = "fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4";
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+    document.body.appendChild(overlay);
+  }
+  overlay.innerHTML = `
+    <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-xs max-h-[70vh] overflow-hidden flex flex-col">
+      <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between flex-shrink-0">
+        <h3 class="font-bold text-gray-900 dark:text-white">Reactions</h3>
+        <button onclick="document.getElementById('post-reactions-overlay').remove()" class="p-1.5 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-4 space-y-2">
+        ${keys.length ? keys.map((k) => {
+          const r = resolveReaction(k);
+          return `<div class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+            <span class="w-5 h-5 flex items-center justify-center">${reactionGlyphHtml(k, "w-4 h-4")}</span>
+            <span class="flex-1">${escapeHtml(r ? r.label : "Reaction")}</span>
+            <span class="font-semibold text-gray-400">${summary[k]}</span>
+          </div>`;
+        }).join("") : `<p class="text-sm text-gray-400 text-center py-6">No reactions yet.</p>`}
+      </div>
+    </div>`;
+  if (window.lucide) lucide.createIcons();
 }
 
 function copyPostLink(postId) {
@@ -987,7 +1020,7 @@ function copyPostLink(postId) {
   }).catch(err => {
     console.error('Could not copy link', err);
   });
-  document.querySelectorAll('.post-dropdown-menu').forEach((menu) => menu.classList.add("hidden"));
+  document.querySelectorAll('.dropdown-menu').forEach((menu) => menu.classList.add("hidden"));
 }
 
 async function deletePost(postId) {

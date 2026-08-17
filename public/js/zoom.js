@@ -34,6 +34,7 @@ let currentZoomJoinUrl = null;
 let currentZoomCallId = null;
 let currentZoomCallGroupId = null;
 let currentZoomCallFriendId = null;
+let currentZoomCallIsHost = false;
 let zoomCallHasJoined = false;
 let zoomLeaveInProgress = false;
 
@@ -48,6 +49,7 @@ function activateZoomCallShell(joinUrl = null) {
   document.body.classList.remove("zoom-call-minimized", "zoom-call-compact", "zoom-call-fullscreen");
   document.body.classList.add("zoom-call-active", "zoom-call-large", "zoom-call-prejoin");
   updateZoomSizeToggleButton();
+  document.getElementById("zoom-end-call-btn")?.classList.toggle("hidden", !currentZoomCallIsHost);
 }
 
 function markZoomCallJoined() {
@@ -191,6 +193,31 @@ function cleanupZoomShellState() {
   setTimeout(clearZoomSdkDom, 1200);
   currentZoomJoinUrl = null;
   zoomCallHasJoined = false;
+  currentZoomCallIsHost = false;
+  document.getElementById("zoom-end-call-btn")?.classList.add("hidden");
+}
+
+// Host-only: ends the call for every participant (zoom_end_call), distinct
+// from leaveZoomCallShell()'s self-only zoom_mark_participant("left"). The
+// toolbar button is hidden client-side for non-hosts (activateZoomCallShell),
+// and the backend independently enforces creator-only too.
+async function endZoomCallForEveryone() {
+  if (!currentZoomCallId || !currentZoomCallIsHost) return;
+  if (!confirm("End this call for everyone?")) return;
+  const callId = currentZoomCallId;
+  try {
+    await leaveZoomMeetingSdk();
+    cleanupZoomShellState();
+    const data = await api("zoom_end_call", { call_id: callId });
+    if (data.status !== "success") {
+      showToast(data.message || "Could not end the call.", "error");
+    }
+  } catch (err) {
+    console.error(err);
+    showToast("Could not end the call.", "error");
+  } finally {
+    cleanupZoomShellState();
+  }
 }
 
 function markCurrentZoomParticipantLeft() {
@@ -333,6 +360,7 @@ async function startZoomCall({ callType, targetType, friendId = null, groupId = 
       group_id: groupId || "",
     });
     if (data.status !== "success") throw new Error(data.message || "Could not start the call.");
+    currentZoomCallIsHost = true;
 
     await joinZoomMeetingInPage(data.zoom, {
       userName: getZoomDisplayName(),
@@ -359,6 +387,7 @@ async function joinZoomCall(callId) {
   try {
     const data = await api("zoom_join_call", { call_id: callId });
     if (data.status !== "success") throw new Error(data.message || "Could not join the call.");
+    currentZoomCallIsHost = false;
 
     await joinZoomMeetingInPage(data.zoom, {
       userName: getZoomDisplayName(),

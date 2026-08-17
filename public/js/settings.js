@@ -1,15 +1,23 @@
-// Account Settings: a focused, real-features-only port of eSamaj's Settings
-// tab (Overview, Personal details, Security, Privacy, Blocked accounts,
-// Danger zone). eSamaj's Community/Family/Galleries/Posts/Archived sections
-// were deliberately not ported — see the step-13g plan for why (they either
-// don't map onto this pet-focused app or duplicate tabs this app already has).
+// Account Settings: a full remaster of eSamaj's Settings tab (step 16),
+// building on the step-13g/14 focused pass. Galleries/Manage-family sections
+// stay unbuilt here since they'd duplicate this app's existing Galleries and
+// Pack Tree tabs; eSamaj's secondary-community "switch between pets" concept
+// has no buildable analog (profiles.user_id is this schema's primary key —
+// one profile per account, confirmed via pg_constraint — a real multi-pet
+// account model, not a Settings addition); horoscope has no pet-app analog.
+// Pet Identity (step 16 Part C4) is this app's analog of eSamaj's primary
+// religion/community change panel, reusing the already-built, already-tested
+// change_pet_type_breed action from build-sequence step 3.
 
 const SETTINGS_SECTIONS = [
   { key: "overview", label: "Overview", icon: "layout-dashboard" },
   { key: "personal", label: "Personal details", icon: "id-card" },
+  { key: "identity", label: "Pet identity", icon: "paw-print" },
   { key: "security", label: "Security", icon: "shield-check" },
   { key: "privacy", label: "Privacy", icon: "eye-off" },
   { key: "blocked", label: "Blocked accounts", icon: "user-x" },
+  { key: "posts", label: "My posts", icon: "image" },
+  { key: "archived", label: "Archived", icon: "archive" },
   { key: "danger", label: "Danger zone", icon: "triangle-alert" },
 ];
 
@@ -21,6 +29,8 @@ let settingsState = {
   currentSessionId: null,
   privacySettings: {},
   blockedUsers: [],
+  myPosts: null,
+  archivedPosts: null,
 };
 
 async function loadAccountSettings() {
@@ -50,6 +60,8 @@ async function loadAccountSettings() {
 function switchSettingsSection(key) {
   settingsState.activeSection = key;
   renderSettingsTab();
+  if (key === "posts" && settingsState.myPosts === null) loadSettingsMyPosts();
+  if (key === "archived" && settingsState.archivedPosts === null) loadSettingsArchivedPosts();
 }
 
 function renderSettingsTab() {
@@ -68,14 +80,18 @@ function renderSettingsTab() {
       <div class="flex-1 min-w-0">${renderSettingsSectionHtml(settingsState.activeSection)}</div>
     </div>`;
   if (window.lucide) lucide.createIcons();
+  if (settingsState.activeSection === "identity") initSettingsIdentitySelects();
 }
 
 function renderSettingsSectionHtml(section) {
   switch (section) {
     case "personal": return renderSettingsPersonalHtml();
+    case "identity": return renderSettingsIdentityHtml();
     case "security": return renderSettingsSecurityHtml();
     case "privacy": return renderSettingsPrivacyHtml();
     case "blocked": return renderSettingsBlockedHtml();
+    case "posts": return renderSettingsMyPostsHtml();
+    case "archived": return renderSettingsArchivedPostsHtml();
     case "danger": return renderSettingsDangerHtml();
     default: return renderSettingsOverviewHtml();
   }
@@ -166,13 +182,141 @@ async function saveSettingsPersonal() {
   }
 }
 
+// ---------------- Pet identity ----------------
+// The pet-native analog of eSamaj's primary "Change religion/community"
+// panel — reuses change_pet_type_breed (build-sequence step 3), which
+// already drops now-mismatched group memberships server-side.
+
+function renderSettingsIdentityHtml() {
+  const p = settingsState.profile || {};
+  return `
+    <div class="warm-glass rounded-2xl p-5 space-y-3 max-w-lg">
+      <h3 class="font-bold text-gray-900 dark:text-white">Pet identity</h3>
+      <p class="text-xs text-gray-500 dark:text-gray-400">Currently: ${escapeHtml(p.pet_type || "—")} · ${escapeHtml(p.breed || "—")}</p>
+      <div class="rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/10 p-3 text-xs text-amber-700 dark:text-amber-400">
+        Changing pet type or breed removes you from any groups scoped to your current one, and may change your feed/search visibility if it's set to "my pet type only" or "my breed only". Friendships are not affected.
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Pet type</label>
+          <select id="settings-identity-pet-type" onchange="updateBreedOptions('settings-identity-pet-type','settings-identity-breed')"
+            class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-gray-50 dark:bg-gray-800 dark:text-white">
+            <option value="">Select…</option>
+            <option value="Dog">Dog</option>
+            <option value="Cat">Cat</option>
+            <option value="Bird">Bird</option>
+            <option value="Fish">Fish</option>
+            <option value="Small Pet">Small Pet</option>
+            <option value="Reptile">Reptile</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Breed</label>
+          <select id="settings-identity-breed" class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-gray-50 dark:bg-gray-800 dark:text-white">
+            <option value="">Select breed…</option>
+          </select>
+        </div>
+      </div>
+      <button id="settings-identity-save-btn" type="button" onclick="saveSettingsPetIdentity()" class="px-4 py-2 rounded-xl text-sm font-bold text-white bg-brand-500 hover:bg-brand-600">Save changes</button>
+    </div>`;
+}
+
+function initSettingsIdentitySelects() {
+  const p = settingsState.profile || {};
+  if (typeof selectBreedWithValue === "function") {
+    selectBreedWithValue("settings-identity-pet-type", "settings-identity-breed", p.pet_type, p.breed);
+  }
+}
+
+async function saveSettingsPetIdentity() {
+  const petType = document.getElementById("settings-identity-pet-type").value;
+  const breed = document.getElementById("settings-identity-breed").value;
+  const p = settingsState.profile || {};
+  if (!petType || !breed) {
+    showToast("Choose a pet type and breed.", "info");
+    return;
+  }
+  if (petType === p.pet_type && breed === p.breed) {
+    showToast("No changes to save.", "info");
+    return;
+  }
+  if (!confirm("Change your pet type/breed? This removes you from any groups scoped to the current one.")) return;
+
+  const btn = document.getElementById("settings-identity-save-btn");
+  setButtonLoading(btn, true, "Saving…");
+  try {
+    const data = await api("change_pet_type_breed", { pet_type: petType, breed });
+    if (data.status !== "success") {
+      showToast(data.message || "Could not update pet type/breed.", "error");
+      return;
+    }
+    if (data.removed_group_count > 0) {
+      showToast(`Removed from ${data.removed_group_count} group(s) that no longer match.`, "info");
+    }
+    showToast("Pet identity updated.", "success");
+    loadAccountSettings();
+  } catch (err) {
+    console.error(err);
+    showToast("Could not update pet type/breed.", "error");
+  } finally {
+    setButtonLoading(btn, false);
+  }
+}
+
 // ---------------- Security ----------------
+
+const SETTINGS_ONLINE_STATUS_OPTIONS = [
+  { value: "auto", label: "Auto", hint: "Based on your recent activity" },
+  { value: "online", label: "Online", hint: "Always show as online" },
+  { value: "away", label: "Away", hint: "Always show as away" },
+  { value: "busy", label: "Busy", hint: "Always show as busy" },
+  { value: "offline", label: "Offline", hint: "Always show as offline" },
+];
 
 function renderSettingsSecurityHtml() {
   const account = settingsState.account || {};
+  const profile = settingsState.profile || {};
   const sessions = settingsState.activeSessions || [];
+  const currentStatus = profile.online_status && SETTINGS_ONLINE_STATUS_OPTIONS.some((o) => o.value === profile.online_status)
+    ? profile.online_status
+    : "auto";
   return `
     <div class="space-y-5 max-w-lg">
+      <div class="warm-glass rounded-2xl p-5 space-y-3">
+        <h3 class="font-bold text-gray-900 dark:text-white">Account info</h3>
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <div><p class="text-[10px] uppercase text-gray-400 font-bold">User ID</p><p class="text-gray-700 dark:text-gray-300 truncate" title="${escapeHtml(account.id || "")}">${escapeHtml((account.id || "—").slice(0, 8))}…</p></div>
+          <div><p class="text-[10px] uppercase text-gray-400 font-bold">Email</p><p class="text-gray-700 dark:text-gray-300 truncate">${escapeHtml(account.email || "—")}</p></div>
+          <div><p class="text-[10px] uppercase text-gray-400 font-bold">Account type</p><p class="text-gray-700 dark:text-gray-300 capitalize">${escapeHtml((account.role || "member").replace(/_/g, " "))}</p></div>
+          <div><p class="text-[10px] uppercase text-gray-400 font-bold">Verified</p><p class="text-gray-700 dark:text-gray-300">${account.is_verified ? "Yes" : "Not yet"}</p></div>
+          <div><p class="text-[10px] uppercase text-gray-400 font-bold">Created</p><p class="text-gray-700 dark:text-gray-300">${account.created_at ? new Date(account.created_at).toLocaleDateString() : "—"}</p></div>
+          <div><p class="text-[10px] uppercase text-gray-400 font-bold">Profile visibility</p><p class="text-gray-700 dark:text-gray-300 capitalize">${escapeHtml((profile.visibility || "public").replace(/_/g, " "))}</p></div>
+          <div><p class="text-[10px] uppercase text-gray-400 font-bold">Active sessions</p><p class="text-gray-700 dark:text-gray-300">${sessions.length}</p></div>
+        </div>
+      </div>
+
+      <div class="warm-glass rounded-2xl p-5 space-y-3">
+        <h3 class="font-bold text-gray-900 dark:text-white">Security checklist</h3>
+        <div class="space-y-1.5 text-sm">
+          <div class="flex items-center gap-2 text-gray-700 dark:text-gray-300"><i data-lucide="check-circle" class="w-4 h-4 text-green-500 flex-shrink-0"></i> Email linked (${escapeHtml(account.email || "—")})</div>
+          <div class="flex items-center gap-2 text-gray-700 dark:text-gray-300"><i data-lucide="check-circle" class="w-4 h-4 text-green-500 flex-shrink-0"></i> Password set</div>
+        </div>
+      </div>
+
+      <div class="warm-glass rounded-2xl p-5 space-y-3">
+        <h3 class="font-bold text-gray-900 dark:text-white">Online status</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Auto shows online/away/offline based on your recent activity. Override it to always show a fixed status.</p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          ${SETTINGS_ONLINE_STATUS_OPTIONS.map((o) => `
+            <button type="button" data-online-status-option="${o.value}" onclick="saveSettingsOnlineStatus('${o.value}')"
+              class="px-3 py-2 rounded-xl text-xs font-bold border transition-colors ${currentStatus === o.value
+                ? "bg-brand-500 border-brand-500 text-white"
+                : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-brand-300"}"
+              title="${escapeHtml(o.hint)}">${o.label}</button>`).join("")}
+        </div>
+      </div>
+
       <div class="warm-glass rounded-2xl p-5 space-y-3">
         <h3 class="font-bold text-gray-900 dark:text-white">Change email or password</h3>
         <p class="text-xs text-gray-500 dark:text-gray-400">Current email: ${escapeHtml(account.email || "")}</p>
@@ -180,6 +324,27 @@ function renderSettingsSecurityHtml() {
         <input id="settings-new-email" type="email" placeholder="New email (optional)" class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-gray-50 dark:bg-gray-800 dark:text-white">
         <input id="settings-new-password" type="password" placeholder="New password (optional, 10+ chars)" class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-gray-50 dark:bg-gray-800 dark:text-white">
         <button id="settings-credentials-save-btn" type="button" onclick="saveSettingsCredentials()" class="px-4 py-2 rounded-xl text-sm font-bold text-white bg-brand-500 hover:bg-brand-600">Update</button>
+      </div>
+
+      <div class="warm-glass rounded-2xl p-5 space-y-3">
+        <h3 class="font-bold text-gray-900 dark:text-white">Handle</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400">A unique @handle for your pet's profile. 5-20 characters, letters/numbers/underscores only.</p>
+        <div class="flex items-center gap-2">
+          <span class="text-gray-400 font-bold">@</span>
+          <input id="settings-handle-input" type="text" value="${escapeHtml(account.handle || "")}" placeholder="pawsome_pup" class="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-gray-50 dark:bg-gray-800 dark:text-white">
+          <button id="settings-handle-save-btn" type="button" onclick="saveSettingsHandle()" class="px-4 py-2 rounded-xl text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 flex-shrink-0">Save</button>
+        </div>
+      </div>
+
+      <div class="warm-glass rounded-2xl p-5 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-gray-900 dark:text-white">Verified Pet Parent</h3>
+          ${settingsState.account?.is_verified
+            ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 flex items-center gap-1"><i data-lucide="badge-check" class="w-3 h-3"></i> Verified</span>`
+            : ""}
+        </div>
+        <p class="text-xs text-gray-500 dark:text-gray-400">${settingsState.account?.is_verified ? "Your pet's profile shows a verified badge." : "Get a verified badge on your pet's profile."}</p>
+        <button type="button" onclick="openVerificationModal()" class="px-4 py-2 rounded-xl text-sm font-bold text-white bg-brand-500 hover:bg-brand-600">${settingsState.account?.is_verified ? "View verification" : "Get Verified"}</button>
       </div>
 
       <div class="warm-glass rounded-2xl p-5 space-y-3">
@@ -196,6 +361,50 @@ function renderSettingsSecurityHtml() {
         </div>
       </div>
     </div>`;
+}
+
+async function saveSettingsHandle() {
+  const handle = document.getElementById("settings-handle-input").value.trim();
+  if (!/^[a-zA-Z0-9_]{5,20}$/.test(handle)) {
+    showToast("Handle must be 5-20 characters — letters, numbers, and underscores only.", "info");
+    return;
+  }
+  const btn = document.getElementById("settings-handle-save-btn");
+  setButtonLoading(btn, true, "Saving…");
+  try {
+    const data = await api("set_handle", { handle });
+    if (data.status !== "success") {
+      showToast(data.message || "Could not save handle.", "error");
+      return;
+    }
+    showToast("Handle updated.", "success");
+    loadAccountSettings();
+  } catch (err) {
+    console.error(err);
+    showToast("Could not save handle.", "error");
+  } finally {
+    setButtonLoading(btn, false);
+  }
+}
+
+async function saveSettingsOnlineStatus(value) {
+  const buttons = document.querySelectorAll("[data-online-status-option]");
+  buttons.forEach((b) => (b.disabled = true));
+  try {
+    const data = await api("set_online_status", { online_status: value });
+    if (data.status !== "success") {
+      showToast(data.message || "Could not update online status.", "error");
+      return;
+    }
+    if (settingsState.profile) settingsState.profile.online_status = value;
+    showToast("Online status updated.", "success");
+    renderSettingsTab();
+  } catch (err) {
+    console.error(err);
+    showToast("Could not update online status.", "error");
+  } finally {
+    buttons.forEach((b) => (b.disabled = false));
+  }
 }
 
 async function saveSettingsCredentials() {
@@ -254,6 +463,7 @@ const SETTINGS_PRIVACY_TOGGLES = [
   { key: "hide_online_status", label: "Hide my online status", hint: "Other pet parents won't see when you're active." },
   { key: "hide_phone", label: "Hide my phone number", hint: "Only visible to you, even on your public profile." },
   { key: "hide_email", label: "Hide my email", hint: "Your email is never shown by default — this keeps it that way everywhere." },
+  { key: "hide_from_playdates", label: "Hide me from Playdates matching", hint: "Your pet won't appear in other members' Playdates deck." },
 ];
 
 function renderSettingsPrivacyHtml() {
@@ -377,6 +587,107 @@ async function unblockSettingsUser(userId) {
   } catch (err) {
     console.error(err);
     showToast("Could not unblock user.", "error");
+  }
+}
+
+// ---------------- My posts ----------------
+
+async function loadSettingsMyPosts() {
+  try {
+    const data = await api("get_user_posts", { limit: 50 });
+    settingsState.myPosts = data.status === "success" ? (data.posts || []) : [];
+  } catch (err) {
+    console.error(err);
+    settingsState.myPosts = [];
+  }
+  if (settingsState.activeSection === "posts") renderSettingsTab();
+}
+
+function renderSettingsMyPostsHtml() {
+  if (settingsState.myPosts === null) {
+    return `<div class="max-w-2xl">${rowCardSkeletonListHtml(3)}</div>`;
+  }
+  const posts = settingsState.myPosts;
+  const mediaPosts = posts.filter((p) => p.media_url);
+  const mediaRoundupHtml = mediaPosts.length ? `
+    <div class="warm-glass rounded-2xl p-4">
+      <p class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2">${mediaPosts.length} post${mediaPosts.length === 1 ? "" : "s"} with photos/videos</p>
+      <div class="grid grid-cols-6 gap-1.5">
+        ${mediaPosts.slice(0, 6).map((p) => `<div class="aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800"><img src="${escapeHtml(p.media_url)}" loading="lazy" class="w-full h-full object-cover"></div>`).join("")}
+      </div>
+    </div>` : "";
+  return `
+    <div class="max-w-2xl space-y-3">
+      <div>
+        <h3 class="font-bold text-gray-900 dark:text-white">My posts</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Everything you've shared to the feed.</p>
+      </div>
+      ${mediaRoundupHtml}
+      ${posts.length ? posts.map((p, i) => postCardHtml(p, i)).join("") : `<p class="text-sm text-gray-400 warm-glass rounded-2xl p-6 text-center">You haven't posted anything yet.</p>`}
+    </div>`;
+}
+
+// ---------------- Archived posts ----------------
+
+async function loadSettingsArchivedPosts() {
+  try {
+    const data = await api("get_user_posts", { archived: true, limit: 50 });
+    settingsState.archivedPosts = data.status === "success" ? (data.posts || []) : [];
+  } catch (err) {
+    console.error(err);
+    settingsState.archivedPosts = [];
+  }
+  if (settingsState.activeSection === "archived") renderSettingsTab();
+}
+
+function renderSettingsArchivedPostsHtml() {
+  if (settingsState.archivedPosts === null) {
+    return `<div class="max-w-2xl">${rowCardSkeletonListHtml(2)}</div>`;
+  }
+  const posts = settingsState.archivedPosts;
+  return `
+    <div class="max-w-2xl space-y-3">
+      <div>
+        <h3 class="font-bold text-gray-900 dark:text-white">Archived posts</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Hidden from your feed, visible only to you here.</p>
+      </div>
+      ${posts.length ? posts.map((p) => `
+        <div class="warm-glass rounded-2xl p-4 flex items-start justify-between gap-3" data-archived-post-id="${p.id}">
+          <div class="min-w-0">
+            <p class="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">${escapeHtml(p.content || "(media post)")}</p>
+            <p class="text-xs text-gray-400 mt-1">${timeAgo(p.created_at)}</p>
+          </div>
+          <button onclick="unarchiveSettingsPost('${p.id}', this)" class="text-xs font-bold text-brand-500 flex-shrink-0 whitespace-nowrap">Restore</button>
+        </div>`).join("") : `<p class="text-sm text-gray-400 warm-glass rounded-2xl p-6 text-center">No archived posts.</p>`}
+    </div>`;
+}
+
+async function unarchiveSettingsPost(postId, btn) {
+  if (btn) {
+    btn.disabled = true;
+    btn.classList.add("opacity-50", "pointer-events-none");
+  }
+  try {
+    const data = await api("unarchive_post", { post_id: postId });
+    if (data.status !== "success") {
+      showToast(data.message || "Could not restore post.", "error");
+      if (btn) {
+        btn.disabled = false;
+        btn.classList.remove("opacity-50", "pointer-events-none");
+      }
+      return;
+    }
+    settingsState.archivedPosts = (settingsState.archivedPosts || []).filter((p) => String(p.id) !== String(postId));
+    settingsState.myPosts = null; // stale now — refetch next time "My posts" is opened
+    document.querySelector(`[data-archived-post-id="${postId}"]`)?.remove();
+    showToast("Post restored to your feed.", "success");
+  } catch (err) {
+    console.error(err);
+    showToast("Could not restore post.", "error");
+    if (btn) {
+      btn.disabled = false;
+      btn.classList.remove("opacity-50", "pointer-events-none");
+    }
   }
 }
 

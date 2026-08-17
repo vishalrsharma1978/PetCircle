@@ -135,6 +135,11 @@ let groupChatPollTimer = null;
 // (refreshGroupMessages) never wipes an unconfirmed or failed send.
 let groupChatOutbox = [];
 
+// Reactions in flight: the 3s poll's full-array replace (refreshGroupMessages)
+// would otherwise clobber an optimistically-applied reaction before the
+// react_group_message call resolves — reapply from here after every poll fetch.
+let groupChatPendingReactions = new Map();
+
 // Group messages have no per-message read tracking (group_messages has no
 // read_at column — per-member read receipts are out of scope), so this is
 // simpler than the DM version: clock (pending) / alert-circle+retry (failed)
@@ -214,6 +219,7 @@ async function reactToGroupChatMessage(messageId, emoji) {
   if (!msg) return;
   const previousReactions = { ...(msg.reactions || {}) };
   msg.reactions = { ...previousReactions, [currentUserObj.id]: emoji };
+  groupChatPendingReactions.set(String(messageId), msg.reactions);
   renderGroupChatTimeline();
   try {
     const data = await api("react_group_message", { message_id: messageId, reaction: emoji });
@@ -230,6 +236,8 @@ async function reactToGroupChatMessage(messageId, emoji) {
     msg.reactions = previousReactions;
     renderGroupChatTimeline();
     showToast("Could not react.", "error");
+  } finally {
+    groupChatPendingReactions.delete(String(messageId));
   }
 }
 
@@ -348,6 +356,13 @@ async function refreshGroupMessages() {
     ]);
     if (msgData.status !== "success") return;
     currentGroupChatMessages = msgData.messages || [];
+    if (groupChatPendingReactions.size) {
+      currentGroupChatMessages.forEach((m) => {
+        if (groupChatPendingReactions.has(String(m.id))) {
+          m.reactions = groupChatPendingReactions.get(String(m.id));
+        }
+      });
+    }
     currentGroupChatCalls = callData?.status === "success" ? (callData.calls || []) : [];
     renderGroupChatTimeline();
   } catch (err) {

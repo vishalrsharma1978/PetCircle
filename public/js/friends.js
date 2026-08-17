@@ -84,6 +84,65 @@ async function sendFriendRequest(friendId, btn) {
   }
 }
 
+async function unfriendUser(userId, name, btn) {
+  if (!confirm(`Remove ${name} from your friends?`)) return;
+  if (btn) {
+    btn.disabled = true;
+    btn.classList.add("opacity-50", "pointer-events-none");
+  }
+  try {
+    const data = await api("remove_friend", { friend_id: userId });
+    if (data.status !== "success") {
+      showToast(data.message || "Could not remove friend.", "error");
+      if (btn) {
+        btn.disabled = false;
+        btn.classList.remove("opacity-50", "pointer-events-none");
+      }
+      return;
+    }
+    showToast(`Removed ${name}.`, "success");
+    if (String(currentFriendChatId) === String(userId)) closeFriendChat();
+    loadFriendsList();
+  } catch (err) {
+    console.error(err);
+    showToast("Could not remove friend.", "error");
+    if (btn) {
+      btn.disabled = false;
+      btn.classList.remove("opacity-50", "pointer-events-none");
+    }
+  }
+}
+
+async function blockFriendUser(userId, name) {
+  if (!confirm(`Block ${name}? They won't be able to interact with you, and your friendship will be removed.`)) return;
+  try {
+    const data = await api("block_user", { blocked_id: userId });
+    if (data.status !== "success") {
+      showToast(data.message || "Could not block user.", "error");
+      return;
+    }
+    showToast(`Blocked ${name}.`, "success");
+    if (String(currentFriendChatId) === String(userId)) closeFriendChat();
+    loadFriendsList();
+  } catch (err) {
+    console.error(err);
+    showToast("Could not block user.", "error");
+  }
+}
+
+// Shared "..." dropdown for a friend — friends-list cards and the chat
+// header both embed this directly next to a toggleDropdownMenu() button,
+// matching the same pattern posts.js already uses for its post menus.
+function friendActionsMenuHtml(userId, name, menuId) {
+  const safeName = escapeHtml(name).replace(/'/g, "\\'");
+  return `
+    <div id="${menuId}" class="dropdown-menu hidden absolute right-0 mt-1 w-44 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-30 py-1">
+      <button onclick="event.stopPropagation(); openMemberProfile('${userId}')" class="w-full text-left px-3 py-2 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-2"><i data-lucide="user" class="w-3.5 h-3.5"></i> View profile</button>
+      <button onclick="event.stopPropagation(); unfriendUser('${userId}', '${safeName}', null)" class="w-full text-left px-3 py-2 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-2"><i data-lucide="user-minus" class="w-3.5 h-3.5"></i> Remove friend</button>
+      <button onclick="event.stopPropagation(); blockFriendUser('${userId}', '${safeName}')" class="w-full text-left px-3 py-2 text-xs font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center gap-2"><i data-lucide="user-x" class="w-3.5 h-3.5"></i> Block</button>
+    </div>`;
+}
+
 function friendRequestCardHtml(r) {
   return `
   <div class="flex items-center justify-between p-3 warm-glass rounded-xl" data-friendship-id="${r.friendship_id}">
@@ -188,17 +247,26 @@ async function loadFriendsList() {
     list.innerHTML = friends.length
       ? friends.map((f) => `
         <div class="flex items-center justify-between p-3 warm-glass rounded-xl">
-          <div class="flex items-center gap-2 min-w-0">
-            <div class="relative w-9 h-9 rounded-full bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center flex-shrink-0 overflow-hidden ring-2 ring-transparent hover:ring-brand-400 transition-all">
-              ${f.profile_photo_url ? `<img src="${escapeHtml(f.profile_photo_url)}" class="w-full h-full object-cover">` : `<span class="text-xs font-bold text-brand-700 dark:text-brand-300">${escapeHtml((f.name || "P")[0])}</span>`}
+          <div class="flex items-center gap-2 min-w-0 cursor-pointer" onclick="openMemberProfile('${f.user_id}')">
+            <div class="relative w-9 h-9 flex-shrink-0">
+              <div class="w-9 h-9 rounded-full bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center overflow-hidden ring-2 ring-transparent hover:ring-brand-400 transition-all">
+                ${f.profile_photo_url ? `<img src="${escapeHtml(f.profile_photo_url)}" class="w-full h-full object-cover">` : `<span class="text-xs font-bold text-brand-700 dark:text-brand-300">${escapeHtml((f.name || "P")[0])}</span>`}
+              </div>
               ${friendCardUnreadBadgeHtml(f.user_id)}
+              ${presenceDotHtml(f.presence, "absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-gray-900")}
             </div>
             <div class="min-w-0">
-              <p class="text-sm font-bold text-gray-900 dark:text-white truncate">${escapeHtml(f.name)}</p>
+              <p class="text-sm font-bold text-gray-900 dark:text-white truncate hover:underline">${escapeHtml(f.name)}</p>
               <p class="text-xs text-gray-400">${[f.pet_type, f.breed].filter(Boolean).map(escapeHtml).join(" · ")}</p>
             </div>
           </div>
-          <button onclick="openFriendChat('${f.user_id}', '${escapeHtml(f.name)}', ${f.profile_photo_url ? `'${escapeHtml(f.profile_photo_url)}'` : "null"})" class="text-xs font-bold text-brand-500 flex-shrink-0 flex items-center gap-1"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i> Message</button>
+          <div class="flex items-center gap-1 flex-shrink-0">
+            <button onclick="openFriendChat('${f.user_id}', '${escapeHtml(f.name)}', ${f.profile_photo_url ? `'${escapeHtml(f.profile_photo_url)}'` : "null"}, '${f.presence || ""}')" class="text-xs font-bold text-brand-500 flex items-center gap-1"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i> Message</button>
+            <div class="relative flex-shrink-0">
+              <button onclick="toggleDropdownMenu(event, 'friend-menu-${f.user_id}')" title="More" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"><i data-lucide="more-vertical" class="w-3.5 h-3.5"></i></button>
+              ${friendActionsMenuHtml(f.user_id, f.name, `friend-menu-${f.user_id}`)}
+            </div>
+          </div>
         </div>`).join("")
       : `<p class="text-xs text-gray-400">No friends yet — search above to find pets to connect with.</p>`;
     if (window.lucide) lucide.createIcons();
@@ -221,6 +289,7 @@ function loadFriendsTab() {
 // since this is a desktop web app.
 
 let currentFriendChatId = null;
+let currentFriendChatName = "";
 let friendChatPollTimer = null;
 let currentFriendChatMessages = [];
 let currentFriendChatCalls = [];
@@ -231,6 +300,11 @@ let friendChatOpenReactionPickerId = null;
 // kept OUTSIDE currentFriendChatMessages so the 3s poll's full-array replace
 // (refreshFriendChatMessages) never wipes an unconfirmed or failed send.
 let friendChatOutbox = [];
+
+// Reactions in flight: the 3s poll's full-array replace (refreshFriendChatMessages)
+// would otherwise clobber an optimistically-applied reaction before the
+// react_direct_message call resolves — reapply from here after every poll fetch.
+let friendChatPendingReactions = new Map();
 
 const CHAT_REACTION_EMOJIS = ["❤️", "👍", "😂", "😮", "😢", "😡"];
 
@@ -316,6 +390,7 @@ async function reactToFriendChatMessage(messageId, emoji) {
   if (!msg) return;
   const previousReactions = { ...(msg.reactions || {}) };
   msg.reactions = { ...previousReactions, [currentUserObj.id]: emoji };
+  friendChatPendingReactions.set(String(messageId), msg.reactions);
   renderFriendChatTimeline();
   try {
     const data = await api("react_direct_message", { message_id: messageId, reaction: emoji });
@@ -332,6 +407,8 @@ async function reactToFriendChatMessage(messageId, emoji) {
     msg.reactions = previousReactions;
     renderFriendChatTimeline();
     showToast("Could not react.", "error");
+  } finally {
+    friendChatPendingReactions.delete(String(messageId));
   }
 }
 
@@ -376,8 +453,9 @@ function renderFriendChatReplyStrip() {
   if (window.lucide) lucide.createIcons();
 }
 
-async function openFriendChat(friendId, name, photoUrl) {
+async function openFriendChat(friendId, name, photoUrl, presence) {
   currentFriendChatId = friendId;
+  currentFriendChatName = name || "Friend";
   friendChatReplyTo = null;
   friendChatOpenReactionPickerId = null;
   friendChatOutbox = [];
@@ -386,7 +464,22 @@ async function openFriendChat(friendId, name, photoUrl) {
   shell.classList.remove("hidden");
   shell.classList.add("flex");
   document.getElementById("friend-chat-name").textContent = name || "Friend";
+  const menuWrap = document.getElementById("friend-chat-menu-wrap");
+  if (menuWrap) menuWrap.innerHTML = friendActionsMenuHtml(friendId, currentFriendChatName, "friend-chat-menu");
   setAvatarPreview("friend-chat-avatar-img", "friend-chat-avatar-text", photoUrl, (name || "P")[0]);
+  const presenceDot = document.getElementById("friend-chat-presence-dot");
+  if (presenceDot) {
+    presenceDot.classList.remove("hidden", "presence-online", "presence-away", "presence-offline");
+    if (presence && presence !== "hidden") {
+      presenceDot.classList.add(`presence-${presence}`);
+      const subtitle = document.getElementById("friend-chat-subtitle");
+      if (subtitle) subtitle.textContent = PRESENCE_LABELS[presence] || "Direct message";
+    } else {
+      presenceDot.classList.add("hidden");
+      const subtitle = document.getElementById("friend-chat-subtitle");
+      if (subtitle) subtitle.textContent = "Direct message";
+    }
+  }
   document.getElementById("friend-chat-messages").innerHTML = rowCardSkeletonListHtml(2);
   renderFriendChatReplyStrip();
   await refreshFriendChatMessages();
@@ -396,6 +489,7 @@ async function openFriendChat(friendId, name, photoUrl) {
 
 function closeFriendChat() {
   currentFriendChatId = null;
+  currentFriendChatName = "";
   friendChatReplyTo = null;
   friendChatOpenReactionPickerId = null;
   friendChatOutbox = [];
@@ -456,6 +550,13 @@ async function refreshFriendChatMessages() {
     ]);
     if (msgData.status !== "success") return;
     currentFriendChatMessages = msgData.messages || [];
+    if (friendChatPendingReactions.size) {
+      currentFriendChatMessages.forEach((m) => {
+        if (friendChatPendingReactions.has(String(m.id))) {
+          m.reactions = friendChatPendingReactions.get(String(m.id));
+        }
+      });
+    }
     currentFriendChatCalls = callData?.status === "success" ? (callData.calls || []) : [];
     renderFriendChatTimeline();
     if (currentFriendChatMessages.length) loadNotifications();

@@ -3,30 +3,6 @@
 // deliberately small for the auth slice rather than pre-stubbing functions
 // for features that don't exist yet.
 
-function formatDateTime(value) {
-  if (!value) return '';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleString();
-}
-
-function clearErrors() {
-  document.querySelectorAll('[id$="-error"]').forEach((el) => {
-    el.classList.add("hidden");
-    el.innerText = "";
-  });
-}
-
-function showError(type, message) {
-  const el = document.getElementById(type + "-error");
-  if (!el) {
-    if (typeof showToast === "function") showToast(message || "Something went wrong.");
-    return;
-  }
-  el.innerText = message;
-  el.classList.remove("hidden");
-}
-
 const breedsByPetType = {
   Dog: ["Labrador Retriever", "Golden Retriever", "German Shepherd", "Poodle", "Bulldog", "Beagle", "Rottweiler", "Dachshund", "Corgi", "Husky", "Pug", "Shih Tzu", "Boxer", "Chihuahua", "Mixed Breed", "other"],
   Cat: ["Persian", "Maine Coon", "Siamese", "Ragdoll", "Bengal", "Sphynx", "British Shorthair", "Abyssinian", "Scottish Fold", "Mixed Breed", "other"],
@@ -58,13 +34,6 @@ function toggleCustomBreedInput() {
   if (breedSelect && customWrap) {
     customWrap.style.display = breedSelect.value === "other" ? "block" : "none";
   }
-}
-
-function clearErrors() {
-  document.querySelectorAll('[id$="-error"]').forEach((el) => {
-    el.classList.add("hidden");
-    el.textContent = "";
-  });
 }
 
 function showFieldError(errorId, message) {
@@ -394,6 +363,35 @@ function startNotificationPolling() {
   });
 }
 
+// Presence heartbeat: pings track_activity (api/routes/auth.php) so this
+// user's own users.last_active_at stays fresh, which is what everyone else's
+// derivePresenceStatus() reads to render their online/away/offline dot. Same
+// cadence + focus-regain pattern as notification polling — no websockets.
+let presenceHeartbeatTimer = null;
+
+function pingPresenceHeartbeat() {
+  api("track_activity", { source: "heartbeat" }).catch((err) => console.warn("Presence heartbeat failed:", err));
+}
+
+function startPresenceHeartbeat() {
+  if (presenceHeartbeatTimer) return;
+  pingPresenceHeartbeat();
+  presenceHeartbeatTimer = setInterval(pingPresenceHeartbeat, 60000);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") pingPresenceHeartbeat();
+  });
+}
+
+const PRESENCE_LABELS = { online: "Online", away: "Away", busy: "Busy", offline: "Offline" };
+
+// Renders nothing for "hidden" (viewer isn't allowed to see this member's
+// status — see hide_online_status in handleGetProfile) or missing values.
+function presenceDotHtml(status, extraClasses = "") {
+  if (!status || status === "hidden") return "";
+  const cls = ["profile-status-dot", `presence-${status}`, extraClasses].filter(Boolean).join(" ");
+  return `<span class="${cls}" title="${PRESENCE_LABELS[status] || ""}"></span>`;
+}
+
 function renderNotifications(notifications) {
   const list = document.getElementById("notifications-list");
   const badge = document.getElementById("notif-badge");
@@ -416,12 +414,30 @@ function renderNotifications(notifications) {
   }
 
   list.innerHTML = notifications.map((n) => `
-    <div class="p-3 border-b border-gray-50 dark:border-gray-800/50 text-sm ${n.is_read ? "" : "bg-brand-50/40 dark:bg-brand-950/20"}">
+    <div class="p-3 border-b border-gray-50 dark:border-gray-800/50 text-sm ${n.is_read ? "" : "bg-brand-50/40 dark:bg-brand-950/20 cursor-pointer"}" ${n.is_read ? "" : `onclick="markSingleNotificationRead('${n.id}', this)"`}>
       <p class="font-bold text-gray-800 dark:text-gray-100">${escapeHtml(n.title || "Notification")}</p>
       <p class="text-gray-600 dark:text-gray-300 mt-0.5">${escapeHtml(n.body || "")}</p>
       <p class="text-xs text-gray-400 mt-1">${timeAgo(n.created_at)}</p>
     </div>
   `).join("");
+}
+
+async function markSingleNotificationRead(notificationId, el) {
+  el?.classList.remove("bg-brand-50/40", "dark:bg-brand-950/20", "cursor-pointer");
+  el?.removeAttribute("onclick");
+  try {
+    const data = await api("mark_notification_read", { notification_id: notificationId });
+    if (data.status !== "success") return;
+    const badge = document.getElementById("notif-badge");
+    if (badge && !badge.classList.contains("hidden")) {
+      const current = parseInt(badge.textContent, 10) || 0;
+      const next = Math.max(0, current - 1);
+      if (next > 0) badge.textContent = String(next);
+      else badge.classList.add("hidden");
+    }
+  } catch (err) {
+    console.warn("Could not mark notification read:", err);
+  }
 }
 
 // ---------------- Messages: header icon, no dedicated tab ----------------
@@ -555,7 +571,7 @@ function showGlobalSearchDropdown(query) {
                         <div class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Matching Connections</div>
                         <div class="space-y-1">
                             ${matches.map(m => `
-                                <div onclick="openUserProfile('${escapeHtml((m.name || 'Member').replace(/'/g, "\\'"))}', '${escapeHtml((m.role || 'Member').replace(/'/g, "\\'"))}', '${String(m.id).replace(/'/g, "\\'")}', '${escapeHtml(m.photo || '')}')" class="flex items-center gap-3 px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
+                                <div onclick="openMemberProfile('${String(m.id).replace(/'/g, "\\'")}')" class="flex items-center gap-3 px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
                                     <i data-lucide="user" class="w-4 h-4 text-brand-500"></i>
                                     <span>${escapeHtml(m.name)}</span>
                                 </div>
@@ -613,7 +629,7 @@ function showGlobalSearchDropdown(query) {
                         <i data-lucide="heart-handshake" class="w-4 h-4 text-brand-500"></i>
                         <span>Playdates</span>
                     </div>
-                    <div onclick="switchView('view-social-feed'); switchSocialTab('friends'); switchFriendsView('discover');" class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
+                    <div onclick="switchView('view-social-feed'); switchSocialTab('friends'); switchFriendsSubtab('discover');" class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
                         <i data-lucide="user-plus" class="w-4 h-4 text-brand-500"></i>
                         <span>Discover People / Add Friends</span>
                     </div>
@@ -785,29 +801,6 @@ function switchSearchTab(tab) {
 
 let searchFilters = { religion: '', gender: '', community: '', sortBy: 'name_asc' };
 
-function toggleSearchFilters() {
-  const panel = document.getElementById('search-filters-panel');
-  if (panel) {
-    panel.classList.toggle('hidden');
-  }
-}
-
-function resetSearchFilters() {
-  document.getElementById('search-filter-religion').value = '';
-  document.getElementById('search-filter-gender').value = '';
-  document.getElementById('search-filter-community').value = '';
-  document.getElementById('search-sort-by').value = 'name_asc';
-  applySearchFilters();
-}
-
-function applySearchFilters() {
-  searchFilters.religion = document.getElementById('search-filter-religion').value;
-  searchFilters.gender = document.getElementById('search-filter-gender').value;
-  searchFilters.community = document.getElementById('search-filter-community').value.trim().toLowerCase();
-  searchFilters.sortBy = document.getElementById('search-sort-by').value;
-  renderSearchResults();
-}
-
 function renderSearchResults() {
   const { members, posts, events, connections } = lastSearchData;
   const renderEmpty = (msg) => `<div class="col-span-full py-12 text-center text-gray-500 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">${msg}</div>`;
@@ -903,10 +896,13 @@ function renderSearchResults() {
   if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
+// No heart/"Love" entry here on purpose — posts already have a dedicated
+// heart Like button (togglePostLike), so a heart reaction would be a second,
+// redundant "I love this" signal. Chat's CHAT_REACTION_EMOJIS (friends.js) is
+// a separate list and keeps its heart since chat has no Like button.
 const EMOJI_REACTIONS = [
   { emoji: "🐶", label: "Woof" },
   { emoji: "🐾", label: "Paw" },
-  { emoji: "❤️", label: "Love" },
   { emoji: "🦴", label: "Bone" },
   { emoji: "😂", label: "Haha" },
   { emoji: "😮", label: "Wow" },

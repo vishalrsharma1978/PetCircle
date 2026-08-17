@@ -14,6 +14,7 @@ const adminConsoleState = {
 const ADMIN_PANEL_TITLES = {
   analytics: "Analytics",
   users: "Users",
+  verification: "Verification Requests",
   contacts: "Contact Book",
   posts: "Posts",
   events: "Events",
@@ -33,6 +34,7 @@ function adminPanelLoader(panel) {
   const loaders = {
     analytics: loadAdminAnalytics,
     users: typeof loadAdminUsers === "function" ? loadAdminUsers : null,
+    verification: typeof loadAdminVerificationRequests === "function" ? loadAdminVerificationRequests : null,
     contacts: typeof loadAdminContactBook === "function" ? loadAdminContactBook : null,
     posts: typeof loadAdminPosts === "function" ? loadAdminPosts : null,
     events: typeof loadAdminEvents === "function" ? loadAdminEvents : null,

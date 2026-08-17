@@ -1,4 +1,4 @@
-// Signup / verify / login / forgot-password / logout wiring, plus the
+﻿// Signup / verify / login / forgot-password / logout wiring, plus the
 // session-restore routine that runs once on page load.
 
 let pendingSignupEmail = "";
@@ -50,7 +50,7 @@ function setButtonLoading(button, loading, loadingText = "Please wait…") {
   }
 }
 
-function goToDashboard(user) {
+function goToDashboard(user, isSessionRestore = false) {
   persistCurrentSession(user);
 
   const letterEl = document.getElementById("header-avatar-letter");
@@ -85,6 +85,70 @@ function goToDashboard(user) {
   }
   loadNotifications();
   startNotificationPolling();
+  startPresenceHeartbeat();
+
+  if (!isSessionRestore) maybePromptSetHandle(user);
+}
+
+// Nudges a pet parent to pick a handle right after signing up or logging in
+// (not on a mere page-reload session restore) — skippable, and always
+// changeable later from Settings > Security's existing Handle card.
+function maybePromptSetHandle(user) {
+  if (!user || user.handle) return;
+  const modal = document.getElementById("set-handle-modal");
+  if (!modal) return;
+  const input = document.getElementById("set-handle-input");
+  if (input) input.value = "";
+  document.getElementById("set-handle-modal-error")?.classList.add("hidden");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+  if (window.lucide) lucide.createIcons();
+}
+
+function closeSetHandleModal() {
+  const modal = document.getElementById("set-handle-modal");
+  modal?.classList.add("hidden");
+  modal?.classList.remove("flex");
+}
+
+async function submitSetHandleModal() {
+  const input = document.getElementById("set-handle-input");
+  const handle = input.value.trim();
+  const errorEl = document.getElementById("set-handle-modal-error");
+  errorEl?.classList.add("hidden");
+  if (!/^[a-zA-Z0-9_]{5,20}$/.test(handle)) {
+    if (errorEl) {
+      errorEl.textContent = "Handle must be 5-20 characters — letters, numbers, and underscores only.";
+      errorEl.classList.remove("hidden");
+    }
+    return;
+  }
+  const btn = document.getElementById("set-handle-modal-submit-btn");
+  setButtonLoading(btn, true, "Saving…");
+  try {
+    const data = await api("set_handle", { handle });
+    if (data.status !== "success") {
+      if (errorEl) {
+        errorEl.textContent = data.message || "Could not save handle.";
+        errorEl.classList.remove("hidden");
+      }
+      return;
+    }
+    if (currentUserObj) {
+      currentUserObj.handle = handle;
+      persistCurrentSession(currentUserObj);
+    }
+    showToast("Handle set.", "success");
+    closeSetHandleModal();
+  } catch (err) {
+    console.error(err);
+    if (errorEl) {
+      errorEl.textContent = "Could not save handle.";
+      errorEl.classList.remove("hidden");
+    }
+  } finally {
+    setButtonLoading(btn, false);
+  }
 }
 
 async function logout() {
@@ -360,7 +424,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const data = await api("session_me", {});
     if (data.status === "success" && data.user) {
-      goToDashboard(data.user);
+      goToDashboard(data.user, true);
     }
   } catch (err) {
     console.warn("Session restore failed:", err);
@@ -380,48 +444,28 @@ const PET_REAL_PHOTOS = {
   Other: 'https://images.unsplash.com/photo-1544568100-847a948585b9?w=1200&q=85&auto=format&fit=crop'
 };
 
-function initLoginFeed() {
-  const container = document.getElementById("login-feed-content");
-  if (!container) return;
-
-  const demoItems = [
-    { pet: "Dog", name: "Max", action: "learned a new trick!" },
-    { pet: "Cat", name: "Luna", action: "found the best sunbeam." },
-    { pet: "Bird", name: "Kiwi", action: "is singing a new tune." },
-    { pet: "Rabbit", name: "Thumper", action: "did a massive binky." },
-    { pet: "Dog", name: "Bella", action: "made a new friend at the park." }
-  ];
-
-  let currentIndex = 0;
-
-  function renderSlide() {
-    const item = demoItems[currentIndex];
-    const image = PET_REAL_PHOTOS[item.pet] || PET_REAL_PHOTOS.Other;
-    container.innerHTML = `
-      <div class="h-full w-full relative overflow-hidden transition-opacity duration-1000">
-        <img src="${image}" class="absolute inset-0 w-full h-full object-cover" alt="${item.pet}">
-        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-        <div class="absolute bottom-12 left-12 right-12 z-10 text-white animate-fade-in-up">
-          <div class="inline-block bg-brand-500/20 backdrop-blur-md border border-brand-400/30 rounded-full px-4 py-1 mb-4">
-            <span class="text-sm font-semibold tracking-wide text-brand-100">Trending Now</span>
-          </div>
-          <h2 class="text-4xl font-bold mb-3">${item.name}</h2>
-          <p class="text-xl text-gray-200 font-light">${item.action}</p>
-        </div>
-      </div>
-    `;
-    currentIndex = (currentIndex + 1) % demoItems.length;
-  }
-
-  renderSlide();
-  setInterval(renderSlide, 5000);
+// Fallback used only when PET_REAL_PHOTOS has no entry for a given pet type
+// (currently unreachable in practice — every pet type the breed-strip cycles
+// through already has a PET_REAL_PHOTOS entry — but kept as a real, safe
+// fallback rather than leaving the call site pointed at an undefined
+// function). A flat accent-colored tile, no external asset/URL involved.
+function getPetIllustrationDataUrl(theme, variant) {
+  var accent = (theme && theme.accent) || '#f97316';
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="' + accent + '"/></svg>';
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (document.getElementById("login-feed-content")) {
-    initLoginFeed();
-  }
-});
+// Reuses the same pet_type -> accent-color map as the login page's own
+// left-pane preview (core.js) and the galleries accent mechanism (step 13e)
+// — a small hex-color lookup, not a full theming object, so it's wrapped
+// here into the {accent, label} shape the login feed's render code expects.
+function getPetTheme(petType) {
+  var accents = (typeof PET_TYPE_PREVIEW_ACCENTS !== 'undefined') ? PET_TYPE_PREVIEW_ACCENTS : {};
+  return {
+    accent: accents[petType] || accents[''] || '#f97316',
+    label: petType || 'Pet',
+  };
+}
 
 var loginFeedFeeds = null;
 
@@ -892,330 +936,6 @@ var loginFeedFeeds = null;
       }
 
     }
-
-
-
-
-
-
-
-    // ── FEED MEDIA LOGIC ──────────────────────────────────────
-
-    function openFeedMediaPicker() {
-
-      var input = document.getElementById("feed-media-input");
-
-      if (input) input.click();
-
-    }
-
-
-
-    function clearFeedMediaSelection() {
-
-      var input = document.getElementById("feed-media-input");
-
-      var previewContainer = document.getElementById("feed-media-preview");
-
-      if (input) input.value = "";
-
-      if (previewContainer) {
-
-        previewContainer.classList.add("hidden");
-
-        previewContainer.innerHTML = "";
-
-      }
-
-    }
-
-
-
-    function handleFeedMediaSelection(event) {
-
-      var file = event.target.files[0];
-
-      if (!file) return;
-
-      var previewContainer = document.getElementById("feed-media-preview");
-
-      if (!previewContainer) return;
-
-
-
-      var reader = new FileReader();
-
-      reader.onload = function (e) {
-
-        previewContainer.classList.remove("hidden");
-
-        if (file.type.startsWith('video/')) {
-
-          previewContainer.innerHTML = `
-
-                    <div class="relative inline-block mt-2">
-
-                        <video src="${e.target.result}" class="max-h-48 rounded-lg" controls></video>
-
-                        <button onclick="clearFeedMediaSelection()" class="absolute -top-2 -right-2 bg-gray-900 text-white rounded-full p-1 shadow-md hover:bg-gray-800"><i data-lucide="x" class="w-4 h-4"></i></button>
-
-                    </div>`;
-
-        } else {
-
-          previewContainer.innerHTML = `
-
-                    <div class="relative inline-block mt-2">
-
-                        <img src="${e.target.result}" class="max-h-48 rounded-lg object-contain" />
-
-                        <button onclick="clearFeedMediaSelection()" class="absolute -top-2 -right-2 bg-gray-900 text-white rounded-full p-1 shadow-md hover:bg-gray-800"><i data-lucide="x" class="w-4 h-4"></i></button>
-
-                    </div>`;
-
-        }
-
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-
-      };
-
-      reader.readAsDataURL(file);
-
-    }
-
-
-
-    // Patch createPost to include media
-
-    var originalCreatePost = window.createPost;
-
-    if (originalCreatePost) {
-
-      window.createPost = function (textId, hashId) {
-
-        var mediaInput = document.getElementById("feed-media-input");
-
-        var contentElem = document.getElementById(textId);
-
-        if (!contentElem) return;
-
-
-
-        var content = contentElem.value.trim();
-
-        if (!content && (!mediaInput || !mediaInput.files[0])) return;
-
-
-
-        if (mediaInput && mediaInput.files[0]) {
-
-          var reader = new FileReader();
-
-          reader.onload = function (e) {
-
-            var newPost = {
-
-              id: Date.now(),
-
-              user_id: currentUserObj.id,
-
-              author: currentUserObj.name,
-
-              profilePhoto: currentUserObj.profilePhoto,
-
-              content: content,
-
-              media_url: e.target.result,
-
-              time: "Just now",
-
-              likes: 0,
-
-              comments: 0
-
-            };
-
-            feedPosts.unshift(newPost);
-
-            clearFeedMediaSelection();
-
-            contentElem.value = "";
-
-            renderFeed();
-
-          };
-
-          reader.readAsDataURL(mediaInput.files[0]);
-
-        } else {
-
-          originalCreatePost(textId, hashId);
-
-        }
-
-      };
-
-    }
-
-
-
-    // ── THREAD MANAGEMENT / POST DETAIL VIEW ────────────────────
-
-    function handleFeedPostCardClick(event, postId) {
-
-      if (event.defaultPrevented) return;
-
-      const interactive = event.target.closest("button, a, input, textarea, select, label, video, [data-no-post-open], .post-menu, .comment-menu");
-
-      if (interactive) return;
-
-      openPostDetail(postId);
-
-    }
-
-
-
-    function closePostDetail() {
-
-      switchSocialTab("feed", { skipScroll: true });
-
-      try {
-
-        const url = new URL(window.location.href);
-
-        if (url.searchParams.has("post")) {
-
-          url.searchParams.delete("post");
-
-          window.history.replaceState({}, "", url.toString());
-
-        }
-
-      } catch (e) { }
-
-    }
-
-
-
-    function openPostDetail(postId, options = {}) {
-
-      const post = feedPosts.find((p) => String(p.id) === String(postId));
-
-      if (!post) {
-
-        if (typeof showToast !== 'undefined') showToast("Post is no longer available.");
-
-        return;
-
-      }
-
-      switchSocialTab("post-detail", { remember: false, skipScroll: true });
-
-      renderPostDetail(postId);
-
-      if (options.updateUrl !== false) {
-
-        try {
-
-          const url = new URL(window.location.href);
-
-          url.searchParams.set("post", postId);
-
-          url.hash = "feed";
-
-          window.history.replaceState({}, "", url.toString());
-
-        } catch (e) { }
-
-      }
-
-      window.scrollTo({ top: 0, behavior: options.instant ? "auto" : "smooth" });
-
-    }
-
-
-
-    function renderPostDetail(postId) {
-
-      const container = document.getElementById("post-detail-view");
-
-      const post = feedPosts.find((p) => String(p.id) === String(postId));
-
-      if (!container || !post) return;
-
-      const safePostId = String(post.id).replace(/'/g, "\\'");
-
-      const safeAuthor = escapeHtml(post.author).replace(/'/g, "\\'");
-
-      const safeProfilePhoto = post.profilePhoto ? escapeHtml(post.profilePhoto).replace(/'/g, "\\'") : "";
-
-      const avatarHtml = post.profilePhoto
-
-        ? `<img src="${escapeHtml(post.profilePhoto)}" onclick="openUserProfile('${safeAuthor}', 'Breed Member', '${String(post.user_id || '').replace(/'/g, "\\'")}', '${safeProfilePhoto}')" loading="lazy" decoding="async" class="w-11 h-11 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-brand-400 transition-all" alt="">`
-
-        : `<div onclick="openUserProfile('${safeAuthor}', 'Breed Member', '${String(post.user_id || '').replace(/'/g, "\\'")}')" class="w-11 h-11 ${post.avatarClass || 'bg-gray-200 text-gray-700'} rounded-full flex items-center justify-center font-bold cursor-pointer hover:ring-2 hover:ring-brand-400 transition-all">${post.initials || 'U'}</div>`;
-
-
-
-      const mediaHtml = post.media_url ? `<img src="${escapeHtml(post.media_url)}" class="mt-4 rounded-xl max-h-[500px] w-full object-contain bg-gray-50 border border-gray-100" />` : "";
-
-      const descriptionText = post.description || post.content || "";
-
-      const descriptionHtml = descriptionText ? `<p class="text-base leading-7 text-gray-800 whitespace-pre-wrap break-words mt-2">${escapeHtml(descriptionText)}</p>` : "";
-
-
-
-      container.innerHTML = `
-
-        <div class="mx-auto max-w-2xl space-y-4 pt-4">
-
-          <button type="button" onclick="closePostDetail()" class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-base font-bold text-gray-700 hover:border-brand-200 hover:text-brand-600 transition-colors shadow-sm mb-2">
-
-            <i data-lucide="arrow-left" class="h-4 w-4"></i> Back to feed
-
-          </button>
-
-          <article class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-md">
-
-            <div class="flex items-start justify-between gap-4 border-b border-gray-50 p-4 sm:p-5">
-
-              <div class="flex min-w-0 items-start gap-3">
-
-                ${avatarHtml}
-
-                <div class="min-w-0">
-
-                  <div class="flex flex-wrap items-center gap-1.5 text-base font-bold text-gray-900">
-
-                    <span class="cursor-pointer hover:underline" onclick="openUserProfile('${safeAuthor}')">${escapeHtml(post.author)}</span>
-
-                  </div>
-
-                  <div class="mt-1 text-xs text-gray-500">${escapeHtml(post.time || 'Just now')}</div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-            <div class="space-y-4 p-4 sm:p-5">
-
-              ${descriptionHtml}
-
-              ${mediaHtml}
-
-            </div>
-
-          </article>
-
-        </div>`;
-
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-
-    }
-
-
 
     initLoginFeed();
 

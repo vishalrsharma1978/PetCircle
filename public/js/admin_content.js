@@ -6,6 +6,99 @@
 adminConsoleState.posts = { search: "", typeFilter: "", petType: "", statusFilter: "", offset: 0, limit: 20 };
 adminConsoleState.events = { search: "", petType: "", offset: 0, limit: 20 };
 adminConsoleState.galleries = { search: "", visibilityFilter: "", petType: "", offset: 0, limit: 20 };
+adminConsoleState.verification = { statusFilter: "pending" };
+
+// ---------------- Verification Requests ----------------
+// list_verification_requests/review_verification_request existed as working
+// admin actions with zero admin UI anywhere — a submitted "Verified Pet
+// Parent" request could never actually be approved or rejected. This panel
+// closes that gap.
+
+const ADMIN_VERIFICATION_PROOF_LABELS = {
+  microchip: "Microchip",
+  vet_record: "Vet record",
+  adoption_papers: "Adoption papers",
+  photo_only: "Photo only",
+};
+
+async function loadAdminVerificationRequests() {
+  const box = document.getElementById("admin-panel-verification");
+  if (!box) return;
+  const state = adminConsoleState.verification;
+
+  box.innerHTML = `
+    <div class="flex flex-wrap gap-2 mb-3">
+      ${adminFilterSelect("admin-verification-status", state.statusFilter, [["pending", "Pending"], ["approved", "Approved"], ["rejected", "Rejected"], ["", "All"]])}
+    </div>
+    <div id="admin-verification-list" class="space-y-2"><p class="text-sm text-gray-400 py-6 text-center">Loading…</p></div>`;
+
+  document.getElementById("admin-verification-status").onchange = (e) => {
+    state.statusFilter = e.target.value;
+    loadAdminVerificationRequestsList();
+  };
+
+  loadAdminVerificationRequestsList();
+}
+
+async function loadAdminVerificationRequestsList() {
+  const list = document.getElementById("admin-verification-list");
+  if (!list) return;
+  const state = adminConsoleState.verification;
+  try {
+    const data = await api("list_verification_requests", { status: state.statusFilter });
+    if (data.status !== "success") {
+      list.innerHTML = `<p class="text-sm text-gray-400 py-6 text-center">${escapeHtml(data.message || "Could not load requests.")}</p>`;
+      return;
+    }
+    const requests = data.requests || [];
+    list.innerHTML = requests.length
+      ? requests.map((r) => `
+          <div class="bg-gray-900 border border-gray-800 rounded-xl p-3" data-verification-request-id="${r.id}">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <p class="text-sm font-bold text-white truncate">${escapeHtml(r.pet_name || "Unnamed pet")} <span class="font-normal text-gray-400">· ${escapeHtml(r.parent_name || "")}</span></p>
+                <p class="text-xs text-gray-400 mt-0.5">${escapeHtml([r.pet_type, r.breed].filter(Boolean).join(" · ") || "No pet type set")} · ${escapeHtml(r.current_city || "")}</p>
+                <p class="text-xs text-gray-500 mt-1">${escapeHtml(ADMIN_VERIFICATION_PROOF_LABELS[r.proof_type] || r.proof_type)}${r.microchip_number ? " · Microchip: " + escapeHtml(r.microchip_number) : ""}</p>
+                ${r.reason ? `<p class="text-xs text-gray-400 mt-1 italic">"${escapeHtml(r.reason)}"</p>` : ""}
+                <div class="flex gap-2 mt-2">
+                  ${r.pet_photo_url ? `<a href="${escapeHtml(r.pet_photo_url)}" target="_blank" rel="noopener" class="text-[10px] font-bold text-brand-400 hover:underline">Pet photo</a>` : ""}
+                  ${r.owner_photo_url ? `<a href="${escapeHtml(r.owner_photo_url)}" target="_blank" rel="noopener" class="text-[10px] font-bold text-brand-400 hover:underline">Owner photo</a>` : ""}
+                  ${r.proof_document_url ? `<a href="${escapeHtml(r.proof_document_url)}" target="_blank" rel="noopener" class="text-[10px] font-bold text-brand-400 hover:underline">Proof document</a>` : ""}
+                </div>
+                <p class="text-[10px] text-gray-600 mt-1.5">Submitted ${escapeHtml(timeAgo(r.created_at))}</p>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase flex-shrink-0 ${r.status === "approved" ? "bg-emerald-500/15 text-emerald-300" : r.status === "rejected" ? "bg-red-500/15 text-red-300" : "bg-amber-500/15 text-amber-300"}">${escapeHtml(r.status)}</span>
+            </div>
+            ${r.status === "pending" ? `
+              <div class="flex gap-2 mt-3">
+                <button onclick="adminReviewVerification('${r.id}', 'approve', this)" class="px-3 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-300 text-xs font-bold hover:bg-emerald-500/25">Approve</button>
+                <button onclick="adminReviewVerification('${r.id}', 'reject', this)" class="px-3 py-1.5 rounded-lg bg-red-500/15 text-red-300 text-xs font-bold hover:bg-red-500/25">Reject</button>
+              </div>` : ""}
+          </div>`).join("")
+      : `<p class="text-sm text-gray-400 py-6 text-center">No ${state.statusFilter || ""} verification requests.</p>`;
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function adminReviewVerification(requestId, action, btn) {
+  if (btn) {
+    btn.disabled = true;
+    btn.closest("div").querySelectorAll("button").forEach((b) => b.classList.add("opacity-50", "pointer-events-none"));
+  }
+  try {
+    const data = await api("review_verification_request", { request_id: requestId, action });
+    if (data.status !== "success") {
+      showToast(data.message || "Could not review request.", "error");
+      return;
+    }
+    showToast(action === "approve" ? "Request approved." : "Request rejected.", "success");
+    loadAdminVerificationRequestsList();
+  } catch (err) {
+    console.error(err);
+    showToast("Could not review request.", "error");
+  }
+}
 
 // ---------------- Posts ----------------
 

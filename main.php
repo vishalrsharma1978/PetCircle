@@ -33,6 +33,9 @@
   <!-- ==================== PET PROFILE ==================== -->
   <?php include 'views/pet_profile.php'; ?>
 
+  <!-- ==================== VIEW ANOTHER MEMBER'S FULL PROFILE ==================== -->
+  <?php include 'views/member_profile_page.php'; ?>
+
   <!-- ==================== PACK TREE ==================== -->
   <?php include 'views/pack_tree.php'; ?>
 
@@ -68,19 +71,14 @@
   <!-- Gallery Lightbox -->
   <?php include 'modals/gallery_lightbox.php'; ?>
 
-  <?php include 'modals/event_share_modal.php'; ?>
-  <?php include 'modals/create_gallery_modal.php'; ?>
   <?php include 'modals/rescue_apply_modal.php'; ?>
   <?php include 'modals/create_rescue_modal.php'; ?>
   <?php include 'modals/verification_modal.php'; ?>
   <?php include 'modals/admin_mode_modal.php'; ?>
-  <?php include 'modals/edit_post_modal.php'; ?>
-  <?php include 'modals/share_post_modal.php'; ?>
-  <?php include 'modals/announcement_modal.php'; ?>
-  <?php include 'modals/broadcast_modal.php'; ?>
-  <?php include 'modals/condolence_modal.php'; ?>
   <?php include 'modals/image_cropper_modal.php'; ?>
   <?php include 'modals/enlarged_calendar_modal.php'; ?>
+  <?php include 'modals/member_profile_modal.php'; ?>
+  <?php include 'modals/set_handle_modal.php'; ?>
 
   <!-- Zoom call shell: floating toolbar + minimized "return to call" chip.
        The Meeting SDK injects its own #zmmtg-root container at ZoomMtg.init()
@@ -93,6 +91,7 @@
       <button type="button" onclick="popOutZoomCall()">Pop out</button>
       <button type="button" onclick="minimizeZoomCallShell()">Minimize</button>
       <button type="button" onclick="leaveZoomCallShell()">Leave call</button>
+      <button type="button" id="zoom-end-call-btn" onclick="endZoomCallForEveryone()" class="hidden">End for everyone</button>
     </div>
   </div>
   <div id="zoom-return-chip" aria-live="polite">
@@ -111,6 +110,7 @@
   <script src="js/hub_widgets.js?v=<?= assetVer('js/hub_widgets.js') ?>" defer></script>
   <script src="js/posts.js?v=<?= assetVer('js/posts.js') ?>" defer></script>
   <script src="js/friends.js?v=<?= assetVer('js/friends.js') ?>" defer></script>
+  <script src="js/member_profile.js?v=<?= assetVer('js/member_profile.js') ?>" defer></script>
   <script src="js/groups.js?v=<?= assetVer('js/groups.js') ?>" defer></script>
   <script src="js/events.js?v=<?= assetVer('js/events.js') ?>" defer></script>
   <script src="js/galleries.js?v=<?= assetVer('js/galleries.js') ?>" defer></script>

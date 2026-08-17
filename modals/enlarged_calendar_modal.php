@@ -13,7 +13,6 @@
                     currentCalendarViewDate.getMonth() - 1,
                   );
                   renderEnlargedCalendar();
-                  renderCalendar();
                 "
               class="p-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
               <i data-lucide="chevron-left" class="w-5 h-5"></i>
@@ -23,7 +22,6 @@
                     currentCalendarViewDate.getMonth() + 1,
                   );
                   renderEnlargedCalendar();
-                  renderCalendar();
                 "
               class="p-2 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
               <i data-lucide="chevron-right" class="w-5 h-5"></i>

@@ -61,6 +61,7 @@
           $adminNavItems = [
             ['analytics', 'activity', 'Analytics'],
             ['users', 'users', 'Users'],
+            ['verification', 'badge-check', 'Verification Requests'],
             ['contacts', 'contact', 'Contact Book'],
             ['posts', 'newspaper', 'Posts'],
             ['events', 'calendar-range', 'Events'],
@@ -93,6 +94,7 @@
 
         <div id="admin-panel-analytics" class="admin-panel space-y-4"></div>
         <div id="admin-panel-users" class="admin-panel hidden space-y-4"></div>
+        <div id="admin-panel-verification" class="admin-panel hidden space-y-4"></div>
         <div id="admin-panel-contacts" class="admin-panel hidden space-y-4"></div>
         <div id="admin-panel-posts" class="admin-panel hidden space-y-4"></div>
         <div id="admin-panel-events" class="admin-panel hidden space-y-4"></div>

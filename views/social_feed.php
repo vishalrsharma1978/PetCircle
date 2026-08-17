@@ -283,16 +283,23 @@
       <div id="friend-chat-shell" class="hidden bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden flex-col h-[650px] max-h-[75vh]">
         <div class="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3 flex-shrink-0">
           <button onclick="closeFriendChat()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full flex-shrink-0"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-          <div class="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center overflow-hidden flex-shrink-0 relative">
-            <span id="friend-chat-avatar-text" class="font-bold text-brand-700 dark:text-brand-300">P</span>
-            <img id="friend-chat-avatar-img" src="" alt="" class="hidden absolute inset-0 w-full h-full object-cover">
+          <div class="relative w-10 h-10 flex-shrink-0">
+            <div class="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center overflow-hidden relative">
+              <span id="friend-chat-avatar-text" class="font-bold text-brand-700 dark:text-brand-300">P</span>
+              <img id="friend-chat-avatar-img" src="" alt="" class="hidden absolute inset-0 w-full h-full object-cover">
+            </div>
+            <span id="friend-chat-presence-dot" class="profile-status-dot hidden absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white dark:border-gray-900"></span>
           </div>
           <div class="min-w-0 flex-1">
             <h3 id="friend-chat-name" class="font-bold text-gray-900 dark:text-white truncate">Friend</h3>
-            <p class="text-xs text-gray-400">Direct message</p>
+            <p class="text-xs text-gray-400" id="friend-chat-subtitle">Direct message</p>
           </div>
           <button onclick="startZoomCall({callType:'voice',targetType:'direct',friendId:currentFriendChatId}, this)" class="p-2 rounded-full text-brand-500 hover:bg-brand-100 dark:hover:bg-brand-900/40 flex-shrink-0" title="Voice call"><i data-lucide="phone" class="w-5 h-5"></i></button>
           <button onclick="startZoomCall({callType:'video',targetType:'direct',friendId:currentFriendChatId}, this)" class="p-2 rounded-full text-brand-500 hover:bg-brand-100 dark:hover:bg-brand-900/40 flex-shrink-0" title="Video call"><i data-lucide="video" class="w-5 h-5"></i></button>
+          <div class="relative flex-shrink-0">
+            <button onclick="toggleDropdownMenu(event, 'friend-chat-menu')" class="p-2 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800" title="More"><i data-lucide="more-vertical" class="w-5 h-5"></i></button>
+            <div id="friend-chat-menu-wrap"></div>
+          </div>
         </div>
         <div id="friend-chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50 dark:bg-gray-950"></div>
         <div id="friend-chat-reply-strip" class="hidden flex-shrink-0"></div>
@@ -397,12 +404,17 @@
           <h3 class="text-xl font-extrabold text-gray-900 dark:text-white font-heading">Rescue &amp; Seva</h3>
           <p class="text-sm text-gray-500 dark:text-gray-400">Help opportunities and rescue needs from your pack.</p>
         </div>
-        <button type="button" onclick="openCreateRescueModal()" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-sm font-bold flex-shrink-0">
-          <i data-lucide="plus" class="w-4 h-4"></i> Post opportunity
-        </button>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <button type="button" id="rescue-my-applications-btn" onclick="toggleRescueMyApplications()" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-bold">
+            <i data-lucide="clipboard-list" class="w-4 h-4"></i> My Applications
+          </button>
+          <button type="button" onclick="openCreateRescueModal()" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-sm font-bold">
+            <i data-lucide="plus" class="w-4 h-4"></i> Post opportunity
+          </button>
+        </div>
       </div>
 
-      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+      <div id="rescue-category-chips" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
         <button data-rescue-category="" onclick="filterRescueByCategory('')" class="rescue-category-chip">All</button>
         <button data-rescue-category="seva" onclick="filterRescueByCategory('seva')" class="rescue-category-chip">Seva</button>
         <button data-rescue-category="teaching" onclick="filterRescueByCategory('teaching')" class="rescue-category-chip">Teaching</button>

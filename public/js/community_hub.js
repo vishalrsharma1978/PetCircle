@@ -55,46 +55,56 @@ function hubSectionHtml(title, icon, innerHtml, emptyText) {
     </section>`;
 }
 
+function renderCommunityHubTab(container, data) {
+  (data.spotlight_guides || []).forEach((g) => { guidesCache[g.id] = g; });
+
+  const sections = [
+    hubSectionHtml("Trending in your pack", "flame",
+      (data.trending_posts || []).length ? `<div class="space-y-4">${data.trending_posts.map(postCardHtml).join("")}</div>` : "",
+      "No posts yet — be the first to share something with your pack."),
+    hubSectionHtml("Care guide spotlight", "book-open-text",
+      (data.spotlight_guides || []).length ? `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">${data.spotlight_guides.map(guideCardHtml).join("")}</div>` : "",
+      "Guides are on the way."),
+    hubSectionHtml("Active groups", "users",
+      (data.active_groups || []).length ? `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${data.active_groups.map(hubGroupCardHtml).join("")}</div>` : "",
+      "No groups yet — start one from the Groups tab."),
+    hubSectionHtml("Upcoming events", "calendar",
+      (data.upcoming_events || []).length ? `<div class="space-y-2">${data.upcoming_events.map(hubEventCardHtml).join("")}</div>` : "",
+      "No upcoming events."),
+    hubSectionHtml("Fresh galleries", "images",
+      (data.fresh_galleries || []).length ? `<div class="grid grid-cols-3 sm:grid-cols-6 gap-2">${data.fresh_galleries.map(hubGalleryCardHtml).join("")}</div>` : "",
+      "No public galleries yet."),
+  ];
+
+  container.innerHTML = `<div class="space-y-8">${sections.join("")}</div>`;
+  if (window.lucide) lucide.createIcons();
+}
+
 async function loadCommunityHubTab() {
   const container = document.getElementById("hub-content");
   if (!container) return;
-  container.innerHTML = `<div class="space-y-8">
-    ${hubSectionHtml("Trending in your pack", "flame", postCardSkeletonListHtml(2), "")}
-    ${hubSectionHtml("Care guide spotlight", "book-open-text", `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">${rowCardSkeletonListHtml(3)}</div>`, "")}
-    ${hubSectionHtml("Active groups", "users", `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${rowCardSkeletonListHtml(2)}</div>`, "")}
-  </div>`;
+
+  const payload = { pet_type: currentUserObj?.pet_type || "" };
+  const cached = peekApiCache("get_community_hub", payload);
+  if (cached?.status === "success") {
+    renderCommunityHubTab(container, cached);
+  } else {
+    container.innerHTML = `<div class="space-y-8">
+      ${hubSectionHtml("Trending in your pack", "flame", postCardSkeletonListHtml(2), "")}
+      ${hubSectionHtml("Care guide spotlight", "book-open-text", `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">${rowCardSkeletonListHtml(3)}</div>`, "")}
+      ${hubSectionHtml("Active groups", "users", `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${rowCardSkeletonListHtml(2)}</div>`, "")}
+    </div>`;
+  }
 
   try {
-    const data = await api("get_community_hub", { pet_type: currentUserObj?.pet_type || "" });
+    const data = await api("get_community_hub", payload, { forceRefresh: !!cached });
     if (data.status !== "success") {
-      container.innerHTML = `<p class="text-center text-sm text-gray-400 py-8">Could not load the community hub.</p>`;
+      if (!cached) container.innerHTML = `<p class="text-center text-sm text-gray-400 py-8">Could not load the community hub.</p>`;
       return;
     }
-
-    (data.spotlight_guides || []).forEach((g) => { guidesCache[g.id] = g; });
-
-    const sections = [
-      hubSectionHtml("Trending in your pack", "flame",
-        (data.trending_posts || []).length ? `<div class="space-y-4">${data.trending_posts.map(postCardHtml).join("")}</div>` : "",
-        "No posts yet — be the first to share something with your pack."),
-      hubSectionHtml("Care guide spotlight", "book-open-text",
-        (data.spotlight_guides || []).length ? `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">${data.spotlight_guides.map(guideCardHtml).join("")}</div>` : "",
-        "Guides are on the way."),
-      hubSectionHtml("Active groups", "users",
-        (data.active_groups || []).length ? `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${data.active_groups.map(hubGroupCardHtml).join("")}</div>` : "",
-        "No groups yet — start one from the Groups tab."),
-      hubSectionHtml("Upcoming events", "calendar",
-        (data.upcoming_events || []).length ? `<div class="space-y-2">${data.upcoming_events.map(hubEventCardHtml).join("")}</div>` : "",
-        "No upcoming events."),
-      hubSectionHtml("Fresh galleries", "images",
-        (data.fresh_galleries || []).length ? `<div class="grid grid-cols-3 sm:grid-cols-6 gap-2">${data.fresh_galleries.map(hubGalleryCardHtml).join("")}</div>` : "",
-        "No public galleries yet."),
-    ];
-
-    container.innerHTML = `<div class="space-y-8">${sections.join("")}</div>`;
-    if (window.lucide) lucide.createIcons();
+    renderCommunityHubTab(container, data);
   } catch (err) {
     console.error(err);
-    container.innerHTML = `<p class="text-center text-sm text-gray-400 py-8">Could not load the community hub.</p>`;
+    if (!cached) container.innerHTML = `<p class="text-center text-sm text-gray-400 py-8">Could not load the community hub.</p>`;
   }
 }

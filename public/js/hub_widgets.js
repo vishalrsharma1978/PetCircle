@@ -6,6 +6,43 @@
 // get_community_hub, get_ads, get_events) rather than any new or fabricated
 // content.
 
+// Bundles the pet-type-theme + hero + highlight + ads + calendar widgets'
+// backing reads into one HTTP round trip (step 24 Part C) instead of the
+// 6 separate requests goToDashboard() used to fire on every login. Seeds
+// the api() cache with each sub-result first, then calls the existing
+// widget loaders completely unchanged — each one's own internal api(...)
+// call transparently resolves from the just-seeded cache instead of
+// hitting the network again. If the batch call itself fails for any
+// reason, the loaders still run right after and just make their normal,
+// uncached calls — no special-case fallback needed.
+async function loadHubWidgetsBatched() {
+  const requests = [
+    { action: "get_app_config", payload: {} },
+    { action: "get_profile", payload: {} },
+    { action: "get_friends", payload: {} },
+    { action: "get_community_hub", payload: { pet_type: currentUserObj?.pet_type || "" } },
+    { action: "get_ads", payload: {} },
+    { action: "get_events", payload: { limit: 100 } },
+  ];
+  try {
+    const batchData = await apiBatch(requests);
+    if (batchData.status === "success" && Array.isArray(batchData.results)) {
+      batchData.results.forEach((result, i) => {
+        const resultData = { ...result };
+        delete resultData.action;
+        seedApiCache(requests[i].action, requests[i].payload, resultData);
+      });
+    }
+  } catch (err) {
+    console.error("Hub widget batch prefetch failed, falling back to individual calls:", err);
+  }
+  applyPetTypeTheme();
+  loadHubHero();
+  loadHubHighlight();
+  loadHubAdsWidget();
+  loadHubCalendarWidget();
+}
+
 async function loadHubHero() {
   const avatarSkeleton = document.getElementById("hub-hero-avatar-skeleton");
   const coverSkeleton = document.getElementById("hub-hero-cover-skeleton");

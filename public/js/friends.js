@@ -193,16 +193,26 @@ async function respondFriendRequest(friendshipId, action, btn) {
   }
 }
 
+function renderFriendRequests(list, requests) {
+  list.innerHTML = requests.length ? requests.map(friendRequestCardHtml).join("") : `<p class="text-xs text-gray-400">No pending requests.</p>`;
+  if (window.lucide) lucide.createIcons();
+}
+
 async function loadFriendRequests() {
   const list = document.getElementById("friend-requests-list");
   if (!list) return;
-  list.innerHTML = rowCardSkeletonListHtml(1);
+
+  const cached = peekApiCache("get_friend_requests", {});
+  if (cached?.status === "success") {
+    renderFriendRequests(list, cached.requests || []);
+  } else {
+    list.innerHTML = rowCardSkeletonListHtml(1);
+  }
+
   try {
-    const data = await api("get_friend_requests", {});
+    const data = await api("get_friend_requests", {}, { forceRefresh: !!cached });
     if (data.status !== "success") return;
-    const requests = data.requests || [];
-    list.innerHTML = requests.length ? requests.map(friendRequestCardHtml).join("") : `<p class="text-xs text-gray-400">No pending requests.</p>`;
-    if (window.lucide) lucide.createIcons();
+    renderFriendRequests(list, data.requests || []);
   } catch (err) {
     console.error(err);
   }
@@ -235,17 +245,8 @@ function friendCardUnreadBadgeHtml(friendId) {
   return `<span class="notif-pulse absolute -top-1 -right-1 min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-brand-500 text-white text-[10px] font-bold leading-[1.1rem] text-center ring-2 ring-white dark:ring-gray-900">${count > 99 ? "99+" : count}</span>`;
 }
 
-async function loadFriendsList() {
-  const list = document.getElementById("friends-list");
-  if (!list) return;
-  list.innerHTML = rowCardSkeletonListHtml(2);
-  try {
-    await loadFriendUnreadCounts();
-    const data = await api("get_friends", {});
-    if (data.status !== "success") return;
-    const friends = data.friends || [];
-    list.innerHTML = friends.length
-      ? friends.map((f) => `
+function friendCardHtml(f) {
+  return `
         <div class="flex items-center justify-between p-3 warm-glass rounded-xl">
           <div class="flex items-center gap-2 min-w-0 cursor-pointer" onclick="openMemberProfile('${f.user_id}')">
             <div class="relative w-9 h-9 flex-shrink-0">
@@ -267,9 +268,32 @@ async function loadFriendsList() {
               ${friendActionsMenuHtml(f.user_id, f.name, `friend-menu-${f.user_id}`)}
             </div>
           </div>
-        </div>`).join("")
-      : `<p class="text-xs text-gray-400">No friends yet — search above to find pets to connect with.</p>`;
-    if (window.lucide) lucide.createIcons();
+        </div>`;
+}
+
+function renderFriendsList(list, friends) {
+  list.innerHTML = friends.length
+    ? friends.map(friendCardHtml).join("")
+    : `<p class="text-xs text-gray-400">No friends yet — search above to find pets to connect with.</p>`;
+  if (window.lucide) lucide.createIcons();
+}
+
+async function loadFriendsList() {
+  const list = document.getElementById("friends-list");
+  if (!list) return;
+
+  const cached = peekApiCache("get_friends", {});
+  if (cached?.status === "success") {
+    renderFriendsList(list, cached.friends || []);
+  } else {
+    list.innerHTML = rowCardSkeletonListHtml(2);
+  }
+
+  try {
+    await loadFriendUnreadCounts();
+    const data = await api("get_friends", {}, { forceRefresh: !!cached });
+    if (data.status !== "success") return;
+    renderFriendsList(list, data.friends || []);
   } catch (err) {
     console.error(err);
   }

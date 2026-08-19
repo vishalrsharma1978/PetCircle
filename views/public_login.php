@@ -1,5 +1,5 @@
 <div id="view-public-login"
-  class="view-section active h-[100dvh] max-h-[100dvh] overflow-hidden flex flex-col lg:flex-row items-stretch w-full"
+  class="view-section active h-auto lg:h-[100dvh] lg:max-h-[100dvh] overflow-y-auto lg:overflow-hidden flex flex-col lg:flex-row items-stretch w-full"
   style="--login-accent: #f97316;">
 
   <!-- ── LEFT PANE: Feature Showcase & Feed ────────────────────────────── -->
@@ -10,12 +10,12 @@
     }
   </style>
   <div id="lp-left-pane"
-    class="w-full lg:w-[55%] h-full max-h-[100dvh] flex flex-col p-4 sm:p-5 lg:p-6 overflow-hidden overflow-x-hidden no-scrollbar relative"
+    class="w-full lg:w-[55%] h-auto lg:h-full lg:max-h-[100dvh] flex flex-col p-4 sm:p-5 lg:p-6 overflow-hidden overflow-x-hidden no-scrollbar relative"
     style="background:linear-gradient(160deg, color-mix(in srgb, var(--login-accent) 32%, #ffffff) 0%, color-mix(in srgb, var(--login-accent) 22%, #f8fafc) 100%); transition:background 0.5s ease, --login-accent 0.5s ease">
 
     <!-- Trailing Paws Background -->
     <section class="den" id="login-den" aria-hidden="true"
-      style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; opacity: 0; z-index: 0;">
+      style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; opacity: 0.4; z-index: 0;">
       <svg class="trail" viewBox="0 0 480 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"
         xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 100%; height: 100%;">
         <path id="loginTrailPath"
@@ -67,9 +67,11 @@
       </span>
     </div>
 
-    <!-- Live rotating feed card -->
+    <!-- Live rotating feed card (hidden on small screens: the left pane is a
+         compact decorative banner there, not a competing full-height panel —
+         see the mobile-first composition note in main.css) -->
     <div id="lp-feed-card"
-      class="flex-1 min-h-0 rounded-2xl bg-white/85 border border-white/90 shadow-md p-4 mb-2 backdrop-blur-sm relative z-10 transition-all duration-500">
+      class="hidden lg:block flex-1 min-h-0 rounded-2xl warm-glass warm-lift p-4 mb-2 relative z-10 transition-all duration-500">
     </div>
 
     <div class="mt-auto pt-2 relative z-10 w-full flex flex-col items-start">
@@ -98,15 +100,15 @@
 
   <!-- ── RIGHT PANE: Login Form ────────────────────────────────────────── -->
   <div id="lp-right-pane"
-    class="w-full lg:w-[45%] h-full flex flex-col items-center justify-start pt-10 sm:pt-16 pb-8 bg-white border-t lg:border-t-0 lg:border-l border-gray-100 p-6 sm:px-8 overflow-y-auto overflow-x-hidden"
+    class="w-full lg:w-[45%] h-auto lg:h-full flex flex-col items-center justify-start pt-8 sm:pt-10 lg:pt-16 pb-8 bg-white border-t lg:border-t-0 lg:border-l border-gray-100 p-6 sm:px-8 overflow-y-auto overflow-x-hidden"
     style="transition: --login-accent 0.5s ease;">
 
     <div class="w-full max-w-[460px] p-6 sm:p-7">
 
       <!-- Welcome Header -->
       <div class="mb-8 text-center">
-        <div
-          class="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-sm mb-4 border border-white/70 overflow-hidden transition-colors duration-500"
+        <div id="lp-brand-badge"
+          class="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-sm mb-4 border border-white/70 overflow-hidden transition-colors duration-500 breathing-glow"
           style="background-color: var(--login-accent);">
           <img src="assets/mascots/pawcircle-logo.svg" alt="PawCircle logo" class="w-11 h-11 object-contain"
             loading="eager" decoding="async" />

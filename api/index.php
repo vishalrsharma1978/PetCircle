@@ -67,6 +67,7 @@ require_once __DIR__ . '/routes/admin_core.php';
 require_once __DIR__ . '/routes/admin_users.php';
 require_once __DIR__ . '/routes/admin_content.php';
 require_once __DIR__ . '/routes/servers.php';
+require_once __DIR__ . '/routes/batch.php';
 
 // --- CORS: only reflect explicitly allowed origins ---
 $allowedOriginsRaw = envValue('ALLOWED_ORIGINS', '');
@@ -211,6 +212,7 @@ $routes = [
     'verify_password_reset_code' => 'handleVerifyPasswordResetCode',
     'reset_password' => 'handleResetPassword',
     'track_activity' => 'handleTrackActivity',
+    'batch' => 'handleBatchRequest',
     'get_profile' => 'handleGetProfile',
     'update_profile' => 'handleUpdateProfile',
     'change_pet_type_breed' => 'handleChangePetTypeBreed',

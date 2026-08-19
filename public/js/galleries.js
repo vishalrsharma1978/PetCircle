@@ -49,27 +49,56 @@ function isTemporaryBrowserMediaUrl(url = "") {
 
 // ---------------- Data loading ----------------
 
+function galleriesTabSkeletonHtml() {
+  return `
+    <section class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 sm:p-6">
+      <div class="h-8 w-56 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse"></div>
+      <div class="mt-5 grid sm:grid-cols-2 gap-5 sm:gap-6">
+        ${Array.from({ length: 4 }).map(() => `<div class="w-full h-72 rounded-[1.75rem] bg-gray-100 dark:bg-gray-800 animate-pulse"></div>`).join("")}
+      </div>
+    </section>`;
+}
+
 async function loadGalleriesTab() {
   const container = document.getElementById("social-tab-galleries");
   if (!container) return;
-  container.innerHTML = `
-    <section class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 sm:p-6">
-      <div class="h-8 w-56 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse"></div>
-      <div class="mt-5 grid grid-cols-1 gap-5">
-        ${Array.from({ length: 4 }).map(() => `<div class="max-w-md mx-auto w-full h-72 rounded-[1.75rem] bg-gray-100 dark:bg-gray-800 animate-pulse"></div>`).join("")}
-      </div>
-    </section>`;
+
+  const galleriesPayload = { owner_user_id: currentUserObj?.id || "" };
+  const eventsPayload = { pet_type: currentUserObj?.pet_type || "" };
+
+  // Prefer whatever's already loaded this session (reflects any optimistic
+  // create/delete already applied to galleriesCache) over a cached network
+  // snapshot, over a skeleton — same "live array beats cache snapshot"
+  // lesson as loadFeedPosts()'s revisit fix.
+  let hadInstantRender = false;
+  if (galleriesCache.length) {
+    renderMainGalleriesTab();
+    hadInstantRender = true;
+  } else {
+    const cachedGalleries = peekApiCache("get_galleries", galleriesPayload);
+    if (cachedGalleries?.status === "success") {
+      galleriesCache = cachedGalleries.galleries || [];
+      eventsCacheForGalleries = peekApiCache("get_events", eventsPayload)?.events || eventsCacheForGalleries;
+      renderMainGalleriesTab();
+      hadInstantRender = true;
+    } else {
+      container.innerHTML = galleriesTabSkeletonHtml();
+    }
+  }
+
   try {
     const [galleriesData, eventsData] = await Promise.all([
-      api("get_galleries", { owner_user_id: currentUserObj?.id || "" }),
-      api("get_events", { pet_type: currentUserObj?.pet_type || "" }),
+      api("get_galleries", galleriesPayload, { forceRefresh: hadInstantRender }),
+      api("get_events", eventsPayload, { forceRefresh: hadInstantRender }),
     ]);
     galleriesCache = galleriesData.status === "success" ? (galleriesData.galleries || []) : [];
     eventsCacheForGalleries = eventsData.status === "success" ? (eventsData.events || []) : [];
   } catch (err) {
     console.error(err);
-    galleriesCache = [];
-    eventsCacheForGalleries = [];
+    if (!hadInstantRender) {
+      galleriesCache = [];
+      eventsCacheForGalleries = [];
+    }
   }
   renderMainGalleriesTab();
 }
@@ -124,8 +153,16 @@ function renderNoGalleriesFoundHtml(title, text) {
 }
 
 function renderGalleryLibraryResultsHtml(galleries) {
+  // sm: (640px) rather than eSamaj's xl: (1280px): this tab removes
+  // #social-main-column's own width cap (updateSocialLayoutForTab's
+  // isFullWidthMainTab), so an xl:-gated grid doesn't reliably hit 2
+  // columns on ordinary laptop/desktop viewports. No max-width/mx-auto
+  // cap here — the grid fills the section's own content box, and the
+  // gap tracks the section's own padding (p-5 sm:p-6 on the wrapping
+  // <section>) exactly, so the left/right margin around the pair of
+  // cards is always equal to the gap between them, by construction.
   return galleries.length
-    ? `<div class="grid grid-cols-1 gap-5">${galleries.map(renderGalleryAlbumCardHtml).join("")}</div>`
+    ? `<div class="grid sm:grid-cols-2 gap-5 sm:gap-6">${galleries.map((gallery) => renderGalleryAlbumCardHtml(gallery, eventsCacheForGalleries)).join("")}</div>`
     : renderNoGalleriesFoundHtml("No galleries match", "Try a different search, filter, or sort option.");
 }
 
@@ -215,48 +252,38 @@ function renderGalleryMediaPreviewHtml(item, classes = "") {
   return `<img src="${escapeHtml(url)}" alt="" loading="lazy" class="${classes}">`;
 }
 
-// A flex-based overlapping card stack, replacing the earlier absolute-position
-// + CSS-custom-property transform math (ported from eSamaj, then re-anchored
-// twice) that kept rendering off-center — pixel offsets tuned against a card
-// width I can't actually see never lined up right without a browser to check
-// against. Flexbox with `justify-content: center` guarantees the whole
-// cluster is centered by construction regardless of tile count/size, so
-// there's no pixel math left to get wrong. Each tile overlaps the previous
-// one via a negative margin (see .gallery-preview-tile in main.css) and gets
-// a small fixed rotation for the fanned-deck look; hovering a tile just lifts
-// and un-rotates that one tile in place.
-function renderGalleryPreviewCardHtml(item, index, extraCount, galleryId, previewCount = 4) {
-  const transformSets = {
-    1: [
-      ["translateX(8px) translateY(8px) rotate(-3deg)", "translateX(-95px) translateY(0px) rotate(0deg)", "2deg"],
-    ],
-    2: [
-      ["translateX(18px) translateY(4px) rotate(-8deg)", "translateX(-165px) translateY(0px) rotate(-2deg)", "-5deg"],
-      ["translateX(-8px) translateY(14px) rotate(7deg)", "translateX(-35px) translateY(0px) rotate(2deg)", "5deg"],
-    ],
-    3: [
-      ["translateX(22px) translateY(0px) rotate(-10deg)", "translateX(-230px) translateY(0px) rotate(-3deg)", "-6deg"],
-      ["translateX(2px) translateY(10px) rotate(-1deg)", "translateX(-100px) translateY(0px) rotate(0deg)", "0deg"],
-      ["translateX(-18px) translateY(20px) rotate(9deg)", "translateX(30px) translateY(0px) rotate(3deg)", "6deg"],
-    ],
-    4: [
-      ["translateX(24px) translateY(0px) rotate(-12deg)", "translateX(-295px) translateY(0px) rotate(-3deg)", "-7deg"],
-      ["translateX(6px) translateY(8px) rotate(-4deg)", "translateX(-165px) translateY(0px) rotate(-1deg)", "-3deg"],
-      ["translateX(-12px) translateY(16px) rotate(5deg)", "translateX(-35px) translateY(0px) rotate(1deg)", "3deg"],
-      ["translateX(-30px) translateY(24px) rotate(13deg)", "translateX(95px) translateY(0px) rotate(3deg)", "7deg"],
-    ],
-  };
-  const transforms = (transformSets[Math.min(Math.max(previewCount, 1), 4)] || transformSets[4])[index] || transformSets[1][0];
-  const style = `--gallery-base-transform:${transforms[0]};--gallery-fan-transform:${transforms[1]};--gallery-hover-rotate:${transforms[2]};z-index:${12 + index};`;
+// A flex-based overlapping card stack: the wrapper is `flex items-center
+// justify-center` (see renderGalleryAlbumCardHtml) so the whole cluster is
+// centered by construction regardless of tile count/card width — no pixel
+// math to keep in sync. Each tile overlaps the previous one via a negative
+// margin (.gallery-preview-tile in main.css) and gets a small fixed base
+// rotation here for the fanned-deck look; hovering a tile lifts, scales,
+// and un-rotates just that tile via the CSS :hover rule (which uses
+// !important specifically so it always wins over this inline base rotation).
+const GALLERY_PREVIEW_ROTATIONS = [-6, 4, -9, 7];
+
+function renderGalleryPreviewCardHtml(item, index, extraCount, galleryId) {
+  const rotation = GALLERY_PREVIEW_ROTATIONS[index % GALLERY_PREVIEW_ROTATIONS.length];
   const moreHtml = extraCount > 0
     ? `<div class="settings-gallery-more-card absolute inset-0 flex flex-col items-center justify-center text-white backdrop-blur-[1px]">
             <span class="text-3xl font-black">+${extraCount}</span>
             <span class="text-xs font-bold uppercase tracking-wide text-white/75">more</span>
           </div>`
     : "";
-  return `<div class="settings-gallery-preview absolute top-10 right-10 w-36 h-44 rounded-2xl overflow-hidden shadow-2xl bg-gray-100 dark:bg-gray-800 cursor-pointer transition-transform duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)]" style="${style}" onclick="event.stopPropagation(); openGallerySlideshow('${galleryId}', ${index})">
+  return `<div class="gallery-preview-tile relative w-36 h-44 rounded-2xl overflow-hidden shadow-2xl bg-gray-100 dark:bg-gray-800 cursor-pointer" style="--tile-rotation:${rotation}deg; z-index:${12 + index};" onclick="event.stopPropagation(); openGallerySlideshow('${galleryId}', ${index})">
         ${renderGalleryMediaPreviewHtml(item, "w-full h-full object-cover pointer-events-none")}
         ${moreHtml}
+      </div>`;
+}
+
+// Empty-gallery placeholder tiles: a generic accent-tinted icon treatment
+// (.settings-gallery-placeholder, already defined in main.css) rather than
+// eSamaj's static religion-themed images (img/bg_hindu.png etc.), which
+// don't exist as assets in this app and would be fabricated file references.
+function renderGalleryPreviewPlaceholderHtml(index) {
+  const rotation = GALLERY_PREVIEW_ROTATIONS[index % GALLERY_PREVIEW_ROTATIONS.length];
+  return `<div class="gallery-preview-tile settings-gallery-placeholder relative w-36 h-44 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center" style="--tile-rotation:${rotation}deg; z-index:${12 + index};">
+        <i data-lucide="paw-print" class="w-8 h-8 text-white/70"></i>
       </div>`;
 }
 
@@ -283,15 +310,12 @@ function getGalleryAccentColor(petType) {
 function renderGalleryAlbumCardHtml(gallery, events = []) {
   const linkedEvent = gallery.event_id ? events.find((eventItem) => String(eventItem.id) === String(gallery.event_id)) : null;
   const items = Array.isArray(gallery.items) ? gallery.items : [];
-  const fallbackImages = [
-    "img/bg_hindu.png",
-    "img/bg_sikh.png",
-    "img/bg_buddhist.png",
-    "img/bg_jain.png",
-  ];
-  const previewItems = items.length ? items.slice(0, 4) : fallbackImages.map((url) => ({ media_url: url }));
+  const previewItems = items.slice(0, 4);
   const extraCount = Math.max(0, items.length - 4);
   const safeGalleryId = escapeHtml(String(gallery.id || ""));
+  const previewHtml = previewItems.length
+    ? previewItems.map((item, index) => renderGalleryPreviewCardHtml(item, index, index === previewItems.length - 1 ? extraCount : 0, safeGalleryId)).join("")
+    : [0, 1, 2].map((index) => renderGalleryPreviewPlaceholderHtml(index)).join("");
   const accentColor = getGalleryAccentColor(currentUserObj?.pet_type);
   const cardStyle = `--gallery-accent:${accentColor};border-color:color-mix(in srgb, var(--gallery-accent) 34%, transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--gallery-accent) 14%, transparent),0 14px 30px rgba(15,23,42,.06);`;
   return `
@@ -316,8 +340,8 @@ function renderGalleryAlbumCardHtml(gallery, events = []) {
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Delete
             </button>
           </div>
-          <div class="absolute inset-0 cursor-pointer" onclick="openGallerySlideshow('${safeGalleryId}')">
-            ${previewItems.map((item, index) => renderGalleryPreviewCardHtml(item, index, index === 3 ? extraCount : 0, safeGalleryId, previewItems.length)).join("")}
+          <div class="absolute inset-0 flex items-center justify-center cursor-pointer" onclick="openGallerySlideshow('${safeGalleryId}')">
+            ${previewHtml}
           </div>
         </article>`;
 }
@@ -714,6 +738,40 @@ async function createGalleryFromModal() {
     submitBtn.disabled = true;
     submitBtn.classList.add("opacity-60", "cursor-not-allowed");
   }
+
+  // Optimistic creation only — editing an existing gallery already shows in
+  // the list, so there's nothing to reveal early there. Show the new
+  // gallery in the tab immediately (title/description/URL-based media —
+  // staged file uploads still need a real gallery id from the server
+  // before they can upload, so those items still appear a moment later),
+  // then reconcile with the real record, or remove it again if the save
+  // actually fails.
+  const isCreating = !galleryId;
+  let optimisticId = null;
+  const stagedFilesSnapshot = galleryModalStagedFiles.slice();
+
+  if (isCreating) {
+    optimisticId = "temp-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
+    galleriesCache = [{
+      id: optimisticId,
+      owner_user_id: currentUserObj?.id || null,
+      event_id: eventId || null,
+      title,
+      description,
+      visibility,
+      created_at: new Date().toISOString(),
+      items: mediaUrls.map((mediaUrl, index) => ({
+        id: `${optimisticId}-item-${index}`,
+        media_url: mediaUrl,
+        media_type: galleryMediaTypeFromUrl(mediaUrl),
+        sort_order: index,
+      })),
+      _optimistic: true,
+    }, ...galleriesCache];
+    renderMainGalleriesTab();
+    closeCreateGalleryModal();
+  }
+
   try {
     let gallery;
     if (galleryId) {
@@ -729,7 +787,7 @@ async function createGalleryFromModal() {
         });
         if (itemData.status !== "success") throw new Error(itemData.message || "Could not add gallery item.");
       }
-      for (const [index, staged] of galleryModalStagedFiles.entries()) {
+      for (const [index, staged] of stagedFilesSnapshot.entries()) {
         const uploaded = await uploadGalleryMediaFile(staged.file, galleryId);
         const itemData = await api("add_gallery_item", {
           gallery_id: galleryId,
@@ -750,10 +808,17 @@ async function createGalleryFromModal() {
       if (data.status !== "success") throw new Error(data.message || "Could not create gallery.");
       gallery = data.gallery;
       const newGalleryId = gallery?.id;
-      if (!newGalleryId && galleryModalStagedFiles.length) {
+
+      // Reconcile: swap the optimistic placeholder for the real record now
+      // that we have one.
+      const optimisticIdx = galleriesCache.findIndex((g) => g.id === optimisticId);
+      if (optimisticIdx !== -1) galleriesCache[optimisticIdx] = gallery;
+      renderMainGalleriesTab();
+
+      if (!newGalleryId && stagedFilesSnapshot.length) {
         throw new Error("Gallery was created but no gallery ID was returned for media upload.");
       }
-      for (const [index, staged] of galleryModalStagedFiles.entries()) {
+      for (const [index, staged] of stagedFilesSnapshot.entries()) {
         const uploaded = await uploadGalleryMediaFile(staged.file, newGalleryId);
         const itemData = await api("add_gallery_item", {
           gallery_id: newGalleryId,
@@ -764,12 +829,18 @@ async function createGalleryFromModal() {
         if (itemData.status !== "success") throw new Error(itemData.message || "Could not add gallery item.");
       }
     }
-    closeCreateGalleryModal();
+    if (!isCreating) closeCreateGalleryModal();
     resetGalleryModalUploadUi();
     showToast(galleryId ? "Gallery updated." : "Gallery created.", "success");
     await loadGalleriesTab();
   } catch (err) {
     console.error(err);
+    if (isCreating) {
+      // The create genuinely failed — remove the optimistic entry rather
+      // than leave a gallery showing that was never actually saved.
+      galleriesCache = galleriesCache.filter((g) => g.id !== optimisticId);
+      renderMainGalleriesTab();
+    }
     showToast(err.message || "Could not save gallery.", "error");
     if (submitBtn) {
       submitBtn.disabled = false;
@@ -871,6 +942,16 @@ function closeGallerySlideshow() {
   if (overlay) overlay.classList.remove("active");
   document.body.classList.remove("overflow-hidden");
 }
+
+// Escape/arrow-key navigation, gated on the lightbox actually being open —
+// matches eSamaj's own lightbox keyboard shortcuts.
+document.addEventListener("keydown", (event) => {
+  const overlay = document.getElementById("gallery-lightbox");
+  if (!overlay?.classList.contains("active")) return;
+  if (event.key === "Escape") closeGallerySlideshow();
+  else if (event.key === "ArrowLeft") moveGallerySlideshow(-1);
+  else if (event.key === "ArrowRight") moveGallerySlideshow(1);
+});
 
 function bindGalleryLightboxScroll() {
   const track = document.getElementById("gallery-lightbox-track");

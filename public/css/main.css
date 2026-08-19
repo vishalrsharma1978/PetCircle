@@ -1004,401 +1004,12 @@
       padding: 0;
     }
 
-    /* ==================== ZOOM CALL SHELL - CLEAN VERSION ==================== */
-
-    body.zoom-call-active {
-      overflow: hidden;
-    }
-
-    body.zoom-call-active::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.68);
-      backdrop-filter: blur(7px);
-      z-index: 8998;
-      pointer-events: none;
-    }
-
-    /* Small floating chip only */
-    #esamaj-zoom-toolbar {
-      position: fixed;
-      top: 18px;
-      right: 24px;
-      z-index: 10002;
-      display: none;
-      align-items: flex-end;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    body.zoom-call-active #esamaj-zoom-toolbar {
-      display: flex;
-    }
-
-    #zoom-toolbar-main {
-      border: 0 !important;
-      background: rgba(17, 24, 39, 0.96) !important;
-      color: white !important;
-      padding: 12px 18px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 800;
-      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.28);
-    }
-
-    #zoom-toolbar-menu {
-      display: flex;
-      gap: 8px;
-      padding: 8px;
-      border-radius: 18px;
-      background: rgba(17, 24, 39, 0.96);
-      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.32);
-    }
-
-    #zoom-toolbar-menu.hidden {
-      display: none;
-    }
-
-    #zoom-toolbar-menu button {
-      border: 0 !important;
-      background: rgba(255, 255, 255, 0.12) !important;
-      color: white !important;
-      padding: 9px 12px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    #zoom-toolbar-menu button:hover,
-    #zoom-toolbar-main:hover {
-      background: var(--theme-accent, #ff5a5a) !important;
-    }
-
-    /* Disable compact while on Zoom pre-join/waiting-room screen */
-    body.zoom-call-prejoin #zoom-size-toggle-btn {
-      opacity: 0.42;
-      pointer-events: none;
-    }
-
-    /* Main Zoom shell: large enough for pre-join screen */
-    body.zoom-call-active #zmmtg-root {
-      position: fixed !important;
-      top: 72px !important;
-      left: 50% !important;
-      transform: translateX(-50%) !important;
-
-      width: min(1040px, calc(100vw - 48px)) !important;
-      height: calc(100vh - 96px) !important;
-      min-width: 760px !important;
-      min-height: 640px !important;
-
-      z-index: 9999 !important;
-      border-radius: 28px !important;
-      background: #ffffff !important;
-      box-shadow:
-        0 30px 90px rgba(0, 0, 0, 0.45),
-        0 0 0 1px rgba(255, 255, 255, 0.16) !important;
-
-      overflow: auto !important;
-      resize: none !important;
-    }
-
-    /* Hide scrollbars visually, but keep scroll working */
-    body.zoom-call-active #zmmtg-root {
-      scrollbar-width: none !important;
-    }
-
-    body.zoom-call-active #zmmtg-root::-webkit-scrollbar {
-      width: 0 !important;
-      height: 0 !important;
-      display: none !important;
-    }
-
-    /* Large mode */
-    body.zoom-call-active.zoom-call-large #zmmtg-root {
-      top: 72px !important;
-      width: min(1120px, calc(100vw - 48px)) !important;
-      height: calc(100vh - 96px) !important;
-    }
-
-    /* Compact mode only makes sense after joining */
-    body.zoom-call-active.zoom-call-compact:not(.zoom-call-prejoin) #zmmtg-root {
-      top: auto !important;
-      right: 24px !important;
-      bottom: 24px !important;
-      left: auto !important;
-      transform: none !important;
-
-      width: 720px !important;
-      height: 480px !important;
-      min-width: 720px !important;
-      min-height: 480px !important;
-
-      border-radius: 24px !important;
-      overflow: auto !important;
-    }
-
-    /* Fullscreen */
-    body.zoom-call-active.zoom-call-fullscreen #zmmtg-root {
-      top: 0 !important;
-      left: 0 !important;
-      transform: none !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      min-width: 0 !important;
-      min-height: 0 !important;
-      border-radius: 0 !important;
-    }
-
-    /* Mobile */
-    @media (max-width: 768px) {
-      #esamaj-zoom-toolbar {
-        top: 10px;
-        right: 10px;
-      }
-
-      #zoom-toolbar-menu {
-        flex-wrap: wrap;
-        max-width: calc(100vw - 20px);
-        justify-content: flex-end;
-      }
-
-      body.zoom-call-active #zmmtg-root {
-        top: 64px !important;
-        width: calc(100vw - 16px) !important;
-        height: calc(100vh - 78px) !important;
-        min-width: 0 !important;
-        min-height: 0 !important;
-        border-radius: 18px !important;
-      }
-
-      body.zoom-call-active.zoom-call-compact:not(.zoom-call-prejoin) #zmmtg-root {
-        width: calc(100vw - 20px) !important;
-        height: 420px !important;
-        right: 10px !important;
-        bottom: 10px !important;
-        min-width: 0 !important;
-        min-height: 0 !important;
-      }
-    }
-
-
-    /* Zoom minimized state: call keeps running, page becomes usable again */
-    body.zoom-call-minimized {
-      overflow: auto !important;
-    }
-
-    body.zoom-call-minimized #zmmtg-root {
-      display: none !important;
-    }
-
-    #zoom-return-chip {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      z-index: 10003;
-      display: none;
-      align-items: center;
-      gap: 8px;
-      padding: 8px;
-      border-radius: 999px;
-      background: rgba(17, 24, 39, 0.96);
-      color: white;
-      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.32);
-      backdrop-filter: blur(12px);
-    }
-
-    body.zoom-call-minimized #zoom-return-chip {
-      display: flex;
-    }
-
-    #zoom-return-chip button {
-      border: 0 !important;
-      border-radius: 999px;
-      padding: 9px 12px;
-      font-size: 12px;
-      font-weight: 800;
-      color: white !important;
-      background: rgba(255, 255, 255, 0.12) !important;
-      cursor: pointer;
-    }
-
-    #zoom-return-chip button:hover {
-      background: var(--theme-accent, #ff5a5a) !important;
-    }
-
-
-    /* ==================== CHAT CALL TIMELINE + ZOOM FIT OVERRIDES ==================== */
-    .group-call-timeline-card {
-      width: min(100%, 720px);
-    }
-
-    /* Client View behaves like a full Zoom app. Give it a full virtual canvas,
-       and scale compact mode instead of shrinking/cropping the canvas. */
-    body.zoom-call-active #zmmtg-root {
-      position: fixed !important;
-      z-index: 9999 !important;
-      top: 64px !important;
-      left: 50% !important;
-      right: auto !important;
-      bottom: auto !important;
-      width: min(1280px, calc(100vw - 32px)) !important;
-      height: calc(100vh - 88px) !important;
-      min-width: 0 !important;
-      min-height: 620px !important;
-      transform: translateX(-50%) !important;
-      transform-origin: center center !important;
-      border-radius: 24px !important;
-      overflow: hidden !important;
-      resize: none !important;
-      background: #fff !important;
-      box-shadow:
-        0 30px 90px rgba(0, 0, 0, 0.45),
-        0 0 0 1px rgba(255, 255, 255, 0.16) !important;
-    }
-
-    body.zoom-call-active.zoom-call-prejoin #zmmtg-root {
-      overflow: auto !important;
-    }
-
-    body.zoom-call-active #zmmtg-root>div,
-    body.zoom-call-active #zmmtg-root .meeting-client,
-    body.zoom-call-active #zmmtg-root .meeting-client-inner {
-      width: 100% !important;
-      height: 100% !important;
-      max-width: none !important;
-      max-height: none !important;
-    }
-
-    body.zoom-call-active.zoom-call-large #zmmtg-root {
-      top: 64px !important;
-      left: 50% !important;
-      right: auto !important;
-      bottom: auto !important;
-      width: min(1280px, calc(100vw - 32px)) !important;
-      height: calc(100vh - 88px) !important;
-      min-width: 0 !important;
-      min-height: 620px !important;
-      transform: translateX(-50%) !important;
-      transform-origin: center center !important;
-      border-radius: 24px !important;
-    }
-
-    body.zoom-call-active.zoom-call-compact:not(.zoom-call-prejoin) #zmmtg-root {
-      top: auto !important;
-      left: auto !important;
-      right: 20px !important;
-      bottom: 20px !important;
-      width: 1280px !important;
-      height: 720px !important;
-      min-width: 1280px !important;
-      min-height: 720px !important;
-      transform: scale(0.55) !important;
-      transform-origin: bottom right !important;
-      border-radius: 28px !important;
-      overflow: hidden !important;
-    }
-
-    body.zoom-call-active.zoom-call-fullscreen #zmmtg-root {
-      top: 0 !important;
-      left: 0 !important;
-      right: auto !important;
-      bottom: auto !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      min-width: 0 !important;
-      min-height: 0 !important;
-      transform: none !important;
-      transform-origin: center center !important;
-      border-radius: 0 !important;
-      overflow: hidden !important;
-    }
-
-    @media (max-width: 768px) {
-
-      body.zoom-call-active #zmmtg-root,
-      body.zoom-call-active.zoom-call-large #zmmtg-root {
-        top: 56px !important;
-        left: 8px !important;
-        right: auto !important;
-        width: calc(100vw - 16px) !important;
-        height: calc(100vh - 70px) !important;
-        min-width: 0 !important;
-        min-height: 0 !important;
-        transform: none !important;
-        border-radius: 18px !important;
-      }
-
-      body.zoom-call-active.zoom-call-compact:not(.zoom-call-prejoin) #zmmtg-root {
-        top: auto !important;
-        left: auto !important;
-        right: 10px !important;
-        bottom: 10px !important;
-        width: 980px !important;
-        height: 620px !important;
-        min-width: 980px !important;
-        min-height: 620px !important;
-        transform: scale(0.38) !important;
-        transform-origin: bottom right !important;
-      }
-    }
-
-    /* ==================== FACEBOOK-STYLE MOBILE NAV DRAWER ==================== */
-    #mobile-nav-drawer {
-      transition: transform 0.28s cubic-bezier(.4, 0, .2, 1);
-      will-change: transform;
-    }
-
-    #mobile-nav-backdrop {
-      transition: opacity 0.28s ease;
-    }
-
-    .drawer-nav-btn {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
-      padding: 11px 12px;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 14px;
-      color: #374151;
-      transition: background-color 0.15s ease, color 0.15s ease;
-      text-align: left;
-    }
-
-    .drawer-nav-btn:hover {
-      background-color: #f3f4f6;
-    }
-
-    .dark .drawer-nav-btn {
-      color: #d1d5db;
-    }
-
-    .dark .drawer-nav-btn:hover {
-      background-color: rgba(255, 255, 255, 0.06);
-    }
-
-    .drawer-nav-btn .drawer-nav-icon {
-      flex-shrink: 0;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-    }
-
-    .drawer-nav-btn.active {
-      background-color: var(--brand-50, #fff1f1);
-      color: var(--brand-600, #d63838);
-    }
-
-    .dark .drawer-nav-btn.active {
-      background-color: rgba(224, 72, 72, 0.16);
-      color: #fca5a5;
-    }
+    /* Note: the real #mobile-nav-drawer/#mobile-nav-backdrop/.drawer-nav-btn
+       styling lives in the "PawCircle-rebuild additions" section further down
+       this file, alongside the actual markup+JS this drawer uses (step 23).
+       A near-identical but unwired duplicate of this block used to sit here
+       (leftover from an earlier, incomplete drawer attempt) and has been
+       removed rather than left as confusing dead weight. */
 
     /* Tab-strip icons only surface on the mobile (Facebook-style) icon row */
     #social-tab-strip .social-tab-item .tab-icon {
@@ -4364,121 +3975,6 @@
     }
 
 
-    /* ==================== CHAT CALL TIMELINE + ZOOM FIT OVERRIDES ==================== */
-    .group-call-timeline-card {
-      width: min(100%, 720px);
-    }
-
-    /* Client View behaves like a full Zoom app. Give it a full virtual canvas,
-       and scale compact mode instead of shrinking/cropping the canvas. */
-    body.zoom-call-active #zmmtg-root {
-      position: fixed !important;
-      z-index: 9999 !important;
-      top: 64px !important;
-      left: 50% !important;
-      right: auto !important;
-      bottom: auto !important;
-      width: min(1280px, calc(100vw - 32px)) !important;
-      height: calc(100vh - 88px) !important;
-      min-width: 0 !important;
-      min-height: 620px !important;
-      transform: translateX(-50%) !important;
-      transform-origin: center center !important;
-      border-radius: 24px !important;
-      overflow: hidden !important;
-      resize: none !important;
-      background: #fff !important;
-      box-shadow:
-        0 30px 90px rgba(0, 0, 0, 0.45),
-        0 0 0 1px rgba(255, 255, 255, 0.16) !important;
-    }
-
-    body.zoom-call-active.zoom-call-prejoin #zmmtg-root {
-      overflow: auto !important;
-    }
-
-    body.zoom-call-active #zmmtg-root>div,
-    body.zoom-call-active #zmmtg-root .meeting-client,
-    body.zoom-call-active #zmmtg-root .meeting-client-inner {
-      width: 100% !important;
-      height: 100% !important;
-      max-width: none !important;
-      max-height: none !important;
-    }
-
-    body.zoom-call-active.zoom-call-large #zmmtg-root {
-      top: 64px !important;
-      left: 50% !important;
-      right: auto !important;
-      bottom: auto !important;
-      width: min(1280px, calc(100vw - 32px)) !important;
-      height: calc(100vh - 88px) !important;
-      min-width: 0 !important;
-      min-height: 620px !important;
-      transform: translateX(-50%) !important;
-      transform-origin: center center !important;
-      border-radius: 24px !important;
-    }
-
-    body.zoom-call-active.zoom-call-compact:not(.zoom-call-prejoin) #zmmtg-root {
-      top: auto !important;
-      left: auto !important;
-      right: 20px !important;
-      bottom: 20px !important;
-      width: 1280px !important;
-      height: 720px !important;
-      min-width: 1280px !important;
-      min-height: 720px !important;
-      transform: scale(0.55) !important;
-      transform-origin: bottom right !important;
-      border-radius: 28px !important;
-      overflow: hidden !important;
-    }
-
-    body.zoom-call-active.zoom-call-fullscreen #zmmtg-root {
-      top: 0 !important;
-      left: 0 !important;
-      right: auto !important;
-      bottom: auto !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      min-width: 0 !important;
-      min-height: 0 !important;
-      transform: none !important;
-      transform-origin: center center !important;
-      border-radius: 0 !important;
-      overflow: hidden !important;
-    }
-
-    @media (max-width: 768px) {
-
-      body.zoom-call-active #zmmtg-root,
-      body.zoom-call-active.zoom-call-large #zmmtg-root {
-        top: 56px !important;
-        left: 8px !important;
-        right: auto !important;
-        width: calc(100vw - 16px) !important;
-        height: calc(100vh - 70px) !important;
-        min-width: 0 !important;
-        min-height: 0 !important;
-        transform: none !important;
-        border-radius: 18px !important;
-      }
-
-      body.zoom-call-active.zoom-call-compact:not(.zoom-call-prejoin) #zmmtg-root {
-        top: auto !important;
-        left: auto !important;
-        right: 10px !important;
-        bottom: 10px !important;
-        width: 980px !important;
-        height: 620px !important;
-        min-width: 980px !important;
-        min-height: 620px !important;
-        transform: scale(0.38) !important;
-        transform-origin: bottom right !important;
-      }
-    }
-
     /* ============================================================
        International phone input (country-code picker)
     ============================================================ */
@@ -4934,6 +4430,20 @@
       .reaction-pop {
         animation: none !important;
       }
+
+      #login-den {
+        display: none !important;
+      }
+    }
+
+    /* Login page: brand badge reacts subtly to the password field gaining
+       focus — CSS-only via :has(), no new JS state needed. */
+    #public-login-form:has(#public-password:focus) #lp-brand-badge {
+      transform: scale(1.08);
+      box-shadow: 0 0 0 6px color-mix(in srgb, var(--login-accent, #f97316) 22%, transparent);
+    }
+    #lp-brand-badge {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     /* Mobile: tighten oversized feed cards & action rows so they feel less
@@ -5103,6 +4613,40 @@
   border-bottom-color: var(--brand-500, #e04848);
 }
 
+#mobile-nav-drawer {
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#mobile-nav-backdrop {
+  transition: opacity 0.28s ease;
+}
+.drawer-nav-btn {
+  color: #374151;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.dark .drawer-nav-btn {
+  color: #d1d5db;
+}
+.drawer-nav-btn:hover {
+  background-color: var(--brand-50, #fff5f5);
+}
+.dark .drawer-nav-btn:hover {
+  background-color: rgba(224, 72, 72, 0.12);
+}
+.drawer-nav-btn.active-tab {
+  background-color: var(--brand-50, #fff5f5);
+  color: var(--brand-600, #dc2626);
+}
+.dark .drawer-nav-btn.active-tab {
+  background-color: rgba(224, 72, 72, 0.14);
+  color: var(--brand-300, #ff8b5a);
+}
+@media (prefers-reduced-motion: reduce) {
+  #mobile-nav-drawer, #mobile-nav-backdrop {
+    transition: none;
+  }
+}
+
 .rescue-category-chip {
   padding: 0.4rem 0.9rem;
   border-radius: 9999px;
@@ -5149,11 +4693,29 @@
    construction — no per-card pixel math to keep in sync with card width. */
 .gallery-preview-tile {
   flex-shrink: 0;
+  transform: rotate(var(--tile-rotation, 0deg));
   transition: transform 0.35s cubic-bezier(.22, 1, .36, 1), box-shadow 0.3s ease, filter 0.3s ease;
 }
 .gallery-preview-tile:not(:first-child) {
   margin-left: -4.5rem;
 }
+/* Stage 1: hovering anywhere on the card fans the whole stack apart —
+   small fixed nudges (not eSamaj's large absolute-position offsets, which
+   were tuned against a card width this environment can't measure) so the
+   fan can't overflow a card regardless of its actual rendered width; the
+   flex parent's justify-content:center keeps the cluster centered either
+   way. Slower/springier timing than the per-tile hover below, matching
+   eSamaj's own "reveal" pacing for this stage. */
+.group:hover .gallery-preview-tile {
+  transition: transform 0.55s cubic-bezier(.22, 1, .36, 1), box-shadow 0.3s ease, filter 0.3s ease;
+}
+.group:hover .gallery-preview-tile:nth-child(1) { transform: translateX(-35px) rotate(var(--tile-rotation, 0deg)); }
+.group:hover .gallery-preview-tile:nth-child(2) { transform: translateX(-12px) rotate(var(--tile-rotation, 0deg)); }
+.group:hover .gallery-preview-tile:nth-child(3) { transform: translateX(12px) rotate(var(--tile-rotation, 0deg)); }
+.group:hover .gallery-preview-tile:nth-child(4) { transform: translateX(35px) rotate(var(--tile-rotation, 0deg)); }
+/* Stage 2: hovering one specific tile lifts/scales/un-rotates just that
+   tile on top of stage 1 — !important so it always wins over both the
+   base rotation and the stage-1 fan-out above. */
 .gallery-preview-tile:hover {
   transform: translateY(-14px) scale(1.1) rotate(0deg) !important;
   box-shadow: 0 24px 45px rgba(0, 0, 0, 0.4);
@@ -5444,12 +5006,14 @@ body.zoom-call-active.zoom-call-fullscreen #zmmtg-root {
     left: auto !important;
     right: 10px !important;
     bottom: 10px !important;
-    width: 980px !important;
-    height: 620px !important;
-    min-width: 980px !important;
-    min-height: 620px !important;
-    transform: scale(0.38) !important;
+    width: calc(100vw - 20px) !important;
+    max-width: 360px !important;
+    height: 220px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    transform: none !important;
     transform-origin: bottom right !important;
+    border-radius: 18px !important;
   }
 }
 

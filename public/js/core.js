@@ -202,12 +202,10 @@ function updateSocialLayoutForTab(tabId) {
   const isSettings = tabId === "settings";
   const isPostDetail = tabId === "post-detail";
   const isFullWidthMainTab = tabId === "galleries" || isPostDetail;
-  const mobileNav = document.getElementById("social-mobile-nav");
   const socialSidebar = document.getElementById("social-left-sidebar");
   const rightSidebar = document.getElementById("social-right-sidebar");
   const mainColumn = document.getElementById("social-main-column");
 
-  if (mobileNav) mobileNav.style.display = (isSettings || isPostDetail) ? "none" : "";
   if (rightSidebar) rightSidebar.style.display = (isSettings || isFullWidthMainTab) ? "none" : "";
   if (socialSidebar) {
     socialSidebar.classList.toggle("lg:flex", !isSettings && !isPostDetail);
@@ -465,6 +463,83 @@ function openMessagesFromHeader() {
   });
 }
 
+function isMobileNavOpen() {
+  return document.getElementById("mobile-nav-drawer")?.classList.contains("nav-open") || false;
+}
+
+function openMobileNav() {
+  const drawer = document.getElementById("mobile-nav-drawer");
+  const backdrop = document.getElementById("mobile-nav-backdrop");
+  if (!drawer || !backdrop) return;
+
+  const letterEl = document.getElementById("drawer-avatar-letter");
+  const imgEl = document.getElementById("drawer-avatar-img");
+  if (currentUserObj?.profile_photo_url && imgEl) {
+    imgEl.src = currentUserObj.profile_photo_url;
+    imgEl.classList.remove("hidden");
+    letterEl?.classList.add("hidden");
+  } else if (letterEl) {
+    letterEl.textContent = (currentUserObj?.pet_name || currentUserObj?.name || "P")[0];
+    letterEl.classList.remove("hidden");
+    imgEl?.classList.add("hidden");
+  }
+  document.getElementById("drawer-profile-name").textContent = currentUserObj?.pet_name || "Pet";
+  document.getElementById("drawer-admin-entry-btn")?.classList.toggle("hidden", !(currentUserObj?.admin_capabilities?.length > 0));
+
+  drawer.classList.add("nav-open");
+  drawer.style.transform = "translateX(0)";
+  drawer.setAttribute("aria-hidden", "false");
+  backdrop.classList.remove("hidden");
+  document.getElementById("mobile-nav-toggle")?.setAttribute("aria-expanded", "true");
+  document.body.style.overflow = "hidden";
+}
+
+function closeMobileNav() {
+  const drawer = document.getElementById("mobile-nav-drawer");
+  const backdrop = document.getElementById("mobile-nav-backdrop");
+  if (!drawer || !backdrop) return;
+  drawer.classList.remove("nav-open");
+  drawer.style.transform = "translateX(-100%)";
+  drawer.setAttribute("aria-hidden", "true");
+  backdrop.classList.add("hidden");
+  document.getElementById("mobile-nav-toggle")?.setAttribute("aria-expanded", "false");
+  document.body.style.overflow = "";
+}
+
+function toggleMobileNav() {
+  if (isMobileNavOpen()) closeMobileNav();
+  else openMobileNav();
+}
+
+(function initMobileNavGestures() {
+  const EDGE_ZONE_PX = 32;
+  const SWIPE_THRESHOLD_PX = 60;
+  let touchStartX = null;
+  let touchStartedAtEdge = false;
+
+  document.addEventListener("touchstart", (e) => {
+    if (window.innerWidth >= 1024) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartedAtEdge = touchStartX <= EDGE_ZONE_PX;
+  }, { passive: true });
+
+  document.addEventListener("touchend", (e) => {
+    if (window.innerWidth >= 1024 || touchStartX === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX;
+    if (!isMobileNavOpen() && touchStartedAtEdge && deltaX > SWIPE_THRESHOLD_PX) {
+      openMobileNav();
+    } else if (isMobileNavOpen() && deltaX < -SWIPE_THRESHOLD_PX) {
+      closeMobileNav();
+    }
+    touchStartX = null;
+    touchStartedAtEdge = false;
+  }, { passive: true });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && isMobileNavOpen()) closeMobileNav();
+  });
+})();
+
 function toggleNotificationsPanel() {
   const panel = document.getElementById("notifications-panel");
   if (!panel) return;
@@ -684,6 +759,9 @@ async function runAdvancedSearch(query, options = {}) {
 
   if (typeof switchView === "function") switchView("view-social-feed");
   if (typeof switchSocialTab === "function") switchSocialTab("search-results");
+  requestAnimationFrame(() => {
+    document.getElementById("social-tab-search-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 
   let displayText = q ? `Results for "${q}"` : "Search Results";
   if (options.religion) {

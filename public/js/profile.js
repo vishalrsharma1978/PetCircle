@@ -272,36 +272,80 @@ function formatDob(dob) {
   return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 }
 
+function renderPetProfileLoading() {
+  document.getElementById("pp-verified-badge")?.classList.add("hidden");
+
+  document.getElementById("pp-cover-skeleton")?.classList.remove("hidden");
+  document.getElementById("pp-avatar-skeleton")?.classList.remove("hidden");
+  document.getElementById("pp-avatar-img")?.classList.add("hidden");
+  document.getElementById("pp-avatar-text")?.classList.add("hidden");
+  document.getElementById("pp-name-skeleton")?.classList.remove("hidden");
+  document.getElementById("pp-type-breed")?.classList.add("hidden");
+
+  for (const field of ["parent-name", "city", "gender", "dob"]) {
+    document.getElementById(`pp-${field}`)?.classList.add("hidden");
+    document.getElementById(`pp-${field}-skeleton`)?.classList.remove("hidden");
+  }
+
+  document.getElementById("pp-bio")?.classList.add("hidden");
+  document.getElementById("pp-bio-skeleton")?.classList.remove("hidden");
+}
+
+function revealPetProfileChrome() {
+  document.getElementById("pp-name-skeleton")?.classList.add("hidden");
+  document.getElementById("pp-type-breed")?.classList.remove("hidden");
+
+  for (const field of ["parent-name", "city", "gender", "dob"]) {
+    document.getElementById(`pp-${field}-skeleton`)?.classList.add("hidden");
+    document.getElementById(`pp-${field}`)?.classList.remove("hidden");
+  }
+
+  document.getElementById("pp-bio-skeleton")?.classList.add("hidden");
+  document.getElementById("pp-bio")?.classList.remove("hidden");
+}
+
+function renderPetProfileFromData(p) {
+  document.getElementById("pp-pet-name").textContent = p.pet_name || "Unnamed pet";
+  document.getElementById("pp-type-breed").textContent = [p.pet_type, p.breed].filter(Boolean).join(" · ") || "Pet type not set";
+  document.getElementById("pp-parent-name").textContent = p.parent_name || "—";
+  document.getElementById("pp-city").textContent = p.current_city || "—";
+  document.getElementById("pp-gender").textContent = p.gender || "—";
+  document.getElementById("pp-dob").textContent = formatDob(p.date_of_birth);
+  document.getElementById("pp-bio").textContent = p.bio || "No bio yet.";
+  revealPetProfileChrome();
+  setAvatarPreview("pp-avatar-img", "pp-avatar-text", p.profile_photo_url, (p.pet_name || "P")[0], "pp-avatar-skeleton");
+  setCoverPreview("pp-cover-img", p.cover_photo_url, "pp-cover-skeleton");
+
+  const microchipWrap = document.getElementById("pp-microchip-wrap");
+  if (p.microchip_number) {
+    document.getElementById("pp-microchip").textContent = p.microchip_number;
+    microchipWrap?.classList.remove("hidden");
+  } else {
+    microchipWrap?.classList.add("hidden");
+  }
+
+  loadPetProfileVerificationBadge();
+}
+
 async function loadPetProfileView() {
+  // Instant reopen if we already have this (own) profile cached — skip the
+  // skeleton and render right away, then silently refresh in the background.
+  const cached = peekApiCache("get_profile", {});
+  if (cached?.status === "success" && cached.profile) {
+    renderPetProfileFromData(cached.profile);
+  } else {
+    renderPetProfileLoading();
+  }
   try {
-    const data = await api("get_profile", {});
+    const data = await api("get_profile", {}, { forceRefresh: !!cached });
     if (data.status !== "success" || !data.profile) {
-      showToast(data.message || "Could not load profile.", "error");
+      if (!cached) showToast(data.message || "Could not load profile.", "error");
       return;
     }
-    const p = data.profile;
-    document.getElementById("pp-pet-name").textContent = p.pet_name || "Unnamed pet";
-    document.getElementById("pp-type-breed").textContent = [p.pet_type, p.breed].filter(Boolean).join(" · ") || "Pet type not set";
-    document.getElementById("pp-parent-name").textContent = p.parent_name || "—";
-    document.getElementById("pp-city").textContent = p.current_city || "—";
-    document.getElementById("pp-gender").textContent = p.gender || "—";
-    document.getElementById("pp-dob").textContent = formatDob(p.date_of_birth);
-    document.getElementById("pp-bio").textContent = p.bio || "No bio yet.";
-    setAvatarPreview("pp-avatar-img", "pp-avatar-text", p.profile_photo_url, (p.pet_name || "P")[0]);
-    setCoverPreview("pp-cover-img", p.cover_photo_url);
-
-    const microchipWrap = document.getElementById("pp-microchip-wrap");
-    if (p.microchip_number) {
-      document.getElementById("pp-microchip").textContent = p.microchip_number;
-      microchipWrap?.classList.remove("hidden");
-    } else {
-      microchipWrap?.classList.add("hidden");
-    }
-
-    loadPetProfileVerificationBadge();
+    renderPetProfileFromData(data.profile);
   } catch (err) {
     console.error(err);
-    showToast("Could not load profile.", "error");
+    if (!cached) showToast("Could not load profile.", "error");
   }
 }
 

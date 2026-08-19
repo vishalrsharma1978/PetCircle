@@ -9,6 +9,7 @@ async function openMemberProfile(userId) {
   if (!userId) return;
   if (currentUserObj && String(userId) === String(currentUserObj.id)) {
     switchView("view-pet-profile");
+    loadPetProfileView();
     return;
   }
   currentMemberProfileId = userId;
@@ -16,19 +17,35 @@ async function openMemberProfile(userId) {
   if (!modal) return;
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-  renderMemberProfileLoading();
+
+  // Instant reopen: if this profile was viewed recently, render it right
+  // away (no skeleton flash) from the cached response, then still refresh
+  // in the background so it stays correct. First open of a given profile
+  // behaves exactly as before (skeleton, then render on fetch).
+  const cached = peekApiCache("get_profile", { target_user_id: userId });
+  if (cached?.status === "success" && cached.profile) {
+    renderMemberProfile(cached.profile, cached.friendship);
+  } else {
+    renderMemberProfileLoading();
+  }
+
   try {
-    const data = await api("get_profile", { target_user_id: userId });
+    const data = await api("get_profile", { target_user_id: userId }, { forceRefresh: !!cached });
+    if (currentMemberProfileId !== userId) return; // modal moved on to a different profile
     if (data.status !== "success") {
-      showToast(data.message || "Could not load profile.", "error");
-      closeMemberProfileModal();
+      if (!cached) {
+        showToast(data.message || "Could not load profile.", "error");
+        closeMemberProfileModal();
+      }
       return;
     }
     renderMemberProfile(data.profile, data.friendship);
   } catch (err) {
     console.error(err);
-    showToast("Could not load profile.", "error");
-    closeMemberProfileModal();
+    if (!cached) {
+      showToast("Could not load profile.", "error");
+      closeMemberProfileModal();
+    }
   }
 }
 
@@ -199,6 +216,7 @@ async function openMemberProfilePage(userId) {
   if (!userId) return;
   if (currentUserObj && String(userId) === String(currentUserObj.id)) {
     switchView("view-pet-profile");
+    loadPetProfileView();
     return;
   }
   currentMemberProfilePageId = userId;
@@ -206,14 +224,26 @@ async function openMemberProfilePage(userId) {
   memberProfilePageHasMorePosts = false;
   switchView("view-member-profile");
   renderMemberProfilePageLoading();
+
+  // Instant reopen for the profile chrome (name/bio/tags/etc.) if cached;
+  // the posts list still shows its own skeleton and loads normally below,
+  // since post history is more likely to have changed since the last visit.
+  const cachedProfile = peekApiCache("get_profile", { target_user_id: userId });
+  if (cachedProfile?.status === "success" && cachedProfile.profile) {
+    renderMemberProfilePage(cachedProfile.profile, cachedProfile.friendship);
+  }
+
   try {
     const [profileData, postsData] = await Promise.all([
-      api("get_profile", { target_user_id: userId }),
+      api("get_profile", { target_user_id: userId }, { forceRefresh: !!cachedProfile }),
       api("get_user_posts", { target_user_id: userId, limit: MEMBER_PROFILE_PAGE_POSTS_PAGE_SIZE }),
     ]);
+    if (currentMemberProfilePageId !== userId) return; // page moved on to a different profile
     if (profileData.status !== "success") {
-      showToast(profileData.message || "Could not load profile.", "error");
-      switchView("view-social-feed");
+      if (!cachedProfile) {
+        showToast(profileData.message || "Could not load profile.", "error");
+        switchView("view-social-feed");
+      }
       return;
     }
     renderMemberProfilePage(profileData.profile, profileData.friendship);

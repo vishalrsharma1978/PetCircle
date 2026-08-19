@@ -64,11 +64,7 @@ function goToDashboard(user, isSessionRestore = false) {
   }
 
   document.getElementById("admin-entry-btn")?.classList.toggle("hidden", !(user?.admin_capabilities?.length > 0));
-  applyPetTypeTheme();
-  loadHubHero();
-  loadHubHighlight();
-  loadHubAdsWidget();
-  loadHubCalendarWidget();
+  loadHubWidgetsBatched();
 
   switchView("view-social-feed");
   

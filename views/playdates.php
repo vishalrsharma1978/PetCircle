@@ -48,7 +48,7 @@
           </label>
         </div>
         <p class="text-xs text-gray-400 -mt-2 mb-3">Turn this off to hide your pet from other people's decks.</p>
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Size</label>
             <select id="pd-size" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
@@ -107,7 +107,7 @@
 
       <div class="pt-5 border-t border-gray-100 dark:border-gray-800">
         <h3 class="font-bold text-sm text-gray-800 dark:text-gray-200 mb-3">Match Preferences</h3>
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Pet Type</label>
             <select id="pd-pref-pet-type" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">

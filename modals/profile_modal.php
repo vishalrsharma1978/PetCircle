@@ -58,7 +58,7 @@
           </label>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Pet Name</label>
             <input type="text" id="prof-pet-name"
@@ -71,7 +71,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Pet Type</label>
             <select id="prof-pet-type" onchange="updateBreedOptions('prof-pet-type','prof-breed')"
@@ -96,7 +96,7 @@
         </div>
         <p class="text-xs text-amber-600 dark:text-amber-400 -mt-2">Changing pet type or breed removes you from groups scoped to your current one.</p>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Gender</label>
             <select id="prof-gender"
@@ -114,7 +114,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">City</label>
             <input type="text" id="prof-city"

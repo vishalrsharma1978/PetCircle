@@ -194,21 +194,10 @@ function postDetailSkeletonHtml() {
     </div>`;
 }
 
-async function openPostPage(postId) {
-  const container = document.getElementById("post-detail-view");
-  if (!container) return;
-  container.innerHTML = postDetailSkeletonHtml();
-  switchSocialTab('post-detail');
-
-
-  try {
-    const data = await api("get_post_by_id", { post_id: postId });
-    if (data.status !== "success" || !data.post) {
-      container.innerHTML = `<p class="text-center text-sm text-red-500 py-8">Post not found.</p>`;
-      return;
-    }
-    
-    const post = data.post;
+// Pure render of the post-detail article HTML from a post object — shared
+// by the instant-open-from-cache path and the normal fetch-then-render
+// path in openPostPage() below.
+function postDetailHtml(post) {
     const isMine = currentUserObj && post.user_id === currentUserObj.id;
     const author = post.author || {};
     const safeAuthorName = escapeHtml(author.name || "Member");
@@ -313,11 +302,47 @@ async function openPostPage(postId) {
           </section>
         </article>
       </div>`;
-    
-    container.innerHTML = html;
+
+    return html;
+}
+
+async function openPostPage(postId) {
+  const container = document.getElementById("post-detail-view");
+  if (!container) return;
+
+  // Instant open: reuse a post already sitting in memory (from the feed
+  // list, or a cached get_post_by_id fetch) before touching the network.
+  let initialPost = feedPosts.find((p) => String(p.id) === String(postId));
+  if (!initialPost) {
+    const cached = peekApiCache("get_post_by_id", { post_id: postId });
+    if (cached?.status === "success" && cached.post) {
+      initialPost = cached.post;
+      feedPosts.push(initialPost);
+    }
+  }
+
+  if (initialPost) {
+    container.innerHTML = postDetailHtml(initialPost);
     if (window.lucide) lucide.createIcons();
-    switchSocialTab('post-detail');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (initialPost.commentsLoaded) updatePostCommentsDom(postId);
+  } else {
+    container.innerHTML = postDetailSkeletonHtml();
+  }
+  switchSocialTab('post-detail');
+  requestAnimationFrame(() => {
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  try {
+    const data = await api("get_post_by_id", { post_id: postId }, { forceRefresh: !!initialPost });
+    if (data.status !== "success" || !data.post) {
+      if (!initialPost) container.innerHTML = `<p class="text-center text-sm text-red-500 py-8">Post not found.</p>`;
+      return;
+    }
+
+    const post = data.post;
+    container.innerHTML = postDetailHtml(post);
+    if (window.lucide) lucide.createIcons();
 
     if (!post.commentsLoaded) {
       try {
@@ -340,7 +365,7 @@ async function openPostPage(postId) {
 
   } catch (err) {
     console.error(err);
-    container.innerHTML = `<p class="text-center text-sm text-red-500 py-8">Could not load post.</p>`;
+    if (!initialPost) container.innerHTML = `<p class="text-center text-sm text-red-500 py-8">Could not load post.</p>`;
   }
 }
 
@@ -393,11 +418,36 @@ async function loadFeedPosts() {
   const list = document.getElementById("feed-list");
   if (!list) return;
   loadComposerAvatar();
-  list.innerHTML = postCardSkeletonListHtml(3);
+
+  const payload = { pet_type: currentUserObj?.pet_type || "" };
+
+  // Posts already sitting in feedPosts reflect this session's local
+  // optimistic edits (likes/reactions/comments — see togglePostLike's
+  // "intentionally omitting overwrite of local state" convention), so they
+  // take priority over a cached network snapshot, which could be stale
+  // relative to those in-place mutations. Only fall back to the response
+  // cache (and then the skeleton) when nothing's loaded yet this session.
+  let hadInstantRender = false;
+  if (feedPosts.length) {
+    list.innerHTML = feedPosts.map(postCardHtml).join("");
+    if (window.lucide) lucide.createIcons();
+    hadInstantRender = true;
+  } else {
+    const cached = peekApiCache("get_posts", payload);
+    if (cached?.status === "success" && cached.posts?.length) {
+      feedPosts = cached.posts;
+      list.innerHTML = cached.posts.map(postCardHtml).join("");
+      if (window.lucide) lucide.createIcons();
+      hadInstantRender = true;
+    } else {
+      list.innerHTML = postCardSkeletonListHtml(3);
+    }
+  }
+
   try {
-    const data = await api("get_posts", { pet_type: currentUserObj?.pet_type || "" });
+    const data = await api("get_posts", payload, { forceRefresh: hadInstantRender });
     if (data.status !== "success") {
-      list.innerHTML = `<p class="text-center text-sm text-red-500 py-8">${escapeHtml(data.message || "Could not load feed.")}</p>`;
+      if (!hadInstantRender) list.innerHTML = `<p class="text-center text-sm text-red-500 py-8">${escapeHtml(data.message || "Could not load feed.")}</p>`;
       return;
     }
     const posts = data.posts || [];
@@ -410,7 +460,7 @@ async function loadFeedPosts() {
     if (window.lucide) lucide.createIcons();
   } catch (err) {
     console.error(err);
-    list.innerHTML = `<p class="text-center text-sm text-red-500 py-8">Could not load feed.</p>`;
+    if (!hadInstantRender) list.innerHTML = `<p class="text-center text-sm text-red-500 py-8">Could not load feed.</p>`;
   }
 }
 

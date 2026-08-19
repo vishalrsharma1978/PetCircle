@@ -196,7 +196,7 @@ function renderSettingsIdentityHtml() {
       <div class="rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/10 p-3 text-xs text-amber-700 dark:text-amber-400">
         Changing pet type or breed removes you from any groups scoped to your current one, and may change your feed/search visibility if it's set to "my pet type only" or "my breed only". Friendships are not affected.
       </div>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Pet type</label>
           <select id="settings-identity-pet-type" onchange="updateBreedOptions('settings-identity-pet-type','settings-identity-breed')"
@@ -387,21 +387,42 @@ async function saveSettingsHandle() {
   }
 }
 
+function highlightOnlineStatusOption(value) {
+  document.querySelectorAll("[data-online-status-option]").forEach((b) => {
+    const isSelected = b.dataset.onlineStatusOption === value;
+    b.classList.toggle("bg-brand-500", isSelected);
+    b.classList.toggle("border-brand-500", isSelected);
+    b.classList.toggle("text-white", isSelected);
+    b.classList.toggle("border-gray-200", !isSelected);
+    b.classList.toggle("dark:border-gray-700", !isSelected);
+    b.classList.toggle("text-gray-600", !isSelected);
+    b.classList.toggle("dark:text-gray-300", !isSelected);
+    b.classList.toggle("hover:border-brand-300", !isSelected);
+  });
+}
+
+// Optimistic: highlight the newly-picked option immediately (this is a
+// toggle-group, not a form — it should react the instant it's clicked, not
+// once a round trip finishes) and revert if the save fails, matching this
+// app's established optimistic-toggle convention (post likes/reactions).
 async function saveSettingsOnlineStatus(value) {
   const buttons = document.querySelectorAll("[data-online-status-option]");
+  const rawPrevious = settingsState.profile?.online_status;
+  const previousDisplay = rawPrevious && SETTINGS_ONLINE_STATUS_OPTIONS.some((o) => o.value === rawPrevious) ? rawPrevious : "auto";
+
+  highlightOnlineStatusOption(value);
+  if (settingsState.profile) settingsState.profile.online_status = value;
   buttons.forEach((b) => (b.disabled = true));
+
   try {
     const data = await api("set_online_status", { online_status: value });
-    if (data.status !== "success") {
-      showToast(data.message || "Could not update online status.", "error");
-      return;
-    }
-    if (settingsState.profile) settingsState.profile.online_status = value;
+    if (data.status !== "success") throw new Error(data.message || "Could not update online status.");
     showToast("Online status updated.", "success");
-    renderSettingsTab();
   } catch (err) {
     console.error(err);
-    showToast("Could not update online status.", "error");
+    highlightOnlineStatusOption(previousDisplay);
+    if (settingsState.profile) settingsState.profile.online_status = rawPrevious;
+    showToast(err.message || "Could not update online status.", "error");
   } finally {
     buttons.forEach((b) => (b.disabled = false));
   }
@@ -482,18 +503,27 @@ function renderSettingsPrivacyHtml() {
     </div>`;
 }
 
+// Optimistic: the checkbox already shows `checked` by the time this fires
+// (native browser behavior), so mirror that into local state immediately
+// rather than waiting for the round trip — and, since nothing previously
+// corrected the checkbox if the save actually failed, explicitly revert
+// both the checkbox and local state on failure instead of leaving them
+// silently out of sync with what's actually persisted.
 async function saveSettingsPrivacyToggle(key, checked) {
+  const previousValue = settingsState.privacySettings?.[key];
+  settingsState.privacySettings = { ...settingsState.privacySettings, [key]: checked };
+
   try {
     const data = await api("save_privacy_settings", { [key]: checked });
-    if (data.status !== "success") {
-      showToast(data.message || "Could not save privacy setting.", "error");
-      return;
-    }
+    if (data.status !== "success") throw new Error(data.message || "Could not save privacy setting.");
     settingsState.privacySettings = data.privacy_settings || settingsState.privacySettings;
     showToast("Privacy setting saved.", "success");
   } catch (err) {
     console.error(err);
-    showToast("Could not save privacy setting.", "error");
+    settingsState.privacySettings = { ...settingsState.privacySettings, [key]: previousValue };
+    const checkbox = document.querySelector(`[data-privacy-key="${key}"]`);
+    if (checkbox) checkbox.checked = !!previousValue;
+    showToast(err.message || "Could not save privacy setting.", "error");
   }
 }
 
@@ -612,7 +642,7 @@ function renderSettingsMyPostsHtml() {
   const mediaRoundupHtml = mediaPosts.length ? `
     <div class="warm-glass rounded-2xl p-4">
       <p class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2">${mediaPosts.length} post${mediaPosts.length === 1 ? "" : "s"} with photos/videos</p>
-      <div class="grid grid-cols-6 gap-1.5">
+      <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
         ${mediaPosts.slice(0, 6).map((p) => `<div class="aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800"><img src="${escapeHtml(p.media_url)}" loading="lazy" class="w-full h-full object-cover"></div>`).join("")}
       </div>
     </div>` : "";

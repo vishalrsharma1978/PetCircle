@@ -262,27 +262,46 @@ document.addEventListener("click", () => {
   document.querySelectorAll('[id^="event-menu-"]').forEach((menu) => menu.classList.add("hidden"));
 });
 
+function splitEventsByDate(all) {
+  const today = new Date().toISOString().slice(0, 10);
+  return {
+    upcoming: all.filter((e) => e.event_date >= today),
+    past: all.filter((e) => e.event_date < today).reverse(),
+  };
+}
+
+function renderEventsTab(list, all) {
+  const { upcoming, past } = splitEventsByDate(all);
+  eventsCache = upcoming;
+  pastEventsCache = past;
+
+  list.innerHTML = upcoming.length ? upcoming.map((e) => eventCardHtml(e, false)).join("") : `<p class="text-sm text-gray-400">No upcoming events — tap + to create one.</p>`;
+
+  const pastSection = document.getElementById("past-events-section");
+  const pastCount = document.getElementById("past-events-count");
+  if (pastSection) pastSection.classList.toggle("hidden", past.length === 0);
+  if (pastCount) pastCount.textContent = String(past.length);
+
+  if (window.lucide) lucide.createIcons();
+}
+
 async function loadEventsTab() {
   const list = document.getElementById("events-list");
   if (!list) return;
-  list.innerHTML = rowCardSkeletonListHtml(3);
   switchEventsSubtab("list");
+
+  const payload = { pet_type: currentUserObj?.pet_type || "", include_past: true };
+  const cached = peekApiCache("get_events", payload);
+  if (cached?.status === "success") {
+    renderEventsTab(list, cached.events || []);
+  } else {
+    list.innerHTML = rowCardSkeletonListHtml(3);
+  }
+
   try {
-    const data = await api("get_events", { pet_type: currentUserObj?.pet_type || "", include_past: true });
+    const data = await api("get_events", payload, { forceRefresh: !!cached });
     if (data.status !== "success") return;
-    const all = data.events || [];
-    const today = new Date().toISOString().slice(0, 10);
-    eventsCache = all.filter((e) => e.event_date >= today);
-    pastEventsCache = all.filter((e) => e.event_date < today).reverse();
-
-    list.innerHTML = eventsCache.length ? eventsCache.map((e) => eventCardHtml(e, false)).join("") : `<p class="text-sm text-gray-400">No upcoming events — tap + to create one.</p>`;
-
-    const pastSection = document.getElementById("past-events-section");
-    const pastCount = document.getElementById("past-events-count");
-    if (pastSection) pastSection.classList.toggle("hidden", pastEventsCache.length === 0);
-    if (pastCount) pastCount.textContent = String(pastEventsCache.length);
-
-    if (window.lucide) lucide.createIcons();
+    renderEventsTab(list, data.events || []);
   } catch (err) {
     console.error(err);
   }

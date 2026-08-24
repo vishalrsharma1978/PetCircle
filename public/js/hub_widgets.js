@@ -83,38 +83,93 @@ async function loadHubHero() {
   }
 }
 
-// ---------------- Highlight card (care guide spotlight) ----------------
+// ---------------- Highlight slideshow (Care Guides + Rescue & Seva) ----------------
+// Both tabs were removed from the primary nav bar, so this rotating
+// slideshow is now their entry point from the Hub.
 
-let hubHighlightGuideId = null;
+const HUB_SPOTLIGHT_ROTATE_MS = 7000;
+let hubSpotlightSlides = [];
+let hubSpotlightIndex = 0;
+let hubSpotlightTimer = null;
 
 async function loadHubHighlight() {
   const card = document.getElementById("hub-highlight-card");
   if (!card) return;
   try {
-    const data = await api("get_community_hub", { pet_type: currentUserObj?.pet_type || "" });
-    if (data.status !== "success") return;
+    const [hubData, rescueData] = await Promise.all([
+      api("get_community_hub", { pet_type: currentUserObj?.pet_type || "" }),
+      api("get_rescue_opportunities", {}),
+    ]);
 
-    const guides = data.spotlight_guides || [];
-    if (!guides.length) return;
+    const guideSlides = (hubData.status === "success" ? hubData.spotlight_guides || [] : []).map((guide) => {
+      guidesCache[guide.id] = guide;
+      return { type: "guide", id: guide.id, kicker: "Care Guide Spotlight", title: guide.title, text: guide.desc || "", icon: guide.icon || "sparkles" };
+    });
 
-    const guide = guides[Math.floor(Math.random() * guides.length)];
-    guidesCache[guide.id] = guide;
-    hubHighlightGuideId = guide.id;
+    const rescueOpps = rescueData.status === "success" ? rescueData.opportunities || [] : [];
+    const rescueSlides = rescueOpps.slice(0, 3).map((o) => ({
+      type: "rescue", id: o.id, kicker: "Rescue & Seva Spotlight", title: o.title,
+      text: [o.org, o.location].filter(Boolean).join(" · "), icon: "hand-heart",
+    }));
 
-    document.getElementById("hub-highlight-title").textContent = guide.title;
-    document.getElementById("hub-highlight-text").textContent = guide.desc || "";
-    document.getElementById("hub-highlight-icon").setAttribute("data-lucide", guide.icon || "sparkles");
+    hubSpotlightSlides = [...guideSlides, ...rescueSlides];
+    if (!hubSpotlightSlides.length) return;
+
+    hubSpotlightIndex = 0;
+    renderHubSpotlightSlide();
     card.classList.remove("hidden");
-    if (window.lucide) lucide.createIcons();
+
+    clearInterval(hubSpotlightTimer);
+    hubSpotlightTimer = setInterval(() => hubSpotlightGoTo(hubSpotlightIndex + 1), HUB_SPOTLIGHT_ROTATE_MS);
   } catch (err) {
     console.error(err);
   }
 }
 
-function openHubHighlightGuide() {
-  if (!hubHighlightGuideId) return;
-  switchSocialTab("guides");
-  openGuideReader(hubHighlightGuideId);
+function renderHubSpotlightSlide() {
+  const slide = hubSpotlightSlides[hubSpotlightIndex];
+  if (!slide) return;
+
+  document.getElementById("hub-highlight-kicker").textContent = slide.kicker;
+  document.getElementById("hub-highlight-title").textContent = slide.title;
+  document.getElementById("hub-highlight-text").textContent = slide.text;
+  document.getElementById("hub-highlight-icon").setAttribute("data-lucide", slide.icon);
+  document.getElementById("hub-highlight-cta").textContent = slide.type === "guide" ? "Read guide" : "View opportunity";
+
+  const dotsBox = document.getElementById("hub-highlight-dots");
+  if (dotsBox) {
+    dotsBox.innerHTML = hubSpotlightSlides.length > 1
+      ? hubSpotlightSlides.map((_, i) => `<button onclick="hubSpotlightGoTo(${i})" aria-label="Go to slide ${i + 1}" class="h-1.5 rounded-full transition-all ${i === hubSpotlightIndex ? "w-4 bg-brand-500" : "w-1.5 bg-gray-300 dark:bg-gray-700"}"></button>`).join("")
+      : "";
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
+function hubSpotlightGoTo(index) {
+  if (!hubSpotlightSlides.length) return;
+  hubSpotlightIndex = ((index % hubSpotlightSlides.length) + hubSpotlightSlides.length) % hubSpotlightSlides.length;
+  renderHubSpotlightSlide();
+  clearInterval(hubSpotlightTimer);
+  hubSpotlightTimer = setInterval(() => hubSpotlightGoTo(hubSpotlightIndex + 1), HUB_SPOTLIGHT_ROTATE_MS);
+}
+
+function hubSpotlightNext() {
+  hubSpotlightGoTo(hubSpotlightIndex + 1);
+}
+
+function hubSpotlightPrev() {
+  hubSpotlightGoTo(hubSpotlightIndex - 1);
+}
+
+function openHubSpotlightItem() {
+  const slide = hubSpotlightSlides[hubSpotlightIndex];
+  if (!slide) return;
+  if (slide.type === "guide") {
+    switchSocialTab("guides");
+    openGuideReader(slide.id);
+  } else {
+    switchSocialTab("rescue");
+  }
 }
 
 // ---------------- Ads rail ----------------

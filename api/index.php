@@ -103,7 +103,11 @@ define('PAWCIRCLE_CSRF_COOKIE', 'pawcircle_csrf_token');
 define('PAWCIRCLE_SESSION_TTL_SECONDS', 60 * 60 * 24 * 90);
 define('PAWCIRCLE_SIGNUP_CODE_TTL_SECONDS', 60 * 15);
 define('PAWCIRCLE_SIGNUP_CODE_MAX_ATTEMPTS', 6);
-define('PAWCIRCLE_EMAIL_VERIFICATION_ENABLED', true);
+// Disabled for now — no verified sender domain configured with SendPulse
+// yet, so verification codes can't actually be emailed out. Signup skips
+// straight to account creation (finalizeSignup()) instead of the
+// code-verification detour. Flip back to true once a domain/sender is set up.
+define('PAWCIRCLE_EMAIL_VERIFICATION_ENABLED', false);
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);

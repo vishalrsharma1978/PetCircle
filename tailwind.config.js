@@ -10,7 +10,7 @@ module.exports = {
       colors: {
         brand: {
           50: "var(--brand-50, #fff5f5)",
-          100: "var(--brand-100, #ffd45a)",
+          100: "var(--brand-100, #f9dada)",
           200: "var(--brand-200, #ffa95a)",
           300: "var(--brand-300, #ff8b5a)",
           400: "var(--brand-400, #ff5a5a)",

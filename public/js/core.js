@@ -701,7 +701,7 @@ function showGlobalSearchDropdown(query) {
                         <span>Explore All Events</span>
                     </div>
                     <div data-feature-gate="matchmaking" onclick="switchView('view-social-feed'); switchSocialTab('playdates');" class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
-                        <i data-lucide="heart-handshake" class="w-4 h-4 text-brand-500"></i>
+                        <i data-lucide="heart" class="w-4 h-4 text-brand-500"></i>
                         <span>Playdates</span>
                     </div>
                     <div onclick="switchView('view-social-feed'); switchSocialTab('friends'); switchFriendsSubtab('discover');" class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">

@@ -1,0 +1,59 @@
+.git
+.gitignore
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+vendor
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Secrets — never bake into an image; pass at runtime instead
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+service-role*.json
+databaseSecrets.md
+
+# Local Supabase backup — real credential/session hashes, never ship in an image
+schema/
+
+# Session-scoped scratch/dev debris, not part of the deployed app
+scratch/
+graphify-out/
+.graphifyignore
+_merge_temp/
+*.patch
+*.py
+*.md
+test_*
+q
+
+# Stale/alternate SQL dumps — sql_scripts/schema.sql is the real source of
+# truth, no need to ship the others in the image
+sql_scripts/data.sql
+sql_scripts/schema_dump_final.sql
+
+# powershells
+*.ps*

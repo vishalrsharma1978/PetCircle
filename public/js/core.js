@@ -212,7 +212,7 @@ function updateSocialLayoutForTab(tabId) {
     socialSidebar.classList.toggle("lg:hidden", isSettings || isPostDetail);
   }
   if (mainColumn) {
-    mainColumn.classList.toggle("max-w-2xl", !isSettings && !isFullWidthMainTab);
+    mainColumn.classList.toggle("max-w-3xl", !isSettings && !isFullWidthMainTab);
     mainColumn.classList.toggle("max-w-none", isSettings || isFullWidthMainTab);
     mainColumn.classList.toggle("mx-auto", !isSettings && !isFullWidthMainTab);
     mainColumn.classList.toggle("lg:mx-0", !isSettings && !isFullWidthMainTab);

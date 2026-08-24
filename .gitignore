@@ -64,3 +64,6 @@ graphify-out/
 *.py
 scratch/
 test_*
+
+# Stray shell-redirect debris (accidental `... > q`-style artifact)
+/q

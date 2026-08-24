@@ -49,6 +49,10 @@ sql_scripts/schema_dump_final.sql
 # Temporary merge resolution files
 _merge_temp/
 
+# Local Supabase backup (contains real user emails, password/session/CSRF
+# token hashes, IP hashes — local-only, never commit)
+schema/
+
 # Graphify
 graphify-out/
 .graphifyignore

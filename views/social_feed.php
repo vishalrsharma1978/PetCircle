@@ -2,7 +2,7 @@
 
   <!-- ======= Top Header (branding + search + action icons) ======= -->
   <div class="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 w-full relative z-50">
-    <div class="max-w-7xl mx-auto px-4 py-3">
+    <div class="max-w-[1600px] mx-auto px-4 py-3">
       <div class="grid grid-cols-[minmax(0,1fr)_auto] xl:grid-cols-[auto_minmax(260px,1fr)_auto] items-center gap-3 xl:gap-6">
         <!-- Branding -->
         <button onclick="switchView('view-social-feed'); switchSocialTab('feed');" class="flex items-center gap-2 sm:gap-3 min-w-0 text-left">
@@ -128,7 +128,7 @@
       <img id="hub-hero-cover-img" src="" alt="" class="absolute inset-0 w-full h-full object-cover hidden">
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6">
       <div class="flex flex-col xl:flex-row xl:items-end gap-4 pb-4">
         <!-- Avatar (overlapping cover) -->
         <div class="relative flex-shrink-0 self-start w-max -mt-12 sm:-mt-16 z-10">
@@ -192,9 +192,9 @@
     </div>
   </div>
 
-  <div class="max-w-7xl mx-auto w-full px-4 py-6 flex flex-col lg:flex-row gap-6">
+  <div class="max-w-[1600px] mx-auto w-full px-4 py-6 flex flex-col lg:flex-row gap-6">
     <!-- ======= Left Sidebar ======= -->
-    <aside id="social-left-sidebar" class="hidden lg:flex flex-col w-64 flex-shrink-0 self-start sticky top-6">
+    <aside id="social-left-sidebar" class="hidden lg:flex flex-col w-72 flex-shrink-0 self-start sticky top-6">
       <div id="social-left-nav" class="warm-glass rounded-[20px] p-2 flex flex-col gap-1">
         <button data-social-tab="hub" onclick="switchSocialTab('hub')" title="Hub" class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
           <div class="p-1.5 rounded-lg"><svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-kennel"></use></svg></div>
@@ -224,7 +224,7 @@
     </aside>
 
     <!-- ======= Main Column ======= -->
-    <div id="social-main-column" class="flex-1 min-w-0 max-w-2xl mx-auto lg:mx-0 w-full space-y-4">
+    <div id="social-main-column" class="flex-1 min-w-0 max-w-3xl mx-auto lg:mx-0 w-full space-y-4">
 
     <!-- ======= HUB TAB ======= -->
     <div id="social-tab-hub" class="social-tab-panel hidden">
@@ -490,7 +490,7 @@
     </div>
 
     <!-- ======= Right Widget Rail ======= -->
-    <div id="social-right-sidebar" class="hidden xl:flex xl:flex-col w-80 flex-shrink-0 self-start gap-6 sticky top-24">
+    <div id="social-right-sidebar" class="hidden xl:flex xl:flex-col w-96 flex-shrink-0 self-start gap-6 sticky top-24">
       <!-- Highlight card -->
       <div id="hub-highlight-card" class="warm-glass warm-lift breathing-glow rounded-[20px] overflow-hidden hidden">
         <div id="hub-highlight-banner" class="h-24 relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-brand-400 to-brand-600">

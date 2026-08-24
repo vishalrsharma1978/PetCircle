@@ -5,7 +5,7 @@
     <div class="max-w-7xl mx-auto px-4 py-3">
       <div class="grid grid-cols-[minmax(0,1fr)_auto] xl:grid-cols-[auto_minmax(260px,1fr)_auto] items-center gap-3 xl:gap-6">
         <!-- Branding -->
-        <button onclick="switchView('view-social-feed'); switchSocialTab('hub');" class="flex items-center gap-2 sm:gap-3 min-w-0 text-left bg-transparent hover:bg-transparent">
+        <button onclick="switchView('view-social-feed'); switchSocialTab('hub');" class="no-accent-hover flex items-center gap-2 sm:gap-3 min-w-0 text-left">
           <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-brand-500 flex items-center justify-center overflow-hidden flex-shrink-0">
             <img src="assets/mascots/pawcircle-logo.svg" alt="" class="w-7 h-7 object-contain">
           </div>
@@ -33,19 +33,19 @@
         <!-- Action icons -->
         <div class="flex items-center justify-end gap-2 sm:gap-3">
           <button id="mobile-nav-toggle" onclick="toggleMobileNav()" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav-drawer"
-            class="lg:hidden bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-brand-200 dark:border-brand-900/60 text-brand-500 dark:text-brand-400 transition-colors p-2 rounded-xl" title="Menu">
+            class="no-accent-hover lg:hidden bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-brand-200 dark:border-brand-900/60 text-brand-500 dark:text-brand-400 transition-colors p-2 rounded-xl" title="Menu">
             <i data-lucide="menu" class="w-5 h-5"></i>
           </button>
           <div class="relative">
             <button id="messages-header-btn" onclick="openMessagesFromHeader()"
-              class="relative bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-brand-200 dark:border-brand-900/60 text-brand-500 dark:text-brand-400 transition-colors p-2 rounded-xl" title="Messages">
+              class="no-accent-hover relative bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-brand-200 dark:border-brand-900/60 text-brand-500 dark:text-brand-400 transition-colors p-2 rounded-xl" title="Messages">
               <i data-lucide="message-circle" class="w-5 h-5"></i>
               <span id="messages-header-badge" class="notif-pulse hidden absolute -top-2 -right-2 min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-brand-500 text-white text-[10px] font-bold leading-[1.1rem] text-center ring-2 ring-white dark:ring-gray-900">0</span>
             </button>
           </div>
           <div class="relative">
             <button id="notif-bell-btn" onclick="toggleNotificationsPanel()"
-              class="relative bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-brand-200 dark:border-brand-900/60 text-brand-500 dark:text-brand-400 transition-colors p-2 rounded-xl" title="Notifications">
+              class="no-accent-hover relative bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-brand-200 dark:border-brand-900/60 text-brand-500 dark:text-brand-400 transition-colors p-2 rounded-xl" title="Notifications">
               <i data-lucide="bell" class="w-5 h-5"></i>
               <span id="notif-badge" class="hidden absolute -top-2 -right-2 min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-brand-500 text-white text-[10px] font-bold leading-[1.1rem] text-center ring-2 ring-white dark:ring-gray-900">0</span>
             </button>
@@ -59,7 +59,7 @@
           </div>
           <div class="relative">
             <button id="profile-menu-btn" onclick="toggleProfileMenu(event)"
-              class="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center overflow-hidden flex-shrink-0 border-2 border-brand-200 dark:border-brand-900/60"
+              class="no-accent-hover w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center overflow-hidden flex-shrink-0 border-2 border-brand-200 dark:border-brand-900/60"
               title="Account" aria-haspopup="true" aria-expanded="false">
               <span id="header-avatar-letter" class="font-bold text-brand-700 dark:text-brand-300">P</span>
               <img id="header-avatar-img" src="" alt="" class="w-full h-full object-cover hidden">
@@ -99,23 +99,23 @@
       <button onclick="closeMobileNav()" aria-label="Close menu" class="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 flex-shrink-0"><i data-lucide="x" class="w-5 h-5"></i></button>
     </div>
     <div class="flex-1 overflow-y-auto p-2">
-      <button data-social-tab="hub" onclick="switchSocialTab('hub'); closeMobileNav();" title="Kennel" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-kennel"></use></svg> Kennel</button>
-      <button data-social-tab="feed" onclick="switchSocialTab('feed'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="paw-print" class="w-9 h-9"></i> Paw-Bites</button>
-      <button data-social-tab="friends" onclick="switchSocialTab('friends'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="dog" class="w-9 h-9"></i> Pawpals</button>
-      <button data-social-tab="groups" onclick="switchSocialTab('groups'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><div class="relative w-9 h-9 flex-shrink-0"><i data-lucide="dog" class="w-6 h-6 absolute top-0 left-0"></i><i data-lucide="dog" class="w-7 h-7 absolute bottom-0 right-0"></i></div> Packs</button>
-      <button data-social-tab="events" onclick="switchSocialTab('events'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="bone" class="w-9 h-9"></i> PawFest</button>
-      <button data-social-tab="galleries" onclick="switchSocialTab('galleries'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="images" class="w-9 h-9"></i> Pawprints</button>
-      <button data-social-tab="settings" onclick="switchSocialTab('settings'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="settings" class="w-5 h-5"></i> Settings</button>
+      <button data-social-tab="hub" onclick="switchSocialTab('hub'); closeMobileNav();" title="Kennel" class="no-accent-hover drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-kennel"></use></svg> Kennel</button>
+      <button data-social-tab="feed" onclick="switchSocialTab('feed'); closeMobileNav();" class="no-accent-hover drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="paw-print" class="w-9 h-9"></i> Paw-Bites</button>
+      <button data-social-tab="friends" onclick="switchSocialTab('friends'); closeMobileNav();" class="no-accent-hover drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="dog" class="w-9 h-9"></i> Pawpals</button>
+      <button data-social-tab="groups" onclick="switchSocialTab('groups'); closeMobileNav();" class="no-accent-hover drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><div class="relative w-9 h-9 flex-shrink-0"><i data-lucide="dog" class="w-6 h-6 absolute top-0 left-0"></i><i data-lucide="dog" class="w-7 h-7 absolute bottom-0 right-0"></i></div> Packs</button>
+      <button data-social-tab="events" onclick="switchSocialTab('events'); closeMobileNav();" class="no-accent-hover drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="bone" class="w-9 h-9"></i> PawFest</button>
+      <button data-social-tab="galleries" onclick="switchSocialTab('galleries'); closeMobileNav();" class="no-accent-hover drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="images" class="w-9 h-9"></i> Pawprints</button>
+      <button data-social-tab="settings" onclick="switchSocialTab('settings'); closeMobileNav();" class="no-accent-hover drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="settings" class="w-5 h-5"></i> Settings</button>
 
       <div class="my-2 border-t border-gray-100 dark:border-gray-800"></div>
 
-      <button onclick="switchView('view-pack-tree'); loadPackTree(); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="git-fork" class="w-5 h-5"></i> Pack Tree</button>
-      <button onclick="switchView('view-playdates'); switchPlaydateTab('deck'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="heart" class="w-5 h-5"></i> Playdates</button>
-      <button onclick="openVerificationModal(); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="badge-check" class="w-5 h-5"></i> Get Verified</button>
-      <button id="drawer-admin-entry-btn" onclick="openAdminEntry(); closeMobileNav();" class="hidden drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-brand-600 dark:text-brand-400"><i data-lucide="shield-check" class="w-5 h-5"></i> Enter Admin Mode</button>
+      <button onclick="switchView('view-pack-tree'); loadPackTree(); closeMobileNav();" class="no-accent-hover drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="git-fork" class="w-5 h-5"></i> Pack Tree</button>
+      <button onclick="switchView('view-playdates'); switchPlaydateTab('deck'); closeMobileNav();" class="no-accent-hover drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="heart" class="w-5 h-5"></i> Playdates</button>
+      <button onclick="openVerificationModal(); closeMobileNav();" class="no-accent-hover drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="badge-check" class="w-5 h-5"></i> Get Verified</button>
+      <button id="drawer-admin-entry-btn" onclick="openAdminEntry(); closeMobileNav();" class="hidden no-accent-hover drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-brand-600 dark:text-brand-400"><i data-lucide="shield-check" class="w-5 h-5"></i> Enter Admin Mode</button>
     </div>
     <div class="p-2 border-t border-gray-100 dark:border-gray-800">
-      <button onclick="closeMobileNav(); logout();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-red-600 dark:text-red-400"><i data-lucide="log-out" class="w-5 h-5"></i> Sign Out</button>
+      <button onclick="closeMobileNav(); logout();" class="no-accent-hover drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-red-600 dark:text-red-400"><i data-lucide="log-out" class="w-5 h-5"></i> Sign Out</button>
     </div>
   </aside>
 
@@ -178,12 +178,12 @@
 
       <!-- Tab strip -->
       <nav class="relative border-t border-gray-200 dark:border-gray-700 flex items-center gap-2 overflow-x-auto no-scrollbar pt-1.5">
-        <button data-social-tab="hub" onclick="switchSocialTab('hub')" title="Kennel" class="social-tab-strip-item flex-shrink-0 px-3 py-3.5 whitespace-nowrap flex items-center justify-center"><svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-kennel"></use></svg></button>
-        <button data-social-tab="feed" onclick="switchSocialTab('feed')" class="social-tab-strip-item flex-1 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><i data-lucide="paw-print" class="w-8 h-8"></i>Paw-Bites</button>
-        <button data-social-tab="friends" onclick="switchSocialTab('friends')" class="social-tab-strip-item flex-1 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><i data-lucide="dog" class="w-8 h-8"></i>Pawpals</button>
-        <button data-social-tab="groups" onclick="switchSocialTab('groups')" class="social-tab-strip-item flex-1 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><div class="relative w-8 h-8 flex-shrink-0"><i data-lucide="dog" class="w-5 h-5 absolute top-0 left-0"></i><i data-lucide="dog" class="w-7 h-7 absolute bottom-0 right-0"></i></div>Packs</button>
-        <button data-social-tab="events" onclick="switchSocialTab('events')" class="social-tab-strip-item flex-1 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><i data-lucide="bone" class="w-8 h-8"></i>PawFest</button>
-        <button data-social-tab="galleries" onclick="switchSocialTab('galleries')" class="social-tab-strip-item flex-1 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><i data-lucide="images" class="w-8 h-8"></i>Pawprints</button>
+        <button data-social-tab="hub" onclick="switchSocialTab('hub')" title="Kennel" class="no-accent-hover social-tab-strip-item flex-shrink-0 px-3 py-3.5 whitespace-nowrap flex items-center justify-center"><svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-kennel"></use></svg></button>
+        <button data-social-tab="feed" onclick="switchSocialTab('feed')" class="no-accent-hover social-tab-strip-item flex-1 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><i data-lucide="paw-print" class="w-8 h-8"></i>Paw-Bites</button>
+        <button data-social-tab="friends" onclick="switchSocialTab('friends')" class="no-accent-hover social-tab-strip-item flex-1 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><i data-lucide="dog" class="w-8 h-8"></i>Pawpals</button>
+        <button data-social-tab="groups" onclick="switchSocialTab('groups')" class="no-accent-hover social-tab-strip-item flex-1 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><div class="relative w-8 h-8 flex-shrink-0"><i data-lucide="dog" class="w-5 h-5 absolute top-0 left-0"></i><i data-lucide="dog" class="w-7 h-7 absolute bottom-0 right-0"></i></div>Packs</button>
+        <button data-social-tab="events" onclick="switchSocialTab('events')" class="no-accent-hover social-tab-strip-item flex-1 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><i data-lucide="bone" class="w-8 h-8"></i>PawFest</button>
+        <button data-social-tab="galleries" onclick="switchSocialTab('galleries')" class="no-accent-hover social-tab-strip-item flex-1 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><i data-lucide="images" class="w-8 h-8"></i>Pawprints</button>
       </nav>
     </div>
   </div>
@@ -192,19 +192,19 @@
     <!-- ======= Left Sidebar ======= -->
     <aside id="social-left-sidebar" class="hidden lg:flex flex-col w-72 flex-shrink-0 self-start sticky top-6">
       <div id="social-left-nav" class="warm-glass rounded-[20px] p-3 flex flex-col gap-2">
-        <button data-social-tab="feed" onclick="switchSocialTab('feed')" class="social-tab-btn w-full flex items-center gap-3 px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
+        <button data-social-tab="feed" onclick="switchSocialTab('feed')" class="no-accent-hover social-tab-btn w-full flex items-center gap-3 px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
           <div class="p-1.5 rounded-lg"><i data-lucide="paw-print" class="w-7 h-7"></i></div> Paw-Bites
         </button>
-        <button data-social-tab="friends" onclick="switchSocialTab('friends')" class="social-tab-btn w-full flex items-center gap-3 px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
+        <button data-social-tab="friends" onclick="switchSocialTab('friends')" class="no-accent-hover social-tab-btn w-full flex items-center gap-3 px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
           <div class="p-1.5 rounded-lg"><i data-lucide="dog" class="w-7 h-7"></i></div> Pawpals
         </button>
-        <button data-social-tab="groups" onclick="switchSocialTab('groups')" class="social-tab-btn w-full flex items-center gap-3 px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
+        <button data-social-tab="groups" onclick="switchSocialTab('groups')" class="no-accent-hover social-tab-btn w-full flex items-center gap-3 px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
           <div class="p-1.5 rounded-lg"><div class="relative w-7 h-7 flex-shrink-0"><i data-lucide="dog" class="w-5 h-5 absolute top-0 left-0"></i><i data-lucide="dog" class="w-6 h-6 absolute bottom-0 right-0"></i></div></div> Packs
         </button>
-        <button data-social-tab="events" onclick="switchSocialTab('events')" class="social-tab-btn w-full flex items-center gap-3 px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
+        <button data-social-tab="events" onclick="switchSocialTab('events')" class="no-accent-hover social-tab-btn w-full flex items-center gap-3 px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
           <div class="p-1.5 rounded-lg"><i data-lucide="bone" class="w-7 h-7"></i></div> PawFest
         </button>
-        <button data-social-tab="galleries" onclick="switchSocialTab('galleries')" class="social-tab-btn w-full flex items-center gap-3 px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
+        <button data-social-tab="galleries" onclick="switchSocialTab('galleries')" class="no-accent-hover social-tab-btn w-full flex items-center gap-3 px-5 py-3.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
           <div class="p-1.5 rounded-lg"><i data-lucide="images" class="w-7 h-7"></i></div> Pawprints
         </button>
       </div>

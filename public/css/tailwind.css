@@ -3733,10 +3733,6 @@ video {
   background-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));
 }
 
-.hover\:bg-transparent:hover {
-  background-color: transparent;
-}
-
 .hover\:text-brand-300:hover {
   color: var(--brand-300, #ff8b5a);
 }

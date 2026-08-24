@@ -99,20 +99,20 @@
       <button onclick="closeMobileNav()" aria-label="Close menu" class="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 flex-shrink-0"><i data-lucide="x" class="w-5 h-5"></i></button>
     </div>
     <div class="flex-1 overflow-y-auto p-2">
-      <button data-social-tab="hub" onclick="switchSocialTab('hub'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="sparkles" class="w-5 h-5"></i> Hub</button>
-      <button data-social-tab="feed" onclick="switchSocialTab('feed'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="layout-list" class="w-5 h-5"></i> Feed</button>
-      <button data-social-tab="friends" onclick="switchSocialTab('friends'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="users" class="w-5 h-5"></i> Friends</button>
-      <button data-social-tab="groups" onclick="switchSocialTab('groups'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="users-round" class="w-5 h-5"></i> Groups</button>
-      <button data-social-tab="events" onclick="switchSocialTab('events'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="calendar-heart" class="w-5 h-5"></i> Events</button>
-      <button data-social-tab="galleries" onclick="switchSocialTab('galleries'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="images" class="w-5 h-5"></i> Galleries</button>
-      <button data-social-tab="rescue" onclick="switchSocialTab('rescue'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="hand-heart" class="w-5 h-5"></i> Rescue &amp; Seva</button>
-      <button data-social-tab="guides" onclick="switchSocialTab('guides'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="book-open-text" class="w-5 h-5"></i> Care Guides</button>
+      <button data-social-tab="hub" onclick="switchSocialTab('hub'); closeMobileNav();" title="Hub" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-kennel"></use></svg> Hub</button>
+      <button data-social-tab="feed" onclick="switchSocialTab('feed'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="paw-print" class="w-7 h-7"></i> Feed</button>
+      <button data-social-tab="friends" onclick="switchSocialTab('friends'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="dog" class="w-7 h-7"></i> Friends</button>
+      <button data-social-tab="groups" onclick="switchSocialTab('groups'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><div class="relative w-7 h-7 flex-shrink-0"><i data-lucide="dog" class="w-5 h-5 absolute top-0 left-0"></i><i data-lucide="dog" class="w-6 h-6 absolute bottom-0 right-0"></i></div> Groups</button>
+      <button data-social-tab="events" onclick="switchSocialTab('events'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="bone" class="w-7 h-7"></i> Events</button>
+      <button data-social-tab="galleries" onclick="switchSocialTab('galleries'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="images" class="w-7 h-7"></i> Galleries</button>
+      <button data-social-tab="rescue" onclick="switchSocialTab('rescue'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="hand-heart" class="w-7 h-7"></i> Rescue &amp; Seva</button>
+      <button data-social-tab="guides" onclick="switchSocialTab('guides'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="book-open-text" class="w-7 h-7"></i> Care Guides</button>
       <button data-social-tab="settings" onclick="switchSocialTab('settings'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="settings" class="w-5 h-5"></i> Settings</button>
 
       <div class="my-2 border-t border-gray-100 dark:border-gray-800"></div>
 
       <button onclick="switchView('view-pack-tree'); loadPackTree(); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="git-fork" class="w-5 h-5"></i> Pack Tree</button>
-      <button onclick="switchView('view-playdates'); switchPlaydateTab('deck'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="heart-handshake" class="w-5 h-5"></i> Playdates</button>
+      <button onclick="switchView('view-playdates'); switchPlaydateTab('deck'); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="heart" class="w-5 h-5"></i> Playdates</button>
       <button onclick="openVerificationModal(); closeMobileNav();" class="drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium"><i data-lucide="badge-check" class="w-5 h-5"></i> Get Verified</button>
       <button id="drawer-admin-entry-btn" onclick="openAdminEntry(); closeMobileNav();" class="hidden drawer-nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-brand-600 dark:text-brand-400"><i data-lucide="shield-check" class="w-5 h-5"></i> Enter Admin Mode</button>
     </div>
@@ -169,7 +169,7 @@
           </button>
           <button onclick="switchView('view-playdates'); switchPlaydateTab('deck');"
             class="bg-brand-100 hover:bg-brand-500 text-brand-700 hover:text-white dark:bg-gray-800 dark:hover:bg-brand-600 dark:text-brand-200 flex items-center gap-2 font-semibold text-sm px-4 py-2 rounded-lg shadow transition-colors">
-            <i data-lucide="heart-handshake" class="w-4 h-4"></i> <span>Playdates</span>
+            <i data-lucide="heart" class="w-4 h-4"></i> <span>Playdates</span>
           </button>
           <button onclick="openVerificationModal()"
             class="bg-brand-500 hover:bg-brand-600 text-white flex items-center gap-2 font-semibold text-sm px-4 py-2 rounded-lg shadow transition-colors">
@@ -180,14 +180,14 @@
 
       <!-- Tab strip -->
       <nav class="relative border-t border-gray-200 dark:border-gray-700 flex items-center gap-1 overflow-x-auto no-scrollbar pt-1">
-        <button data-social-tab="hub" onclick="switchSocialTab('hub')" class="social-tab-strip-item px-4 py-3 text-sm font-semibold whitespace-nowrap flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4"></i>Hub</button>
-        <button data-social-tab="feed" onclick="switchSocialTab('feed')" class="social-tab-strip-item px-4 py-3 text-sm font-semibold whitespace-nowrap flex items-center gap-2"><i data-lucide="layout-list" class="w-4 h-4"></i>Feed</button>
-        <button data-social-tab="friends" onclick="switchSocialTab('friends')" class="social-tab-strip-item px-4 py-3 text-sm font-semibold whitespace-nowrap flex items-center gap-2"><i data-lucide="users" class="w-4 h-4"></i>Friends</button>
-        <button data-social-tab="groups" onclick="switchSocialTab('groups')" class="social-tab-strip-item px-4 py-3 text-sm font-semibold whitespace-nowrap flex items-center gap-2"><i data-lucide="users-round" class="w-4 h-4"></i>Groups</button>
-        <button data-social-tab="events" onclick="switchSocialTab('events')" class="social-tab-strip-item px-4 py-3 text-sm font-semibold whitespace-nowrap flex items-center gap-2"><i data-lucide="calendar-heart" class="w-4 h-4"></i>Events</button>
-        <button data-social-tab="galleries" onclick="switchSocialTab('galleries')" class="social-tab-strip-item px-4 py-3 text-sm font-semibold whitespace-nowrap flex items-center gap-2"><i data-lucide="images" class="w-4 h-4"></i>Galleries</button>
-        <button data-social-tab="rescue" onclick="switchSocialTab('rescue')" class="social-tab-strip-item px-4 py-3 text-sm font-semibold whitespace-nowrap flex items-center gap-2"><i data-lucide="hand-heart" class="w-4 h-4"></i>Rescue &amp; Seva</button>
-        <button data-social-tab="guides" onclick="switchSocialTab('guides')" class="social-tab-strip-item px-4 py-3 text-sm font-semibold whitespace-nowrap flex items-center gap-2"><i data-lucide="book-open-text" class="w-4 h-4"></i>Care Guides</button>
+        <button data-social-tab="hub" onclick="switchSocialTab('hub')" title="Hub" class="social-tab-strip-item px-4 py-3 text-sm font-semibold whitespace-nowrap flex items-center justify-center"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-kennel"></use></svg></button>
+        <button data-social-tab="feed" onclick="switchSocialTab('feed')" class="social-tab-strip-item px-4 py-3 text-sm font-semibold whitespace-nowrap flex items-center gap-2"><i data-lucide="paw-print" class="w-6 h-6"></i>Feed</button>
+        <button data-social-tab="friends" onclick="switchSocialTab('friends')" class="social-tab-strip-item px-4 py-3 text-sm font-semibold whitespace-nowrap flex items-center gap-2"><i data-lucide="dog" class="w-6 h-6"></i>Friends</button>
+        <button data-social-tab="groups" onclick="switchSocialTab('groups')" class="social-tab-strip-item px-4 py-3 text-sm font-semibold whitespace-nowrap flex items-center gap-2"><div class="relative w-6 h-6 flex-shrink-0"><i data-lucide="dog" class="w-4 h-4 absolute top-0 left-0"></i><i data-lucide="dog" class="w-5 h-5 absolute bottom-0 right-0"></i></div>Groups</button>
+        <button data-social-tab="events" onclick="switchSocialTab('events')" class="social-tab-strip-item px-4 py-3 text-sm font-semibold whitespace-nowrap flex items-center gap-2"><i data-lucide="bone" class="w-6 h-6"></i>Events</button>
+        <button data-social-tab="galleries" onclick="switchSocialTab('galleries')" class="social-tab-strip-item px-4 py-3 text-sm font-semibold whitespace-nowrap flex items-center gap-2"><i data-lucide="images" class="w-6 h-6"></i>Galleries</button>
+        <button data-social-tab="rescue" onclick="switchSocialTab('rescue')" class="social-tab-strip-item px-4 py-3 text-sm font-semibold whitespace-nowrap flex items-center gap-2"><i data-lucide="hand-heart" class="w-6 h-6"></i>Rescue &amp; Seva</button>
+        <button data-social-tab="guides" onclick="switchSocialTab('guides')" class="social-tab-strip-item px-4 py-3 text-sm font-semibold whitespace-nowrap flex items-center gap-2"><i data-lucide="book-open-text" class="w-6 h-6"></i>Care Guides</button>
       </nav>
     </div>
   </div>
@@ -196,29 +196,29 @@
     <!-- ======= Left Sidebar ======= -->
     <aside id="social-left-sidebar" class="hidden lg:flex flex-col w-64 flex-shrink-0 self-start sticky top-6">
       <div id="social-left-nav" class="warm-glass rounded-[20px] p-2 flex flex-col gap-1">
-        <button data-social-tab="hub" onclick="switchSocialTab('hub')" class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-          <div class="p-1.5 rounded-lg"><i data-lucide="sparkles" class="w-5 h-5"></i></div> Hub
+        <button data-social-tab="hub" onclick="switchSocialTab('hub')" title="Hub" class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
+          <div class="p-1.5 rounded-lg"><svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-kennel"></use></svg></div>
         </button>
         <button data-social-tab="feed" onclick="switchSocialTab('feed')" class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-          <div class="p-1.5 rounded-lg"><i data-lucide="layout-list" class="w-5 h-5"></i></div> Feed
+          <div class="p-1.5 rounded-lg"><i data-lucide="paw-print" class="w-7 h-7"></i></div> Feed
         </button>
         <button data-social-tab="friends" onclick="switchSocialTab('friends')" class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-          <div class="p-1.5 rounded-lg"><i data-lucide="users" class="w-5 h-5"></i></div> Friends
+          <div class="p-1.5 rounded-lg"><i data-lucide="dog" class="w-7 h-7"></i></div> Friends
         </button>
         <button data-social-tab="groups" onclick="switchSocialTab('groups')" class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-          <div class="p-1.5 rounded-lg"><i data-lucide="users-round" class="w-5 h-5"></i></div> Groups
+          <div class="p-1.5 rounded-lg"><div class="relative w-7 h-7 flex-shrink-0"><i data-lucide="dog" class="w-5 h-5 absolute top-0 left-0"></i><i data-lucide="dog" class="w-6 h-6 absolute bottom-0 right-0"></i></div></div> Groups
         </button>
         <button data-social-tab="events" onclick="switchSocialTab('events')" class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-          <div class="p-1.5 rounded-lg"><i data-lucide="calendar-heart" class="w-5 h-5"></i></div> Events
+          <div class="p-1.5 rounded-lg"><i data-lucide="bone" class="w-7 h-7"></i></div> Events
         </button>
         <button data-social-tab="galleries" onclick="switchSocialTab('galleries')" class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-          <div class="p-1.5 rounded-lg"><i data-lucide="images" class="w-5 h-5"></i></div> Galleries
+          <div class="p-1.5 rounded-lg"><i data-lucide="images" class="w-7 h-7"></i></div> Galleries
         </button>
         <button data-social-tab="rescue" onclick="switchSocialTab('rescue')" class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-          <div class="p-1.5 rounded-lg"><i data-lucide="hand-heart" class="w-5 h-5"></i></div> Rescue &amp; Seva
+          <div class="p-1.5 rounded-lg"><i data-lucide="hand-heart" class="w-7 h-7"></i></div> Rescue &amp; Seva
         </button>
         <button data-social-tab="guides" onclick="switchSocialTab('guides')" class="social-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium transition-colors">
-          <div class="p-1.5 rounded-lg"><i data-lucide="book-open-text" class="w-5 h-5"></i></div> Care Guides
+          <div class="p-1.5 rounded-lg"><i data-lucide="book-open-text" class="w-7 h-7"></i></div> Care Guides
         </button>
       </div>
     </aside>

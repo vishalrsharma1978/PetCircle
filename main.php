@@ -13,6 +13,18 @@
       <ellipse cx="17.4" cy="8" rx="2.5" ry="3.1" />
       <ellipse cx="20" cy="12.4" rx="2.2" ry="2.9" />
     </symbol>
+
+    <!-- Kennel icon (step 31) for the Hub tab, which is icon-only (no text
+         label). The other 7 tabs use Lucide's own real icons directly
+         (paw-print/heart/dog/bone/images/hand-heart/book-open-text — this
+         pinned lucide@1.22.0 build actually has all of these) rather than
+         a full set of hand-drawn paw variants, which read as scattered
+         disconnected blobs at nav-icon size instead of a recognizable paw. -->
+    <symbol id="icon-kennel" viewBox="0 0 24 24">
+      <path d="M4 11 L12 4 L20 11" />
+      <path d="M5.5 11 L5.5 20 L18.5 20 L18.5 11" />
+      <path d="M9.5 20 L9.5 15.5 A2.5 2.5 0 0 1 14.5 15.5 L14.5 20" />
+    </symbol>
   </svg>
 
   <!-- ==================== PUBLIC LOGIN ==================== -->

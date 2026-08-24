@@ -12,7 +12,7 @@
         </button>
         <button onclick="switchView('view-playdates'); switchPlaydateTab('deck');"
           class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm text-gray-700 dark:text-gray-200 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2">
-          <i data-lucide="heart-handshake" class="w-4 h-4"></i> Playdates
+          <i data-lucide="heart" class="w-4 h-4"></i> Playdates
         </button>
         <button onclick="openVerificationModal()"
           class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm text-gray-700 dark:text-gray-200 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2">

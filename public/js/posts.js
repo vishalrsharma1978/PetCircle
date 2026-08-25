@@ -370,7 +370,9 @@ async function openPostPage(postId) {
 }
 
 async function archivePost(postId) {
-  if (!confirm("Archive this post? It will be hidden from the feed.")) return;
+  const btn = (typeof event !== "undefined" && event) ? event.target.closest("button") : null;
+  if (!(await confirmAction({ title: "Archive this post?", message: "It will be hidden from the feed. You can restore it later from Settings.", confirmLabel: "Archive", danger: false, icon: "archive" }))) return;
+  setButtonLoading(btn, true);
   try {
     const data = await api("archive_post", { post_id: postId });
     if (data.status !== "success") {
@@ -385,6 +387,8 @@ async function archivePost(postId) {
   } catch (err) {
     console.error(err);
     showToast("Could not archive post.", "error");
+  } finally {
+    setButtonLoading(btn, false);
   }
 }
 
@@ -821,7 +825,7 @@ function archiveComment(postId, commentId) {
 
 async function deleteComment(postId, commentId) {
   document.querySelectorAll(".comment-menu").forEach((m) => m.classList.add("hidden"));
-  if (!confirm("Delete this comment? This cannot be undone.")) return;
+  if (!(await confirmAction({ title: "Delete this comment?", message: "This cannot be undone.", confirmLabel: "Delete" }))) return;
   const post = feedPosts.find((p) => String(p.id) === String(postId));
   if (post && Array.isArray(post.commentList)) {
     post.commentList = post.commentList.filter((c) => String(c.id) !== String(commentId));
@@ -1074,7 +1078,9 @@ function copyPostLink(postId) {
 }
 
 async function deletePost(postId) {
-  if (!confirm("Are you sure you want to delete this post? This cannot be undone.")) return;
+  const btn = (typeof event !== "undefined" && event) ? event.target.closest("button") : null;
+  if (!(await confirmAction({ title: "Delete this post?", message: "This cannot be undone.", confirmLabel: "Delete" }))) return;
+  setButtonLoading(btn, true);
   try {
     const data = await api("delete_post", { post_id: postId });
     if (data.status !== "success") {
@@ -1089,6 +1095,8 @@ async function deletePost(postId) {
   } catch (err) {
     if (typeof showToast === 'function') showToast("Error deleting post.", "error");
     console.error(err);
+  } finally {
+    setButtonLoading(btn, false);
   }
 }
 

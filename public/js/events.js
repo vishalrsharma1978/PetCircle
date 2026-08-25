@@ -346,17 +346,21 @@ async function rsvpEvent(eventId, status, btn) {
 }
 
 async function deleteEvent(eventId) {
-  if (!confirm("Delete this event?")) return;
+  const btn = (typeof event !== "undefined" && event) ? event.target.closest("button") : null;
+  if (!(await confirmAction({ title: "Delete this event?", confirmLabel: "Delete" }))) return;
+  setButtonLoading(btn, true);
   try {
     const data = await api("delete_event", { event_id: eventId });
     if (data.status !== "success") {
       showToast(data.message || "Could not delete event.", "error");
+      setButtonLoading(btn, false);
       return;
     }
     document.querySelector(`[data-event-id="${eventId}"]`)?.remove();
   } catch (err) {
     console.error(err);
     showToast("Could not delete event.", "error");
+    setButtonLoading(btn, false);
   }
 }
 

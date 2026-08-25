@@ -399,29 +399,20 @@ async function pingAdminServer(id, btn) {
 }
 
 async function deleteAdminServer(id, btn) {
-  if (!confirm("Decommission and delete this server node?")) return;
-  if (btn) {
-    btn.disabled = true;
-    btn.classList.add("opacity-50", "pointer-events-none");
-  }
+  if (!(await confirmAction({ title: "Decommission this server node?", message: "This permanently deletes it.", confirmLabel: "Delete" }))) return;
+  setButtonLoading(btn, true);
   try {
     const data = await api("admin_delete_server", { id });
     if (data.status !== "success") {
       showToast(data.message || "Could not delete server.", "error");
-      if (btn) {
-        btn.disabled = false;
-        btn.classList.remove("opacity-50", "pointer-events-none");
-      }
+      setButtonLoading(btn, false);
       return;
     }
     showToast("Server node deleted.", "success");
     fetchAdminServers();
   } catch (err) {
     console.error(err);
-    if (btn) {
-      btn.disabled = false;
-      btn.classList.remove("opacity-50", "pointer-events-none");
-    }
+    setButtonLoading(btn, false);
   }
 }
 

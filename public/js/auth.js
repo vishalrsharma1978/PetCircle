@@ -35,15 +35,20 @@ function getOtpValue(inputs) {
   return inputs.map((i) => i.value).join("");
 }
 
-function setButtonLoading(button, loading, loadingText = "Please wait…") {
+const LOADING_SPINNER_SVG = '<svg class="inline-block w-4 h-4 animate-spin align-[-0.15em]" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>';
+
+// loadingText omitted -> spinner only (icon-only buttons); passed -> spinner + text
+// (text-only buttons, e.g. "Deleting…"). Restores the button's exact prior
+// innerHTML (icon or text) when loading is turned back off.
+function setButtonLoading(button, loading, loadingText = "") {
   if (!button) return;
   if (loading) {
     button.dataset.originalHtml = button.innerHTML;
     button.disabled = true;
-    button.textContent = loadingText;
+    button.innerHTML = LOADING_SPINNER_SVG + (loadingText ? `<span class="ml-1.5">${escapeHtml(loadingText)}</span>` : "");
   } else {
     button.disabled = false;
-    if (button.dataset.originalHtml) {
+    if (button.dataset.originalHtml !== undefined) {
       button.innerHTML = button.dataset.originalHtml;
       delete button.dataset.originalHtml;
     }

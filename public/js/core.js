@@ -303,6 +303,44 @@ function closeProfileMenu() {
   document.getElementById("profile-menu-btn")?.setAttribute("aria-expanded", "false");
 }
 
+// ---------------- Confirm modal (replaces native confirm() for delete/archive) ----------------
+
+let confirmModalResolver = null;
+
+// Usage: if (!(await confirmAction({ title, message, confirmLabel, danger }))) return;
+// Resolves true (confirmed) or false (cancelled/dismissed) — never throws.
+function confirmAction({ title = "Are you sure?", message = "", confirmLabel = "Delete", danger = true, icon = null } = {}) {
+  return new Promise((resolve) => {
+    confirmModalResolver = resolve;
+    document.getElementById("confirm-modal-title").textContent = title;
+    document.getElementById("confirm-modal-message").textContent = message;
+
+    const confirmBtn = document.getElementById("confirm-modal-confirm-btn");
+    confirmBtn.textContent = confirmLabel;
+    confirmBtn.className = `no-accent-hover px-4 py-2 rounded-lg text-sm font-semibold text-white transition-colors ${danger ? "bg-red-500 hover:bg-red-600" : "bg-brand-500 hover:bg-brand-600"}`;
+
+    const iconWrap = document.getElementById("confirm-modal-icon-wrap");
+    iconWrap.className = `w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${danger ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400" : "bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400"}`;
+    document.getElementById("confirm-modal-icon").setAttribute("data-lucide", icon || (danger ? "trash-2" : "help-circle"));
+
+    const backdrop = document.getElementById("confirm-modal-backdrop");
+    backdrop.classList.remove("hidden");
+    backdrop.classList.add("flex");
+    if (window.lucide) lucide.createIcons();
+  });
+}
+
+function resolveConfirmModal(result) {
+  const backdrop = document.getElementById("confirm-modal-backdrop");
+  backdrop.classList.add("hidden");
+  backdrop.classList.remove("flex");
+  if (confirmModalResolver) {
+    const resolve = confirmModalResolver;
+    confirmModalResolver = null;
+    resolve(result);
+  }
+}
+
 function copyProfileLink() {
   navigator.clipboard.writeText(window.location.href);
   showToast("Profile link copied!", "success");
@@ -317,7 +355,12 @@ document.addEventListener("click", (e) => {
 });
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeProfileMenu();
+  if (e.key === "Escape") {
+    closeProfileMenu();
+    if (!document.getElementById("confirm-modal-backdrop")?.classList.contains("hidden")) {
+      resolveConfirmModal(false);
+    }
+  }
 });
 
 function timeAgo(value) {

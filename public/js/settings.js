@@ -775,7 +775,7 @@ async function confirmDeleteAccount() {
     showToast('Enter your password and type "DELETE" to confirm.', "info");
     return;
   }
-  if (!confirm("This permanently deletes your account and cannot be undone. Continue?")) return;
+  if (!(await confirmAction({ title: "Permanently delete your account?", message: "This cannot be undone.", confirmLabel: "Delete account" }))) return;
   const btn = document.getElementById("settings-delete-btn");
   setButtonLoading(btn, true, "Deleting…");
   try {

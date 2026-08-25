@@ -182,7 +182,7 @@ function closePackSidePanel() {
 
 async function deleteCurrentPackMember() {
   if (!currentSidePanelMemberId) return;
-  if (!confirm("Remove this pack member?")) return;
+  if (!(await confirmAction({ title: "Remove this pack member?", confirmLabel: "Remove" }))) return;
   const btn = document.getElementById("pack-panel-delete-btn");
   setButtonLoading(btn, true, "Removing…");
   try {
@@ -336,19 +336,13 @@ async function savePackMember() {
 }
 
 async function deletePackMemberFromModal(memberId, btn) {
-  if (!confirm("Remove this pack member?")) return;
-  if (btn) {
-    btn.disabled = true;
-    btn.classList.add("opacity-50", "pointer-events-none");
-  }
+  if (!(await confirmAction({ title: "Remove this pack member?", confirmLabel: "Remove" }))) return;
+  setButtonLoading(btn, true);
   try {
     const data = await api("delete_pack_member", { id: memberId });
     if (data.status !== "success") {
       showToast(data.message || "Could not remove pack member.", "error");
-      if (btn) {
-        btn.disabled = false;
-        btn.classList.remove("opacity-50", "pointer-events-none");
-      }
+      setButtonLoading(btn, false);
       return;
     }
     await loadPackTree();
@@ -356,9 +350,6 @@ async function deletePackMemberFromModal(memberId, btn) {
   } catch (err) {
     console.error(err);
     showToast("Could not remove pack member.", "error");
-    if (btn) {
-      btn.disabled = false;
-      btn.classList.remove("opacity-50", "pointer-events-none");
-    }
+    setButtonLoading(btn, false);
   }
 }

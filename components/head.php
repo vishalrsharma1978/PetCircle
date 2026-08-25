@@ -76,6 +76,11 @@ if (!empty($_GET['post'])) {
   <meta property="og:title" content="<?= htmlspecialchars($ogTitle, ENT_QUOTES) ?>" />
   <meta property="og:description" content="<?= htmlspecialchars($ogDescription, ENT_QUOTES) ?>" />
   <meta property="og:type" content="website" />
+  <?php
+    $ogScheme = (($_SERVER['HTTPS'] ?? '') === 'on' || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https') ? 'https' : 'http';
+    $ogUrl = $ogScheme . '://' . ($_SERVER['HTTP_HOST'] ?? '') . ($_SERVER['REQUEST_URI'] ?? '/');
+  ?>
+  <meta property="og:url" content="<?= htmlspecialchars($ogUrl, ENT_QUOTES) ?>" />
   <?php if ($ogImage): ?>
   <meta property="og:image" content="<?= htmlspecialchars($ogImage, ENT_QUOTES) ?>" />
   <?php endif; ?>

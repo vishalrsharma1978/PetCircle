@@ -12,8 +12,8 @@
 //    management view with edit/delete on every card, not a public feed).
 //  - No "Edit event" button or link-gallery-to-existing-event flow — this
 //    rebuild has no event-edit modal to hook it to.
-//  - Confirmations use the existing plain confirm() convention used
-//    elsewhere in this codebase rather than porting eSamaj's showConfirm().
+//  - Confirmations use the app's confirmAction() modal (core.js) rather
+//    than porting eSamaj's showConfirm() or the browser's native confirm().
 
 const GALLERY_MEDIA_MAX_BYTES = 25 * 1024 * 1024;
 const GALLERY_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -851,11 +851,8 @@ async function createGalleryFromModal() {
 
 async function deleteGalleryItem(galleryId, itemId, btn) {
   if (!galleryId || !itemId) return;
-  if (!confirm("Remove this media item from the gallery?")) return;
-  if (btn) {
-    btn.disabled = true;
-    btn.classList.add("opacity-50", "pointer-events-none");
-  }
+  if (!(await confirmAction({ title: "Remove this media item?", message: "It will be removed from the gallery.", confirmLabel: "Remove" }))) return;
+  setButtonLoading(btn, true);
   try {
     const data = await api("delete_gallery_item", { gallery_id: galleryId, item_id: itemId });
     if (data.status !== "success") throw new Error(data.message || "Could not remove media item.");
@@ -869,10 +866,7 @@ async function deleteGalleryItem(galleryId, itemId, btn) {
   } catch (err) {
     console.error(err);
     showToast(err.message || "Could not remove media item.", "error");
-    if (btn) {
-      btn.disabled = false;
-      btn.classList.remove("opacity-50", "pointer-events-none");
-    }
+    setButtonLoading(btn, false);
   }
 }
 
@@ -880,11 +874,8 @@ async function deleteGallery(galleryId, btn) {
   if (!galleryId) return;
   const gallery = galleriesCache.find((item) => String(item.id) === String(galleryId));
   const name = gallery?.title || "this gallery";
-  if (!confirm(`Delete "${name}"? All its media items will be removed too.`)) return;
-  if (btn) {
-    btn.disabled = true;
-    btn.classList.add("opacity-50", "pointer-events-none");
-  }
+  if (!(await confirmAction({ title: `Delete "${name}"?`, message: "All its media items will be removed too.", confirmLabel: "Delete" }))) return;
+  setButtonLoading(btn, true);
   try {
     const data = await api("delete_gallery", { gallery_id: galleryId });
     if (data.status !== "success") throw new Error(data.message || "Could not delete gallery.");
@@ -895,10 +886,7 @@ async function deleteGallery(galleryId, btn) {
   } catch (err) {
     console.error(err);
     showToast(err.message || "Could not delete gallery.", "error");
-    if (btn) {
-      btn.disabled = false;
-      btn.classList.remove("opacity-50", "pointer-events-none");
-    }
+    setButtonLoading(btn, false);
   }
 }
 

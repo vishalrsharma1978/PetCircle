@@ -85,19 +85,13 @@ async function sendFriendRequest(friendId, btn) {
 }
 
 async function unfriendUser(userId, name, btn) {
-  if (!confirm(`Remove ${name} from your friends?`)) return;
-  if (btn) {
-    btn.disabled = true;
-    btn.classList.add("opacity-50", "pointer-events-none");
-  }
+  if (!(await confirmAction({ title: `Remove ${name} from your friends?`, confirmLabel: "Remove" }))) return;
+  setButtonLoading(btn, true);
   try {
     const data = await api("remove_friend", { friend_id: userId });
     if (data.status !== "success") {
       showToast(data.message || "Could not remove friend.", "error");
-      if (btn) {
-        btn.disabled = false;
-        btn.classList.remove("opacity-50", "pointer-events-none");
-      }
+      setButtonLoading(btn, false);
       return;
     }
     showToast(`Removed ${name}.`, "success");
@@ -106,10 +100,7 @@ async function unfriendUser(userId, name, btn) {
   } catch (err) {
     console.error(err);
     showToast("Could not remove friend.", "error");
-    if (btn) {
-      btn.disabled = false;
-      btn.classList.remove("opacity-50", "pointer-events-none");
-    }
+    setButtonLoading(btn, false);
   }
 }
 

@@ -354,11 +354,8 @@ async function submitRescueApplication() {
 }
 
 async function archiveRescueOpportunity(oppId, btn) {
-  if (!confirm("Archive this opportunity? It will no longer be listed as open.")) return;
-  if (btn) {
-    btn.disabled = true;
-    btn.classList.add("opacity-50", "pointer-events-none");
-  }
+  if (!(await confirmAction({ title: "Archive this opportunity?", message: "It will no longer be listed as open.", confirmLabel: "Archive", danger: false, icon: "archive" }))) return;
+  setButtonLoading(btn, true);
   try {
     const data = await api("archive_rescue_opportunity", { opportunity_id: oppId });
     if (data.status !== "success") {
@@ -370,19 +367,13 @@ async function archiveRescueOpportunity(oppId, btn) {
     console.error(err);
     showToast("Could not archive opportunity.", "error");
   } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.classList.remove("opacity-50", "pointer-events-none");
-    }
+    setButtonLoading(btn, false);
   }
 }
 
 async function deleteRescueOpportunityCard(oppId, btn) {
-  if (!confirm("Delete this opportunity? This also removes all applications for it.")) return;
-  if (btn) {
-    btn.disabled = true;
-    btn.classList.add("opacity-50", "pointer-events-none");
-  }
+  if (!(await confirmAction({ title: "Delete this opportunity?", message: "This also removes all applications for it.", confirmLabel: "Delete" }))) return;
+  setButtonLoading(btn, true);
   try {
     const data = await api("delete_rescue_opportunity", { opportunity_id: oppId });
     if (data.status !== "success") {
@@ -393,9 +384,6 @@ async function deleteRescueOpportunityCard(oppId, btn) {
   } catch (err) {
     console.error(err);
     showToast("Could not delete opportunity.", "error");
-    if (btn) {
-      btn.disabled = false;
-      btn.classList.remove("opacity-50", "pointer-events-none");
-    }
+    setButtonLoading(btn, false);
   }
 }

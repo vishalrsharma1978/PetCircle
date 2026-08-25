@@ -87,6 +87,7 @@
   <?php include 'modals/create_rescue_modal.php'; ?>
   <?php include 'modals/verification_modal.php'; ?>
   <?php include 'modals/admin_mode_modal.php'; ?>
+  <?php include 'modals/confirm_modal.php'; ?>
   <?php include 'modals/image_cropper_modal.php'; ?>
   <?php include 'modals/enlarged_calendar_modal.php'; ?>
   <?php include 'modals/member_profile_modal.php'; ?>

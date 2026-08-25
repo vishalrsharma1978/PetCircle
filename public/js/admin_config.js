@@ -231,11 +231,8 @@ async function toggleAdminReaction(reactionId, isActive, btn) {
 }
 
 async function deleteAdminReaction(reactionId, btn) {
-  if (!confirm("Delete this reaction?")) return;
-  if (btn) {
-    btn.disabled = true;
-    btn.classList.add("opacity-50", "pointer-events-none");
-  }
+  if (!(await confirmAction({ title: "Delete this reaction?", confirmLabel: "Delete" }))) return;
+  setButtonLoading(btn, true);
   try {
     const data = await api("admin_delete_custom_reaction", { reaction_id: reactionId });
     if (data.status !== "success") {
@@ -247,10 +244,7 @@ async function deleteAdminReaction(reactionId, btn) {
   } catch (err) {
     console.error(err);
   } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.classList.remove("opacity-50", "pointer-events-none");
-    }
+    setButtonLoading(btn, false);
   }
 }
 
@@ -527,11 +521,8 @@ async function toggleAdminAd(adId, isActive, btn) {
 }
 
 async function deleteAdminAd(adId, btn) {
-  if (!confirm("Delete this ad?")) return;
-  if (btn) {
-    btn.disabled = true;
-    btn.classList.add("opacity-50", "pointer-events-none");
-  }
+  if (!(await confirmAction({ title: "Delete this ad?", confirmLabel: "Delete" }))) return;
+  setButtonLoading(btn, true);
   try {
     const data = await api("admin_delete_ad", { ad_id: adId });
     if (data.status !== "success") {
@@ -543,9 +534,6 @@ async function deleteAdminAd(adId, btn) {
   } catch (err) {
     console.error(err);
   } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.classList.remove("opacity-50", "pointer-events-none");
-    }
+    setButtonLoading(btn, false);
   }
 }

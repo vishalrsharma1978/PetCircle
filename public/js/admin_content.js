@@ -239,11 +239,8 @@ async function loadAdminEventsList() {
 }
 
 async function adminDeleteEventAction(eventId, btn) {
-  if (!confirm("Delete this event? This also removes its RSVPs.")) return;
-  if (btn) {
-    btn.disabled = true;
-    btn.classList.add("opacity-50", "pointer-events-none");
-  }
+  if (!(await confirmAction({ title: "Delete this event?", message: "This also removes its RSVPs.", confirmLabel: "Delete" }))) return;
+  setButtonLoading(btn, true);
   try {
     const data = await api("admin_delete_event", { event_id: eventId });
     if (data.status !== "success") {
@@ -255,10 +252,7 @@ async function adminDeleteEventAction(eventId, btn) {
   } catch (err) {
     console.error(err);
   } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.classList.remove("opacity-50", "pointer-events-none");
-    }
+    setButtonLoading(btn, false);
   }
 }
 
@@ -320,11 +314,8 @@ async function loadAdminGalleriesList() {
 }
 
 async function adminDeleteGalleryAction(galleryId, btn) {
-  if (!confirm("Delete this gallery and all its items?")) return;
-  if (btn) {
-    btn.disabled = true;
-    btn.classList.add("opacity-50", "pointer-events-none");
-  }
+  if (!(await confirmAction({ title: "Delete this gallery?", message: "This also removes all its items.", confirmLabel: "Delete" }))) return;
+  setButtonLoading(btn, true);
   try {
     const data = await api("admin_delete_gallery", { gallery_id: galleryId });
     if (data.status !== "success") {
@@ -336,9 +327,6 @@ async function adminDeleteGalleryAction(galleryId, btn) {
   } catch (err) {
     console.error(err);
   } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.classList.remove("opacity-50", "pointer-events-none");
-    }
+    setButtonLoading(btn, false);
   }
 }

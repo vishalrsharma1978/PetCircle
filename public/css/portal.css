@@ -1002,6 +1002,66 @@
 
 
 
+    .mascot {
+
+      position: absolute;
+
+      top: -48px;
+
+      right: 22px;
+
+      width: 64px;
+
+      height: 64px;
+
+      pointer-events: none;
+
+      z-index: 5;
+
+    }
+
+
+
+    .mascot svg {
+
+      display: block;
+
+      width: 100%;
+
+      height: 100%;
+
+    }
+
+
+
+    .mascot .lids {
+
+      transition: height 0.15s ease;
+
+    }
+
+
+
+    .mascot .tail {
+
+      transform-origin: 88px 86px;
+
+      animation: mascot-wag 1.4s ease-in-out infinite;
+
+    }
+
+
+
+    @keyframes mascot-wag {
+
+      0%, 100% { transform: rotate(-8deg); }
+
+      50% { transform: rotate(18deg); }
+
+    }
+
+
+
     .eye-toggle {
 
       position: absolute;

@@ -214,7 +214,7 @@
                   <circle cx="71" cy="47" r="9" fill="#FFF8EC" />
                   <circle class="pupil pupil-l" cx="49" cy="47" r="4" fill="#2B2420" />
                   <circle class="pupil pupil-r" cx="71" cy="47" r="4" fill="#2B2420" />
-                  <rect class="lids" x="40" y="42" width="40" height="11" fill="#F2A93B" />
+                  <rect class="lids" x="40" y="38" width="40" height="0" fill="#F2A93B" />
                   <ellipse cx="60" cy="63" rx="14" ry="10" fill="#FFF8EC" />
                   <ellipse cx="60" cy="58" rx="5" ry="3.5" fill="#2B2420" />
                   <path d="M 60 61.5 V 66 M 53 65 Q 56.5 69 60 66 M 60 66 Q 63.5 69 67 65" stroke="#2B2420"

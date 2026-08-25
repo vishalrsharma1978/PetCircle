@@ -117,15 +117,6 @@ const PET_TYPE_PREVIEW_ACCENTS = {
   Other: "#e04848",
 };
 
-function handleLoginPetTypeChange(petType) {
-  const accent = PET_TYPE_PREVIEW_ACCENTS[petType] || PET_TYPE_PREVIEW_ACCENTS[""];
-  const leftPane = document.getElementById("lp-left-pane");
-  const rightPane = document.getElementById("lp-right-pane");
-  [leftPane, rightPane, document.getElementById("view-public-login")].forEach((el) => {
-    if (el) el.style.setProperty("--login-accent", accent);
-  });
-}
-
 // Password-field mascot: pupils track the mouse, paws cover the eyes while a
 // password is being typed. See mascot.md for the reference implementation
 // this is adapted from (element IDs here match views/signup.php's markup).
@@ -157,11 +148,11 @@ function initPasswordMascot(pwInputId, eyeToggleId, mascotId) {
     if (pwInput.type === "password" && pwInput.value.length > 0) {
       pawL.style.transform = "translate(2px, -57px) rotate(15deg)";
       pawR.style.transform = "translate(-2px, -57px) rotate(-15deg)";
-      if (lids) lids.setAttribute("height", "11");
+      if (lids) lids.setAttribute("height", "18");
     } else {
       pawL.style.transform = "";
       pawR.style.transform = "";
-      if (lids) lids.setAttribute("height", document.activeElement === pwInput && pwInput.type === "password" ? "28" : "11");
+      if (lids) lids.setAttribute("height", "0");
     }
   }
 
@@ -170,7 +161,7 @@ function initPasswordMascot(pwInputId, eyeToggleId, mascotId) {
   pwInput.addEventListener("blur", () => {
     pawL.style.transform = "";
     pawR.style.transform = "";
-    if (lids) lids.setAttribute("height", "11");
+    if (lids) lids.setAttribute("height", "0");
   });
 
   eyeToggle.addEventListener("click", () => {

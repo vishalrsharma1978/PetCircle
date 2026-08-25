@@ -1,0 +1,39 @@
+# OPTIONAL fallback — only needed if the Hostinger domain's document root
+# cannot be pointed directly at the public/ folder via hPanel (Hosting ->
+# Manage -> Website -> Advanced -> your domain's document root). Pointing
+# the document root at public/ directly is the clean approach and makes
+# this file unnecessary; keep it only as a safety net for setups that must
+# serve from the repo root instead.
+#
+# It transparently rewrites every request into public/, so app code never
+# has to know which mode it's running in (router.php's own path resolution
+# is unaffected either way).
+
+# Deny access to dotfiles (.env, .git, .user.ini, this file itself, etc.)
+# regardless of which mode is active — defense in depth alongside public/
+# never containing .env in the first place.
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Already inside public/ (e.g. document root is already set correctly) —
+    # don't double-rewrite.
+    RewriteCond %{REQUEST_URI} ^/public/ [NC]
+    RewriteRule ^ - [L]
+
+    # Serve an existing real file/directory under public/ as-is (css, js,
+    # images, robots.txt, etc.).
+    RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -f [OR]
+    RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -d
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # /api/* goes through public/api/index.php, matching router.php's own
+    # split between public/index.php and public/api/index.php exactly.
+    RewriteRule ^api(/.*)?$ public/api/index.php [L]
+
+    # Everything else (app routes) goes through public/index.php.
+    RewriteRule ^(.*)$ public/index.php [L]
+</IfModule>

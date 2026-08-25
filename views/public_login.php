@@ -89,7 +89,7 @@
             <option class="text-gray-900" value="Rabbit">Rabbit</option>
             <option class="text-gray-900" value="Fish">Fish</option>
             <option class="text-gray-900" value="Reptile">Reptile</option>
-            <option class="text-gray-900" value="Small Pets">Small Pets</option>
+            <option class="text-gray-900" value="Small Pet">Small Pet</option>
             <option class="text-gray-900" value="Other">Other</option>
           </select>
           <i data-lucide="chevron-down" class="absolute right-3 top-3.5 w-4 h-4 text-gray-500 pointer-events-none"></i>
@@ -106,11 +106,11 @@
     <div class="w-full max-w-[460px] p-6 sm:p-7">
 
       <!-- Welcome Header -->
-      <div class="mb-8 text-center">
+      <div class="mb-6 text-center">
         <div id="lp-brand-badge"
-          class="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-sm mb-4 border border-white/70 overflow-hidden transition-colors duration-500 breathing-glow"
+          class="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-sm mb-3 border border-white/70 overflow-hidden transition-colors duration-500 breathing-glow"
           style="background-color: var(--login-accent);">
-          <img src="assets/mascots/pawcircle-logo.svg" alt="PawCircle logo" class="w-11 h-11 object-contain"
+          <img id="lp-brand-badge-img" src="assets/mascots/pawcircle-logo.svg" alt="PawCircle logo" class="w-11 h-11 object-contain"
             loading="eager" decoding="async" />
         </div>
         <h3 class="text-3xl font-bold text-gray-900" style="font-family: 'Poppins'">Welcome back</h3>

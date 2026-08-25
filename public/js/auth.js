@@ -439,10 +439,14 @@ const PET_REAL_PHOTOS = {
   Cat: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=1200&q=85&auto=format&fit=crop',
   Bird: 'https://images.unsplash.com/photo-1444465693019-aa0b6392460d?w=1200&q=85&auto=format&fit=crop',
   Fish: 'https://images.unsplash.com/photo-1524704796725-9fc3044a58b2?w=1200&q=85&auto=format&fit=crop',
-  Reptile: 'https://images.unsplash.com/photo-1484406596175-b408d56a7350?w=1200&q=85&auto=format&fit=crop',
-  Rabbit: 'https://images.unsplash.com/photo-1585110396000-c9faf4e4f9ba?w=1200&q=85&auto=format&fit=crop',
-  Hamster: 'https://images.unsplash.com/photo-1425082661705-1834bfd0999c?w=1200&q=85&auto=format&fit=crop',
-  Other: 'https://images.unsplash.com/photo-1544568100-847a948585b9?w=1200&q=85&auto=format&fit=crop'
+  // Reptile/Rabbit/Small Pet/Other are self-hosted (not hotlinked) because the
+  // original Unsplash URLs here were dead (404) or, for Other, resolved but
+  // depicted the wrong animal (a dog) — each replacement was downloaded only
+  // after being visually confirmed to actually show the right species.
+  Reptile: 'assets/mascots/reptile.jpg',
+  Rabbit: 'assets/mascots/rabbit.jpg',
+  'Small Pet': 'assets/mascots/small-pet.jpg',
+  Other: 'assets/mascots/other.jpg'
 };
 
 // Fallback used only when PET_REAL_PHOTOS has no entry for a given pet type
@@ -818,7 +822,11 @@ var loginFeedFeeds = null;
 
           }
 
-          
+          // Sync brand badge photo to the currently-rotating theme
+
+          updateLoginBrandBadge(f.petTheme);
+
+
 
           // Sync dropdown selection
 
@@ -886,11 +894,43 @@ var loginFeedFeeds = null;
 
 
 
+    function updateLoginBrandBadge(type) {
+
+      var img = document.getElementById('lp-brand-badge-img');
+
+      if (!img) return;
+
+      var photo = type && PET_REAL_PHOTOS[type];
+
+      if (photo) {
+
+        img.src = photo;
+
+        img.alt = type + ' photo';
+
+        img.className = 'w-full h-full object-cover';
+
+      } else {
+
+        img.src = 'assets/mascots/pawcircle-logo.svg';
+
+        img.alt = 'PawCircle logo';
+
+        img.className = 'w-11 h-11 object-contain';
+
+      }
+
+    }
+
+
+
     function handleLoginPetTypeChange(type) {
 
       var rightPane = document.getElementById('lp-right-pane');
 
       var loginView = document.getElementById('view-public-login');
+
+      updateLoginBrandBadge(type);
 
       if (!type) {
 

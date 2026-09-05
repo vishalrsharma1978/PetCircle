@@ -107,7 +107,7 @@ define('PAWCIRCLE_SIGNUP_CODE_MAX_ATTEMPTS', 6);
 // yet, so verification codes can't actually be emailed out. Signup skips
 // straight to account creation (finalizeSignup()) instead of the
 // code-verification detour. Flip back to true once a domain/sender is set up.
-define('PAWCIRCLE_EMAIL_VERIFICATION_ENABLED', false);
+define('PAWCIRCLE_EMAIL_VERIFICATION_ENABLED', true);
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);

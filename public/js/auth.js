@@ -107,9 +107,7 @@ function maybePromptSetHandle(user) {
 }
 
 function closeSetHandleModal() {
-  const modal = document.getElementById("set-handle-modal");
-  modal?.classList.add("hidden");
-  modal?.classList.remove("flex");
+  pcHideModal("set-handle-modal");
 }
 
 async function submitSetHandleModal() {
@@ -434,15 +432,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
+// Every species is now self-hosted. Dog/Cat/Bird/Fish used to hotlink
+// images.unsplash.com, which had already bitten once — the note that used to
+// sit here recorded those URLs going 404 and one of them resolving to the
+// wrong animal. They are the same photographs, fetched once and committed.
+//
+// All eight are cropped to a single 320x240. The largest this art ever renders
+// is the 106x76 CSS px breed-strip tile (style_0.css:256), so that is 3x DPR
+// headroom; the previous files were up to 1200x1800 and 265KB apiece to fill
+// it, and each had a different aspect ratio, so `background-size: cover` chose
+// a different part of each subject. The set totals 87KB, down from 699KB.
 const PET_REAL_PHOTOS = {
-  Dog: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=1200&q=85&auto=format&fit=crop',
-  Cat: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=1200&q=85&auto=format&fit=crop',
-  Bird: 'https://images.unsplash.com/photo-1444465693019-aa0b6392460d?w=1200&q=85&auto=format&fit=crop',
-  Fish: 'https://images.unsplash.com/photo-1524704796725-9fc3044a58b2?w=1200&q=85&auto=format&fit=crop',
-  // Reptile/Rabbit/Small Pet/Other are self-hosted (not hotlinked) because the
-  // original Unsplash URLs here were dead (404) or, for Other, resolved but
-  // depicted the wrong animal (a dog) — each replacement was downloaded only
-  // after being visually confirmed to actually show the right species.
+  Dog: 'assets/mascots/dog.jpg',
+  Cat: 'assets/mascots/cat.jpg',
+  Bird: 'assets/mascots/bird.jpg',
+  Fish: 'assets/mascots/fish.jpg',
   Reptile: 'assets/mascots/reptile.jpg',
   Rabbit: 'assets/mascots/rabbit.jpg',
   'Small Pet': 'assets/mascots/small-pet.jpg',

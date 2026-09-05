@@ -27,11 +27,31 @@
     </symbol>
   </svg>
 
+  <!-- Shared gradients and filters for the character rigs. MUST come before the
+       library and must never be cloned: the rigs reference these by id, and the
+       library is cloneNode'd into several live SVGs at once (the auth hero and
+       the kennel hover stage), so anything carrying an id had to live outside
+       the cloned subtree. Every definition in there is colourless — species
+       colour comes from the base fills underneath. -->
+  <?php include 'components/mascot_defs.php'; ?>
+
+  <!-- Character rigs for the playful auth pages. Included once here rather
+       than inside either view: auth_scene.js clones the requested species out
+       of this library into whichever stage needs it, so the sign-in and
+       sign-up pages share one copy of the artwork. -->
+  <?php include 'components/auth_mascots.php'; ?>
+
   <!-- ==================== PUBLIC LOGIN ==================== -->
   <?php include 'views/public_login.php'; ?>
 
+  <!-- ==================== PUBLIC LOGIN (PLAYFUL REDESIGN) ==================== -->
+  <?php include 'views/public_login_v2.php'; ?>
+
   <!-- ==================== SIGNUP ==================== -->
   <?php include 'views/signup.php'; ?>
+
+  <!-- ==================== SIGNUP (PLAYFUL REDESIGN) ==================== -->
+  <?php include 'views/signup_v2.php'; ?>
 
   <!-- ==================== VERIFY EMAIL ==================== -->
   <?php include 'views/verify_email.php'; ?>
@@ -116,7 +136,20 @@
   <script src="js/vendor.js?v=<?= assetVer('js/vendor.js') ?>" defer></script>
   <script src="js/state.js?v=<?= assetVer('js/state.js') ?>" defer></script>
   <script src="js/core.js?v=<?= assetVer('js/core.js') ?>" defer></script>
+  <!-- anime.js UMD (sets window.anime) + the motion layer that uses it. Both
+       must follow core.js: core.js calls pcOnSocialTabChanged/pcDrawerOpen
+       through typeof guards, so a failure to load here degrades the app to its
+       previous static behaviour rather than breaking navigation. Vendored
+       rather than CDN-loaded to match js/vendor/ and to keep the nav working
+       offline. -->
+  <script src="js/vendor/anime.umd.min.js" defer></script>
+  <script src="js/motion.js?v=<?= assetVer('js/motion.js') ?>" defer></script>
   <script src="js/auth.js?v=<?= assetVer('js/auth.js') ?>" defer></script>
+  <!-- auth_scene.js must precede auth_v2.js: both are deferred (so they run in
+       document order) and auth_v2.js's init calls into av2Scene* immediately
+       when ?ui=playful opens a redesigned page on load. -->
+  <script src="js/auth_scene.js?v=<?= assetVer('js/auth_scene.js') ?>" defer></script>
+  <script src="js/auth_v2.js?v=<?= assetVer('js/auth_v2.js') ?>" defer></script>
   <script src="js/profile.js?v=<?= assetVer('js/profile.js') ?>" defer></script>
   <script src="js/cropper.js?v=<?= assetVer('js/cropper.js') ?>" defer></script>
   <script src="js/verification.js?v=<?= assetVer('js/verification.js') ?>" defer></script>

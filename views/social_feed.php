@@ -6,9 +6,15 @@
       <div class="grid grid-cols-[minmax(0,1fr)_auto] xl:grid-cols-[auto_minmax(260px,1fr)_auto] items-center gap-3 xl:gap-6">
         <!-- Branding -->
         <button onclick="switchView('view-social-feed'); switchSocialTab('hub');" class="no-accent-hover flex items-center gap-2 sm:gap-3 min-w-0 text-left">
-          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-brand-500 flex items-center justify-center overflow-hidden flex-shrink-0">
-            <img src="assets/mascots/pawcircle-logo.svg" alt="" class="w-7 h-7 object-contain">
-          </div>
+          <!-- The tile is overflow-hidden (it clips the logo into the rounded
+               square), so the hover paw-puffs cannot live inside it. This
+               wrapper is their escape hatch — see .pc-brand-logo in motion.css. -->
+          <span class="pc-brand-logo">
+            <span class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-brand-500 flex items-center justify-center overflow-hidden flex-shrink-0">
+              <img src="assets/mascots/pawcircle-logo.svg" alt="" class="w-7 h-7 object-contain">
+            </span>
+            <span class="pc-paw-puffs" aria-hidden="true"></span>
+          </span>
           <div class="min-w-0">
             <h1 class="text-lg sm:text-xl font-extrabold text-gray-900 dark:text-white leading-tight truncate" style="font-family:'Poppins'">PawCircle</h1>
             <p class="text-xs text-gray-500 dark:text-gray-400 truncate hidden sm:block">Find your pack</p>
@@ -176,15 +182,60 @@
         </div>
       </div>
 
-      <!-- Tab strip -->
-      <nav class="relative border-t border-gray-200 dark:border-gray-700 flex items-center gap-2 overflow-x-auto no-scrollbar pt-1.5">
-        <button data-social-tab="hub" onclick="switchSocialTab('hub')" title="Kennel" class="no-accent-hover social-tab-strip-item flex-shrink-0 px-3 py-3.5 whitespace-nowrap flex items-center justify-center"><svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-kennel"></use></svg></button>
-        <button data-social-tab="feed" onclick="switchSocialTab('feed')" class="no-accent-hover social-tab-strip-item flex-1 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><i data-lucide="paw-print" class="w-8 h-8"></i>Paw-Bites</button>
-        <button data-social-tab="friends" onclick="switchSocialTab('friends')" class="no-accent-hover social-tab-strip-item flex-1 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><i data-lucide="dog" class="w-8 h-8"></i>Pawpals</button>
-        <button data-social-tab="groups" onclick="switchSocialTab('groups')" class="no-accent-hover social-tab-strip-item flex-1 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><div class="relative w-8 h-8 flex-shrink-0"><i data-lucide="dog" class="w-5 h-5 absolute top-0 left-0"></i><i data-lucide="dog" class="w-7 h-7 absolute bottom-0 right-0"></i></div>Packs</button>
-        <button data-social-tab="events" onclick="switchSocialTab('events')" class="no-accent-hover social-tab-strip-item flex-1 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><i data-lucide="bone" class="w-8 h-8"></i>PawFest</button>
-        <button data-social-tab="galleries" onclick="switchSocialTab('galleries')" class="no-accent-hover social-tab-strip-item flex-1 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><i data-lucide="images" class="w-8 h-8"></i>Pawprints</button>
+      <!-- Tab strip. -->
+      <nav id="social-tab-nav" class="relative border-t border-gray-200 dark:border-gray-700 flex items-center gap-2 overflow-x-auto no-scrollbar pt-1.5">
+        <!-- Kennel tab. On hover motion.js widens this button and the five
+             flex-1 siblings give up the width, so the whole scene plays INSIDE
+             the button and nothing has to escape the nav's overflow.
+             Two stacked graphics, cross-faded: .kennel-icon at rest, and
+             .kennel-scene once open. The icon is inlined rather than
+             <use href="#icon-kennel"> because a <use> instance lives in a
+             shadow tree that neither document CSS nor querySelector can reach
+             (see the note in auth_mascots.php), so its door could never be
+             animated. The drawer's twin keeps its <use> — this is a
+             pointer-hover affordance and the drawer is the touch surface. -->
+        <button data-social-tab="hub" onclick="switchSocialTab('hub')" title="Kennel" class="no-accent-hover social-tab-strip-item kennel-tab flex-shrink-0 py-3.5 whitespace-nowrap flex items-center justify-center">
+          <svg class="kennel-icon w-9 h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 11 L12 4 L20 11" />
+            <path d="M5.5 11 L5.5 20 L18.5 20 L18.5 11" />
+            <path d="M9.5 20 L9.5 15.5 A2.5 2.5 0 0 1 14.5 15.5 L14.5 20" />
+          </svg>
+          <svg class="kennel-scene" viewBox="0 0 210 64" aria-hidden="true" focusable="false">
+            <!-- The house sits on the LEFT, roughly where the resting icon is,
+                 so opening the button reveals space to walk through instead of
+                 relocating the building. The pet therefore enters from the
+                 right.
+
+                 SVG has no z-index, so this order IS the depth. The house is
+                 built back-to-front first (wall, then the doorway void cut into
+                 it, then the roof over the top), and only then the animal, so
+                 it walks IN FRONT of the house until it reaches the doorway.
+                 The door panel comes last of all so it can swing shut over the
+                 animal that just went inside. -->
+            <ellipse class="kennel-ground" cx="42" cy="58.5" rx="32" ry="3" />
+            <g class="kennel-house">
+              <path class="kennel-wall" d="M18 34 L18 58 L66 58 L66 34 Z" />
+              <path class="kennel-wall-shade" d="M54 34 L66 34 L66 58 L54 58 Z" />
+              <path class="kennel-hole" d="M33 58 L33 47 A9 9 0 0 1 51 47 L51 58 Z" />
+              <path class="kennel-roof" d="M12 35 L42 19 L72 35 Z" />
+              <path class="kennel-roof-lit" d="M12 35 L42 19 L42 35 Z" />
+              <path class="kennel-shingle" d="M21 30 H63 M26 26 H58 M31 22 H53" />
+              <path class="kennel-eave" d="M12 35 H72" />
+            </g>
+            <g class="kennel-actor">
+              <g class="kennel-actor-slot" transform="translate(0 29) scale(0.15)"></g>
+            </g>
+            <path class="kennel-door-panel" d="M33 58 L33 47 A9 9 0 0 1 51 47 L51 58 Z" />
+          </svg>
+        </button>
+        <button data-social-tab="feed" onclick="switchSocialTab('feed')" class="no-accent-hover social-tab-strip-item flex-1 min-w-0 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><i data-lucide="paw-print" class="w-8 h-8"></i>Paw-Bites</button>
+        <button data-social-tab="friends" onclick="switchSocialTab('friends')" class="no-accent-hover social-tab-strip-item flex-1 min-w-0 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><i data-lucide="dog" class="w-8 h-8"></i>Pawpals</button>
+        <button data-social-tab="groups" onclick="switchSocialTab('groups')" class="no-accent-hover social-tab-strip-item flex-1 min-w-0 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><div class="relative w-8 h-8 flex-shrink-0"><i data-lucide="dog" class="w-5 h-5 absolute top-0 left-0"></i><i data-lucide="dog" class="w-7 h-7 absolute bottom-0 right-0"></i></div>Packs</button>
+        <button data-social-tab="events" onclick="switchSocialTab('events')" class="no-accent-hover social-tab-strip-item flex-1 min-w-0 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><i data-lucide="bone" class="w-8 h-8"></i>PawFest</button>
+        <button data-social-tab="galleries" onclick="switchSocialTab('galleries')" class="no-accent-hover social-tab-strip-item flex-1 min-w-0 px-5 py-3.5 text-base font-semibold whitespace-nowrap flex items-center justify-center gap-2"><i data-lucide="images" class="w-8 h-8"></i>Pawprints</button>
+        <span id="social-tab-underline" aria-hidden="true"></span>
       </nav>
+
     </div>
   </div>
 
@@ -230,6 +281,15 @@
             class="flex-1 resize-none border-0 focus:ring-0 text-sm dark:text-white placeholder-gray-400 bg-gray-50 dark:bg-gray-800/60 rounded-2xl px-4 py-2.5 transition-all"></textarea>
         </div>
         <div id="composer-extra" class="hidden mt-3">
+          <!-- Audience picker. A native <select> on purpose: it gets mobile
+               pickers, keyboard access and long-name truncation for free.
+               Populated by loadComposerAudience() with the groups you're in. -->
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 flex-shrink-0">Post to</span>
+            <select id="composer-audience" class="text-xs font-bold rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 dark:text-white px-2 py-1.5 max-w-[70%] truncate">
+              <option value="">My feed</option>
+            </select>
+          </div>
           <div id="composer-media-preview" class="hidden mb-3">
             <img id="composer-media-img" src="" alt="" class="max-h-48 rounded-xl object-cover">
             <button type="button" onclick="clearComposerMedia()" class="text-xs text-red-500 font-semibold mt-1">Remove photo</button>

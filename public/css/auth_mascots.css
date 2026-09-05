@@ -1,0 +1,335 @@
+/* ============================================================
+   auth_mascots.css — animation and state rules for the character
+   rigs in components/auth_mascots.php.
+
+   Paired with that file rather than folded into auth_scene.css:
+   the rig is a self-contained thing (one skeleton, eight species)
+   whose CSS is meaningless without the markup and vice versa, and
+   keeping them adjacent is what makes a species edit a two-file
+   change instead of a hunt. auth_scene.css owns the world the
+   character stands in; this owns the character.
+
+   Loaded by components/head.php before auth_scene.css.
+   ============================================================ */
+
+/* transform-box goes ONLY on the groups this file actually animates — never on
+   `.pcm *`. Several species position a shape with an SVG transform attribute
+   (e.g. the dog's ears use transform="rotate(-14 55 66)"), and that attribute
+   is the same property as CSS `transform`: switching its reference box to
+   fill-box reinterprets the rotation's centre as fill-box-relative instead of
+   user-space, which tears the ears and tail clean off the body. The rotated
+   shapes are children of these groups, so they keep the default view-box
+   reference and stay where they were drawn. */
+.pcm,
+.pcm-shadow,
+.pcm-body,
+.pcm-head,
+.pcm-eye,
+.pcm-pupil,
+.pcm-glint,
+.pcm-tail,
+.pcm-ear,
+.pcm-paw,
+.pcm-tongue,
+.pcm-muzzle,
+.pcm-blush {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+.pcm-shadow {
+  fill: rgba(43, 36, 32, 0.16);
+  animation: pcm-shadow 3.4s ease-in-out infinite;
+}
+
+.pcm-body {
+  transform-origin: 50% 100%;
+  animation: pcm-breathe 3.4s ease-in-out infinite;
+}
+
+.pcm-head {
+  transform-origin: 50% 92%;
+  animation: pcm-sway 5.6s ease-in-out infinite;
+}
+
+.pcm-eye {
+  animation: pcm-blink 6.4s infinite;
+}
+
+.pcm-pupil,
+.pcm-glint {
+  transition: transform 0.14s ease-out;
+}
+
+.pcm-tail {
+  transform-origin: 12% 88%;
+  animation: pcm-wag 1.6s ease-in-out infinite;
+}
+
+.pcm-ear {
+  transform-origin: 50% 8%;
+  animation: pcm-ear 4.8s ease-in-out infinite;
+}
+
+.pcm-ear-r {
+  animation-delay: -1.3s;
+}
+
+.pcm-paw {
+  transition: transform 0.42s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.pcm-tongue {
+  transform-origin: 50% 0%;
+  animation: pcm-pant 1.9s ease-in-out infinite;
+}
+
+@keyframes pcm-breathe {
+  0%, 100% { transform: scale(1, 1); }
+  50%      { transform: scale(1.022, 0.982); }
+}
+
+@keyframes pcm-shadow {
+  0%, 100% { transform: scale(1, 1); opacity: 1; }
+  50%      { transform: scale(0.955, 1); opacity: 0.85; }
+}
+
+@keyframes pcm-sway {
+  0%, 100% { transform: rotate(-1.6deg) translateY(0); }
+  50%      { transform: rotate(1.6deg) translateY(-2px); }
+}
+
+/* Eyes stay open for the overwhelming majority of the cycle — the closed
+   frames are deliberately only ~3% of it so the blink reads as a blink and
+   not a squint. */
+@keyframes pcm-blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  93%           { transform: scaleY(0.06); }
+  96%           { transform: scaleY(1); }
+}
+
+@keyframes pcm-wag {
+  0%, 100% { transform: rotate(-8deg); }
+  50%      { transform: rotate(10deg); }
+}
+
+@keyframes pcm-ear {
+  0%, 100% { transform: rotate(-3deg); }
+  50%      { transform: rotate(4deg); }
+}
+
+@keyframes pcm-pant {
+  0%, 100% { transform: scaleY(0.75); }
+  50%      { transform: scaleY(1.15); }
+}
+
+/* ---------- Reactive states (auth_scene.js toggles these) ---------- */
+
+/* Hop: played when the character changes species or the wizard advances. */
+.pcm.is-hop {
+  animation: pcm-hop 0.62s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+@keyframes pcm-hop {
+  0%   { transform: translateY(0) scaleY(1); }
+  22%  { transform: translateY(4px) scaleY(0.92); }
+  55%  { transform: translateY(-24px) scaleY(1.07); }
+  80%  { transform: translateY(2px) scaleY(0.96); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+
+/* Delight: a faster tail and a wider grin on a successful submit. */
+.pcm.is-happy .pcm-tail { animation-duration: 0.42s; }
+.pcm.is-happy .pcm-ear  { animation-duration: 0.9s; }
+
+/* Dejected: ears droop, head dips, tail stops. Used on a failed sign-in. */
+.pcm.is-sad .pcm-tail {
+  animation: none;
+  transform: rotate(-24deg);
+}
+
+.pcm.is-sad .pcm-ear-l { animation: none; transform: rotate(-26deg); }
+.pcm.is-sad .pcm-ear-r { animation: none; transform: rotate(26deg); }
+
+.pcm.is-sad .pcm-head {
+  animation: none;
+  transform: translateY(5px) rotate(-3deg);
+}
+
+.pcm.is-sad .pcm-muzzle {
+  transform: translateY(2px) scaleY(-1) scale(0.7);
+  transform-origin: 50% 30%;
+}
+
+/* Bashful: paws over the eyes while a password is being typed.
+   --pcm-shy-x/y is the delta from the LEFT paw's resting centre to the LEFT
+   eye's centre, in the 200x200 rig's own units; the right paw mirrors it below.
+   They are custom properties because every species parks its paws in a slightly
+   different place, and the two whose "paws" are fins or wings park them
+   somewhere else entirely.
+
+   This only reads as anything because .pcm-paw-* are the LAST children of the
+   group — see the paint-order note in components/auth_mascots.php. Raised paws
+   land on top of the face, and SVG resolves that by document order alone. */
+.pcm {
+  --pcm-shy-x: 10px;
+  --pcm-shy-y: -108px;
+}
+
+.pcm.is-shy .pcm-paw-l { transform: translate(var(--pcm-shy-x), var(--pcm-shy-y)) rotate(16deg); }
+.pcm.is-shy .pcm-paw-r { transform: translate(calc(-1 * var(--pcm-shy-x)), var(--pcm-shy-y)) rotate(-16deg); }
+
+.pcm.is-shy .pcm-eye {
+  animation: none;
+  transform: scaleY(0.06);
+}
+
+/* ---------- Species-specific pivots and offsets ---------- */
+
+/* Dog was redrawn with a real skull-and-muzzle silhouette and erect ears
+   instead of the original circle-plus-two-ellipses. That changed every
+   group's fill-box, and since the shared rules above express each pivot as a
+   PERCENTAGE of that box, the defaults no longer land on the right anatomy —
+   the ears in particular ended up hinging 33 units away from their roots,
+   near their own tips, which swings them off the skull.
+   Percentages below were measured from the new boxes so each pivot sits where
+   the joint actually is: ear roots at (83,49)/(117,49), skull base at
+   (100,112), tail root at (122,158). Re-derive them with __mascot_lab.php's
+   bbox mode if this artwork changes again. */
+.pcm[data-species="Dog"] .pcm-head { transform-origin: 47.6% 97.5%; }
+.pcm[data-species="Dog"] .pcm-ear-l { transform-origin: 58.3% 78.4%; }
+.pcm[data-species="Dog"] .pcm-ear-r { transform-origin: 41.7% 78.4%; }
+.pcm[data-species="Dog"] .pcm-tail { transform-origin: 18.4% 93.7%; }
+
+/* Cat, same story. Its ears are taller and wider at the base than the shared
+   50%/8% assumes, so they need their own hinge; the left and right differ
+   because the pair is mirrored inside boxes of the same width. The head keeps
+   the default — the whiskers widen its box, but symmetrically, so the
+   percentage still lands on the skull base. */
+.pcm[data-species="Cat"] .pcm-ear-l { transform-origin: 57.1% 80.3%; }
+.pcm[data-species="Cat"] .pcm-ear-r { transform-origin: 42.8% 80.3%; }
+.pcm[data-species="Cat"] .pcm-tail { transform-origin: 8.2% 93.1%; }
+
+/* The shared .is-sad rule turns the smile into a frown by flipping the WHOLE
+   muzzle with scaleY(-1). That works on the flat rigs, whose muzzle is a
+   symmetric ellipse with a dot for a nose, but Dog and Cat now have a modelled
+   nose with its own core shade and specular — inverted, it reads as a dark
+   blob sitting where the mouth should be. These two flip only the mouth, which
+   is what the gag was ever actually about, and let the muzzle just drop.
+   .pcm-mouth is a Dog/Cat-only wrapper, and none of its children carry an SVG
+   transform attribute, so giving it fill-box here is safe — see the warning at
+   the top of this file about why that must never be applied broadly. */
+.pcm[data-species="Dog"].is-sad .pcm-muzzle,
+.pcm[data-species="Cat"].is-sad .pcm-muzzle {
+  transform: translateY(3px);
+}
+
+.pcm-mouth {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+.pcm[data-species="Dog"].is-sad .pcm-mouth,
+.pcm[data-species="Cat"].is-sad .pcm-mouth {
+  transform: translateY(5px) scaleY(-1);
+}
+
+/* Bird's tail fans from its left edge, Fish's caudal fin from its narrow
+   root — a bottom-left pivot would swing them through the body. */
+.pcm[data-species="Bird"] .pcm-tail {
+  transform-origin: 4% 50%;
+}
+
+/* Fish's veiltail sits symmetrically behind the body, so it swishes about its
+   own centre instead of hinging from one edge. */
+.pcm[data-species="Fish"] .pcm-tail {
+  transform-origin: 50% 40%;
+}
+
+/* Round puff / stub tails: jiggle in place rather than sweep. */
+.pcm[data-species="Rabbit"] .pcm-tail,
+.pcm[data-species="Small Pet"] .pcm-tail {
+  transform-origin: 50% 50%;
+  animation-name: pcm-jiggle;
+}
+
+@keyframes pcm-jiggle {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-3px) scale(1.06); }
+}
+
+.pcm[data-species="Other"] .pcm-tail { transform-origin: 2% 60%; }
+.pcm[data-species="Reptile"] .pcm-tail { transform-origin: 4% 80%; }
+
+/* Each value is (eye-l centre) - (paw-l resting centre) for that species.
+   Bird's wings and Fish's pectoral fins already sit high on the body, so they
+   have much less distance to travel than a paw on the ground does. */
+/* Dog: remeasured after the redraw moved the eyes to (85,66) and the paws to
+   (80,185) — 85-80 and 66-185. */
+.pcm[data-species="Dog"]       { --pcm-shy-x: 5px;  --pcm-shy-y: -119px; }
+/* Cat: remeasured after the redraw — eyes (85,64), paws (80,185). */
+.pcm[data-species="Cat"]       { --pcm-shy-x: 5px;  --pcm-shy-y: -121px; }
+.pcm[data-species="Rabbit"]    { --pcm-shy-x: 9px;  --pcm-shy-y: -107px; }
+.pcm[data-species="Small Pet"] { --pcm-shy-x: 5px;  --pcm-shy-y: -107px; }
+.pcm[data-species="Reptile"]   { --pcm-shy-x: 12px; --pcm-shy-y: -106px; }
+.pcm[data-species="Bird"]      { --pcm-shy-x: 24px; --pcm-shy-y: -79px; }
+.pcm[data-species="Fish"]      { --pcm-shy-x: 10px; --pcm-shy-y: -54px; }
+
+/* Fish bubbles. The fish is the only species that touches nothing, so it needs
+   a cue that it is floating rather than falling; these supply it. A bob on the
+   root .pcm would be the obvious alternative, but .pcm.is-hop already owns that
+   element's transform at equal specificity and would fight it on every species
+   swap and wizard step. */
+.pcm-bubble {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: pcm-bubble 4.6s ease-in-out infinite;
+}
+
+.pcm-bubble:nth-of-type(2) { animation-duration: 5.8s; animation-delay: -1.9s; }
+.pcm-bubble:nth-of-type(3) { animation-duration: 5.1s; animation-delay: -3.4s; }
+
+@keyframes pcm-bubble {
+  0%   { transform: translate(0, 6px) scale(0.6); opacity: 0; }
+  20%  { opacity: 0.5; }
+  70%  { opacity: 0.32; }
+  100% { transform: translate(6px, -34px) scale(1.05); opacity: 0; }
+}
+
+/* Bird's crest and Reptile's brows pivot from their inner edge. */
+.pcm[data-species="Bird"] .pcm-ear,
+.pcm[data-species="Reptile"] .pcm-ear {
+  transform-origin: 50% 60%;
+}
+
+/* Only the dog has a tongue; the selector is harmless elsewhere. */
+
+/* ---------- Reduced motion ---------- */
+
+/* The character holds a still, neutral, fully-drawn pose: no idle loop, no
+   blink, and no transition on the pupils or the paws. The paws-over-eyes and
+   dejected states still apply — they carry meaning, they just arrive without
+   being animated into place. */
+@media (prefers-reduced-motion: reduce) {
+  .pcm-shadow,
+  .pcm-body,
+  .pcm-head,
+  .pcm-eye,
+  .pcm-tail,
+  .pcm-ear,
+  .pcm-tongue,
+  .pcm-bubble,
+  .pcm.is-hop {
+    animation: none !important;
+  }
+
+  /* The bubble keyframe starts and ends at opacity 0, so stilling it mid-flight
+     would leave the fish's bubbles invisible rather than merely motionless. */
+  .pcm-bubble { opacity: 0.4; }
+
+  .pcm-paw,
+  .pcm-pupil,
+  .pcm-glint {
+    transition: none !important;
+  }
+}

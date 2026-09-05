@@ -1,0 +1,261 @@
+/* motion.css — static styling for the anime.js-driven motion added to the
+   logged-in app (public/js/motion.js).
+
+   Rule for this whole file: it may style things, but it must never HIDE
+   anything. Every `opacity: 0` starting state is written from JS instead, so
+   that if anime.js fails to load — blocked CDN, cached miss, a syntax error
+   earlier in the file — the page degrades to its old static self rather than
+   to a blank one.
+
+   The `prefers-reduced-motion` block at the bottom follows the convention
+   already established in main.css:4424 and auth_mascots.css:265. */
+
+
+/* ============================================================
+   1. Kennel tab (expands sideways on hover)
+   ============================================================ */
+
+/* The button carries an explicit width so anime.js has something to tween;
+   without it the width is implicit from the icon and there is no start value.
+   overflow:hidden is what lets the scene be revealed by the widening rather
+   than spilling over the neighbouring tabs, and it means nothing has to escape
+   the nav's overflow the way the old floating stage did. */
+/* applyAccentColor() (core.js:51) only publishes --brand-50..500 and 900, so
+   --brand-600/700 would silently fall back to a fixed red and refuse to follow
+   the admin's per-pet-type accent while the walls followed it. Mixing down from
+   500 keeps the whole house on the theme. */
+.kennel-tab {
+  --kennel-dark: color-mix(in srgb, var(--brand-500, #e04848) 84%, black);
+  --kennel-deep: color-mix(in srgb, var(--brand-500, #e04848) 66%, black);
+  position: relative;
+  width: 60px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Both graphics are stacked and cross-faded by motion.js. Neither is hidden
+   here: with the script absent the icon simply stays visible and the scene
+   sits behind it at the button's resting width, which crops it away. */
+.kennel-tab .kennel-icon {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.kennel-tab .kennel-scene {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 210px;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.kennel-ground {
+  fill: rgba(43, 36, 32, 0.14);
+}
+
+/* The doorway void, painted before the animal so it reads as depth behind
+   them rather than a shape sitting on top. */
+.kennel-hole {
+  fill: rgba(17, 24, 39, 0.3);
+}
+
+.dark .kennel-hole {
+  fill: rgba(0, 0, 0, 0.55);
+}
+
+.kennel-wall {
+  fill: var(--brand-100, #fbe3e3);
+  stroke: var(--kennel-dark);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+/* Right face turned away from the light. */
+.kennel-wall-shade {
+  fill: rgba(43, 27, 20, 0.14);
+}
+
+.kennel-roof {
+  fill: var(--kennel-dark);
+  stroke: var(--kennel-dark);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+/* Left pitch catches the key light, which is what stops the roof reading as
+   one flat triangle. */
+.kennel-roof-lit {
+  fill: rgba(255, 255, 255, 0.16);
+}
+
+.kennel-shingle {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.34);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+}
+
+.kennel-eave {
+  fill: none;
+  stroke: var(--kennel-deep);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+/* Hinged at its left edge. fill-box keeps the origin on the panel's own
+   geometry rather than the whole 210-unit viewBox. */
+.kennel-door-panel {
+  fill: var(--kennel-dark);
+  transform-box: fill-box;
+  transform-origin: left center;
+}
+
+.kennel-actor {
+  will-change: transform, opacity;
+}
+
+
+/* ============================================================
+   2. Sliding tab indicator
+   ============================================================ */
+
+#social-tab-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  border-radius: 3px 3px 0 0;
+  background: var(--brand-500, #e04848);
+  pointer-events: none;
+  will-change: transform, width;
+}
+
+
+/* ============================================================
+   3. Mobile drawer
+   ============================================================ */
+
+/* main.css:4614 gives the drawer its own `transition: transform .28s`. Once
+   anime.js is driving the same property every frame, that transition eases
+   each individual write and the drawer visibly lags behind the finger. The
+   class is added by motion.js only when it has actually taken over. */
+#mobile-nav-drawer.pc-motion-driven {
+  transition: none !important;
+}
+
+
+/* ============================================================
+   4. Pack tree draw-in
+   ============================================================ */
+
+/* The tree is a CSS ul/li with pseudo-element border connectors, not SVG, so
+   there is no stroke to dash-offset. Scaling the connector boxes off their
+   join instead reads the same: the horizontal branches grow outward from the
+   parent's centre stem, so the line appears to draw itself toward each child.
+   --pc-line is tweened 0 -> 1 by motion.js and inherits down from the
+   container. It defaults to 1 so a tree that renders before the script is
+   ready (or with motion disabled) is drawn complete. */
+.css-pack-tree.pc-drawing li::before {
+  transform: scaleX(var(--pc-line, 1));
+  transform-origin: right center;
+}
+
+.css-pack-tree.pc-drawing li::after {
+  transform: scaleX(var(--pc-line, 1));
+  transform-origin: left center;
+}
+
+.css-pack-tree.pc-drawing ul ul::before,
+.css-pack-tree.pc-drawing li.has-children > .spouse-container::after {
+  transform: scaleY(var(--pc-line, 1));
+  transform-origin: center top;
+}
+
+/* .node-card carries `transition: all 0.5s` (main.css:3808) for its hover
+   lift. Left in place it would ease every inline transform anime.js writes,
+   turning a 320ms stagger into a smeared half-second. Suppressed only while
+   the reveal runs. */
+.css-pack-tree.pc-revealing .node-card {
+  transition: none !important;
+}
+
+
+/* ============================================================
+   5. Brand logo hover
+   ============================================================ */
+
+/* The logo tile itself is `overflow-hidden` (it clips the logo into the
+   rounded square), so the paw puffs cannot live inside it. This wrapper sits
+   around the tile and lets them escape. */
+.pc-brand-logo {
+  position: relative;
+  overflow: visible;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.pc-paw-puffs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.pc-paw-puff {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  color: var(--brand-400, #e96a6a);
+  will-change: transform, opacity;
+}
+
+.pc-paw-puff svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+
+/* ============================================================
+   6. Reduced motion
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  /* motion.js already no-ops every entry point under this query; these rules
+     are the belt-and-braces half, covering the states it may have written
+     before the preference changed mid-session. The Kennel tab must stay at its
+     resting width and show only its icon. */
+  .kennel-tab {
+    width: 60px !important;
+  }
+
+  .kennel-tab .kennel-scene {
+    display: none !important;
+  }
+
+  .kennel-actor,
+  .pc-paw-puff {
+    animation: none !important;
+  }
+
+  #social-tab-underline {
+    transition: none !important;
+  }
+
+  .css-pack-tree.pc-drawing li::before,
+  .css-pack-tree.pc-drawing li::after,
+  .css-pack-tree.pc-drawing ul ul::before,
+  .css-pack-tree.pc-drawing li.has-children > .spouse-container::after {
+    transform: none !important;
+  }
+}

@@ -55,7 +55,7 @@ schema/
 
 # Graphify
 graphify-out/
-.graphifyignore
+
 
 # Patches
 *.patch

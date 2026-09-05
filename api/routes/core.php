@@ -526,12 +526,52 @@ function handlePhotoUpload()
         $s3Key = $actualBucket . '/' . $objectPath;
         $fp = fopen($file['tmp_name'], 'r');
         $s3Res = s3PutObject($s3Key, $fp, $detectedType);
-        if ($s3Res['code'] === 200 || $s3Res['code'] === 204) {
-            $publicUrl = s3PublicUrl($s3Key);
-            jsonSuccess(["photo_url" => $publicUrl, "bucket" => $requestedBucket, "path" => $objectPath, "mime_type" => $detectedType]);
-        } else {
+        if ($s3Res['code'] !== 200 && $s3Res['code'] !== 204) {
+            error_log("[pawcircle][" . requestId() . "] s3 put failed | key=$s3Key | http=" . $s3Res['code']);
             jsonError("Storage upload to S3 failed. HTTP " . $s3Res['code'], 500);
+            return;
         }
+
+        $publicUrl = s3PublicUrl($s3Key);
+
+        // The PUT succeeded, but SigV4 credentials got it there — that proves
+        // nothing about whether an anonymous <img> can read it back. Confirm with
+        // an unsigned HEAD before persisting the URL, so a missing bucket policy
+        // surfaces here instead of as a 403 placeholder in every user's feed.
+        //
+        // 'verification' is skipped unconditionally: those keys may be
+        // intentionally excluded from the public-read grant (docs/aws-s3-setup.md
+        // §5), in which case a 403 is the correct state rather than a failure —
+        // without this exemption every verification upload would fail its own
+        // check and be deleted. Add any other deliberately-private logical bucket
+        // to this list.
+        $privateBuckets = ['verification'];
+        $verifyFlag = strtolower(trim((string) envValue('PAWCIRCLE_VERIFY_PUBLIC_MEDIA', 'true')));
+        $skipVerify = in_array($verifyFlag, ['false', '0', 'off', 'no'], true)
+            || in_array($requestedBucket, $privateBuckets, true);
+
+        if (!$skipVerify) {
+            $readState = mediaUrlPublicReadState($publicUrl);
+            if ($readState === 'forbidden') {
+                // Don't leave an unreachable object behind: nothing will ever
+                // reference it, so it would be unreclaimable garbage.
+                s3DeleteObject($s3Key);
+                error_log("[pawcircle][" . requestId() . "] s3 object not publicly readable,"
+                    . " upload rejected and object deleted | key=$s3Key | url=$publicUrl");
+                jsonError("Upload stored but was not publicly readable, so it was discarded. "
+                    . "The S3 bucket policy is missing a public s3:GetObject grant for the "
+                    . "petcircle/ prefix — see docs/aws-s3-setup.md section 2.", 500);
+                return;
+            }
+            if ($readState === 'indeterminate') {
+                // Couldn't reach S3 to check. The object is stored; allow it
+                // rather than destroying a good upload over a network blip.
+                error_log("[pawcircle][" . requestId() . "] could not verify public readability,"
+                    . " allowing upload | key=$s3Key | url=$publicUrl");
+            }
+        }
+
+        jsonSuccess(["photo_url" => $publicUrl, "bucket" => $requestedBucket, "path" => $objectPath, "mime_type" => $detectedType]);
         return;
     }
 

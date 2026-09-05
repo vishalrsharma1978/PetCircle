@@ -47,6 +47,7 @@ async function runFriendSearch(query) {
       ? users.map(discoverCardHtml).join("")
       : `<p class="text-sm text-gray-400 col-span-full py-4">No pets found.</p>`;
     if (window.lucide) lucide.createIcons();
+    if (typeof pcRevealChildren === "function") pcRevealChildren(results);
   } catch (err) {
     console.error(err);
   }
@@ -187,6 +188,7 @@ async function respondFriendRequest(friendshipId, action, btn) {
 function renderFriendRequests(list, requests) {
   list.innerHTML = requests.length ? requests.map(friendRequestCardHtml).join("") : `<p class="text-xs text-gray-400">No pending requests.</p>`;
   if (window.lucide) lucide.createIcons();
+  if (typeof pcRevealChildren === "function") pcRevealChildren(list);
 }
 
 async function loadFriendRequests() {
@@ -267,6 +269,7 @@ function renderFriendsList(list, friends) {
     ? friends.map(friendCardHtml).join("")
     : `<p class="text-xs text-gray-400">No friends yet — search above to find pets to connect with.</p>`;
   if (window.lucide) lucide.createIcons();
+  if (typeof pcRevealChildren === "function") pcRevealChildren(list);
 }
 
 async function loadFriendsList() {

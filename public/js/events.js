@@ -40,9 +40,7 @@ function openCreateEventModal(prefillDate = "") {
 }
 
 function closeCreateEventModal() {
-  const modal = document.getElementById("create-event-modal");
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
+  pcHideModal("create-event-modal");
 }
 
 function openEditEventModal(eventId) {
@@ -208,7 +206,9 @@ function eventCardHtml(e, isPast = false) {
       : `<button onclick="rsvpEvent('${e.id}', 'going', this)" class="text-xs font-bold text-brand-500 border border-brand-200 dark:border-brand-800 px-3 py-1.5 rounded-lg">RSVP</button>`;
 
   const goToGroupBtn = (e.linked_group_id && e.is_group_member)
-    ? `<button onclick="openGroupChat('${e.linked_group_id}', '${escapeHtml(e.title)} — Event Group')" class="text-xs font-bold text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-lg flex items-center gap-1"><i data-lucide="message-square" class="w-3.5 h-3.5"></i> Group</button>`
+    // escapeJsAttr, not escapeHtml — an event title with an apostrophe
+    // ("Doggo's Birthday") would otherwise break out of this string literal.
+    ? `<button onclick="openGroupChat('${escapeJsAttr(e.linked_group_id)}', '${escapeJsAttr(e.title)} — Event Group')" class="text-xs font-bold text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-lg flex items-center gap-1"><i data-lucide="message-square" class="w-3.5 h-3.5"></i> Group</button>`
     : "";
 
   const menuBtn = isMine
@@ -390,9 +390,7 @@ function openEventShareModal(eventId) {
 
 function closeEventShareModal() {
   currentShareEventId = null;
-  const modal = document.getElementById("event-share-modal");
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
+  pcHideModal("event-share-modal");
 }
 
 async function copyEventLink() {
@@ -473,10 +471,14 @@ async function loadEventAnalytics() {
     const data = await api("get_event_analytics", {});
     if (data.status !== "success") return;
 
-    document.getElementById("events-stat-total").textContent = data.total_events;
-    document.getElementById("events-stat-attendees").textContent = data.total_attendees;
-    document.getElementById("events-stat-my-rsvps").textContent = data.my_rsvps;
-    document.getElementById("events-stat-pet-types").textContent = Object.keys(data.events_by_pet_type || {}).length;
+    const setStat = (id, value) => {
+      if (typeof pcCountUp === "function") pcCountUp(id, value);
+      else document.getElementById(id).textContent = value;
+    };
+    setStat("events-stat-total", data.total_events);
+    setStat("events-stat-attendees", data.total_attendees);
+    setStat("events-stat-my-rsvps", data.my_rsvps);
+    setStat("events-stat-pet-types", Object.keys(data.events_by_pet_type || {}).length);
 
     if (!window.Chart) return;
 
@@ -517,9 +519,7 @@ function openEnlargedCalendarModal() {
 }
 
 function closeEnlargedCalendarModal() {
-  document
-    .getElementById("enlarged-calendar-modal")
-    .classList.add("hidden");
+  pcHideModal("enlarged-calendar-modal");
 }
 
 function renderEnlargedCalendar() {

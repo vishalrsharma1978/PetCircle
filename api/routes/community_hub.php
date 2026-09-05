@@ -13,7 +13,7 @@
 
 function handleGetCommunityHub($data)
 {
-    $petType = cleanPlainValue($data['pet_type'] ?? '', 80);
+    $petType = cleanFilterValue($data['pet_type'] ?? '', 80);
     $viewerId = $data['user_id'] ?? null;
 
     jsonSuccess([
@@ -28,8 +28,14 @@ function handleGetCommunityHub($data)
 function communityHubTrendingPosts($petType, $viewerId)
 {
     $query = [
-        'select' => 'id,user_id,content,media_url,post_type,pet_type,breed,is_deleted,created_at,updated_at,hashtags',
+        'select' => postsSelectColumns(),
         'is_deleted' => 'eq.false',
+        // Group posts are excluded from trending outright rather than filtered
+        // per viewer. Trending is a deliberately non-viewer-scoped discovery
+        // surface, it's client-cached for 20s across users, and get_community_hub
+        // is in the batch allowlist — making it membership-aware would defeat
+        // all three, so members-only content simply doesn't belong here.
+        'group_id' => 'is.null',
         'order' => 'created_at.desc',
         'limit' => '40',
     ];

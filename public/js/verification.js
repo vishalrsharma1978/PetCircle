@@ -104,8 +104,7 @@ async function openVerificationModal() {
 }
 
 function closeVerificationModal() {
-  document.getElementById("verification-modal")?.classList.add("hidden");
-  document.getElementById("verification-modal")?.classList.remove("flex");
+  pcHideModal("verification-modal");
 }
 
 async function submitVerificationRequest() {

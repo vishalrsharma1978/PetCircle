@@ -4608,9 +4608,13 @@
 .social-tab-strip-item:hover {
   color: var(--brand-500, #e04848);
 }
+/* The active indicator is #social-tab-underline (motion.css), a single span
+   that slides between tabs. The per-button border-bottom-color that used to
+   draw it is deliberately not set here — two indicators would be visible at
+   once during the slide. The transparent border above is kept so every tab
+   still reserves the same 2px and nothing shifts vertically. */
 .social-tab-strip-item.active-tab {
   color: var(--brand-500, #e04848);
-  border-bottom-color: var(--brand-500, #e04848);
 }
 
 #mobile-nav-drawer {

@@ -1,0 +1,300 @@
+/* ============================================================
+   auth_den.css — everything specific to the playful SIGN-UP page.
+
+   The sign-in and sign-up share one markup shape, one character rig
+   and one parallax engine; this file is what makes them read as two
+   different places rather than one page with different fields:
+
+     - the stage becomes a night forest instead of a golden-hour park
+     - the sun becomes a moon, pollen becomes fireflies, round canopies
+       become pine silhouettes (shapes come from auth_scene.js's "den"
+       variant; the colour and light are here)
+     - a four-star constellation completes itself as the wizard advances
+     - the form column gets its own paper, corner and typographic scale
+
+   The dark green base (#101C17 / #16241C / #1E332A) is lifted straight
+   from the CLASSIC sign-up's .den panel in portal.css, so the contrast
+   between the two playful pages follows a distinction the app had
+   already drawn rather than a new one invented here.
+
+   Loaded by components/head.php after auth_scene.css, whose defaults
+   it overrides. Kept separate from that file both because it is one
+   coherent subject and because folding it in would push auth_scene.css
+   past the 800-line ceiling in coding-style.md.
+   ============================================================ */
+
+/* ============================================================
+   1. THE NIGHT SKY
+   ============================================================ */
+
+/* The accent still tints the sky so the pet-type theming carries through,
+   but at a far lower percentage than the park uses — this has to stay
+   night-time under Bird's #0ea5e9 and Small Pet's #eab308 alike. */
+.av2-stage--den {
+  background: linear-gradient(180deg,
+      color-mix(in srgb, var(--av2-accent, #F2A93B) 10%, #0C1712) 0%,
+      color-mix(in srgb, var(--av2-accent, #F2A93B) 13%, #16241C) 46%,
+      color-mix(in srgb, var(--av2-accent, #F2A93B) 16%, #22392D) 100%);
+}
+
+/* Same element as the park's sun, restyled into a moon: paler, cooler, with a
+   crescent bitten out of it by an offset inset shadow rather than a second
+   element. */
+.av2-stage--den .av2-sun {
+  top: 9%;
+  right: 12%;
+  width: 96px;
+  height: 96px;
+  /* Two soft mare blooms rather than a hard-edged inset crescent, which at
+     this size read as surface rather than as a bite taken out of an egg. */
+  background:
+    radial-gradient(circle at 62% 38%, rgba(203, 196, 172, 0.55) 0%, rgba(203, 196, 172, 0) 34%),
+    radial-gradient(circle at 40% 66%, rgba(203, 196, 172, 0.4) 0%, rgba(203, 196, 172, 0) 26%),
+    radial-gradient(circle at 50% 50%, #FFF8EC 0%, #F6ECD8 56%, rgba(246, 236, 216, 0) 70%);
+  box-shadow: 0 0 46px 12px rgba(255, 248, 236, 0.16);
+  animation-duration: 11s;
+}
+
+.av2-star {
+  position: absolute;
+  border-radius: 50%;
+  background: #FFF8EC;
+  opacity: 0.7;
+  animation: av2-twinkle ease-in-out infinite;
+}
+
+.av2-stars {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes av2-twinkle {
+  0%, 100% { opacity: 0.22; transform: scale(0.85); }
+  50%      { opacity: 0.9;  transform: scale(1.15); }
+}
+
+/* Night clouds are barely-there smudges, not the park's bright white puffs. */
+.av2-stage--den .av2-cloud {
+  background: rgba(220, 236, 226, 0.1);
+  filter: blur(2px);
+}
+
+/* Pollen -> fireflies: warm, individually brighter, and pulsing as they drift
+   so they read as living things rather than dust. */
+.av2-stage--den .av2-mote {
+  background: #FFD98A;
+  box-shadow: 0 0 12px 3px rgba(255, 200, 90, 0.65), 0 0 26px 8px rgba(255, 180, 60, 0.25);
+  animation-name: av2-firefly;
+}
+
+@keyframes av2-firefly {
+  0%   { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  12%  { opacity: 0.95; }
+  40%  { opacity: 0.35; }
+  62%  { opacity: 1; }
+  85%  { opacity: 0.4; }
+  100% { transform: translate(var(--mx, 18px), var(--my, -80px)) scale(1); opacity: 0; }
+}
+
+/* A warm pool of light on the ground the character stands in — the single
+   element that stops the dark scene reading as merely unlit. */
+.av2-lantern {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  z-index: 3;
+  width: min(52vh, 460px);
+  height: min(26vh, 230px);
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 62%,
+      rgba(255, 206, 122, 0.34) 0%,
+      rgba(255, 186, 92, 0.16) 38%,
+      rgba(255, 176, 80, 0) 70%);
+  transform: translate3d(calc(-50% + var(--px, 0px)), var(--py, 0px), 0);
+  transition: transform 0.5s cubic-bezier(.16, 1, .3, 1);
+  animation: av2-lantern-flicker 5.5s ease-in-out infinite;
+}
+
+@keyframes av2-lantern-flicker {
+  0%, 100% { opacity: 0.9; }
+  38%      { opacity: 1; }
+  62%      { opacity: 0.82; }
+}
+
+/* The character is lit by that pool rather than by daylight: a warm glow under
+   it instead of the park's neutral drop shadow. */
+.av2-stage--den .av2-hero-svg {
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.45))
+          drop-shadow(0 -2px 16px rgba(255, 198, 112, 0.34));
+}
+
+/* Weathered board at night, lit from the same warm source. */
+.av2-stage--den .av2-signpost {
+  background: linear-gradient(170deg, #5C4227, #40301D);
+  border-color: #2A2013;
+  box-shadow: 0 16px 34px -12px rgba(0, 0, 0, 0.7), 0 0 26px -6px rgba(255, 190, 100, 0.28);
+}
+
+.av2-stage--den .av2-signpost::before,
+.av2-stage--den .av2-signpost::after { background: #2A2013; }
+
+.av2-stage--den .av2-signpost-eyebrow { color: #FFD98A; opacity: 0.9; }
+
+/* ============================================================
+   2. THE CONSTELLATION
+   One star per wizard step, lighting up and joining as the form is
+   completed. Positioned entirely in the upper sky (top 6%, height
+   32%) so it never reaches the hills layer, which is bottom-anchored
+   at 46% — no z-index juggling needed.
+   ============================================================ */
+
+.av2-constellation {
+  position: absolute;
+  top: 6%;
+  left: 8%;
+  right: 8%;
+  height: 32%;
+  z-index: 1;
+  pointer-events: none;
+  transform: translate3d(var(--px, 0px), var(--py, 0px), 0);
+  transition: transform 0.5s cubic-bezier(.16, 1, .3, 1);
+}
+
+.av2-constellation svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Centred with negative margins rather than a translate, which leaves
+   `transform` free for the pop animation to own outright. */
+.av2-cst-star {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  border-radius: 50%;
+  background: #FFF8EC;
+  opacity: 0.24;
+  transition: opacity 0.45s ease, box-shadow 0.45s ease;
+}
+
+.av2-cst-star.is-lit {
+  opacity: 1;
+  box-shadow: 0 0 8px 2px rgba(255, 236, 180, 0.9), 0 0 20px 6px rgba(255, 205, 110, 0.45);
+  animation: av2-cst-pop 0.55s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+@keyframes av2-cst-pop {
+  0%   { transform: scale(0.4); }
+  55%  { transform: scale(1.75); }
+  100% { transform: scale(1); }
+}
+
+/* pathLength="1" on the <line> (set in auth_scene.js) makes this a plain
+   1 -> 0 wipe no matter how long the segment is or how the box is scaled. */
+.av2-cst-line {
+  stroke: #FFE9B8;
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  transition: stroke-dashoffset 0.6s cubic-bezier(.16, 1, .3, 1), opacity 0.3s ease;
+}
+
+.av2-cst-line.is-lit {
+  stroke-dashoffset: 0;
+  opacity: 0.62;
+}
+
+/* ============================================================
+   3. THE FORM COLUMN
+   Same components as the sign-in, deliberately not the same page:
+   different paper, mirrored corner, no washi tape, and a bigger
+   typographic step so each wizard scene reads as its own chapter.
+   ============================================================ */
+
+#view-signup-v2 .av2-panel {
+  background: #FFF9F0;
+}
+
+/* Mirrored from the sign-in card's 30px 30px 30px 8px. */
+#view-signup-v2 .av2-card {
+  border-radius: 8px 30px 30px 30px;
+}
+
+/* The washi tape is the sign-in's signature; the sign-up does without it. */
+#view-signup-v2 .av2-card::before { display: none; }
+
+#view-signup-v2 .av2-step-caption {
+  color: var(--av2-accent, var(--marigold, #F2A93B));
+  opacity: 0.85;
+}
+
+/* A quieter trail than the sign-in's controls, because the constellation is
+   now carrying the visual weight of progress; this stays for the literal
+   "step 2 of 4" reading a picture in the sky cannot give. */
+#view-signup-v2 .av2-trail { margin-bottom: 18px; }
+#view-signup-v2 .av2-trail-paw { width: 25px; height: 25px; }
+#view-signup-v2 .av2-trail-paw svg { width: 12px; height: 12px; }
+
+@media (min-width: 1024px) {
+  /* !important is load-bearing here, not laziness: main.css carries an
+     app-wide `h1 { font-size: 24px !important }` (twice — main.css:96 and
+     :3694) that outranks any selector, which is why the Tailwind text-3xl on
+     these headings has never actually applied. Overriding it app-wide is not
+     this change's business, so the sign-up buys back its own scale locally. */
+  #view-signup-v2 .av2-step h1 {
+    font-size: 2.3rem !important;
+    line-height: 1.14;
+  }
+
+  #view-signup-v2 .av2-card { padding: 2rem 2.25rem; }
+}
+
+/* ============================================================
+   4. SMALL SCREENS
+   The stage is a 210px banner and every wizard step is on screen at
+   once, so there is no step progression for a constellation to
+   report — same reasoning that already hides the signpost.
+   ============================================================ */
+
+@media (max-width: 1023px) {
+  .av2-constellation,
+  .av2-lantern { display: none; }
+
+  /* Fewer, dimmer stars at banner size, where a full field turns to noise. */
+  .av2-star:nth-child(n + 13) { display: none; }
+}
+
+/* ============================================================
+   5. REDUCED MOTION
+   The scene keeps its shape and its lit/unlit progress state — only
+   the movement stops. The constellation in particular must still
+   show how far through the form you are.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .av2-star,
+  .av2-lantern,
+  .av2-cst-star.is-lit {
+    animation: none !important;
+  }
+
+  .av2-cst-line,
+  .av2-cst-star,
+  .av2-constellation {
+    transition: none !important;
+  }
+
+  /* Still legible as "three of four done", just without the draw-on. */
+  .av2-cst-line.is-lit {
+    stroke-dashoffset: 0;
+    opacity: 0.62;
+  }
+}

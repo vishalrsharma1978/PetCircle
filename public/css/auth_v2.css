@@ -1,0 +1,295 @@
+/* ============================================================
+   auth_v2.css — shared playful design system for the redesigned
+   sign-in (views/public_login_v2.php) and sign-up
+   (views/signup_v2.php) pages. Scoped under .av2-* classes so it
+   never bleeds into the classic pages or the rest of the app.
+   Reuses the app's existing palette (--cream/--marigold/--coral/
+   --moss/--charcoal/--fog, defined in portal.css's :root) rather
+   than inventing a new one, and --font-display (Baloo 2, now
+   actually loaded via head.php) for headlines.
+   ============================================================ */
+
+.av2-shell {
+  font-family: var(--font-body, 'Nunito', system-ui, sans-serif);
+  background: var(--cream, #FFF8EC);
+  color: var(--charcoal, #2B2420);
+  position: relative;
+  isolation: isolate;
+}
+
+/* Faint kraft-paper speckle texture behind everything — atmosphere without
+   competing with the form for attention. */
+.av2-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(43, 36, 32, 0.035) 0, transparent 1.4px),
+    radial-gradient(circle at 65% 70%, rgba(43, 36, 32, 0.03) 0, transparent 1.4px),
+    radial-gradient(circle at 85% 20%, rgba(43, 36, 32, 0.035) 0, transparent 1.4px);
+  background-size: 34px 34px, 46px 46px, 38px 38px;
+}
+
+.av2-heading {
+  font-family: var(--font-display, 'Baloo 2', system-ui, sans-serif);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* ---------- Ambient drifting paw prints (very low opacity, decorative) --- */
+
+.av2-paw-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.av2-paw-field svg {
+  position: absolute;
+  fill: var(--marigold, #F2A93B);
+  opacity: 0.09;
+  animation: av2-drift 22s ease-in-out infinite;
+}
+
+.av2-paw-field svg:nth-child(1) { width: 46px; height: 46px; top: 8%; left: 6%; animation-delay: 0s; animation-duration: 24s; }
+.av2-paw-field svg:nth-child(2) { width: 30px; height: 30px; top: 62%; left: 12%; animation-delay: -6s; animation-duration: 19s; }
+.av2-paw-field svg:nth-child(3) { width: 56px; height: 56px; top: 22%; left: 85%; animation-delay: -3s; animation-duration: 27s; opacity: 0.07; }
+.av2-paw-field svg:nth-child(4) { width: 34px; height: 34px; top: 78%; left: 78%; animation-delay: -11s; animation-duration: 21s; }
+.av2-paw-field svg:nth-child(5) { width: 24px; height: 24px; top: 45%; left: 92%; animation-delay: -8s; animation-duration: 18s; opacity: 0.08; }
+
+@keyframes av2-drift {
+  0%, 100% { transform: translate(0, 0) rotate(-6deg); }
+  50% { transform: translate(10px, -16px) rotate(8deg); }
+}
+
+/* ---------- Scrapbook / sticker card ---------- */
+
+.av2-card {
+  position: relative;
+  background: #fffefb;
+  border-radius: 30px 30px 30px 8px;
+  border: 1px solid rgba(43, 36, 32, 0.06);
+  box-shadow: 0 22px 44px -20px rgba(120, 80, 40, 0.28), 0 2px 0 rgba(43, 36, 32, 0.04);
+  transform: rotate(-0.55deg);
+  transition: transform 0.45s cubic-bezier(.16, 1, .3, 1);
+}
+
+.av2-card:focus-within,
+.av2-card:hover {
+  transform: rotate(0deg);
+}
+
+/* Washi-tape corner accent */
+.av2-card::before {
+  content: "";
+  position: absolute;
+  top: -14px;
+  left: 32px;
+  width: 78px;
+  height: 26px;
+  background: repeating-linear-gradient(45deg, var(--coral, #FF7A5C), var(--coral, #FF7A5C) 6px, #ffffff 6px, #ffffff 12px);
+  opacity: 0.85;
+  transform: rotate(-8deg);
+  border-radius: 3px;
+  box-shadow: 0 3px 6px rgba(43, 36, 32, 0.15);
+}
+
+/* ---------- Buttons ---------- */
+
+.av2-btn {
+  font-family: var(--font-display, 'Baloo 2', system-ui, sans-serif);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border-radius: 18px;
+  transition: transform 0.22s cubic-bezier(.34, 1.56, .64, 1), box-shadow 0.22s ease, filter 0.2s ease;
+  box-shadow: 0 6px 0 0 rgba(0, 0, 0, 0.15), 0 10px 20px -10px rgba(120, 80, 40, 0.4);
+}
+
+.av2-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.03);
+}
+
+.av2-btn:active,
+.av2-btn.av2-squish {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.15), 0 4px 10px -6px rgba(120, 80, 40, 0.4);
+}
+
+.av2-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ---------- Chunky playful inputs ---------- */
+
+.av2-field label {
+  font-family: var(--font-display, 'Baloo 2', system-ui, sans-serif);
+  font-weight: 600;
+  font-size: 0.86rem;
+  color: var(--charcoal, #2B2420);
+}
+
+.av2-input {
+  border: 2.5px solid var(--fog, #E7DECB);
+  border-radius: 16px;
+  background: #fffefb;
+  transition: border-color 0.2s ease, transform 0.18s cubic-bezier(.34, 1.56, .64, 1), box-shadow 0.2s ease;
+}
+
+.av2-input:focus {
+  outline: none;
+  border-color: var(--av2-accent, var(--marigold, #F2A93B));
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--av2-accent, var(--marigold, #F2A93B)) 18%, transparent);
+  animation: av2-pop 0.28s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+@keyframes av2-pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.015); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- Pet-type sticker tiles (signup) ---------- */
+
+.av2-pet-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px 8px;
+  border-radius: 16px;
+  border: 2.5px solid var(--fog, #E7DECB);
+  background: #fffefb;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s cubic-bezier(.34, 1.56, .64, 1), border-color 0.2s ease, background 0.2s ease;
+}
+
+.av2-pet-tile:hover {
+  transform: translateY(-2px) scale(1.03);
+}
+
+.av2-pet-tile .av2-pet-emoji {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.av2-pet-tile .av2-pet-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #8a7a5f;
+  text-align: center;
+}
+
+.av2-pet-tile.av2-selected {
+  border-color: var(--av2-accent, var(--marigold, #F2A93B));
+  background: color-mix(in srgb, var(--av2-accent, var(--marigold, #F2A93B)) 12%, white);
+  animation: av2-wiggle 0.4s ease;
+}
+
+.av2-pet-tile.av2-selected .av2-pet-label {
+  color: var(--charcoal, #2B2420);
+}
+
+@keyframes av2-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-4deg) scale(1.05); }
+  75% { transform: rotate(4deg) scale(1.05); }
+}
+
+/* ---------- Success paw-stamp burst ---------- */
+
+.av2-burst-paw {
+  position: fixed;
+  pointer-events: none;
+  z-index: 200;
+  fill: var(--moss, #6B8F71);
+  opacity: 0.95;
+  animation: av2-burst 0.7s cubic-bezier(.16, 1, .3, 1) forwards;
+}
+
+@keyframes av2-burst {
+  0% { transform: translate(0, 0) scale(0.3) rotate(0deg); opacity: 0.95; }
+  100% { transform: var(--av2-burst-transform, translate(0, -80px) scale(1) rotate(30deg)); opacity: 0; }
+}
+
+/* ---------- Quick pet-preview pills (login) ---------- */
+
+.av2-pill-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.av2-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid var(--fog, #E7DECB);
+  background: #fffefb;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(.34, 1.56, .64, 1), border-color 0.2s ease;
+}
+
+.av2-pill:hover {
+  transform: scale(1.1);
+}
+
+.av2-pill.av2-selected {
+  border-color: var(--av2-accent, var(--marigold, #F2A93B));
+  transform: scale(1.12);
+}
+
+/* ---------- Cross-links between classic <-> playful versions ---------- */
+
+.av2-try-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--marigold-dark, #C9851F);
+  cursor: pointer;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--marigold, #F2A93B) 14%, white);
+  border: 1.5px dashed color-mix(in srgb, var(--marigold, #F2A93B) 55%, transparent);
+  transition: transform 0.2s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.av2-try-link:hover {
+  transform: translateY(-1px) scale(1.03);
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .av2-paw-field svg,
+  .av2-input:focus,
+  .av2-pet-tile.av2-selected {
+    animation: none !important;
+  }
+
+  .av2-card,
+  .av2-btn,
+  .av2-btn:active {
+    transition: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  .av2-paw-field svg:nth-child(3),
+  .av2-paw-field svg:nth-child(5) {
+    display: none;
+  }
+}

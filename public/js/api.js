@@ -44,6 +44,7 @@ const CACHE_TTL_MS = {
   get_rescue_opportunities: 25000,
   get_events: 20000,
   get_posts: 15000,
+  get_group_posts: 15000,
   get_user_posts: 15000,
   get_post_by_id: 15000,
   get_community_hub: 20000,
@@ -67,10 +68,10 @@ const CACHE_INVALIDATES = {
   set_handle: ["get_profile"],
   change_pet_type_breed: ["get_profile"],
   upload_photo: ["get_profile"],
-  create_post: ["get_posts", "get_user_posts", "get_community_hub"],
-  delete_post: ["get_posts", "get_post_by_id", "get_user_posts", "get_community_hub"],
-  archive_post: ["get_posts", "get_user_posts"],
-  unarchive_post: ["get_posts", "get_user_posts"],
+  create_post: ["get_posts", "get_user_posts", "get_community_hub", "get_group_posts"],
+  delete_post: ["get_posts", "get_post_by_id", "get_user_posts", "get_community_hub", "get_group_posts"],
+  archive_post: ["get_posts", "get_user_posts", "get_group_posts"],
+  unarchive_post: ["get_posts", "get_user_posts", "get_group_posts"],
   toggle_like: ["get_posts", "get_post_by_id"],
   set_post_reaction: ["get_posts", "get_post_by_id"],
   submit_comment: ["get_post_by_id"],
@@ -78,9 +79,13 @@ const CACHE_INVALIDATES = {
   remove_friend: ["get_friends"],
   block_user: ["get_friends"],
   unblock_user: ["get_friends"],
-  create_group: ["get_groups", "get_community_hub"],
-  join_group: ["get_groups"],
-  leave_group: ["get_groups"],
+  // These three clear get_posts because group membership now determines what
+  // the feed returns. Without it, joining a group leaves you looking at a
+  // stale feed for up to CACHE_PEEK_MAX_AGE_MS (10 minutes) — correctness,
+  // not polish.
+  create_group: ["get_groups", "get_community_hub", "get_posts"],
+  join_group: ["get_groups", "get_posts"],
+  leave_group: ["get_groups", "get_posts"],
   create_event: ["get_events", "get_community_hub"],
   update_event: ["get_events"],
   delete_event: ["get_events"],
@@ -206,6 +211,27 @@ function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = String(str ?? "");
   return div.innerHTML;
+}
+
+// Safe interpolation of arbitrary text into a JS string literal that itself
+// sits inside an HTML attribute — i.e. onclick="fn('HERE')".
+//
+// escapeHtml() is NOT sufficient for this: it goes through textContent, which
+// escapes & < > and leaves both quote characters untouched, so a value
+// containing ' closes the literal and everything after it is executed. Nor is
+// entity-encoding the quote enough on its own — the HTML parser decodes
+// &#39; back to ' before the attribute's JavaScript is compiled. The order
+// matters: backslash-escape for the JS layer first, entity-escape for the
+// HTML layer second.
+function escapeJsAttr(str) {
+  return String(str ?? "")
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'")
+    .replace(/\r?\n/g, "\\n")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 function showToast(message, type = "info") {

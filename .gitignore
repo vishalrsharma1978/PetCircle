@@ -8,7 +8,10 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-vendor
+# Composer only. Anchored so it does not also swallow public/js/vendor/,
+# whose bundles are committed deliberately (there is no Node on the
+# Hostinger deploy host, so nothing would restore them there).
+/vendor
 dist
 dist-ssr
 *.local
@@ -55,7 +58,7 @@ schema/
 
 # Graphify
 graphify-out/
-
+.graphifyignore
 
 # Patches
 *.patch

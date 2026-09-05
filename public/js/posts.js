@@ -35,16 +35,25 @@ async function submitPost() {
     return;
   }
 
+  const groupId = document.getElementById("composer-audience")?.value || "";
+
   const btn = document.getElementById("composer-submit-btn");
   setButtonLoading(btn, true, "Posting…");
   try {
-    const data = await api("create_post", { content, media_url: composerMediaUrl || "" });
+    const payload = { content, media_url: composerMediaUrl || "" };
+    if (groupId) payload.group_id = groupId;
+    const data = await api("create_post", payload);
     if (data.status !== "success") {
       showToast(data.message || "Could not create post.", "error");
       return;
     }
     contentEl.value = "";
     clearComposerMedia();
+    // Reset the audience so the next post doesn't silently go to the same
+    // group again — posting to the wrong audience is not an undoable mistake.
+    const audienceEl = document.getElementById("composer-audience");
+    if (audienceEl) audienceEl.value = "";
+    if (groupId) showToast("Posted to the group.", "success");
     loadFeedPosts();
   } catch (err) {
     console.error(err);
@@ -62,6 +71,69 @@ function markPostMediaLoaded(id) {
 function markPostMediaError(id) {
   const el = document.getElementById(id);
   if (el) el.classList.add("is-loaded", "has-error");
+}
+
+// The author block of a feed card, in two shapes.
+//
+// Ordinary post: circular author avatar, bold author name + @handle, then
+// "Dog · Beagle · 3h ago" underneath. Unchanged from before group posts.
+//
+// Group post: the GROUP is the headline — its name takes the bold top line
+// where the author's used to be, and the author drops to the small line
+// alongside the timestamp. The avatar becomes a rounded-square group tile with
+// the author's circular photo badged over its corner. The square-vs-circle
+// contrast is what signals "this is a group, not a person" without needing any
+// new artwork; the badge is what says who actually wrote it.
+function postCardHeaderHtml(post, author, size = "sm") {
+  const group = post.group || null;
+  const authorId = String(author.user_id || "");
+  const isLarge = size === "lg";
+  const box = isLarge ? "w-11 h-11" : "w-10 h-10";
+
+  const authorAvatarInner = author.profile_photo_url
+    ? `<img src="${escapeHtml(author.profile_photo_url)}" class="w-full h-full object-cover">`
+    : `<span class="font-bold text-brand-700 dark:text-brand-300">${escapeHtml((author.name || "P")[0])}</span>`;
+
+  if (!group) {
+    return `
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="${box} rounded-full bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center overflow-hidden flex-shrink-0 ring-2 ring-transparent hover:ring-brand-400 transition-all cursor-pointer" onclick="event.stopPropagation(); openMemberProfile('${authorId}')">
+          ${authorAvatarInner}
+        </div>
+        <div class="min-w-0">
+          <p class="font-bold text-sm text-gray-900 dark:text-white truncate cursor-pointer hover:underline flex items-center gap-1" onclick="event.stopPropagation(); openMemberProfile('${authorId}')">
+            <span class="truncate">${escapeHtml(author.name || "Member")}</span>
+            ${author.handle ? `<span class="text-xs text-gray-500 dark:text-gray-400 font-normal flex-shrink-0">@${escapeHtml(author.handle)}</span>` : ""}
+          </p>
+          <p class="text-xs text-gray-400">${[author.pet_type, author.breed].filter(Boolean).map(escapeHtml).join(" · ")} · ${timeAgo(post.created_at)}</p>
+        </div>
+      </div>`;
+  }
+
+  // escapeJsAttr, not escapeHtml: the group name goes into a JS string literal
+  // inside an inline onclick, where escapeHtml's unescaped quotes are an XSS.
+  const openGroup = `event.stopPropagation(); openGroupChat('${escapeJsAttr(group.id)}', '${escapeJsAttr(group.name)}')`;
+  const groupTileInner = group.avatar_url
+    ? `<img src="${escapeHtml(group.avatar_url)}" class="w-full h-full object-cover">`
+    : `<span class="font-bold text-brand-700 dark:text-brand-300">${escapeHtml((group.name || "G")[0])}</span>`;
+
+  return `
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="relative ${box} flex-shrink-0">
+          <div class="${box} rounded-xl bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center overflow-hidden ring-2 ring-transparent hover:ring-brand-400 transition-all cursor-pointer" onclick="${openGroup}">
+            ${groupTileInner}
+          </div>
+          <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-brand-100 dark:bg-brand-900/40 border-2 border-white dark:border-gray-900 flex items-center justify-center overflow-hidden text-[9px] cursor-pointer" onclick="event.stopPropagation(); openMemberProfile('${authorId}')">
+            ${authorAvatarInner}
+          </div>
+        </div>
+        <div class="min-w-0">
+          <p class="font-bold text-sm text-gray-900 dark:text-white truncate cursor-pointer hover:underline" onclick="${openGroup}">${escapeHtml(group.name || "Group")}</p>
+          <p class="text-xs text-gray-400 truncate">
+            <span class="cursor-pointer hover:underline" onclick="event.stopPropagation(); openMemberProfile('${authorId}')">${escapeHtml(author.name || "Member")}</span>${author.handle ? ` <span class="font-normal">@${escapeHtml(author.handle)}</span>` : ""} · ${timeAgo(post.created_at)}
+          </p>
+        </div>
+      </div>`;
 }
 
 function postCardHtml(post, index = 0) {
@@ -84,12 +156,16 @@ function postCardHtml(post, index = 0) {
       </div>`;
   }
   const isMine = currentUserObj && post.user_id === currentUserObj.id;
+  // Group admins moderate their own group's posts (server enforces this too —
+  // this only decides whether the menu item is offered).
+  const canModerate = !!(post.group && post.group.my_role === "admin");
     const menuItems = isMine
     ? `<button onclick="event.stopPropagation(); editPost('${post.id}')" class="w-full text-left px-3 py-2 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-2"><i data-lucide="pencil" class="w-3.5 h-3.5"></i> Edit</button>
        <button onclick="event.stopPropagation(); deletePost('${post.id}')" class="w-full text-left px-3 py-2 text-xs font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center gap-2"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Delete</button>
        <button onclick="event.stopPropagation(); archivePost('${post.id}')" class="w-full text-left px-3 py-2 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-2"><i data-lucide="archive" class="w-3.5 h-3.5"></i> Archive</button>
        <button onclick="event.stopPropagation(); copyPostLink('${post.id}')" class="w-full text-left px-3 py-2 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-2"><i data-lucide="link" class="w-3.5 h-3.5"></i> Copy link</button>`
-    : `<button onclick="event.stopPropagation(); reportPost('${post.id}')" class="w-full text-left px-3 py-2 text-xs font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center gap-2"><i data-lucide="flag" class="w-3.5 h-3.5"></i> Report</button>
+    : `${canModerate ? `<button onclick="event.stopPropagation(); deletePost('${post.id}')" class="w-full text-left px-3 py-2 text-xs font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center gap-2"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Delete</button>` : ""}
+       <button onclick="event.stopPropagation(); reportPost('${post.id}')" class="w-full text-left px-3 py-2 text-xs font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center gap-2"><i data-lucide="flag" class="w-3.5 h-3.5"></i> Report</button>
        <button onclick="event.stopPropagation(); copyPostLink('${post.id}')" class="w-full text-left px-3 py-2 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-2"><i data-lucide="link" class="w-3.5 h-3.5"></i> Copy link</button>`;
 
   const menuBtn = `
@@ -103,18 +179,7 @@ function postCardHtml(post, index = 0) {
   return `
   <div class="warm-glass warm-lift rounded-2xl p-4 cursor-pointer relative" style="z-index: ${Math.max(1, 30 - (typeof index === 'number' ? index : 0))};" data-post-id="${post.id}" onclick="openPostPage('${post.id}')">
     <div class="flex items-start justify-between gap-2">
-      <div class="flex items-center gap-3 min-w-0">
-        <div class="w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center overflow-hidden flex-shrink-0 ring-2 ring-transparent hover:ring-brand-400 transition-all cursor-pointer" onclick="event.stopPropagation(); openMemberProfile('${author.user_id}')">
-          ${author.profile_photo_url ? `<img src="${escapeHtml(author.profile_photo_url)}" class="w-full h-full object-cover">` : `<span class="font-bold text-brand-700 dark:text-brand-300">${escapeHtml((author.name || "P")[0])}</span>`}
-        </div>
-        <div class="min-w-0">
-          <p class="font-bold text-sm text-gray-900 dark:text-white truncate cursor-pointer hover:underline flex items-center gap-1" onclick="event.stopPropagation(); openMemberProfile('${author.user_id}')">
-            <span class="truncate">${escapeHtml(author.name || "Member")}</span>
-            ${author.handle ? `<span class="text-xs text-gray-500 dark:text-gray-400 font-normal flex-shrink-0">@${escapeHtml(author.handle)}</span>` : ""}
-          </p>
-          <p class="text-xs text-gray-400">${[author.pet_type, author.breed].filter(Boolean).map(escapeHtml).join(" · ")} · ${timeAgo(post.created_at)}</p>
-        </div>
-      </div>
+      ${postCardHeaderHtml(post, author)}
       ${menuBtn}
     </div>
     ${post.content ? `<p class="text-sm text-gray-800 dark:text-gray-200 mt-3 whitespace-pre-wrap">${escapeHtml(post.content)}</p>` : ""}
@@ -199,18 +264,17 @@ function postDetailSkeletonHtml() {
 // path in openPostPage() below.
 function postDetailHtml(post) {
     const isMine = currentUserObj && post.user_id === currentUserObj.id;
+    // Author/avatar/group markup now comes from the shared postCardHeaderHtml()
+    // so the detail view and the feed card can't drift apart.
     const author = post.author || {};
-    const safeAuthorName = escapeHtml(author.name || "Member");
-    const safeAuthorId = String(author.user_id || "").replace(/'/g, "\\'");
-    const safeAvatar = author.profile_photo_url
-      ? `<img src="${escapeHtml(author.profile_photo_url)}" class="w-11 h-11 rounded-full object-cover cursor-pointer" onclick="openMemberProfile('${safeAuthorId}')">`
-      : `<div class="w-11 h-11 bg-brand-100 dark:bg-brand-900/40 rounded-full flex items-center justify-center font-bold text-brand-700 dark:text-brand-300 cursor-pointer" onclick="openMemberProfile('${safeAuthorId}')">${safeAuthorName[0]}</div>`;
-      
+
+    const canModerate = !!(post.group && post.group.my_role === "admin");
     const menuItems = isMine
       ? `<button onclick="event.stopPropagation(); deletePost('${post.id}')" class="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete post</button>
          <button onclick="event.stopPropagation(); archivePost('${post.id}')" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"><i data-lucide="archive" class="w-4 h-4"></i> Archive post</button>
          <button onclick="event.stopPropagation(); copyPostLink('${post.id}')" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"><i data-lucide="link" class="w-4 h-4"></i> Copy link</button>`
-      : `<button onclick="event.stopPropagation(); reportPost('${post.id}')" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"><i data-lucide="flag" class="w-4 h-4"></i> Report</button>
+      : `${canModerate ? `<button onclick="event.stopPropagation(); deletePost('${post.id}')" class="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete post</button>` : ""}
+         <button onclick="event.stopPropagation(); reportPost('${post.id}')" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"><i data-lucide="flag" class="w-4 h-4"></i> Report</button>
          <button onclick="event.stopPropagation(); copyPostLink('${post.id}')" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"><i data-lucide="link" class="w-4 h-4"></i> Copy link</button>`;
 
     const moreHtml = `
@@ -246,16 +310,7 @@ function postDetailHtml(post) {
         </button>
         <article class="overflow-hidden rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm">
           <div class="flex items-start justify-between gap-4 border-b border-gray-50 dark:border-gray-800 p-4 sm:p-5">
-            <div class="flex min-w-0 items-start gap-3">
-              ${safeAvatar}
-              <div class="min-w-0">
-                <div class="flex flex-wrap items-center gap-1.5 text-sm font-bold text-gray-900 dark:text-gray-100">
-                  <span class="cursor-pointer hover:underline flex items-center gap-1" onclick="openMemberProfile('${safeAuthorId}')">${safeAuthorName}</span>
-                  ${author.handle ? `<span class="text-xs text-gray-500 dark:text-gray-400 font-normal">@${escapeHtml(author.handle)}</span>` : ""}
-                </div>
-                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">${timeAgo(post.created_at)}</div>
-              </div>
-            </div>
+            ${postCardHeaderHtml(post, author, "lg")}
             ${moreHtml}
           </div>
           <div class="space-y-4 p-4 sm:p-5">
@@ -309,6 +364,13 @@ function postDetailHtml(post) {
 async function openPostPage(postId) {
   const container = document.getElementById("post-detail-view");
   if (!container) return;
+
+  // Cards in the group modal's Posts tab are the same postCardHtml, so their
+  // whole-card onclick lands here. Without this the detail view would open on
+  // the tab *behind* the still-open modal.
+  if (document.getElementById("group-chat-modal")?.classList.contains("flex")) {
+    closeGroupChatModal();
+  }
 
   // Instant open: reuse a post already sitting in memory (from the feed
   // list, or a cached get_post_by_id fetch) before touching the network.
@@ -418,10 +480,42 @@ function loadComposerAvatar() {
   setAvatarPreview("composer-avatar-img", "composer-avatar-text", currentUserObj.profile_photo_url, (currentUserObj.pet_name || "P")[0]);
 }
 
+// Cleared by joinGroup()/leaveCurrentGroup() in groups.js so the picker picks
+// up a membership change without a reload.
+let composerGroupsLoaded = false;
+
+// Fills the composer's "Post to" dropdown with the groups you're a member of.
+// Reuses get_groups with the exact payload the Groups tab sends, so it's
+// normally a cache hit rather than an extra round trip.
+//
+// Known edge: get_groups scopes by or=(scope.eq.global,pet_type.eq.X), so a
+// group you joined that no longer matches your current pet type won't be
+// listed here. Largely moot — changing pet type already drops those
+// memberships server-side (handleChangePetTypeBreed).
+async function loadComposerAudience() {
+  const sel = document.getElementById("composer-audience");
+  if (!sel || composerGroupsLoaded) return;
+  try {
+    const data = await api("get_groups", { pet_type: currentUserObj?.pet_type || "" });
+    if (data.status !== "success") return;
+    const mine = (data.groups || []).filter((g) => g.is_member);
+    const previous = sel.value;
+    sel.innerHTML =
+      `<option value="">My feed</option>` +
+      mine.map((g) => `<option value="${escapeHtml(g.id)}">${escapeHtml(g.name)}</option>`).join("");
+    // Preserve an in-progress selection across a re-render.
+    if (previous && mine.some((g) => String(g.id) === String(previous))) sel.value = previous;
+    composerGroupsLoaded = true;
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 async function loadFeedPosts() {
   const list = document.getElementById("feed-list");
   if (!list) return;
   loadComposerAvatar();
+  loadComposerAudience();
 
   const payload = { pet_type: currentUserObj?.pet_type || "" };
 
@@ -435,6 +529,7 @@ async function loadFeedPosts() {
   if (feedPosts.length) {
     list.innerHTML = feedPosts.map(postCardHtml).join("");
     if (window.lucide) lucide.createIcons();
+    revealFeed(list);
     hadInstantRender = true;
   } else {
     const cached = peekApiCache("get_posts", payload);
@@ -442,6 +537,7 @@ async function loadFeedPosts() {
       feedPosts = cached.posts;
       list.innerHTML = cached.posts.map(postCardHtml).join("");
       if (window.lucide) lucide.createIcons();
+      revealFeed(list);
       hadInstantRender = true;
     } else {
       list.innerHTML = postCardSkeletonListHtml(3);
@@ -462,10 +558,21 @@ async function loadFeedPosts() {
     }
     list.innerHTML = posts.map(postCardHtml).join("");
     if (window.lucide) lucide.createIcons();
+    // Only when this is the user's first sight of the list. The instant render
+    // above has already animated its own paint; running the stagger again on
+    // the network refresh would replay the whole feed a second time.
+    if (!hadInstantRender) revealFeed(list);
   } catch (err) {
     console.error(err);
     if (!hadInstantRender) list.innerHTML = `<p class="text-center text-sm text-red-500 py-8">Could not load feed.</p>`;
   }
+}
+
+// Posts below the fold are held back by pcRevealChildren and animated by its
+// IntersectionObserver as they scroll into view, so a long feed does not run a
+// 60-step stagger on cards nobody can see yet.
+function revealFeed(list) {
+  if (typeof pcRevealChildren === "function") pcRevealChildren(list, null, { eager: 5 });
 }
 
 // Optimistic: flip the heart/count immediately, then reconcile with (or
@@ -1188,7 +1295,7 @@ function editPost(postId) {
 }
 
 function closeEditPostModal() {
-  document.getElementById('edit-post-modal').classList.add('hidden');
+  pcHideModal('edit-post-modal');
   currentEditPostId = null;
 }
 

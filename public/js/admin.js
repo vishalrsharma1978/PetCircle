@@ -157,8 +157,7 @@ function openAdminModeModal() {
 }
 
 function closeAdminModeModal() {
-  document.getElementById("admin-mode-modal")?.classList.add("hidden");
-  document.getElementById("admin-mode-modal")?.classList.remove("flex");
+  pcHideModal("admin-mode-modal");
 }
 
 async function submitAdminModePassword() {

@@ -274,6 +274,7 @@ $routes = [
     'get_groups' => 'handleGetGroups',
     'join_group' => 'handleJoinGroup',
     'leave_group' => 'handleLeaveGroup',
+    'get_group_posts' => 'handleGetGroupPosts',
     'send_group_message' => 'handleSendGroupMessage',
     'get_group_messages' => 'handleGetGroupMessages',
     'react_group_message' => 'handleReactToGroupMessage',

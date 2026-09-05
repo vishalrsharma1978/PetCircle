@@ -74,3 +74,24 @@ function cleanPlainValue($value, $maxLength = 255)
     }
     return $text;
 }
+
+/**
+ * cleanPlainValue() for a value that gets interpolated into a PostgREST
+ * filter *expression* (an or=/and= clause), rather than passed as a plain
+ * eq. operand.
+ *
+ * PostgREST parses , ( ) . * as structure, so a value carrying them can close
+ * one logic group and open another — rewriting the boolean tree rather than
+ * just the value. That used to be merely a widened match; since handleGetPosts
+ * now expresses group-membership visibility as a nested and=(or(),or()), the
+ * same injection is a visibility bypass. Strip them outright: no legitimate
+ * pet_type or breed contains any of these.
+ */
+function cleanFilterValue($value, $maxLength = 255)
+{
+    return str_replace(
+        ['(', ')', ',', '.', '*', '"', '\\'],
+        '',
+        cleanPlainValue($value, $maxLength)
+    );
+}

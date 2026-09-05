@@ -51,10 +51,7 @@ async function openMemberProfile(userId) {
 
 function closeMemberProfileModal() {
   currentMemberProfileId = null;
-  const modal = document.getElementById("member-profile-modal");
-  if (!modal) return;
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
+  pcHideModal("member-profile-modal");
 }
 
 function renderMemberProfileLoading() {

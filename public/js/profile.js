@@ -109,8 +109,7 @@ async function openProfileModal() {
 }
 
 function closeProfileModal() {
-  document.getElementById("profile-modal")?.classList.add("hidden");
-  document.getElementById("profile-modal")?.classList.remove("flex");
+  pcHideModal("profile-modal");
 }
 
 async function uploadPhotoFile(file, bucket, folder = "") {

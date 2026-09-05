@@ -8,6 +8,44 @@
  * strings) that doesn't match what this database actually has.
  */
 
+/**
+ * The one place the posts column list lives. It used to be copy-pasted into
+ * four separate queries (the feed, profile posts, single-post fetch, and the
+ * community hub's trending widget); adding group_id to three of those four
+ * would have been a silent bug rather than a loud one — enrichPosts() would
+ * see no group_id on the fourth and render a group post as an ordinary one.
+ * Keep every posts SELECT going through here.
+ */
+function postsSelectColumns()
+{
+    return 'id,user_id,group_id,content,media_url,post_type,pet_type,breed,is_deleted,created_at,updated_at,hashtags';
+}
+
+/**
+ * True if $viewerId is allowed to read or interact with $postId.
+ *
+ * Ordinary posts (group_id IS NULL) are open to any authenticated user, as
+ * before. Group posts are members-only, so every endpoint that takes a bare
+ * post_id and would otherwise reveal or mutate its content needs this — the
+ * post id alone is not proof of entitlement.
+ */
+function viewerCanSeePost($postId, $viewerId)
+{
+    if (!isValidUuid($postId))
+        return false;
+
+    $res = supabaseRequest('GET', '/rest/v1/posts', [
+        'id' => 'eq.' . $postId,
+        'select' => 'group_id',
+        'limit' => '1',
+    ]);
+    if (supabaseFailed($res) || empty($res['data']))
+        return false;
+
+    $groupId = $res['data'][0]['group_id'] ?? null;
+    return $groupId === null ? true : isGroupMember($groupId, $viewerId);
+}
+
 function enrichPosts($posts, $viewerUserId = null)
 {
     $posts = $posts ?? [];
@@ -30,6 +68,38 @@ function enrichPosts($posts, $viewerUserId = null)
         foreach (($handleRes['data'] ?? []) as $row) {
             if (!empty($row['handle'])) {
                 $handleMap[$row['id']] = $row['handle'];
+            }
+        }
+    }
+
+    // Group posts: resolve the group's display identity, plus the *viewer's*
+    // role in it (that's what decides whether the card offers a moderator
+    // Delete). Both queries are behind the emptiness guard on purpose — a feed
+    // with no group posts in it must keep costing the same 4 Supabase round
+    // trips it always has, not 6.
+    $groupMap = [];
+    $viewerGroupRoles = [];
+    $groupIds = normalizeUuidList(array_filter(array_map(function ($p) {
+        return $p['group_id'] ?? null;
+    }, $posts)));
+
+    if (!empty($groupIds)) {
+        $groupsRes = supabaseRequest('GET', '/rest/v1/groups', [
+            'id' => 'in.(' . implode(',', $groupIds) . ')',
+            'select' => 'id,name,avatar_url',
+        ]);
+        foreach (($groupsRes['data'] ?? []) as $row) {
+            $groupMap[$row['id']] = $row;
+        }
+
+        if ($viewerUserId) {
+            $rolesRes = supabaseRequest('GET', '/rest/v1/group_members', [
+                'group_id' => 'in.(' . implode(',', $groupIds) . ')',
+                'user_id' => 'eq.' . $viewerUserId,
+                'select' => 'group_id,role',
+            ]);
+            foreach (($rolesRes['data'] ?? []) as $row) {
+                $viewerGroupRoles[$row['group_id']] = $row['role'];
             }
         }
     }
@@ -75,7 +145,7 @@ function enrichPosts($posts, $viewerUserId = null)
         }
     }
 
-    return array_map(function ($post) use ($profileMap, $handleMap, $likeCounts, $reactionSummaries, $viewerLikes, $viewerReactions, $commentCounts) {
+    return array_map(function ($post) use ($profileMap, $handleMap, $likeCounts, $reactionSummaries, $viewerLikes, $viewerReactions, $commentCounts, $groupMap, $viewerGroupRoles) {
         $authorId = $post['user_id'];
         $author = $profileMap[$authorId] ?? null;
 
@@ -92,6 +162,19 @@ function enrichPosts($posts, $viewerUserId = null)
         $post['comment_count'] = $commentCounts[$post['id']] ?? 0;
         $post['is_liked_by_me'] = isset($viewerLikes[$post['id']]);
         $post['viewer_reaction'] = $viewerReactions[$post['id']] ?? null;
+
+        // Present only on group posts. The frontend keys its whole header
+        // variant off `post.group` being non-null, so read group_id defensively
+        // (?? null) — a caller with a stale SELECT should degrade to an
+        // ordinary-looking post rather than fatal.
+        $groupId = $post['group_id'] ?? null;
+        $post['group'] = ($groupId && isset($groupMap[$groupId])) ? [
+            'id' => $groupId,
+            'name' => $groupMap[$groupId]['name'] ?? 'Group',
+            'avatar_url' => $groupMap[$groupId]['avatar_url'] ?? null,
+            'my_role' => $viewerGroupRoles[$groupId] ?? null,
+        ] : null;
+
         return $post;
     }, $posts);
 }
@@ -146,13 +229,36 @@ function handleCreatePost($data)
         $postType = preg_match('/\.(mp4|webm|mov|m4v)$/', $path) ? 'video' : 'image';
     }
 
+    // Optional: post into a group instead of to your own feed. Deliberately
+    // isValidUuid() and not requireUuid() — the latter exit()s, which would
+    // kill every ordinary post that legitimately omits group_id.
+    $groupId = null;
+    if (!empty($data['group_id'])) {
+        $groupId = trim((string) $data['group_id']);
+        if (!isValidUuid($groupId)) {
+            jsonError("Invalid group_id.", 400);
+            return;
+        }
+        // Without this, any authenticated user could inject posts into any
+        // group — including a private one they were never in — and those posts
+        // would then be pushed into every real member's feed.
+        if (!isGroupMember($groupId, $data['user_id'])) {
+            jsonError("You must be a member of this group to post in it.", 403);
+            return;
+        }
+    }
+
     $profile = getAccountProfile($data['user_id']);
 
     $body = [
         'user_id' => $data['user_id'],
+        'group_id' => $groupId,
         'content' => $content === '' ? null : $content,
         'media_url' => $mediaUrl === '' ? null : $mediaUrl,
         'post_type' => $postType,
+        // Still backfilled for group posts even though the feed ignores
+        // pet_type for them — it keeps the author meta line and any later
+        // pet-type analytics intact.
         'pet_type' => cleanNullableText($data['pet_type'] ?? ($profile['pet_type'] ?? ''), 80),
         'breed' => cleanNullableText($data['breed'] ?? ($profile['breed'] ?? ''), 140),
     ];
@@ -177,8 +283,10 @@ function handleGetPosts($data)
     $limit = isset($data['limit']) ? max(1, min((int) $data['limit'], 50)) : 20;
     $offset = isset($data['offset']) ? max(0, (int) $data['offset']) : 0;
 
+    $viewerId = $data['user_id'] ?? null;
+
     $query = [
-        'select' => 'id,user_id,content,media_url,post_type,pet_type,breed,is_deleted,created_at,updated_at,hashtags',
+        'select' => postsSelectColumns(),
         'is_deleted' => 'eq.false',
         'is_archived' => 'eq.false',
         'order' => 'created_at.desc',
@@ -187,10 +295,37 @@ function handleGetPosts($data)
     ];
 
     // Feed scope: "my pet type" (+ everything untagged) unless the caller
-    // asks for everything explicitly.
+    // asks for everything explicitly. Applies to ordinary posts only — a post
+    // from a group you're in always shows, whatever pet type it carries.
+    $petType = '';
     if (!empty($data['pet_type']) && empty($data['all'])) {
-        $petType = cleanPlainValue($data['pet_type'], 80);
-        $query['or'] = '(pet_type.is.null,pet_type.eq.' . $petType . ')';
+        $petType = cleanFilterValue($data['pet_type'], 80);
+    }
+
+    // Visibility: ordinary posts (group_id IS NULL) plus posts from groups the
+    // viewer belongs to, and nothing else. Without this every group post would
+    // land in every user's feed, which is the whole point of the feature
+    // inverted.
+    $myGroupIds = $viewerId ? getMyGroupIds($viewerId) : [];
+
+    if (empty($myGroupIds)) {
+        // No memberships, so there is nothing to union in. An empty in.() list
+        // is legal PostgREST and matches zero rows, but a plain is.null is
+        // cheaper and lets the partial idx_posts_no_group_created_at apply.
+        $query['group_id'] = 'is.null';
+        if ($petType !== '') {
+            $query['or'] = '(pet_type.is.null,pet_type.eq.' . $petType . ')';
+        }
+    } else {
+        $clauses = ['or(group_id.is.null,group_id.in.(' . implode(',', $myGroupIds) . '))'];
+        if ($petType !== '') {
+            $clauses[] = 'or(group_id.not.is.null,pet_type.is.null,pet_type.eq.' . $petType . ')';
+        }
+        // Both clauses fold into a single and= on purpose. Do NOT also set
+        // $query['or'] here: PostgREST ANDs top-level params together, so a
+        // stray or= would re-apply the pet-type filter to group posts and
+        // undo the bypass above.
+        $query['and'] = '(' . implode(',', $clauses) . ')';
     }
 
     if (!empty($data['search_query'])) {
@@ -221,15 +356,32 @@ function handleGetUserPosts($data)
     $limit = isset($data['limit']) ? max(1, min((int) $data['limit'], 100)) : 50;
     $offset = isset($data['offset']) ? max(0, (int) $data['offset']) : 0;
 
-    $res = supabaseRequest('GET', '/rest/v1/posts', [
+    $viewerId = $data['user_id'] ?? null;
+    $isSelf = ($viewerId !== null && $userId === $viewerId);
+
+    $params = [
         'user_id' => 'eq.' . $userId,
         'is_deleted' => 'eq.false',
         'is_archived' => $wantsArchived ? 'eq.true' : 'eq.false',
-        'select' => 'id,user_id,content,media_url,post_type,pet_type,breed,is_deleted,created_at,updated_at,hashtags',
+        'select' => postsSelectColumns(),
         'order' => 'created_at.desc',
         'limit' => (string) $limit,
         'offset' => (string) $offset,
-    ]);
+    ];
+
+    // Your own group posts show on your own profile unconditionally. Someone
+    // else's only show if you're in that group too — otherwise visiting the
+    // author's profile would be a complete bypass of members-only visibility.
+    // A single top-level or= is enough here; unlike the feed, this endpoint has
+    // no pet-type filter to combine with.
+    if (!$isSelf) {
+        $myGroupIds = getMyGroupIds($viewerId);
+        $params['or'] = empty($myGroupIds)
+            ? '(group_id.is.null)'
+            : '(group_id.is.null,group_id.in.(' . implode(',', $myGroupIds) . '))';
+    }
+
+    $res = supabaseRequest('GET', '/rest/v1/posts', $params);
 
     if (supabaseFailed($res)) {
         sendSupabaseError("Failed to fetch posts.", $res);
@@ -244,20 +396,47 @@ function handleDeletePost($data)
     if (!requireFields($data, ['user_id', 'post_id']))
         return;
 
+    // Ownership is now decided in PHP rather than by scoping the query, because
+    // a group admin may delete another member's post. That makes the id guard
+    // load-bearing: it is the only thing standing between a malformed post_id
+    // and the unscoped PATCH below.
+    $postId = trim((string) $data['post_id']);
+    if (!isValidUuid($postId)) {
+        jsonError("Invalid post_id.", 400);
+        return;
+    }
+
     $postRes = supabaseRequest('GET', '/rest/v1/posts', [
-        'id' => 'eq.' . $data['post_id'],
-        'user_id' => 'eq.' . $data['user_id'],
-        'select' => 'id,media_url',
+        'id' => 'eq.' . $postId,
+        'select' => 'id,user_id,group_id,media_url',
         'limit' => '1',
     ]);
     if (supabaseFailed($postRes) || empty($postRes['data'])) {
         sendSupabaseError("Post not found.", $postRes, 404);
         return;
     }
+    $post = $postRes['data'][0];
 
+    $canDelete = ($post['user_id'] === $data['user_id']);
+    if (!$canDelete && !empty($post['group_id'])) {
+        // Group admins moderate their own group. Not 'moderator' — that role
+        // exists in the enum but is never assigned by any code path.
+        $canDelete = (getGroupRole($post['group_id'], $data['user_id']) === 'admin');
+    }
+    if (!$canDelete) {
+        // 404 rather than 403: a 403 would confirm the post exists to someone
+        // who has no business knowing that.
+        jsonError("Post not found.", 404);
+        return;
+    }
+
+    // The user_id filter is deliberately absent from this PATCH. Leaving it in
+    // would make an admin deleting someone else's post match zero rows —
+    // which PostgREST answers 2xx, so supabaseFailed() stays false and the API
+    // would cheerfully report "Post deleted." while nothing was deleted. The
+    // authorization decision above is the only gate, by design.
     $res = supabaseRequest('PATCH', '/rest/v1/posts', [
-        'id' => 'eq.' . $data['post_id'],
-        'user_id' => 'eq.' . $data['user_id'],
+        'id' => 'eq.' . $postId,
     ], ['is_deleted' => true, 'updated_at' => gmdate('c')], ['Prefer: return=minimal']);
 
     if (supabaseFailed($res)) {
@@ -265,7 +444,9 @@ function handleDeletePost($data)
         return;
     }
 
-    $mediaUrl = $postRes['data'][0]['media_url'] ?? null;
+    // Runs for admin deletes too, removing another member's storage object.
+    // Intended: the post is gone, its media should go with it.
+    $mediaUrl = $post['media_url'] ?? null;
     if ($mediaUrl) {
         $parsed = parsePublicStorageUrl($mediaUrl);
         if ($parsed)
@@ -281,6 +462,14 @@ function handleToggleLike($data)
         return;
     $uid = $data['user_id'];
     $pid = $data['post_id'];
+
+    // A post id on its own is not proof of entitlement: without this, a
+    // non-member holding a group post's id could write likes into a
+    // members-only thread, where they'd render for real members.
+    if (!viewerCanSeePost($pid, $uid)) {
+        jsonError("Post not found.", 404);
+        return;
+    }
 
     $check = supabaseRequest('GET', '/rest/v1/post_likes', [
         'user_id' => 'eq.' . $uid,
@@ -384,6 +573,11 @@ function handleSetPostReaction($data)
     $pid = $data['post_id'];
     $newReaction = trim($data['reaction']);
 
+    if (!viewerCanSeePost($pid, $uid)) {
+        jsonError("Post not found.", 404);
+        return;
+    }
+
     $check = supabaseRequest('GET', '/rest/v1/post_likes', [
         'user_id' => 'eq.' . $uid,
         'post_id' => 'eq.' . $pid,
@@ -469,6 +663,27 @@ function handleAddComment($data)
 {
     if (!requireFields($data, ['post_id', 'content', 'user_id']))
         return;
+
+    // This lookup used to happen after the insert, purely to find the owner to
+    // notify. It moves ahead of the insert so the same round trip also decides
+    // entitlement: commenting on a group post you're not in would otherwise
+    // inject content into a closed thread and fire a notification at its
+    // author. Net cost is unchanged — one query, used twice.
+    $postRes = supabaseRequest('GET', '/rest/v1/posts', [
+        'id' => 'eq.' . $data['post_id'],
+        'select' => 'user_id,group_id',
+        'limit' => '1',
+    ]);
+    if (supabaseFailed($postRes) || empty($postRes['data'])) {
+        jsonError("Post not found.", 404);
+        return;
+    }
+    $parentPost = $postRes['data'][0];
+    if (!empty($parentPost['group_id']) && !isGroupMember($parentPost['group_id'], $data['user_id'])) {
+        jsonError("Post not found.", 404);
+        return;
+    }
+
     $body = [
         'post_id' => $data['post_id'],
         'user_id' => $data['user_id'],
@@ -485,8 +700,7 @@ function handleAddComment($data)
         return;
     }
 
-    $postRes = supabaseRequest('GET', '/rest/v1/posts', ['id' => 'eq.' . $data['post_id'], 'select' => 'user_id', 'limit' => '1']);
-    $ownerId = $postRes['data'][0]['user_id'] ?? null;
+    $ownerId = $parentPost['user_id'] ?? null;
     if ($ownerId && $ownerId !== $data['user_id']) {
         $commenterProfile = getAccountProfile($data['user_id']);
         $commenterName = $commenterProfile['pet_name'] ?? 'Someone';
@@ -503,6 +717,16 @@ function handleAddComment($data)
 function handleGetComments($data)
 {
     $postId = requireUuid($data['post_id'] ?? '', 'post_id');
+
+    // Easy one to miss, because a comment thread reads like a sub-resource
+    // that inherits the parent's protection — it doesn't. Ungated, this is a
+    // direct content leak of a members-only discussion to anyone holding the
+    // post id.
+    if (!viewerCanSeePost($postId, $data['user_id'] ?? null)) {
+        jsonError("Post not found.", 404);
+        return;
+    }
+
     $res = supabaseRequest('GET', '/rest/v1/post_comments', [
         'post_id' => 'eq.' . $postId,
         'is_deleted' => 'eq.false',
@@ -648,7 +872,7 @@ function handleGetPostById($data)
         'id' => 'eq.' . $data['post_id'],
         'is_deleted' => 'eq.false',
         'is_archived' => 'eq.false',
-        'select' => 'id,user_id,content,media_url,post_type,pet_type,breed,is_deleted,created_at,updated_at,hashtags',
+        'select' => postsSelectColumns(),
         'limit' => '1',
     ]);
 
@@ -662,8 +886,60 @@ function handleGetPostById($data)
         return;
     }
 
+    // copyPostLink() mints shareable ?post=<uuid> URLs, so this id travels
+    // outside the group it belongs to. 404 rather than 403 — the latter would
+    // confirm the post exists to a non-member.
+    $groupId = $res['data'][0]['group_id'] ?? null;
+    if ($groupId && !isGroupMember($groupId, $data['user_id'] ?? null)) {
+        jsonError("Post not found.", 404);
+        return;
+    }
+
     $post = enrichPosts($res['data'], $data['user_id'] ?? null)[0];
     jsonSuccess(["post" => $post]);
+}
+
+/**
+ * Posts belonging to one group — powers the Posts tab in the group chat modal.
+ *
+ * Note the membership check: its neighbour handleGetGroupMessages (groups.php)
+ * has none, which is a known pre-existing hole, not a pattern to copy. This
+ * one follows handleSendGroupMessage instead.
+ */
+function handleGetGroupPosts($data)
+{
+    if (!requireFields($data, ['user_id', 'group_id']))
+        return;
+
+    $groupId = trim((string) $data['group_id']);
+    if (!isValidUuid($groupId)) {
+        jsonError("Invalid group_id.", 400);
+        return;
+    }
+    if (!isGroupMember($groupId, $data['user_id'])) {
+        jsonError("You must be a member of this group to see its posts.", 403);
+        return;
+    }
+
+    $limit = isset($data['limit']) ? max(1, min((int) $data['limit'], 50)) : 20;
+    $offset = isset($data['offset']) ? max(0, (int) $data['offset']) : 0;
+
+    $res = supabaseRequest('GET', '/rest/v1/posts', [
+        'group_id' => 'eq.' . $groupId,
+        'is_deleted' => 'eq.false',
+        'is_archived' => 'eq.false',
+        'select' => postsSelectColumns(),
+        'order' => 'created_at.desc',
+        'limit' => (string) $limit,
+        'offset' => (string) $offset,
+    ]);
+
+    if (supabaseFailed($res)) {
+        sendSupabaseError("Failed to fetch group posts.", $res);
+        return;
+    }
+
+    jsonSuccess(["posts" => enrichPosts($res['data'] ?? [], $data['user_id'])]);
 }
 
 function handleArchivePost($data)

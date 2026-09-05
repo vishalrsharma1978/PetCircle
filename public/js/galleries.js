@@ -174,6 +174,7 @@ function renderGalleryLibraryResults() {
   if (resultsEl) {
     resultsEl.innerHTML = renderGalleryLibraryResultsHtml(visible);
     if (window.lucide) lucide.createIcons();
+    if (typeof pcRevealChildren === "function") pcRevealChildren(resultsEl);
   }
 }
 
@@ -383,8 +384,7 @@ function closeCreateGalleryModal() {
     if (item?.previewUrl) URL.revokeObjectURL(item.previewUrl);
   });
   galleryModalStagedFiles = [];
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
+  pcHideModal(modal);
 }
 
 function openEditGalleryModal(galleryId) {

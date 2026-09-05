@@ -8,6 +8,73 @@
  * this turns out to not match the original intent.
  */
 
+/**
+ * Group ids the caller belongs to, newest membership first.
+ *
+ * The 100 cap is a URL-length budget, not a product rule: these ids go into a
+ * PostgREST in.() list at ~37 bytes each, against an ~8KB URL ceiling. 100 ids
+ * is ~3.7KB and leaves generous headroom. A user in more than 100 groups stops
+ * seeing feed posts from their *oldest* memberships (hence joined_at.desc).
+ *
+ * Every id is passed through normalizeUuidList(), whose /^[0-9a-fA-F-]{36}$/
+ * character class excludes every PostgREST metacharacter (, ( ) . *). That is
+ * the property callers rely on when interpolating the result into an in.()
+ * clause — do not relax it.
+ */
+function getMyGroupIds($userId)
+{
+    if (!isValidUuid($userId))
+        return [];
+
+    $res = supabaseRequest('GET', '/rest/v1/group_members', [
+        'user_id' => 'eq.' . $userId,
+        'select' => 'group_id',
+        'order' => 'joined_at.desc',
+        'limit' => '100',
+    ]);
+    if (supabaseFailed($res))
+        return [];
+
+    return normalizeUuidList(array_column($res['data'] ?? [], 'group_id'));
+}
+
+function isGroupMember($groupId, $userId)
+{
+    if (!isValidUuid($groupId) || !isValidUuid($userId))
+        return false;
+
+    $res = supabaseRequest('GET', '/rest/v1/group_members', [
+        'group_id' => 'eq.' . $groupId,
+        'user_id' => 'eq.' . $userId,
+        'select' => 'user_id',
+        'limit' => '1',
+    ]);
+    return !supabaseFailed($res) && !empty($res['data']);
+}
+
+/**
+ * 'admin' | 'moderator' | 'member' | null (not a member). Only 'admin' is
+ * ever actually assigned today — handleCreateGroup gives it to the creator
+ * and everyone else joins as 'member'; 'moderator' exists in the enum but is
+ * never written by any code path.
+ */
+function getGroupRole($groupId, $userId)
+{
+    if (!isValidUuid($groupId) || !isValidUuid($userId))
+        return null;
+
+    $res = supabaseRequest('GET', '/rest/v1/group_members', [
+        'group_id' => 'eq.' . $groupId,
+        'user_id' => 'eq.' . $userId,
+        'select' => 'role',
+        'limit' => '1',
+    ]);
+    if (supabaseFailed($res) || empty($res['data']))
+        return null;
+
+    return $res['data'][0]['role'] ?? null;
+}
+
 function computePackKey($scope, $petType, $breed)
 {
     if ($scope === 'breed' && $breed)
@@ -65,7 +132,7 @@ function handleGetGroups($data)
         'limit' => (string) $limit,
     ];
     if (!empty($data['pet_type']) && empty($data['all'])) {
-        $petType = cleanPlainValue($data['pet_type'], 80);
+        $petType = cleanFilterValue($data['pet_type'], 80);
         $params['or'] = '(scope.eq.global,pet_type.eq.' . $petType . ')';
     }
 
@@ -165,13 +232,7 @@ function handleSendGroupMessage($data)
         return;
     }
 
-    $membership = supabaseRequest('GET', '/rest/v1/group_members', [
-        'group_id' => 'eq.' . $data['group_id'],
-        'user_id' => 'eq.' . $data['user_id'],
-        'select' => 'user_id',
-        'limit' => '1',
-    ]);
-    if (supabaseFailed($membership) || empty($membership['data'])) {
+    if (!isGroupMember($data['group_id'], $data['user_id'])) {
         jsonError("You must be a member of this group to message it.", 403);
         return;
     }
@@ -242,13 +303,7 @@ function handleReactToGroupMessage($data)
     }
     $message = $msgRes['data'][0];
 
-    $membership = supabaseRequest('GET', '/rest/v1/group_members', [
-        'group_id' => 'eq.' . $message['group_id'],
-        'user_id' => 'eq.' . $userId,
-        'select' => 'user_id',
-        'limit' => '1',
-    ]);
-    if (supabaseFailed($membership) || empty($membership['data'])) {
+    if (!isGroupMember($message['group_id'], $userId)) {
         jsonError("You must be a member of this group to react.", 403);
         return;
     }

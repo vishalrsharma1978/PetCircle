@@ -47,9 +47,7 @@ function resetRescueModalForm() {
 }
 
 function closeCreateRescueModal() {
-  const modal = document.getElementById("create-rescue-modal");
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
+  pcHideModal("create-rescue-modal");
 }
 
 async function submitCreateRescueOpportunity() {
@@ -314,9 +312,7 @@ function openRescueApplyModal(oppId, title) {
 
 function closeRescueApplyModal() {
   currentRescueApplyOppId = null;
-  const modal = document.getElementById("rescue-apply-modal");
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
+  pcHideModal("rescue-apply-modal");
 }
 
 async function submitRescueApplication() {

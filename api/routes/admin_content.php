@@ -15,7 +15,13 @@ function handleAdminListPosts($data)
     $offset = adminOffset($data);
 
     $query = [
-        'select' => 'id,user_id,content,media_url,post_type,pet_type,breed,is_deleted,created_at',
+        // Deliberately narrower than postsSelectColumns() (no updated_at /
+        // hashtags — the moderation table doesn't show them), but group_id is
+        // needed: without it enrichPosts() emits group:null and a group post
+        // would be indistinguishable from an ordinary one in the admin list.
+        // Global admins moderate every post, group ones included, so this
+        // panel is not membership-filtered.
+        'select' => 'id,user_id,group_id,content,media_url,post_type,pet_type,breed,is_deleted,created_at',
         'order' => 'created_at.desc',
         'limit' => (string) $limit,
         'offset' => (string) $offset,

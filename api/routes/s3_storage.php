@@ -190,6 +190,97 @@ function s3DeleteObject($key)
 }
 
 /**
+ * Anonymously HEAD a public media URL to confirm a browser can actually load it.
+ *
+ * Deliberately UNSIGNED and credential-free — no SigV4, no Authorization, no
+ * apikey. The whole point is to reproduce exactly what a bare <img src> does;
+ * routing this through s3Request() would sign it, make it pass regardless of the
+ * bucket policy, and render the check worthless.
+ *
+ * A signed PUT succeeding proves only that *we* could write the object. It says
+ * nothing about whether the public can read it back, which is precisely how a
+ * missing public-read bucket policy stays invisible until a user reports a broken
+ * image. See docs/aws-s3-setup.md.
+ *
+ * S3 has been strongly read-after-write consistent for new objects since December
+ * 2020, so a HEAD issued immediately after a successful PUT is safe: a 404 here
+ * means the object genuinely is not at that key, not that we raced our own write.
+ *
+ * Returns:
+ *   'public'        2xx — the browser will be able to load it.
+ *   'forbidden'     a 4xx that demonstrably came from AWS — the object exists but
+ *                   is unreadable, or is not where we think it is. Fail hard.
+ *   'indeterminate' no trustworthy answer (transport failure, timeout, a 5xx, or
+ *                   a 4xx that did not come from AWS). Allow the upload and log.
+ */
+function mediaUrlPublicReadState($url)
+{
+    if (!is_string($url) || $url === '') {
+        return 'indeterminate';
+    }
+
+    $sawAwsHeader = false;
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_NOBODY, true);          // HEAD — never transfer the body
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);  // S3 can 307 on region hints
+    curl_setopt($ch, CURLOPT_MAXREDIRS, 3);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Expect:']);
+    // Every genuine S3 response — success or error — carries x-amz-request-id
+    // (CloudFront answers with x-amz-cf-id). Middleboxes that synthesize a
+    // rejection do not. See the $sawAwsHeader check below for why that matters.
+    curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($handle, $header) use (&$sawAwsHeader) {
+        if (stripos($header, 'x-amz-') === 0) {
+            $sawAwsHeader = true;
+        }
+        return strlen($header);
+    });
+    curl_exec($ch);
+    $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+
+    if ($code >= 200 && $code < 300) {
+        return 'public';
+    }
+
+    // No HTTP status at all (DNS, TLS, timeout, refused connection). We learned
+    // nothing about the bucket policy, so do not destroy a stored object over it.
+    if ($code === 0 || $curlError !== '') {
+        return 'indeterminate';
+    }
+
+    // 5xx is S3 failing transiently (SlowDown, InternalError) and carries zero
+    // information about permissions. Grouping it with 4xx would let a brief
+    // 503 window delete every object uploaded during it — the exact data loss
+    // this check exists to prevent. Move this below the 4xx return to make 5xx
+    // fail hard instead.
+    if ($code >= 500) {
+        return 'indeterminate';
+    }
+
+    // A 4xx with no x-amz-* header never reached AWS: a corporate proxy, egress
+    // filter, or captive portal manufactured it. That is indistinguishable from
+    // a real AccessDenied by status code alone, and treating it as authoritative
+    // would delete a perfectly good object because of a network policy. Observed
+    // for real: a sandboxed host with no egress returns a bare 403 here, errno 0.
+    if (!$sawAwsHeader) {
+        return 'indeterminate';
+    }
+
+    return 'forbidden'; // 401 / 403 / 404 / 405 / 410 / ... : authoritative
+}
+
+/** Convenience predicate for callers that only care about the happy path. */
+function mediaUrlIsPubliclyReadable($url)
+{
+    return mediaUrlPublicReadState($url) === 'public';
+}
+
+/**
  * If $url points at our S3 bucket (direct S3, path-style, or the configured
  * public/CDN base), return ['key' => objectKey]; otherwise null.
  */

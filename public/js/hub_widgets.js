@@ -69,7 +69,11 @@ async function loadHubHero() {
 
     api("get_friends", {}).then((fd) => {
       const countEl = document.getElementById("hub-hero-friends-count");
-      if (countEl && fd.status === "success") countEl.textContent = (fd.friends || []).length;
+      if (!countEl || fd.status !== "success") return;
+      const total = (fd.friends || []).length;
+      // pcCountUp also clears the inline skeleton span this element ships with.
+      if (typeof pcCountUp === "function") pcCountUp(countEl, total);
+      else countEl.textContent = total;
     }).catch((err) => console.error(err));
 
     setCoverPreview("hub-hero-cover-img", p.cover_photo_url, "hub-hero-cover-skeleton");

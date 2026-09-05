@@ -119,9 +119,10 @@
     </section>
 
     <section class="signup">
-      <div class="signup-top">
-        Already part of the pack? <a id="signinLink" onclick="switchView('view-public-login')"
-          style="cursor:pointer">Sign in</a>
+      <div class="signup-top" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <span>Already part of the pack? <a id="signinLink" onclick="switchView('view-public-login')"
+            style="cursor:pointer">Sign in</a></span>
+        <span class="av2-try-link" onclick="openAuthV2Signup()">✨ Try our playful new look</span>
       </div>
 
       <div class="signup-body">

@@ -339,9 +339,7 @@ function openAdminServerModal(id = null) {
 }
 
 function closeAdminServerModal() {
-  const modal = document.getElementById("admin-server-modal");
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
+  pcHideModal("admin-server-modal");
 }
 
 async function saveAdminServerNode() {

@@ -1,0 +1,619 @@
+/* ============================================================
+   auth_scene.css — the immersive desktop layer for the playful
+   auth pages. Everything here is either scoped to .av2-* / .pcm-*
+   or gated behind @media (min-width: 1024px), so the mobile
+   presentation stays exactly the card/stacked treatment that
+   auth_v2.css already defines.
+
+   Three files cover the playful auth pages, split by what they
+   describe rather than arbitrarily by size:
+     auth_v2.css       form primitives and the mobile card layer
+     auth_mascots.css  the character rigs (pairs with the markup in
+                       components/auth_mascots.php)
+     auth_scene.css    this file — the world the character stands
+                       in, the form panel, and the sign-up wizard
+
+   Palette comes from portal.css's :root (--cream/--marigold/
+   --coral/--moss/--charcoal/--fog); the per-view accent arrives as
+   --av2-accent, set by auth_v2.js from getPetTheme().
+   ============================================================ */
+
+/* ============================================================
+   1. THE STAGE (desktop diorama)
+   Layers are built by auth_scene.js so the login and sign-up views
+   share one definition instead of duplicating the markup.
+   ============================================================ */
+
+.av2-stage {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(180deg,
+      color-mix(in srgb, var(--av2-accent, #F2A93B) 26%, #FFF8EC) 0%,
+      color-mix(in srgb, var(--av2-accent, #F2A93B) 12%, #FFF8EC) 48%,
+      #FFF8EC 100%);
+  transition: background 0.7s ease;
+}
+
+/* Each layer translates by a different amount on pointermove — the further
+   "back" it sits, the less it moves. auth_scene.js writes --px/--py. */
+.av2-layer {
+  position: absolute;
+  left: -4%;
+  bottom: 0;
+  width: 108%;
+  display: block;
+  pointer-events: none;
+  transform: translate3d(var(--px, 0px), var(--py, 0px), 0);
+  transition: transform 0.5s cubic-bezier(.16, 1, .3, 1);
+  will-change: transform;
+}
+
+.av2-layer-hills  { height: 46%; z-index: 1; }
+/* 67.5% is 54% x 375/300, matching the 75 units of headroom added to this
+   layer's viewBox in auth_scene.js so the tallest canopies are not sliced off.
+   The pair has to move together: the ratio is what keeps the trees at their
+   original scale and keeps the ground line pinned. */
+.av2-layer-trees  { height: 67.5%; z-index: 2; }
+.av2-layer-ground { height: 26%; z-index: 3; }
+.av2-layer-fore   { height: 22%; z-index: 6; }
+
+/* The sun/moon disc behind everything, tinted by the active accent. */
+.av2-sun {
+  position: absolute;
+  top: 12%;
+  right: 16%;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  z-index: 0;
+  /* Reads as light rather than a solid disc — a saturated core looks like a
+     stray ball on the cooler accents (Cat's violet, Reptile's green). */
+  background: radial-gradient(circle at 50% 50%,
+      color-mix(in srgb, var(--av2-accent, #F2A93B) 62%, white) 0%,
+      color-mix(in srgb, var(--av2-accent, #F2A93B) 30%, transparent) 58%,
+      transparent 72%);
+  animation: av2-sun-pulse 7s ease-in-out infinite;
+  transition: background 0.7s ease;
+}
+
+@keyframes av2-sun-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50%      { transform: scale(1.06); opacity: 1; }
+}
+
+.av2-cloud {
+  position: absolute;
+  z-index: 0;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  filter: blur(0.4px);
+  animation: av2-cloud-drift linear infinite;
+}
+
+.av2-cloud::before,
+.av2-cloud::after {
+  content: "";
+  position: absolute;
+  bottom: 6px;
+  border-radius: 50%;
+  background: inherit;
+}
+
+.av2-cloud::before { left: 16%; width: 44px; height: 44px; }
+.av2-cloud::after  { right: 18%; width: 32px; height: 32px; }
+
+.av2-cloud:nth-of-type(1) { top: 9%;  width: 132px; animation-duration: 58s; animation-delay: -6s;  opacity: 0.85; }
+.av2-cloud:nth-of-type(2) { top: 22%; width: 96px;  animation-duration: 74s; animation-delay: -30s; opacity: 0.6; }
+.av2-cloud:nth-of-type(3) { top: 5%;  width: 74px;  animation-duration: 92s; animation-delay: -52s; opacity: 0.5; }
+
+@keyframes av2-cloud-drift {
+  from { transform: translateX(-40%); }
+  to   { transform: translateX(760%); }
+}
+
+/* Pollen motes / fireflies drifting through the middle distance. */
+.av2-motes {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.av2-mote {
+  position: absolute;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--av2-accent, #F2A93B) 70%, white);
+  box-shadow: 0 0 10px 2px color-mix(in srgb, var(--av2-accent, #F2A93B) 40%, transparent);
+  opacity: 0;
+  animation: av2-mote-float ease-in-out infinite;
+}
+
+@keyframes av2-mote-float {
+  0%       { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  15%      { opacity: 0.85; }
+  70%      { opacity: 0.6; }
+  100%     { transform: translate(var(--mx, 30px), var(--my, -140px)) scale(1); opacity: 0; }
+}
+
+/* ---------- The hero character ---------- */
+
+.av2-hero {
+  position: absolute;
+  left: 50%;
+  bottom: 12%;
+  z-index: 4;
+  width: min(46vh, 400px);
+  transform: translate3d(calc(-50% + var(--px, 0px)), var(--py, 0px), 0);
+  transition: transform 0.5s cubic-bezier(.16, 1, .3, 1);
+  will-change: transform;
+}
+
+.av2-hero-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 18px 26px rgba(120, 80, 40, 0.22));
+}
+
+/* Species cross-fade: the outgoing character shrinks away while the incoming
+   one pops in, so the swap reads as a transformation rather than a cut. */
+.av2-hero-svg.is-entering { animation: av2-hero-in 0.5s cubic-bezier(.34, 1.56, .64, 1); }
+.av2-hero-svg.is-leaving  { animation: av2-hero-out 0.28s ease-in forwards; position: absolute; inset: 0; }
+
+@keyframes av2-hero-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.82) rotate(-6deg); }
+  to   { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+}
+
+@keyframes av2-hero-out {
+  to { opacity: 0; transform: translateY(-10px) scale(0.86) rotate(7deg); }
+}
+
+/* ---------- Signpost carrying the rotating headline ---------- */
+
+.av2-signpost {
+  position: absolute;
+  left: 6%;
+  bottom: 14%;
+  z-index: 7;
+  max-width: 300px;
+  padding: 16px 20px 18px;
+  border-radius: 18px 18px 20px 20px;
+  background: linear-gradient(170deg, #C89A5B, #A97C42);
+  border: 3px solid #8E6534;
+  box-shadow: 0 16px 30px -14px rgba(70, 45, 15, 0.6);
+  transform: rotate(-2.2deg) translate3d(var(--px, 0px), var(--py, 0px), 0);
+  transition: transform 0.5s cubic-bezier(.16, 1, .3, 1);
+  color: #FFF8EC;
+}
+
+/* The two posts holding the board up. */
+.av2-signpost::before,
+.av2-signpost::after {
+  content: "";
+  position: absolute;
+  bottom: -46px;
+  width: 12px;
+  height: 50px;
+  background: #8E6534;
+  border-radius: 3px;
+  z-index: -1;
+}
+
+.av2-signpost::before { left: 22%; }
+.av2-signpost::after  { right: 22%; }
+
+.av2-signpost-eyebrow {
+  font-family: var(--font-display, 'Baloo 2', system-ui, sans-serif);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.av2-signpost-text {
+  font-family: var(--font-display, 'Baloo 2', system-ui, sans-serif);
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.32;
+  margin-top: 4px;
+  animation: av2-signpost-swap 0.55s cubic-bezier(.16, 1, .3, 1);
+}
+
+@keyframes av2-signpost-swap {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.av2-signpost-dots {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.av2-signpost-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 248, 236, 0.35);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.av2-signpost-dots span.av2-active {
+  background: #FFF8EC;
+  transform: scale(1.35);
+}
+
+/* ============================================================
+   2. THE FORM PANEL (desktop)
+   ============================================================ */
+
+.av2-panel {
+  position: relative;
+  z-index: 10;
+  background: #FFFDF7;
+  box-shadow: -18px 0 44px -28px rgba(120, 80, 40, 0.45);
+}
+
+/* Per-letter drop-in for the panel headline. auth_scene.js splits the text
+   into spans and sets --i on each. */
+.av2-letter {
+  display: inline-block;
+  white-space: pre;
+  animation: av2-letter-drop 0.52s cubic-bezier(.34, 1.56, .64, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 34ms);
+}
+
+@keyframes av2-letter-drop {
+  from { opacity: 0; transform: translateY(-22px) rotate(-8deg); }
+  to   { opacity: 1; transform: translateY(0) rotate(0deg); }
+}
+
+/* Field icons that react to focus: the envelope flap lifts, the padlock
+   shackle pops. Both are drawn inline in the view. */
+.av2-field-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  transform: translateY(-50%);
+  color: #b9a888;
+  pointer-events: none;
+  transition: color 0.24s ease;
+  /* Gives the envelope flap's rotateX somewhere to go: without a perspective
+     on the parent it flattens into a vertical squash instead of opening. */
+  perspective: 90px;
+}
+
+.av2-input-wrap:focus-within .av2-field-icon {
+  color: var(--av2-accent, var(--marigold, #F2A93B));
+}
+
+.av2-icon-flap {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform 0.34s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.av2-input-wrap:focus-within .av2-icon-flap { transform: rotateX(-160deg); }
+
+.av2-icon-shackle {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform 0.3s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.av2-input-wrap:focus-within .av2-icon-shackle { transform: translateY(-3px) rotate(-14deg); }
+
+/* Inputs that carry a leading icon need room for it. */
+.av2-input-wrap { position: relative; }
+.av2-input-wrap .av2-input { padding-left: 42px; }
+
+/* Error shake, paired with the character's is-sad state. */
+.av2-shake { animation: av2-shake 0.5s cubic-bezier(.36, .07, .19, .97); }
+
+@keyframes av2-shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-7px); }
+  40%, 60% { transform: translateX(7px); }
+}
+
+/* ---------- Paw-shaped iris wipe out of the auth pages ---------- */
+
+.av2-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  pointer-events: none;
+  background: var(--av2-accent, var(--marigold, #F2A93B));
+  clip-path: circle(0% at var(--wx, 50%) var(--wy, 50%));
+  animation: av2-wipe-in 0.62s cubic-bezier(.6, 0, .4, 1) forwards;
+}
+
+.av2-wipe svg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 96px;
+  height: 96px;
+  fill: #FFF8EC;
+  transform: translate(-50%, -50%) scale(0.4);
+  opacity: 0;
+  animation: av2-wipe-paw 0.62s 0.16s cubic-bezier(.34, 1.56, .64, 1) forwards;
+}
+
+@keyframes av2-wipe-in {
+  to { clip-path: circle(150% at var(--wx, 50%) var(--wy, 50%)); }
+}
+
+@keyframes av2-wipe-paw {
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(-8deg); }
+}
+
+/* ============================================================
+   3. SIGN-UP WIZARD
+   One step visible at a time on desktop. On mobile every step is
+   shown at once, which reproduces the single scrolling form the
+   current v2 sign-up already presents.
+   ============================================================ */
+
+.av2-step { display: none; }
+
+.av2-step.is-active {
+  display: block;
+  animation: av2-step-in 0.44s cubic-bezier(.16, 1, .3, 1);
+}
+
+.av2-step.is-leaving {
+  display: block;
+  animation: av2-step-out 0.26s ease-in forwards;
+}
+
+/* Reverse direction when stepping backwards, so "Back" visibly rewinds. */
+.av2-step.is-active.is-reverse { animation-name: av2-step-in-rev; }
+.av2-step.is-leaving.is-reverse { animation-name: av2-step-out-rev; }
+
+@keyframes av2-step-in {
+  from { opacity: 0; transform: translateX(44px) scale(0.97); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes av2-step-out {
+  to { opacity: 0; transform: translateX(-38px) scale(0.97); }
+}
+
+@keyframes av2-step-in-rev {
+  from { opacity: 0; transform: translateX(-44px) scale(0.97); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes av2-step-out-rev {
+  to { opacity: 0; transform: translateX(38px) scale(0.97); }
+}
+
+/* ---------- Paw-print progress trail ---------- */
+
+.av2-trail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 22px;
+}
+
+.av2-trail-paw {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px dashed var(--fog, #E7DECB);
+  background: transparent;
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.av2-trail-paw svg {
+  width: 15px;
+  height: 15px;
+  fill: var(--fog, #E7DECB);
+  transform: rotate(-14deg);
+  transition: fill 0.3s ease;
+}
+
+.av2-trail-paw.is-done {
+  border-style: solid;
+  border-color: var(--av2-accent, var(--marigold, #F2A93B));
+  background: color-mix(in srgb, var(--av2-accent, var(--marigold, #F2A93B)) 16%, white);
+  animation: av2-stamp 0.42s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.av2-trail-paw.is-done svg { fill: var(--av2-accent, var(--marigold, #F2A93B)); }
+
+.av2-trail-paw.is-current {
+  border-style: solid;
+  border-color: var(--av2-accent, var(--marigold, #F2A93B));
+  transform: scale(1.16);
+}
+
+.av2-trail-paw.is-current svg { fill: var(--av2-accent, var(--marigold, #F2A93B)); }
+
+.av2-trail-link {
+  flex: 1 1 auto;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--fog, #E7DECB);
+  transition: background 0.35s ease;
+}
+
+.av2-trail-link.is-done { background: var(--av2-accent, var(--marigold, #F2A93B)); }
+
+@keyframes av2-stamp {
+  0%   { transform: scale(0.55) rotate(-24deg); }
+  60%  { transform: scale(1.22) rotate(6deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.av2-step-caption {
+  font-family: var(--font-display, 'Baloo 2', system-ui, sans-serif);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #a89570;
+  margin-bottom: 6px;
+}
+
+.av2-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.av2-btn-ghost {
+  font-family: var(--font-display, 'Baloo 2', system-ui, sans-serif);
+  font-weight: 700;
+  padding: 12px 20px;
+  border-radius: 18px;
+  border: 2.5px solid var(--fog, #E7DECB);
+  background: transparent;
+  color: #8a7a5f;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(.34, 1.56, .64, 1), border-color 0.2s ease, color 0.2s ease;
+}
+
+.av2-btn-ghost:hover {
+  transform: translateY(-2px);
+  border-color: var(--av2-accent, var(--marigold, #F2A93B));
+  color: var(--charcoal, #2B2420);
+}
+
+/* ============================================================
+   4. DESKTOP COMPOSITION
+   Below 1024px none of this applies and auth_v2.css's card layout
+   is what renders — deliberately, so the mobile experience is the
+   one that already exists.
+   ============================================================ */
+
+@media (min-width: 1024px) {
+  .av2-shell {
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+  }
+
+  .av2-split-stage { width: 57%; flex: none; }
+  .av2-split-panel { width: 43%; flex: none; }
+
+  /* Sign-up inverts the sign-in's proportions: left panel SMALLER than right,
+     matching the classic sign-up's own grid-template-columns: 0.9fr 1.15fr
+     (portal.css). Scoped to the view rather than done with modifier classes so
+     the shared markup stays identical between the two pages. */
+  #view-signup-v2 .av2-split-stage { width: 44%; }
+  #view-signup-v2 .av2-split-panel { width: 56%; }
+
+  .av2-panel {
+    height: 100dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* The card chrome from auth_v2.css (washi tape, rotation, drop shadow)
+     is a mobile device — on desktop the panel itself is the surface. */
+  .av2-panel .av2-card {
+    transform: none;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+    border-radius: 0;
+  }
+
+  .av2-panel .av2-card::before { display: none; }
+
+  /* The ambient drifting paws from auth_v2.css would fight the diorama. */
+  .av2-shell > .av2-paw-field { display: none; }
+}
+
+@media (max-width: 1023px) {
+  /* Mobile keeps a compact animated banner instead of the full diorama. */
+  .av2-stage {
+    height: 210px;
+    flex: none;
+    border-radius: 0 0 28px 28px;
+  }
+
+  .av2-hero { width: 132px; bottom: 6%; }
+  .av2-signpost,
+  .av2-motes { display: none; }
+
+  /* One column, all wizard steps visible: the current v2 sign-up form. Each
+     step's heading then reads as a section label for the fields under it. */
+  .av2-step,
+  .av2-step.is-leaving {
+    display: block;
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .av2-step + .av2-step { margin-top: 30px; }
+
+  /* No steps to count through, so the trail, the "Step N of 4" eyebrows, and
+     the Back/Next controls all have nothing to do. Only step 4 keeps its nav
+     row, because that is where the single submit button lives. */
+  .av2-trail,
+  .av2-step-caption,
+  .av2-step:not([data-step="4"]) .av2-nav-row,
+  .av2-nav-row .av2-btn-ghost { display: none; }
+
+  .av2-nav-row .av2-btn-submit { width: 100%; }
+}
+
+/* ============================================================
+   5. REDUCED MOTION
+   Mirrors auth_v2.css's own block: every animation introduced
+   above is stilled, and every element it moved is left in its
+   resting, fully legible state.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .av2-sun,
+  .av2-cloud,
+  .av2-mote,
+  .av2-hero-svg.is-entering,
+  .av2-hero-svg.is-leaving,
+  .av2-signpost-text,
+  .av2-letter,
+  .av2-shake,
+  .av2-step.is-active,
+  .av2-step.is-leaving,
+  .av2-trail-paw.is-done,
+  .av2-wipe,
+  .av2-wipe svg {
+    animation: none !important;
+  }
+
+  .av2-layer,
+  .av2-hero,
+  .av2-signpost,
+  .av2-icon-flap,
+  .av2-icon-shackle {
+    transition: none !important;
+  }
+
+  .av2-letter,
+  .av2-step.is-active { opacity: 1; transform: none; }
+
+  .av2-mote { display: none; }
+
+  /* The wipe still needs to disappear rather than sit as a solid overlay. */
+  .av2-wipe { display: none; }
+}

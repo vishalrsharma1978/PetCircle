@@ -115,6 +115,7 @@
         </div>
         <h3 class="text-3xl font-bold text-gray-900" style="font-family: 'Poppins'">Welcome back</h3>
         <p class="mt-2 text-sm text-gray-500">Let the tail-wagging fun begin!</p>
+        <span class="av2-try-link mt-3" onclick="openAuthV2Login()">✨ Try our playful new look</span>
       </div>
 
       <div id="public-error"

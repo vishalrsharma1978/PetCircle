@@ -4,13 +4,17 @@
   "description": "PawCircle: a social platform for pet parents to connect, coordinate playdates, find rescue and volunteer opportunities, and build their pet's pack. Rebuilt on the eSamaj (community_proj) platform architecture.",
   "main": "index.js",
   "scripts": {
-    "build:css": "tailwindcss -i ./css/input.css -o ./css/tailwind.css --watch"
+    "build:css": "tailwindcss -i ./css/input.css -o ./public/css/tailwind.css --watch",
+    "build:css:once": "tailwindcss -i ./css/input.css -o ./public/css/tailwind.css",
+    "vendor:anime": "node -e \"var f=require('fs'),s='node_modules/animejs/dist/bundles/anime.umd.min.js';if(f.existsSync(s)){f.mkdirSync('public/js/vendor',{recursive:true});f.copyFileSync(s,'public/js/vendor/anime.umd.min.js');console.log('vendored anime.umd.min.js')}else{console.log('animejs not installed - skipping')}\"",
+    "postinstall": "npm run vendor:anime"
   },
   "keywords": [],
   "author": "",
   "license": "UNLICENSED",
   "type": "commonjs",
   "devDependencies": {
+    "animejs": "^4.5.0",
     "tailwindcss": "^3.4.19"
   }
 }

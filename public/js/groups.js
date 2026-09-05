@@ -11,9 +11,7 @@ function openCreateGroupModal() {
 }
 
 function closeCreateGroupModal() {
-  const modal = document.getElementById("create-group-modal");
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
+  pcHideModal("create-group-modal");
 }
 
 function filterGroupsBySearch(query) {
@@ -23,6 +21,7 @@ function filterGroupsBySearch(query) {
   const filtered = q ? allGroupsCache.filter((g) => (g.name || "").toLowerCase().includes(q)) : allGroupsCache;
   list.innerHTML = filtered.length ? filtered.map(groupCardHtml).join("") : `<p class="text-sm text-gray-400 col-span-2">No groups match "${escapeHtml(query)}".</p>`;
   if (window.lucide) lucide.createIcons();
+  if (typeof pcRevealChildren === "function") pcRevealChildren(list);
 }
 
 async function submitCreateGroup() {
@@ -52,6 +51,8 @@ async function submitCreateGroup() {
     document.getElementById("new-group-description").value = "";
     closeCreateGroupModal();
     showToast("Group created.", "success");
+    // Creating a group makes you its admin, i.e. a new posting audience.
+    composerGroupsLoaded = false;
     loadGroupsTab();
   } catch (err) {
     console.error(err);
@@ -63,7 +64,9 @@ async function submitCreateGroup() {
 
 function groupCardHtml(g) {
   const actionBtn = g.is_member
-    ? `<button onclick="openGroupChat('${g.id}', '${escapeHtml(g.name)}')" class="text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 px-3 py-1.5 rounded-lg">Open chat</button>`
+    // escapeJsAttr, not escapeHtml: this name lands inside a JS string literal
+    // in an inline onclick, and escapeHtml leaves quotes intact.
+    ? `<button onclick="openGroupChat('${escapeJsAttr(g.id)}', '${escapeJsAttr(g.name)}')" class="text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 px-3 py-1.5 rounded-lg">Open chat</button>`
     : `<button onclick="joinGroup('${g.id}', this)" class="text-xs font-bold text-brand-500 border border-brand-200 dark:border-brand-800 px-3 py-1.5 rounded-lg">Join</button>`;
 
   return `
@@ -91,6 +94,7 @@ async function loadGroupsTab() {
     allGroupsCache = data.groups || [];
     list.innerHTML = allGroupsCache.length ? allGroupsCache.map(groupCardHtml).join("") : `<p class="text-sm text-gray-400 col-span-2">No groups yet — tap + to start one.</p>`;
     if (window.lucide) lucide.createIcons();
+    if (typeof pcRevealChildren === "function") pcRevealChildren(list);
   } catch (err) {
     console.error(err);
   }
@@ -108,6 +112,10 @@ async function joinGroup(groupId, btn) {
       showToast(data.message || "Could not join group.", "error");
       return;
     }
+    // Membership changes what the composer can post to and what the feed
+    // returns, so both memoized copies have to go.
+    composerGroupsLoaded = false;
+    feedPosts = [];
     loadGroupsTab();
   } catch (err) {
     console.error(err);
@@ -287,11 +295,16 @@ async function openGroupChat(groupId, name) {
   groupChatReplyTo = null;
   groupChatOpenReactionPickerId = null;
   groupChatOutbox = [];
+  currentGroupPosts = [];
+  groupPostMediaUrl = null;
   document.getElementById("group-chat-title").textContent = name;
   renderGroupChatReplyStrip();
   const modal = document.getElementById("group-chat-modal");
   modal.classList.remove("hidden");
   modal.classList.add("flex");
+  // Always open on Chat, and set the tab state before the first fetch —
+  // refreshGroupMessages() bails unless groupModalTab is "chat".
+  switchGroupModalTab("chat");
   await refreshGroupMessages();
   startGroupChatPolling();
 }
@@ -301,10 +314,11 @@ function closeGroupChatModal() {
   groupChatReplyTo = null;
   groupChatOpenReactionPickerId = null;
   groupChatOutbox = [];
+  currentGroupPosts = [];
+  groupPostMediaUrl = null;
+  groupModalTab = "chat";
   stopGroupChatPolling();
-  const modal = document.getElementById("group-chat-modal");
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
+  pcHideModal("group-chat-modal");
 }
 
 // Pending/failed outbox entries rendered as pseudo-messages, merged with the
@@ -348,6 +362,7 @@ function renderGroupChatTimeline() {
 
 async function refreshGroupMessages() {
   if (!currentGroupId) return;
+  if (groupModalTab !== "chat") return; // catches a tick already in flight when the user switched to Posts
   if (groupChatOpenReactionPickerId) return; // don't wipe an open picker mid-interaction
   try {
     const [msgData, callData] = await Promise.all([
@@ -401,6 +416,141 @@ function submitGroupMessage() {
   });
   renderGroupChatTimeline();
   sendGroupChatOutboxEntry(clientId);
+}
+
+// ---------------------------------------------------------------------------
+// Group posts: the modal's second tab. Posts made here go to every member's
+// main feed (headed by the group name) — they are NOT chat messages and never
+// appear in the message timeline.
+// ---------------------------------------------------------------------------
+
+let groupModalTab = "chat";
+let currentGroupPosts = [];
+let groupPostMediaUrl = null;
+
+const GROUP_TAB_ACTIVE_CLASSES = ["bg-white", "dark:bg-gray-900", "text-gray-900", "dark:text-white", "shadow-sm"];
+const GROUP_TAB_IDLE_CLASSES = ["text-gray-500", "dark:text-gray-400"];
+
+function setGroupModalTabButtonState(btn, isActive) {
+  if (!btn) return;
+  btn.classList.remove(...GROUP_TAB_ACTIVE_CLASSES, ...GROUP_TAB_IDLE_CLASSES);
+  btn.classList.add(...(isActive ? GROUP_TAB_ACTIVE_CLASSES : GROUP_TAB_IDLE_CLASSES));
+}
+
+function switchGroupModalTab(tab) {
+  groupModalTab = tab === "posts" ? "posts" : "chat";
+  const isChat = groupModalTab === "chat";
+
+  document.getElementById("group-chat-messages")?.classList.toggle("hidden", !isChat);
+  document.getElementById("group-chat-composer")?.classList.toggle("hidden", !isChat);
+  document.getElementById("group-posts-pane")?.classList.toggle("hidden", isChat);
+  document.getElementById("group-posts-composer")?.classList.toggle("hidden", isChat);
+  // The reply strip belongs to the chat composer and must not linger over Posts.
+  document.getElementById("group-chat-reply-strip")?.classList.toggle("hidden", !isChat || !groupChatReplyTo);
+
+  setGroupModalTabButtonState(document.getElementById("group-tab-chat-btn"), isChat);
+  setGroupModalTabButtonState(document.getElementById("group-tab-posts-btn"), !isChat);
+
+  // Stop the 3s message poll while reading posts: no needless network churn,
+  // and no chance of its re-render fighting the posts pane.
+  if (isChat) {
+    startGroupChatPolling();
+  } else {
+    stopGroupChatPolling();
+    loadGroupPosts();
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
+async function loadGroupPosts() {
+  const pane = document.getElementById("group-posts-pane");
+  if (!pane || !currentGroupId) return;
+
+  pane.innerHTML = postCardSkeletonListHtml(2);
+  try {
+    const data = await api("get_group_posts", { group_id: currentGroupId }, { forceRefresh: true });
+    if (data.status !== "success") {
+      pane.innerHTML = `<p class="text-center text-sm text-red-500 py-8">${escapeHtml(data.message || "Could not load posts.")}</p>`;
+      return;
+    }
+    currentGroupPosts = data.posts || [];
+
+    // postCardHtml's like/react handlers resolve their target through
+    // feedPosts.find() and silently do nothing when it's absent, so cards
+    // rendered outside the feed otherwise ship with dead buttons. Merge these
+    // in so the pane behaves like the feed does.
+    currentGroupPosts.forEach((p) => {
+      if (!feedPosts.some((f) => String(f.id) === String(p.id))) feedPosts.push(p);
+    });
+
+    pane.innerHTML = currentGroupPosts.length
+      ? currentGroupPosts.map(postCardHtml).join("")
+      : `<p class="text-center text-sm text-gray-400 py-8">No posts in this group yet — share something above.</p>`;
+    if (window.lucide) lucide.createIcons();
+  } catch (err) {
+    console.error(err);
+    pane.innerHTML = `<p class="text-center text-sm text-red-500 py-8">Could not load posts.</p>`;
+  }
+}
+
+async function handleGroupPostMediaUpload(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+  try {
+    const data = await uploadPhotoFile(file, "post-media");
+    if (data.status !== "success") {
+      showToast(data.message || "Could not upload photo.", "error");
+      return;
+    }
+    groupPostMediaUrl = data.photo_url;
+    document.getElementById("group-post-media-img").src = data.photo_url;
+    document.getElementById("group-post-media-preview").classList.remove("hidden");
+  } catch (err) {
+    console.error(err);
+    showToast("Could not upload photo.", "error");
+  }
+}
+
+function clearGroupPostMedia() {
+  groupPostMediaUrl = null;
+  document.getElementById("group-post-media-preview")?.classList.add("hidden");
+  const input = document.getElementById("group-post-media-input");
+  if (input) input.value = "";
+}
+
+async function submitGroupPost() {
+  if (!currentGroupId) return;
+  const input = document.getElementById("group-post-input");
+  const content = input.value.trim();
+  if (!content && !groupPostMediaUrl) {
+    showToast("Write something or add a photo first.", "info");
+    return;
+  }
+
+  const btn = document.getElementById("group-post-submit-btn");
+  setButtonLoading(btn, true, "Posting…");
+  try {
+    const data = await api("create_post", {
+      content,
+      media_url: groupPostMediaUrl || "",
+      group_id: currentGroupId,
+    });
+    if (data.status !== "success") {
+      showToast(data.message || "Could not post.", "error");
+      return;
+    }
+    input.value = "";
+    clearGroupPostMedia();
+    // The new post also belongs in the main feed; drop the stale copy so the
+    // next feed load refetches rather than rendering without it.
+    feedPosts = [];
+    loadGroupPosts();
+  } catch (err) {
+    console.error(err);
+    showToast("Could not post.", "error");
+  } finally {
+    setButtonLoading(btn, false);
+  }
 }
 
 async function sendGroupChatOutboxEntry(clientId) {
@@ -460,6 +610,10 @@ async function leaveCurrentGroup() {
   setButtonLoading(btn, true, "Leaving…");
   try {
     await api("leave_group", { group_id: currentGroupId });
+    // Leaving revokes access to that group's posts — drop both memoized
+    // copies so neither the composer nor the feed keeps showing them.
+    composerGroupsLoaded = false;
+    feedPosts = [];
     closeGroupChatModal();
     loadGroupsTab();
   } catch (err) {

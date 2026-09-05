@@ -75,6 +75,22 @@ async function applyPetTypeTheme() {
   }
 }
 
+// Every close*Modal() hides its dialog through here. When motion.js is loaded
+// this plays the exit fade and applies the classes on completion; otherwise it
+// is exactly the immediate class toggle those functions used to do inline.
+// Modals are shown by removing `hidden` and adding `flex` (base class is
+// `hidden flex-col`), so both have to be undone together.
+function pcHideModal(target) {
+  if (typeof pcModalExit === "function") {
+    pcModalExit(target);
+    return;
+  }
+  const node = typeof target === "string" ? document.getElementById(target) : target;
+  if (!node) return;
+  node.classList.add("hidden");
+  node.classList.remove("flex");
+}
+
 function switchView(viewId) {
   document.querySelectorAll(".view-section").forEach((el) => el.classList.remove("active"));
   const target = document.getElementById(viewId);
@@ -215,6 +231,9 @@ function switchSocialTab(tab) {
   document.querySelectorAll("[data-social-tab]").forEach((btn) => {
     btn.classList.toggle("active-tab", btn.dataset.socialTab === tab);
   });
+  // Single choke point for the sliding underline, so the strip and the drawer
+  // can never disagree about which tab is active.
+  if (typeof pcOnSocialTabChanged === "function") pcOnSocialTabChanged(tab);
   const loader = SOCIAL_TAB_LOADERS[tab];
   if (typeof loader === "function") loader();
 }
@@ -518,12 +537,20 @@ function openMobileNav() {
   document.getElementById("drawer-profile-name").textContent = currentUserObj?.pet_name || "Pet";
   document.getElementById("drawer-admin-entry-btn")?.classList.toggle("hidden", !(currentUserObj?.admin_capabilities?.length > 0));
 
+  // State flips synchronously — isMobileNavOpen() and the edge-swipe handlers
+  // below read .nav-open and must never see a half-animated drawer. Only the
+  // visuals are handed to motion.js.
   drawer.classList.add("nav-open");
-  drawer.style.transform = "translateX(0)";
   drawer.setAttribute("aria-hidden", "false");
-  backdrop.classList.remove("hidden");
   document.getElementById("mobile-nav-toggle")?.setAttribute("aria-expanded", "true");
   document.body.style.overflow = "hidden";
+
+  if (typeof pcDrawerOpen === "function") {
+    pcDrawerOpen(drawer, backdrop);
+  } else {
+    drawer.style.transform = "translateX(0)";
+    backdrop.classList.remove("hidden");
+  }
 }
 
 function closeMobileNav() {
@@ -531,11 +558,16 @@ function closeMobileNav() {
   const backdrop = document.getElementById("mobile-nav-backdrop");
   if (!drawer || !backdrop) return;
   drawer.classList.remove("nav-open");
-  drawer.style.transform = "translateX(-100%)";
   drawer.setAttribute("aria-hidden", "true");
-  backdrop.classList.add("hidden");
   document.getElementById("mobile-nav-toggle")?.setAttribute("aria-expanded", "false");
   document.body.style.overflow = "";
+
+  if (typeof pcDrawerClose === "function") {
+    pcDrawerClose(drawer, backdrop);
+  } else {
+    drawer.style.transform = "translateX(-100%)";
+    backdrop.classList.add("hidden");
+  }
 }
 
 function toggleMobileNav() {
@@ -755,6 +787,13 @@ function showGlobalSearchDropdown(query) {
   dropdown.innerHTML = html;
   if (typeof lucide !== 'undefined') lucide.createIcons({ root: dropdown });
   dropdown.classList.remove('hidden');
+  // Individual rows have no stable class, but the dropdown's direct children
+  // are the section blocks. Kept short and eager — this re-renders on every
+  // keystroke, and pcRevealChildren cancels the previous pass so no row can be
+  // stranded mid-fade.
+  if (typeof pcRevealChildren === 'function') {
+    pcRevealChildren(dropdown, null, { stagger: 18, duration: 160, distance: 6, eager: 12 });
+  }
 }
 
 function debouncedGlobalTypeahead(query) {

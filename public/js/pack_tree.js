@@ -103,6 +103,11 @@ function renderPackTree(members) {
 
   if (window.lucide) lucide.createIcons();
   initPackPanZoom();
+  // Draws the connector lines outward from the root, then pops the cards in.
+  // Runs after initPackPanZoom deliberately: the draw-in animates a CSS
+  // custom property, never a transform, so it cannot clobber the pan/zoom
+  // transform this just installed on the same element.
+  if (typeof pcDrawPackTree === "function") pcDrawPackTree(container);
 }
 
 function renderPackList(members) {
@@ -124,6 +129,7 @@ function renderPackList(members) {
         </div>
       </div>
     </div>`).join("")}</div>`;
+  if (typeof pcRevealChildren === "function") pcRevealChildren(container.firstElementChild);
 }
 
 async function loadPackTree() {
@@ -214,8 +220,7 @@ async function openPackMembersModal() {
 }
 
 function closePackMembersModal() {
-  document.getElementById("pack-members-modal")?.classList.add("hidden");
-  document.getElementById("pack-members-modal")?.classList.remove("flex");
+  pcHideModal("pack-members-modal");
 }
 
 function renderPackMembersModalList() {

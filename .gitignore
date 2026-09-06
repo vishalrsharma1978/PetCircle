@@ -49,6 +49,28 @@ sql_scripts/schema_dump_final.sql
 *.png
 *.txt
 
+# ...except these. The blanket *.png / *.txt rules above are aimed at
+# stray screenshots and scratch notes, and they were silently swallowing
+# real source assets.
+
+# The cut hero layers. The auth hero cannot render without them and there
+# is no build step to regenerate them on deploy.
+!public/assets/mascots/hero/*.png
+
+# The source photographs the layers are cut from, and the prompt recipe
+# that produced them. Without these the layer coordinates baked into
+# AV2_HERO_PHOTOS (public/js/auth_scene.js) cannot be re-derived, and a
+# new species cannot be generated to match the existing set.
+!incoming-mascots/*.png
+!incoming-mascots/PROMPTS.txt
+
+# Superseded: this is the first cat, generated before the prompt banned
+# contact shadows. Its shadow sits inside the cat's own brightness range
+# so it cannot be keyed out — cat1.png is the one actually used. Kept on
+# disk as a reference for what NOT to accept, but not worth 852KB in the
+# repository.
+incoming-mascots/cat.png
+
 # Temporary merge resolution files
 _merge_temp/
 

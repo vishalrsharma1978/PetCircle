@@ -172,6 +172,100 @@
   to { opacity: 0; transform: translateY(-10px) scale(0.86) rotate(7deg); }
 }
 
+/* ---------- Photographic hero (species listed in AV2_HERO_PHOTOS) ---------- */
+
+/* Square box, so the percentage offsets on each layer resolve against the same
+   geometry they were measured in. The drop-shadow is applied per-layer rather
+   than here: on the wrapper it would shadow the whole rectangle, including the
+   transparent parts between the tail and the body. */
+.av2-hero-photo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+.av2-photo-layer {
+  position: absolute;
+  display: block;
+  height: auto;
+  filter: drop-shadow(0 14px 20px rgba(120, 80, 40, 0.20));
+  will-change: transform;
+}
+
+/* Stacking order IS the depth, and it is what hides both cuts: the tail sits
+   behind the body so its ragged root is covered, the head sits over the body so
+   the neck join is covered. Neither can open a seam however far it rotates. */
+.av2-photo-tail { z-index: 1; }
+.av2-photo-body { z-index: 2; }
+.av2-photo-head { z-index: 3; }
+
+/* Small amplitudes on purpose. A cut-out photo rotates rigidly, with none of
+   the bend or motion blur a real tail has, so a wide sweep reads as a
+   windscreen wiper. At a few degrees it reads as a relaxed sway. */
+.av2-photo-tail { animation: av2-photo-wag 2.6s ease-in-out infinite; }
+.av2-photo-head { animation: av2-photo-sway 6.2s ease-in-out infinite; }
+
+@keyframes av2-photo-wag {
+  0%, 100% { transform: rotate(-5deg); }
+  50%      { transform: rotate(5deg); }
+}
+
+@keyframes av2-photo-sway {
+  0%, 100% { transform: rotate(-1.5deg); }
+  50%      { transform: rotate(1.5deg); }
+}
+
+/* Bashful. The rig lifts its paws over its eyes; a photograph has no separable
+   paws, so the cut head turns away and dips instead — the same "not peeking"
+   beat, without cross-fading a photograph into a cartoon. The tail stills,
+   because a cat that has just looked away does not keep swishing. */
+.av2-hero-photo.is-shy .av2-photo-head {
+  animation: none;
+  transform: rotate(-13deg) translateY(4%);
+  transition: transform 0.42s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.av2-hero-photo.is-shy .av2-photo-tail {
+  animation: none;
+  transform: rotate(-3deg);
+  transition: transform 0.42s ease-out;
+}
+
+/* Species cross-fade, matching the rig's timing so a photo species and a rig
+   species swap identically. */
+.av2-hero-photo.is-entering { animation: av2-hero-in 0.5s cubic-bezier(.34, 1.56, .64, 1); }
+.av2-hero-photo.is-leaving {
+  animation: av2-hero-out 0.28s ease-in forwards;
+  position: absolute;
+  inset: 0;
+}
+
+.av2-hero-photo.is-hop { animation: av2-photo-hop 0.62s cubic-bezier(.34, 1.56, .64, 1); }
+
+@keyframes av2-photo-hop {
+  0%   { transform: translateY(0) scaleY(1); }
+  22%  { transform: translateY(2%) scaleY(0.97); }
+  55%  { transform: translateY(-7%) scaleY(1.03); }
+  80%  { transform: translateY(1%) scaleY(0.99); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .av2-photo-tail,
+  .av2-photo-head,
+  .av2-hero-photo.is-hop,
+  .av2-hero-photo.is-entering,
+  .av2-hero-photo.is-leaving {
+    animation: none !important;
+  }
+  /* The shy pose still applies — it carries meaning — it just arrives without
+     being animated into place. */
+  .av2-hero-photo.is-shy .av2-photo-head,
+  .av2-hero-photo.is-shy .av2-photo-tail {
+    transition: none !important;
+  }
+}
+
 /* ---------- Signpost carrying the rotating headline ---------- */
 
 .av2-signpost {

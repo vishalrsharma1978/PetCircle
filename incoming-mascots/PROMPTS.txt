@@ -1,0 +1,142 @@
+ImagineArt web app — 8 mascot images for PawCircle
+==================================================
+Each prompt below is COMPLETE. Copy one whole block, paste, generate.
+
+Settings for ALL EIGHT (consistency across the set matters more than any
+single image being perfect — same model and same lighting throughout, or
+they read as eight stock photos instead of one family):
+
+    same aspect as cat1.png (1024x768)  •  same model (GPT Image 2)
+    •  white background  •  same lighting
+
+Do NOT switch to 1:1. cat1.png came out 1024x768 and is approved — a
+768x768 crop centred on the subject keeps the whole animal with ~85px
+margin to spare, so the 4:3 frame is fine and actually gives the
+sideways-extended tails more room. Changing aspect now would make the
+remaining seven frame differently from the one already signed off.
+
+Save into this folder as PNG:  dog  cat  bird  rabbit  fish
+                               small-pet  reptile  other
+(e.g. dog.png)
+
+
+NEVER SAY "SEAMLESS"
+--------------------
+"Seamless" is the photographic term for a studio backdrop roll — a paper
+sweep with a floor curve. Asking for a "plain pure white background (RGB 255,255,255), cut-out style, no studio backdrop, no floor surface"
+invites a grey studio scene with a visible floor and a cast shadow, which
+is the opposite of a cut-out. The first dog came back exactly that way and
+could not be keyed: its brightest fur (226) was lighter than the darkest
+background (213), so no threshold separates them, and the floor plane
+survives every flood fill. Say "isolated, cut-out style, RGB 255 white,
+no floor surface" instead.
+
+
+NO SHADOWS — THIS ONE IS NOT OPTIONAL
+-------------------------------------
+Every prompt says "NO shadow and NO reflection". A generated contact shadow
+is dark enough to land inside the animal's own brightness range, so nothing
+can separate the two — the shadow survives the cutout as a grey skirt round
+the feet. Invisible on a white page, obvious the moment the animal sits on
+the cream diorama or the dark den background. The scene casts its own
+shadow, so a baked-in one was never wanted.
+
+
+WHY THE POSE WORDING MATTERS
+----------------------------
+These get cut into layers so they can animate. Two parts get cut:
+
+  TAIL  -> wags.  Painted BEHIND the body, so a ragged cut at the tail
+                  root is hidden. This ONLY works if the tail is clearly
+                  clear of the body in the photo — a tail tucked behind
+                  the animal or curled across its chest cannot be cut out
+                  without taking a bite out of the body with it. Hence
+                  "held clear of the body" in every prompt below.
+
+  HEAD  -> tilts. Painted OVER the body, so the neck join is covered.
+                  Needs the head held up with a bit of neck showing.
+
+Everything else stays one flat layer. Ears and blinking are deliberately
+not attempted: they sit in front with nothing to hide the join, so a
+rotated cut-out ear just exposes the original ear underneath it.
+
+Rabbit and Small Pet have no usable tail — they get the head tilt only,
+which is why their wording doesn't stress tail separation.
+
+
+------------------------------------------------------------------ 1. DOG
+Photorealistic golden retriever sitting upright facing the camera head-on, head
+raised with the neck visible, both front paws on the ground, friendly open
+expression. The feathered tail is extended out to one side, held clear of the
+body with a visible gap between tail and flank, fully in frame. Isolated on a plain pure white background (RGB 255,255,255), cut-out product-photography style, no studio backdrop, no paper sweep, no floor surface, no floor line, no horizon. Soft diffused daylight from the
+upper left, NO shadow and NO reflection of any kind. Complete full body in frame,
+centred, clear empty margin on all sides. Sharp focus, fine fur detail, natural
+golden colour. No props, no collar, no text, no watermark, no border, nothing
+else in frame.
+
+------------------------------------------------------------------ 2. CAT
+Photorealistic silver tabby domestic shorthair cat sitting upright facing the
+camera head-on, head raised with the neck visible, calm alert expression. The
+tail is extended out to one side along the ground, held clear of the body with a
+visible gap between tail and flank, not curled around the paws, fully in frame.
+Isolated on a plain pure white background (RGB 255,255,255), cut-out product-photography style, no studio backdrop, no paper sweep, no floor surface, no floor line, no horizon. Soft
+diffused daylight from the upper left, NO shadow and NO reflection of any kind. Complete
+full body in frame, centred, clear empty margin on all sides. Sharp focus, fine
+fur detail, natural colours. No props, no collar, no text, no watermark, no
+border, nothing else in frame.
+
+------------------------------------------------------------------ 3. BIRD
+Photorealistic budgerigar parakeet standing upright facing the camera head-on,
+head raised, both feet visible, wings folded. The tail feathers point down and
+away from the body, clearly separated from it, fully in frame. Plain uniform plain pure white background (RGB 255,255,255), cut-out style, no studio backdrop, no floor surface, no floor line, no horizon, no perch or branch. Soft
+diffused daylight from the upper left, NO shadow and NO reflection of any kind. Complete
+full body in frame, centred, clear empty margin on all sides. Sharp focus, fine
+feather detail, natural colours. No props, no text, no watermark, no border,
+nothing else in frame.
+
+------------------------------------------------------------------ 4. RABBIT
+Photorealistic lop-eared rabbit sitting upright facing the camera head-on, head
+raised with the neck visible, ears hanging beside the head, front paws together.
+Isolated on a plain pure white background (RGB 255,255,255), cut-out product-photography style, no studio backdrop, no paper sweep, no floor surface, no floor line, no horizon. Soft
+diffused daylight from the upper left, NO shadow and NO reflection of any kind. Complete
+full body in frame, centred, clear empty margin on all sides. Sharp focus, fine
+fur detail, natural colours. No props, no text, no watermark, no border, nothing
+else in frame.
+
+------------------------------------------------------------------ 5. FISH
+The only one framed differently — a fish cannot sit, and it must look weightless
+rather than resting on a surface, so this prompt deliberately has NO contact
+shadow. Its caudal fin is the "tail" that will wave.
+
+Photorealistic betta fish in full side profile swimming, whole fish in frame with
+fins and tail fully spread and clearly separated from the body, level with the
+camera. Isolated on a plain pure white background (RGB 255,255,255), cut-out product-photography style, no studio backdrop, no paper sweep, no floor surface, no floor line, no horizon,
+no water, no bubbles, no tank. Soft diffused daylight from the upper left, no
+contact shadow, the fish suspended and weightless. Centred, clear empty margin on
+all sides. Sharp focus, fine scale and fin detail, natural colours. No props, no
+text, no watermark, no border, nothing else in frame.
+
+------------------------------------------------------------- 6. SMALL PET
+Photorealistic guinea pig sitting facing the camera head-on, head raised, all
+four feet on the ground, whole rounded body in frame. Isolated on a plain pure white background (RGB 255,255,255), cut-out style, no studio backdrop, no floor surface, no floor line, no horizon. Soft diffused daylight from the
+upper left, NO shadow and NO reflection of any kind. Complete full body in frame, centred,
+clear empty margin on all sides. Sharp focus, fine fur detail, natural colours.
+No props, no text, no watermark, no border, nothing else in frame.
+
+--------------------------------------------------------------- 7. REPTILE
+Photorealistic bearded dragon standing facing the camera head-on, head raised,
+all four legs visible. The long tail trails out to one side, held clear of the
+body with a visible gap between tail and flank, fully in frame. Isolated on a plain pure white background (RGB 255,255,255), cut-out product-photography style, no studio backdrop, no paper sweep, no floor surface, no floor line, no horizon, no rock or branch.
+Soft diffused daylight from the upper left, NO shadow and NO reflection of any kind.
+Complete full body in frame, centred, clear empty margin on all sides. Sharp
+focus, fine scale detail, natural colours. No props, no text, no watermark, no
+border, nothing else in frame.
+
+----------------------------------------------------------------- 8. OTHER
+Photorealistic ferret sitting upright on its haunches facing the camera head-on,
+head raised with the neck visible, front paws held together at the chest. The
+long bushy tail extends out to one side behind it, held clear of the body with a
+visible gap, fully in frame. Isolated on a plain pure white background (RGB 255,255,255), cut-out product-photography style, no studio backdrop, no paper sweep, no floor surface, no
+floor line, no horizon. Soft diffused daylight from the upper left, NO shadow and NO reflection of any kind. Complete full body in frame, centred, clear empty margin
+on all sides. Sharp focus, fine fur detail, natural colours. No props, no text,
+no watermark, no border, nothing else in frame.

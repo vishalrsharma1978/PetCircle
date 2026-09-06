@@ -273,6 +273,57 @@ function av2SceneBindParallax(stage) {
 
 // ---------------- The hero character ----------------
 
+// Species that have a photographic hero. Each entry lists the cut layers and
+// where they sit inside the hero's square box, as percentages, so the same
+// numbers work at any rendered size.
+//
+// The animal is cut into three pieces rather than shown as one flat photo so it
+// can actually move. The stacking order is what makes the cuts invisible:
+// the tail is painted BEHIND the body, so the ragged edge at its root is
+// covered; the head is painted OVER the body, so the neck join is covered.
+// Neither can open a seam however far they rotate.
+//
+// Only Cat exists so far. Any species not listed here falls through to the
+// vector rig below, so the two can coexist.
+const AV2_HERO_PHOTOS = {
+  Cat: {
+    dir: "assets/mascots/hero/cat",
+    layers: [
+      { part: "tail", left: 11.979, top: 75.130, width: 45.703, origin: "91.2% 45.3%" },
+      { part: "body", left: 47.917, top: 35.026, width: 40.365 },
+      { part: "head", left: 49.740, top: 5.990,  width: 28.255, origin: "47% 98.4%" }
+    ]
+  },
+  Dog: {
+    dir: "assets/mascots/hero/dog",
+    layers: [
+      { part: "tail", left: 59.766, top: 72.852, width: 32.812, origin: "22% 37.7%" },
+      { part: "body", left: 28.418, top: 31.348, width: 37.598 },
+      { part: "head", left: 29.297, top: 7.520,  width: 32.031, origin: "50.3% 99.3%" }
+    ]
+  }
+};
+
+function av2SceneBuildPhoto(species) {
+  const spec = AV2_HERO_PHOTOS[species];
+  if (!spec) return null;
+  const wrap = document.createElement("div");
+  wrap.className = "av2-hero-photo is-entering";
+  spec.layers.forEach((l) => {
+    const img = document.createElement("img");
+    img.className = "av2-photo-layer av2-photo-" + l.part;
+    img.src = spec.dir + "-" + l.part + ".webp";
+    img.alt = "";
+    img.setAttribute("aria-hidden", "true");
+    img.style.left = l.left + "%";
+    img.style.top = l.top + "%";
+    img.style.width = l.width + "%";
+    if (l.origin) img.style.transformOrigin = l.origin;
+    wrap.appendChild(img);
+  });
+  return wrap;
+}
+
 function av2SceneCloneSpecies(species) {
   const library = document.getElementById("pcm-library");
   if (!library) return null;
@@ -293,6 +344,14 @@ function av2SceneSetSpecies(stage, species) {
   if (hero.dataset.species === species) return;
   hero.dataset.species = species || "";
 
+  const photo = av2SceneBuildPhoto(species);
+  if (photo) {
+    av2SceneRetireHero(hero);
+    hero.appendChild(photo);
+    av2SceneHop(stage);
+    return;
+  }
+
   const group = av2SceneCloneSpecies(species);
   if (!group) return;
 
@@ -310,13 +369,27 @@ function av2SceneSetSpecies(stage, species) {
   // forever, un-animated and never removed. They then win
   // ":not(.is-leaving)", so the character visibly stops tracking the
   // selection and stale ghosts stack up behind it.
-  hero.querySelectorAll(".av2-hero-svg").forEach((previous) => {
+  av2SceneRetireHero(hero);
+  hero.appendChild(svg);
+  av2SceneHop(stage);
+}
+
+// querySelectorAll, not querySelector: two swaps can land inside the 320ms
+// retirement window — the login rotates its species every 6s while the pet
+// pills can fire a swap at any moment — and retiring only the first stale hero
+// leaves the others parked in the DOM forever, un-animated and never removed.
+// They then win ":not(.is-leaving)", so the character visibly stops tracking
+// the selection and stale ghosts stack up behind it.
+function av2SceneRetireHero(hero) {
+  hero.querySelectorAll(".av2-hero-svg, .av2-hero-photo").forEach((previous) => {
     previous.classList.remove("is-entering");
     previous.classList.add("is-leaving");
     setTimeout(() => previous.remove(), 320);
   });
-  hero.appendChild(svg);
-  av2SceneHop(stage);
+}
+
+function av2ScenePhoto(stage) {
+  return stage ? stage.querySelector(".av2-hero-photo:not(.is-leaving)") : null;
 }
 
 function av2SceneCharacter(stage) {
@@ -326,6 +399,13 @@ function av2SceneCharacter(stage) {
 // Retriggers the hop keyframe. Removing the class and forcing a reflow before
 // re-adding is what makes a repeated hop actually replay.
 function av2SceneHop(stage) {
+  const photo = av2ScenePhoto(stage);
+  if (photo && !av2SceneReducedMotion()) {
+    photo.classList.remove("is-hop");
+    void photo.offsetWidth;
+    photo.classList.add("is-hop");
+    setTimeout(() => photo.classList.remove("is-hop"), 700);
+  }
   const pcm = av2SceneCharacter(stage);
   if (!pcm || av2SceneReducedMotion()) return;
   pcm.classList.remove("is-hop");
@@ -348,6 +428,8 @@ function av2SceneReact(stage, state, ms) {
 function av2SceneSetShy(stage, shy) {
   const pcm = av2SceneCharacter(stage);
   if (pcm) pcm.classList.toggle("is-shy", !!shy);
+  const photo = av2ScenePhoto(stage);
+  if (photo) photo.classList.toggle("is-shy", !!shy);
 }
 
 // ---------------- Pupil tracking ----------------

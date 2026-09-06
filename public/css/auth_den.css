@@ -130,6 +130,20 @@
           drop-shadow(0 -2px 16px rgba(255, 198, 112, 0.34));
 }
 
+/* Same treatment for a photographic hero. It goes on each cut layer rather
+   than the wrapper: on the wrapper the glow would trace the whole rectangle,
+   including the empty space between the tail and the body. Applying it per
+   layer also means the head's shadow falls across the body, which is what
+   should happen. */
+.av2-stage--den .av2-photo-layer {
+  /* Much weaker warm edge than the rig gets. At the rig's 0.34/16px the glow
+     traces a photographic silhouette so tightly that the animal looks like it
+     is lit from within — fine on flat vector shapes, obviously wrong on a
+     photo. Kept only as a hint of the den's lantern light. */
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.5))
+          drop-shadow(0 -1px 6px rgba(255, 198, 112, 0.13));
+}
+
 /* Weathered board at night, lit from the same warm source. */
 .av2-stage--den .av2-signpost {
   background: linear-gradient(170deg, #5C4227, #40301D);
